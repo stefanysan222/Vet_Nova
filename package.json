@@ -1,0 +1,24 @@
+{
+  "name": "vet_nova-1",
+  "version": "1.0.0",
+  "description": "Sistema web para gestión de una clínica veterinaria.",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/stefanysan222/Vet_Nova.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/stefanysan222/Vet_Nova/issues"
+  },
+  "homepage": "https://github.com/stefanysan222/Vet_Nova#readme",
+  "dependencies": {
+    "@prisma/client": "^7.8.0",
+    "prisma": "^7.8.0"
+  }
+}
