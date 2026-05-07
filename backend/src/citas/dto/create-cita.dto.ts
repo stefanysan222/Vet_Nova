@@ -16,4 +16,8 @@ export class CreateCitaDto {
 
   @IsInt()
   id_usuario: number;
+
+  @IsOptional()
+  @IsString()
+  descripcion?: string;
 }

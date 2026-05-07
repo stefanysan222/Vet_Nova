@@ -17,7 +17,6 @@ export class MascotasService {
       throw new BadRequestException('Propietario no existe');
     }
   
-    return this.prisma.mascotas.create({ data: dto });
   }
   findAll() {
     return this.prisma.mascotas.findMany({

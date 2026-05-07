@@ -1,16 +1,24 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
-import { CreatePropietarioDto } from './dto/create.propietario.dto';
-import { UpdatePropietarioDto } from './dto/update.propietario.dto';
+
+import { CreatePropietarioDto } from './dto/create-propietario.dto';
+import { UpdatePropietarioDto } from './dto/update-propietario.dto';
 
 @Injectable()
 export class PropietariosService {
+
   constructor(private prisma: PrismaService) {}
 
   // CREATE
-  create(createPropietarioDto: CreatePropietarioDto) {
+  async create(createPropietarioDto: CreatePropietarioDto) {
+
     return this.prisma.propietarios.create({
-      data: createPropietarioDto,
+      data: {
+        nombre: createPropietarioDto.nombre,
+        telefono: createPropietarioDto.telefono,
+        direccion: createPropietarioDto.direccion,
+        email: createPropietarioDto.email,
+      },
     });
   }
 
@@ -36,17 +44,19 @@ export class PropietariosService {
   }
 
   // UPDATE
-  updatePropietario(id: number, data: UpdatePropietarioDto) {
+  update(id: number, updatePropietarioDto: UpdatePropietarioDto) {
+
     return this.prisma.propietarios.update({
       where: {
         id_propietario: id,
       },
-      data,
+      data: updatePropietarioDto,
     });
   }
 
   // DELETE
-  deletePropietario(id: number) {
+  remove(id: number) {
+
     return this.prisma.propietarios.delete({
       where: {
         id_propietario: id,
