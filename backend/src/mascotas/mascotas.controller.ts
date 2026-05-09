@@ -1,18 +1,32 @@
-import { UseGuards } from '@nestjs/common';
-import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
-import { Controller, Get, Post, Body, Param, Put, Delete } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Param,
+  Put,
+  Delete,
+  UseGuards,
+} from '@nestjs/common';
+
+import { ApiBearerAuth } from '@nestjs/swagger';
+
 import { MascotasService } from './mascotas.service';
+
 import { CreateMascotaDto } from './dto/create.mascota.dto';
 import { UpdateMascotaDto } from './dto/update.mascotas.dto';
 
+import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
+
+@ApiBearerAuth('access-token')
 @UseGuards(JwtAuthGuard)
 @Controller('mascotas')
 export class MascotasController {
   constructor(private readonly mascotasService: MascotasService) {}
 
   @Post()
-  create(@Body() createMascotaDto: CreateMascotaDto) {
-    return this.mascotasService.create(createMascotaDto);
+  create(@Body() dto: CreateMascotaDto) {
+    return this.mascotasService.create(dto);
   }
 
   @Get()
@@ -20,12 +34,17 @@ export class MascotasController {
     return this.mascotasService.findAll();
   }
 
+  @Get(':id')
+  findOne(@Param('id') id: string) {
+    return this.mascotasService.findOne(+id);
+  }
+
   @Put(':id')
   update(
     @Param('id') id: string,
-    @Body() updateMascotaDto: UpdateMascotaDto,
+    @Body() dto: UpdateMascotaDto,
   ) {
-    return this.mascotasService.updateMascota(+id, updateMascotaDto);
+    return this.mascotasService.updateMascota(+id, dto);
   }
 
   @Delete(':id')

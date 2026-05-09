@@ -6,12 +6,16 @@ import {
   Param,
   Put,
   Delete,
+  UseGuards,
 } from '@nestjs/common';
-
+import { ApiBearerAuth } from '@nestjs/swagger';
+import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { PropietariosService } from './propietarios.service';
 import { CreatePropietarioDto } from './dto/create-propietario.dto';
 import { UpdatePropietarioDto } from './dto/update-propietario.dto';
 
+@ApiBearerAuth('access-token')
+@UseGuards(JwtAuthGuard)
 @Controller('propietarios')
 export class PropietariosController {
   constructor(

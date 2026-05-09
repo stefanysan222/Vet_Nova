@@ -62,7 +62,7 @@ model citas {
   id_cita Int @id @default(autoincrement())
 
   fecha  DateTime
-  hora   String
+  hora   dto.hora
   estado String   @default("pendiente")
 
   id_mascota Int
