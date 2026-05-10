@@ -9,8 +9,7 @@ import { CitasModule } from './citas/citas.module';
 import { UsuariosModule } from './usuarios/usuarios.module';
 import { AuthModule } from './auth/auth.module';
 import { DashboardModule } from './dashboard/dashboard.module';
-
-
+import { FacturasModule } from './facturas/facturas.module';
 
 @Module({
   imports: [
@@ -21,6 +20,7 @@ import { DashboardModule } from './dashboard/dashboard.module';
     UsuariosModule,
     AuthModule,
     DashboardModule,
+    FacturasModule,
   ],
   controllers: [AppController],
   providers: [AppService],
