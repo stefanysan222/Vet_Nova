@@ -32,8 +32,9 @@ export class CitasService {
       throw new BadRequestException('El usuario no existe');
     }
 
-    // Verificar cita duplicada
-    const citaExistente = await this.prisma.citas.findFirst({
+    // cita duplicada
+    const citaExistente = 
+    await this.prisma.citas.findFirst({
       where: {
         fecha: new Date(dto.fecha),
         hora: dto.hora,
@@ -60,8 +61,13 @@ export class CitasService {
   }
 
   // GET ALL
-  findAll() {
+  findAll(estado?: string) {
     return this.prisma.citas.findMany({
+      where: estado
+        ? {
+            estado,
+          }
+        : {},
       include: {
         mascotas: true,
         usuarios: true,
@@ -75,12 +81,14 @@ export class CitasService {
       where: {
         id_cita: id,
       },
+  
       include: {
         mascotas: true,
         usuarios: true,
       },
     });
   }
+  
 
   // UPDATE
   update(id: number, dto: UpdateCitaDto) {

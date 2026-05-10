@@ -10,7 +10,8 @@ datasource db {
 enum Rol {
   ADMIN
   VETERINARIO
-  ASISTENTE
+  RECEPCIONISTA
+  CLIENTE
 }
 
 model propietarios {
@@ -22,6 +23,17 @@ model propietarios {
 
   mascotas mascotas[]
   facturas facturas[]
+  
+}
+
+model documentos_medicos {
+  id_documento  Int      @id @default(autoincrement())
+  url           String
+  nombre        String
+  tipo          String   // "lab", "radiografia", "receta", etc.
+  id_mascota    Int
+  mascota       mascotas @relation(fields: [id_mascota], references: [id_mascota])
+  createdAt     DateTime @default(now())
 }
 
 model mascotas {
@@ -31,6 +43,8 @@ model mascotas {
   raza       String   @db.VarChar(50)
   edad       Int
   peso       Decimal? @db.Decimal(5, 2)
+  foto String? // URL de Cloudinary
+
 
   id_propietario Int
 
@@ -41,7 +55,10 @@ model mascotas {
   facturas           facturas[]
   recordatorios      recordatorios[]
   registro_vacunas   registro_vacunas[]
+  documentos_medicos documentos_medicos[] 
 }
+
+
 
 model usuarios {
   id_usuario Int @id @default(autoincrement())
@@ -50,7 +67,7 @@ model usuarios {
   email    String @unique
   password String
 
-  rol Rol @default(ASISTENTE)
+  rol Rol @default(RECEPCIONISTA)
 
   createdAt DateTime @default(now())
 
@@ -62,7 +79,7 @@ model citas {
   id_cita Int @id @default(autoincrement())
 
   fecha  DateTime
-  hora   dto.hora
+  hora   String
   estado String   @default("pendiente")
 
   id_mascota Int

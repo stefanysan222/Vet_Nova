@@ -23,11 +23,16 @@ export class PropietariosService {
   }
 
   // READ ALL
-  findAll() {
+  findAll(nombre?: string) {
     return this.prisma.propietarios.findMany({
-      include: {
-        mascotas: true,
-      },
+      where: nombre
+        ? {
+            nombre: {
+              contains: nombre,
+              mode: 'insensitive',
+            },
+          }
+        : {},
     });
   }
 
