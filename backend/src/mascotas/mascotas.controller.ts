@@ -10,6 +10,8 @@ import { AuthGuard } from '@nestjs/passport';
 import { UseGuards } from '@nestjs/common';
 
 import { MascotasService } from './mascotas.service';
+import { ApiOperation } from '@nestjs/swagger';
+import { ApiResponse } from '@nestjs/swagger';
 
 @ApiTags('Mascotas')
 @ApiBearerAuth('access-token')
@@ -19,26 +21,97 @@ export class MascotasController {
   constructor(private readonly mascotasService: MascotasService) {}
 
   @Get()
+
+  @ApiOperation({
+    summary: 'Obtener todas las mascotas',
+  })
+  @ApiResponse({
+    status: 200,
+    description: 'Lista de mascotas obtenida correctamente',
+  })
+  
+  @ApiResponse({
+    status: 401,
+    description: 'No autorizado',
+  })
   findAll(@Query('nombre') nombre?: string) {
     return this.mascotasService.findAll(nombre);
   }
 
   @Post()
+  @ApiOperation({
+    summary: 'Crear una mascota',
+  })
+  @ApiResponse({
+    status: 201,
+    description: 'Mascota creada correctamente',
+  })
+  
+  @ApiResponse({
+    status: 400,
+    description: 'Datos inválidos',
+  })
+  
+  @ApiResponse({
+    status: 401,
+    description: 'No autorizado',
+  })
   create(@Body() dto: any) {
     return this.mascotasService.create(dto);
   }
 
   @Get(':id')
+  @ApiOperation({
+    summary: 'Obtener una mascota por id',
+  })
+  @ApiResponse({
+    status: 200,
+    description: 'Mascota encontrada',
+  })
+  
+  @ApiResponse({
+    status: 404,
+    description: 'Mascota no encontrada',
+  })
   findOne(@Param('id') id: string) {
     return this.mascotasService.findOne(+id);
   }
 
   @Put(':id')
+  @ApiOperation({
+    summary: 'Actualizar una mascota',
+  })
+  @ApiResponse({
+    status: 200,
+    description: 'Mascota actualizada correctamente',
+  })
+  
+  @ApiResponse({
+    status: 400,
+    description: 'Datos inválidos',
+  })
+  
+  @ApiResponse({
+    status: 404,
+    description: 'Mascota no encontrada',
+  })
   update(@Param('id') id: string, @Body() dto: any) {
     return this.mascotasService.updateMascota(+id, dto);
   }
 
   @Delete(':id')
+  @ApiOperation({
+    summary: 'eliminar una mascota',
+  })
+  @ApiResponse({
+    status: 200,
+    description: 'Mascota eliminada correctamente',
+  })
+  
+  @ApiResponse({
+    status: 404,
+    description: 'Mascota no encontrada',
+  })
   remove(@Param('id') id: string) {
     return this.mascotasService.deleteMascota(+id);
   }

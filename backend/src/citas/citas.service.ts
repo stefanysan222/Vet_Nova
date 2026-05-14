@@ -1,7 +1,13 @@
-import { Injectable, BadRequestException } from '@nestjs/common';
+import {
+  Injectable,
+  BadRequestException,
+} from '@nestjs/common';
+
 import { PrismaService } from '../prisma/prisma.service';
+
 import { CreateCitaDto } from './dto/create-cita.dto';
-import { UpdateCitaDto } from './dto/update-cita.dto';
+
+import { EstadoCita } from '@prisma/client';
 
 @Injectable()
 export class CitasService {
@@ -11,36 +17,42 @@ export class CitasService {
   async create(dto: CreateCitaDto) {
 
     // Verificar mascota
-    const mascota = await this.prisma.mascotas.findUnique({
-      where: {
-        id_mascota: dto.id_mascota,
-      },
-    });
+    const mascota =
+      await this.prisma.mascotas.findUnique({
+        where: {
+          id_mascota: dto.id_mascota,
+        },
+      });
 
     if (!mascota) {
-      throw new BadRequestException('La mascota no existe');
+      throw new BadRequestException(
+        'La mascota no existe',
+      );
     }
 
     // Verificar usuario
-    const usuario = await this.prisma.usuarios.findUnique({
-      where: {
-        id_usuario: dto.id_usuario,
-      },
-    });
+    const usuario =
+      await this.prisma.usuarios.findUnique({
+        where: {
+          id_usuario: dto.id_usuario,
+        },
+      });
 
     if (!usuario) {
-      throw new BadRequestException('El usuario no existe');
+      throw new BadRequestException(
+        'El usuario no existe',
+      );
     }
 
     // cita duplicada
-    const citaExistente = 
-    await this.prisma.citas.findFirst({
-      where: {
-        fecha: new Date(dto.fecha),
-        hora: dto.hora,
-        estado: 'pendiente',
-      },
-    });
+    const citaExistente =
+      await this.prisma.citas.findFirst({
+        where: {
+          fecha: new Date(dto.fecha),
+          hora: dto.hora,
+          estado: EstadoCita.pendiente,
+        },
+      });
 
     if (citaExistente) {
       throw new BadRequestException(
@@ -53,7 +65,7 @@ export class CitasService {
       data: {
         fecha: new Date(dto.fecha),
         hora: dto.hora,
-        estado: dto.estado ?? 'pendiente',
+        estado: EstadoCita.pendiente,
         id_mascota: dto.id_mascota,
         id_usuario: dto.id_usuario,
       },
@@ -61,12 +73,10 @@ export class CitasService {
   }
 
   // GET ALL
-  findAll(estado?: string) {
+  findAll(estado?: EstadoCita) {
     return this.prisma.citas.findMany({
       where: estado
-        ? {
-            estado,
-          }
+        ? { estado }
         : {},
       include: {
         mascotas: true,
@@ -81,22 +91,26 @@ export class CitasService {
       where: {
         id_cita: id,
       },
-  
+
       include: {
         mascotas: true,
         usuarios: true,
       },
     });
   }
-  
 
-  // UPDATE
-  update(id: number, dto: UpdateCitaDto) {
+  // UPDATE ESTADO
+  async updateEstado(
+    id: number,
+    estado: EstadoCita,
+  ) {
     return this.prisma.citas.update({
       where: {
         id_cita: id,
       },
-      data: dto,
+      data: {
+        estado,
+      },
     });
   }
 

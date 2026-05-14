@@ -6,6 +6,7 @@ import { PrismaService } from '../prisma/prisma.service';
 export class DashboardService {
   constructor(private prisma: PrismaService) {}
 
+
   async getDashboard(user: any) {
     const { rol, sub } = user;
 

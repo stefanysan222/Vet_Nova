@@ -80,7 +80,7 @@ model citas {
 
   fecha  DateTime
   hora   String
-  estado String   @default("pendiente")
+  estado EstadoCita   @default(pendiente)
 
   id_mascota Int
   id_usuario Int
@@ -88,6 +88,13 @@ model citas {
   mascotas mascotas @relation(fields: [id_mascota], references: [id_mascota])
 
   usuarios usuarios @relation(fields: [id_usuario], references: [id_usuario])
+}
+
+enum EstadoCita {
+  pendiente
+  confirmada
+  cancelada
+  completada
 }
 
 model historias_clinicas {

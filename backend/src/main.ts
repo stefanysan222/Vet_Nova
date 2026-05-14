@@ -11,7 +11,7 @@ async function bootstrap() {
   app.useGlobalPipes(new ValidationPipe());
 
   const config = new DocumentBuilder()
-  .setTitle('VetNova API')
+  .setTitle('VetNova')
   .setDescription('Sistema veterinario')
   .setVersion('1.0')
   .addBearerAuth(
@@ -20,8 +20,8 @@ async function bootstrap() {
       scheme: 'bearer',
       bearerFormat: 'JWT',
       name: 'JWT',
-      description: 'Ingresa el token JWT',
-      in: 'header',
+      description: 'Ingresa el token',
+      
     },
     'access-token',
   )

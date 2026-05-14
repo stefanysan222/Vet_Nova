@@ -15,7 +15,8 @@ import {
   import { RolesGuard } from '../auth/guards/roles.guard';
   
   import { Roles } from '../auth/decorators/roles.decorator';
-  
+  import { ApiOperation } from '@nestjs/swagger';
+  import { ApiResponse } from '@nestjs/swagger';
   @ApiBearerAuth()
   
   @UseGuards(JwtAuthGuard, RolesGuard)
@@ -29,6 +30,24 @@ import {
     @Get()
   
     @Roles('ADMIN')
+    @ApiOperation({
+      summary: 'obtener todos los usuarios',
+    })
+  
+    @ApiResponse({
+      status: 200,
+      description: 'Usuarios obtenidos correctamente',
+    })
+  
+    @ApiResponse({
+      status: 401,
+      description: 'No autorizado',
+    })
+  
+    @ApiResponse({
+      status: 500,
+      description: 'Error interno del servidor',
+    })
   
     findAll() {
       return this.usuariosService.findAll();
@@ -37,7 +56,24 @@ import {
     @Get(':id')
   
     @Roles('ADMIN')
+    @ApiOperation({
+      summary: 'obtener un usuario',
+    })
   
+    @ApiResponse({
+      status: 200,
+      description: 'Usuario obtenido correctamente',
+    })
+  
+    @ApiResponse({
+      status: 401,
+      description: 'No autorizado',
+    })
+  
+    @ApiResponse({
+      status: 500,
+      description: 'Error interno del servidor',
+    })
     findOne(@Param('id') id: string) {
       return this.usuariosService.findOne(+id);
     }
@@ -45,6 +81,24 @@ import {
     @Delete(':id')
   
     @Roles('ADMIN')
+    @ApiOperation({
+      summary: 'eliminar un usuario',
+    })
+  
+    @ApiResponse({
+      status: 200,
+      description: 'Usuario eliminado correctamente',
+    })
+  
+    @ApiResponse({
+      status: 401,
+      description: 'No autorizado',
+    })
+  
+    @ApiResponse({
+      status: 500,
+      description: 'Error interno del servidor',
+    })
   
     remove(@Param('id') id: string) {
       return this.usuariosService.remove(+id);
