@@ -9,7 +9,13 @@ import { CitasModule } from './citas/citas.module';
 import { UsuariosModule } from './usuarios/usuarios.module';
 import { AuthModule } from './auth/auth.module';
 import { DashboardModule } from './dashboard/dashboard.module';
-
+import { FacturasModule } from './facturas/facturas.module';
+import { ServiciosModule } from './servicios/servicios.module';
+import { ProductosModule } from './productos/productos.module';
+import { VacunasModule } from './vacunas/vacunas.module';
+import { RecordatoriosModule } from './recordatorios/recordatorios.module';
+import { ConsultasModule } from './consultas/consultas.module';
+import { DocumentosMedicosModule } from './documentos-medicos/documentos-medicos.module';
 
 
 @Module({
@@ -21,6 +27,13 @@ import { DashboardModule } from './dashboard/dashboard.module';
     UsuariosModule,
     AuthModule,
     DashboardModule,
+    FacturasModule,
+    ServiciosModule,
+    ProductosModule,
+    VacunasModule,
+    RecordatoriosModule,
+    ConsultasModule,
+    DocumentosMedicosModule,
   ],
   controllers: [AppController],
   providers: [AppService],

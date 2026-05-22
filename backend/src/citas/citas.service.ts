@@ -13,10 +13,10 @@ import { EstadoCita } from '@prisma/client';
 export class CitasService {
   constructor(private prisma: PrismaService) {}
 
-  // CREATE
+  
   async create(dto: CreateCitaDto) {
 
-    // Verificar mascota
+  
     const mascota =
       await this.prisma.mascotas.findUnique({
         where: {
@@ -30,7 +30,7 @@ export class CitasService {
       );
     }
 
-    // Verificar usuario
+    
     const usuario =
       await this.prisma.usuarios.findUnique({
         where: {
@@ -44,7 +44,7 @@ export class CitasService {
       );
     }
 
-    // cita duplicada
+    
     const citaExistente =
       await this.prisma.citas.findFirst({
         where: {
@@ -60,7 +60,7 @@ export class CitasService {
       );
     }
 
-    // Crear cita
+    
     return this.prisma.citas.create({
       data: {
         fecha: new Date(dto.fecha),
@@ -68,35 +68,43 @@ export class CitasService {
         estado: EstadoCita.pendiente,
         id_mascota: dto.id_mascota,
         id_usuario: dto.id_usuario,
+        descripcion: dto.descripcion,
       },
     });
-  }
+    
+    } 
+    
+    findAll(estado?: EstadoCita) {
+      return this.prisma.citas.findMany({
+        where: estado ? { estado } : {},
+        include: {
+          mascotas: true,
+          usuarios: true,
+        },
+      });
+    }
 
-  // GET ALL
-  findAll(estado?: EstadoCita) {
-    return this.prisma.citas.findMany({
-      where: estado
-        ? { estado }
-        : {},
-      include: {
-        mascotas: true,
-        usuarios: true,
-      },
-    });
-  }
+  
+  async findOne(id: number) {
 
-  // GET ONE
-  findOne(id: number) {
-    return this.prisma.citas.findUnique({
+    const cita = await this.prisma.citas.findUnique({
       where: {
         id_cita: id,
       },
-
+  
       include: {
         mascotas: true,
         usuarios: true,
       },
     });
+  
+    if (!cita) {
+      throw new BadRequestException(
+        'La cita no existe',
+      );
+    }
+  
+    return cita;
   }
 
   // UPDATE ESTADO

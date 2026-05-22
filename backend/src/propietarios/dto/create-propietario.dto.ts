@@ -3,6 +3,7 @@ import {
   IsNotEmpty,
   IsOptional,
   IsString,
+  MinLength,
 } from 'class-validator';
 
 export class CreatePropietarioDto {
@@ -13,6 +14,7 @@ export class CreatePropietarioDto {
 
   @IsString()
   @IsNotEmpty()
+  @MinLength(7)
   telefono: string;
 
   @IsOptional()

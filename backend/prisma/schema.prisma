@@ -80,14 +80,14 @@ model citas {
 
   fecha  DateTime
   hora   String
-  estado EstadoCita   @default(pendiente)
+  estado  EstadoCita   @default(pendiente)
+  descripcion  String?
 
   id_mascota Int
   id_usuario Int
 
   mascotas mascotas @relation(fields: [id_mascota], references: [id_mascota])
-
-  usuarios usuarios @relation(fields: [id_usuario], references: [id_usuario])
+   usuarios usuarios @relation(fields: [id_usuario], references: [id_usuario])
 }
 
 enum EstadoCita {

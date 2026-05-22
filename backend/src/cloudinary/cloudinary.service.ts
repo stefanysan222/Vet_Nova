@@ -1,19 +1,22 @@
-// src/cloudinary/cloudinary.service.ts
-import { Injectable } from '@nestjs/common';
-import { v2 as cloudinary } from 'cloudinary';
+import { Injectable, Inject } from '@nestjs/common';
 import { Readable } from 'stream';
 
 @Injectable()
 export class CloudinaryService {
+  constructor(
+    @Inject('CLOUDINARY') private readonly cloudinary,
+  ) {}
+
   async subirImagen(archivo: Express.Multer.File): Promise<string> {
     return new Promise((resolve, reject) => {
-      const uploadStream = cloudinary.uploader.upload_stream(
-        { folder: 'vetnova/mascotas' }, // carpeta en Cloudinary
+      const uploadStream = this.cloudinary.uploader.upload_stream(
+        { folder: 'vetnova/mascotas' },
         (error, result) => {
-            if (error || !result) return reject(error ?? new Error('Upload fallido'));
-            resolve(result.secure_url); // URL pública de la imagen
+          if (error || !result) return reject(error ?? new Error('Upload fallido'));
+          resolve(result.secure_url);
         },
       );
+
       Readable.from(archivo.buffer).pipe(uploadStream);
     });
   }

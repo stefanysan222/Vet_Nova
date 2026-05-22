@@ -28,17 +28,30 @@ export class AuthService {
     });
 
     if (existe) {
-      throw new BadRequestException('El email ya existe');
+      throw new BadRequestException(
+        'Ya existe un usuario con este correo',
+      );
     }
 
-    const hashedPassword = await bcrypt.hash(dto.password, 10);
+    const saltRounds = 10;
 
+    const hashedPassword = await bcrypt.hash(
+      dto.password,
+      saltRounds,
+    );
+    
     const usuario = await this.prisma.usuarios.create({
       data: {
         nombre: dto.nombre,
         email: dto.email,
         password: hashedPassword,
         rol: dto.rol,
+      },
+      select: {
+        id_usuario: true,
+        nombre: true,
+        email: true,
+        rol: true,
       },
     });
 
@@ -79,7 +92,12 @@ export class AuthService {
 
     return {
       access_token: token,
-      usuario,
+      usuario: {
+        id: usuario.id_usuario,
+        nombre: usuario.nombre,
+        email: usuario.email,
+        rol: usuario.rol,
+      },
     };
   }
 }

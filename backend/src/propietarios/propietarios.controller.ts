@@ -9,23 +9,26 @@ import {
   UseGuards,
   Query,
 } from '@nestjs/common';
-import { ApiBearerAuth } from '@nestjs/swagger';
-import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
-import { PropietariosService } from './propietarios.service';
-import { CreatePropietarioDto } from './dto/create-propietario.dto';
-import { UpdatePropietarioDto } from './dto/update-propietario.dto';
-import { RolesGuard } from '../auth/guards/roles.guard';
-import { Roles } from '../auth/decorators/roles.decorator';
-import { ApiOperation } from '@nestjs/swagger';
+
 import {
+  ApiBearerAuth,
+  ApiOperation,
   ApiResponse,
+  ApiTags,
 } from '@nestjs/swagger';
 
+import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
+import { RolesGuard } from '../auth/guards/roles.guard';
+import { Roles } from '../auth/decorators/roles.decorator';
 
+import { PropietariosService } from './propietarios.service';
+
+import { CreatePropietarioDto } from './dto/create-propietario.dto';
+import { UpdatePropietarioDto } from './dto/update-propietario.dto';
+
+@ApiTags('Propietarios')
 @ApiBearerAuth('access-token')
-
 @UseGuards(JwtAuthGuard, RolesGuard)
-
 @Controller('propietarios')
 
 export class PropietariosController {
@@ -33,33 +36,38 @@ export class PropietariosController {
     private readonly propietariosService: PropietariosService,
   ) {}
 
+  // CREATE
   @Post()
 
-  @Roles('ADMIN', 'RECEPCIONISTA')
+  @Roles(
+    'ADMIN',
+    'RECEPCIONISTA',
+  )
+
   @ApiOperation({
-    summary: 'Crear nuevo propietario',
+    summary: 'Crear propietario',
   })
 
   @ApiResponse({
     status: 201,
-    description: 'Propietario creado',
+    description: 'Propietario creado correctamente',
   })
 
   @ApiResponse({
     status: 400,
-    description: 'Propietario no creado',
+    description: 'Datos inválidos',
   })
 
-
   create(
-    @Body() createPropietarioDto: CreatePropietarioDto,
+    @Body()
+    dto: CreatePropietarioDto,
   ) {
     return this.propietariosService.create(
-      createPropietarioDto,
+      dto,
     );
   }
 
-  
+  // GET ALL
   @Get()
 
   @Roles(
@@ -67,25 +75,27 @@ export class PropietariosController {
     'VETERINARIO',
     'RECEPCIONISTA',
   )
+
   @ApiOperation({
-    summary: 'Obtener todos los propietarios',
-  })
-  @ApiResponse({
-    status: 200,
-    description: 'Propietarios obtenidos',
-  })
-  @ApiResponse({
-    status: 400,
-    description: 'Propietarios no obtenidos',
+    summary: 'Obtener propietarios',
   })
 
-  findAll(@Query('nombre') nombre?: string) {
-    return this.propietariosService.findAll(nombre);
+  @ApiResponse({
+    status: 200,
+    description: 'Propietarios obtenidos correctamente',
+  })
+
+  findAll(
+    @Query('nombre')
+    nombre?: string,
+  ) {
+    return this.propietariosService.findAll(
+      nombre,
+    );
   }
 
   // GET ONE
   @Get(':id')
-
 
   @Roles(
     'ADMIN',
@@ -93,27 +103,37 @@ export class PropietariosController {
     'RECEPCIONISTA',
     'CLIENTE',
   )
+
   @ApiOperation({
     summary: 'Consultar propietario',
   })
 
   @ApiResponse({
     status: 200,
-    description: 'Propietario obtenido',
-  })
-  @ApiResponse({
-    status: 400,
-    description: 'Propietario no obtenido',
+    description: 'Propietario encontrado',
   })
 
-  findOne(@Param('id') id: string) {
-    return this.propietariosService.findOne(+id);
+  @ApiResponse({
+    status: 404,
+    description: 'Propietario no encontrado',
+  })
+
+  findOne(
+    @Param('id')
+    id: string,
+  ) {
+    return this.propietariosService.findOne(
+      +id,
+    );
   }
 
   // UPDATE
   @Put(':id')
 
-  @Roles('ADMIN', 'RECEPCIONISTA')
+  @Roles(
+    'ADMIN',
+    'RECEPCIONISTA',
+  )
 
   @ApiOperation({
     summary: 'Actualizar propietario',
@@ -121,20 +141,24 @@ export class PropietariosController {
 
   @ApiResponse({
     status: 200,
-    description: 'Propietario actualizado',
+    description: 'Propietario actualizado correctamente',
   })
+
   @ApiResponse({
-    status: 400,
-    description: 'Propietario no actualizado',
+    status: 404,
+    description: 'Propietario no encontrado',
   })
 
   update(
-    @Param('id') id: string,
-    @Body() updatePropietarioDto: UpdatePropietarioDto,
+    @Param('id')
+    id: string,
+
+    @Body()
+    dto: UpdatePropietarioDto,
   ) {
     return this.propietariosService.update(
       +id,
-      updatePropietarioDto,
+      dto,
     );
   }
 
@@ -142,20 +166,27 @@ export class PropietariosController {
   @Delete(':id')
 
   @Roles('ADMIN')
+
   @ApiOperation({
     summary: 'Eliminar propietario',
   })
 
   @ApiResponse({
     status: 200,
-    description: 'Propietario eliminado',
-  })
-  @ApiResponse({
-    status: 400,
-    description: 'Propietario no eliminado',
+    description: 'Propietario eliminado correctamente',
   })
 
-  remove(@Param('id') id: string) {
-    return this.propietariosService.remove(+id);
+  @ApiResponse({
+    status: 404,
+    description: 'Propietario no encontrado',
+  })
+
+  remove(
+    @Param('id')
+    id: string,
+  ) {
+    return this.propietariosService.remove(
+      +id,
+    );
   }
 }

@@ -1,146 +1,218 @@
 import {
-  Controller, Get, Post, Body, Param, Put,
-  Delete, Query, UseInterceptors, UploadedFile,
-  BadRequestException, ParseIntPipe,
+  Controller,
+  Get,
+  Post,
+  Body,
+  Param,
+  Put,
+  Delete,
+  Query,
+  UseGuards,
+  UploadedFile,
+  UseInterceptors,
 } from '@nestjs/common';
-import { FileInterceptor } from '@nestjs/platform-express';
-import { memoryStorage } from 'multer';
-import { ApiBearerAuth, ApiTags, ApiConsumes, ApiBody } from '@nestjs/swagger';
+
 import { AuthGuard } from '@nestjs/passport';
-import { UseGuards } from '@nestjs/common';
+
+import { FileInterceptor } from '@nestjs/platform-express';
+
+import {
+  ApiBearerAuth,
+  ApiOperation,
+  ApiResponse,
+  ApiTags,
+  ApiConsumes,
+  ApiBody,
+} from '@nestjs/swagger';
 
 import { MascotasService } from './mascotas.service';
-import { ApiOperation } from '@nestjs/swagger';
-import { ApiResponse } from '@nestjs/swagger';
+import { CloudinaryService } from '../cloudinary/cloudinary.service';
+
+import { CreateMascotaDto } from './dto/create.mascota.dto';
+import { UpdateMascotaDto } from './dto/update.mascotas.dto';
 
 @ApiTags('Mascotas')
 @ApiBearerAuth('access-token')
 @UseGuards(AuthGuard('jwt'))
 @Controller('mascotas')
 export class MascotasController {
-  constructor(private readonly mascotasService: MascotasService) {}
+  constructor(
+    private readonly mascotasService: MascotasService,
+    private readonly cloudinaryService: CloudinaryService,
+  ) {}
 
+  // OBTENER TODAS
   @Get()
-
   @ApiOperation({
     summary: 'Obtener todas las mascotas',
   })
+
   @ApiResponse({
     status: 200,
-    description: 'Lista de mascotas obtenida correctamente',
+    description: 'Lista obtenida correctamente',
   })
-  
+
   @ApiResponse({
     status: 401,
     description: 'No autorizado',
   })
-  findAll(@Query('nombre') nombre?: string) {
-    return this.mascotasService.findAll(nombre);
+
+  findAll(
+    @Query('nombre') nombre?: string,
+  ) {
+    return this.mascotasService.findAll(
+      nombre,
+    );
   }
 
+  // CREAR
   @Post()
+
   @ApiOperation({
-    summary: 'Crear una mascota',
+    summary: 'Crear mascota',
   })
+
   @ApiResponse({
     status: 201,
     description: 'Mascota creada correctamente',
   })
-  
+
   @ApiResponse({
     status: 400,
     description: 'Datos inválidos',
   })
-  
-  @ApiResponse({
-    status: 401,
-    description: 'No autorizado',
-  })
-  create(@Body() dto: any) {
-    return this.mascotasService.create(dto);
+
+  create(
+    @Body()
+    dto: CreateMascotaDto,
+  ) {
+    return this.mascotasService.create(
+      dto,
+    );
   }
 
-  @Get(':id')
+  // SUBIR FOTO
+  @Post(':id/foto')
+
+  @UseInterceptors(
+    FileInterceptor('foto'),
+  )
+
   @ApiOperation({
-    summary: 'Obtener una mascota por id',
+    summary: 'Subir foto de mascota',
   })
+
+  @ApiConsumes(
+    'multipart/form-data',
+  )
+
+  @ApiBody({
+    schema: {
+      type: 'object',
+      properties: {
+        foto: {
+          type: 'string',
+          format: 'binary',
+        },
+      },
+    },
+  })
+
+  async subirFoto(
+    @Param('id') id: string,
+
+    @UploadedFile()
+    archivo: Express.Multer.File,
+  ) {
+    const url =
+      await this.cloudinaryService.subirImagen(
+        archivo,
+      );
+
+    return this.mascotasService.actualizarFoto(
+      +id,
+      url,
+    );
+  }
+
+  // OBTENER UNA
+  @Get(':id')
+
+  @ApiOperation({
+    summary:
+      'Obtener mascota por id',
+  })
+
   @ApiResponse({
     status: 200,
     description: 'Mascota encontrada',
   })
-  
+
   @ApiResponse({
     status: 404,
-    description: 'Mascota no encontrada',
+    description:
+      'Mascota no encontrada',
   })
-  findOne(@Param('id') id: string) {
-    return this.mascotasService.findOne(+id);
-  }
 
-  @Put(':id')
-  @ApiOperation({
-    summary: 'Actualizar una mascota',
-  })
-  @ApiResponse({
-    status: 200,
-    description: 'Mascota actualizada correctamente',
-  })
-  
-  @ApiResponse({
-    status: 400,
-    description: 'Datos inválidos',
-  })
-  
-  @ApiResponse({
-    status: 404,
-    description: 'Mascota no encontrada',
-  })
-  update(@Param('id') id: string, @Body() dto: any) {
-    return this.mascotasService.updateMascota(+id, dto);
-  }
-
-  @Delete(':id')
-  @ApiOperation({
-    summary: 'eliminar una mascota',
-  })
-  @ApiResponse({
-    status: 200,
-    description: 'Mascota eliminada correctamente',
-  })
-  
-  @ApiResponse({
-    status: 404,
-    description: 'Mascota no encontrada',
-  })
-  remove(@Param('id') id: string) {
-    return this.mascotasService.deleteMascota(+id);
-  }
-
-  // ← adentro de la clase, antes del cierre }
-  @Post(':id/foto')
-  @ApiConsumes('multipart/form-data')
-  @ApiBody({
-    schema: {
-      type: 'object',
-      properties: { foto: { type: 'string', format: 'binary' } },
-    },
-  })
-  @UseInterceptors(FileInterceptor('foto', {
-    storage: memoryStorage(),
-    fileFilter: (req, file, cb) => {
-      if (!file.mimetype.match(/\/(jpg|jpeg|png|webp)$/)) {
-        return cb(new BadRequestException('Solo imágenes'), false);
-      }
-      cb(null, true);
-    },
-    limits: { fileSize: 5 * 1024 * 1024 },
-  }))
-  async subirFoto(
-    @Param('id', ParseIntPipe) id: number,
-    @UploadedFile() foto: Express.Multer.File,
+  findOne(
+    @Param('id') id: string,
   ) {
-    const url = await this.mascotasService.subirFoto(id, foto);
-    return { message: 'Foto subida correctamente', url };
+    return this.mascotasService.findOne(
+      +id,
+    );
   }
 
-} // ← cierre de la clase al final
+  // ACTUALIZAR
+  @Put(':id')
+
+  @ApiOperation({
+    summary:
+      'Actualizar mascota',
+  })
+
+  @ApiResponse({
+    status: 200,
+    description:
+      'Mascota actualizada',
+  })
+
+  update(
+    @Param('id') id: string,
+
+    @Body()
+    dto: UpdateMascotaDto,
+  ) {
+    return this.mascotasService.updateMascota(
+      +id,
+      dto,
+    );
+  }
+
+  // ELIMINAR
+  @Delete(':id')
+
+  @ApiOperation({
+    summary:
+      'Eliminar mascota',
+  })
+
+  @ApiResponse({
+    status: 200,
+    description:
+      'Mascota eliminada',
+  })
+
+  @ApiResponse({
+    status: 404,
+    description:
+      'Mascota no encontrada',
+  })
+
+  remove(
+    @Param('id') id: string,
+  ) {
+    return this.mascotasService.deleteMascota(
+      +id,
+    );
+  }
+}

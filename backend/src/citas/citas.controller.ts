@@ -11,20 +11,13 @@ import {
 } from '@nestjs/common';
 
 import { ApiBearerAuth } from '@nestjs/swagger';
-
 import { CitasService } from './citas.service';
-
 import { CreateCitaDto } from './dto/create-cita.dto';
-
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
-
 import { RolesGuard } from '../auth/guards/roles.guard';
-
 import { Roles } from '../auth/decorators/roles.decorator';
-
-import { EstadoCita } from '@prisma/client';
+import { EstadoCita, Rol } from '@prisma/client';
 import { UpdateEstadoDto } from './dto/update-estado.dto';
-
 import { ApiOperation } from '@nestjs/swagger';
 import {
   ApiResponse,
@@ -40,12 +33,12 @@ export class CitasController {
     private readonly citasService: CitasService,
   ) {}
 
-  // CREATE
+  
   @Post()
 
   @Roles(
-    'ADMIN',
-    'RECEPCIONISTA',
+    Rol.ADMIN,
+    Rol.RECEPCIONISTA
   )
   @ApiOperation({
     summary: 'Crear una cita',
@@ -64,13 +57,13 @@ export class CitasController {
     return this.citasService.create(dto);
   }
 
-  // GET ALL
+ 
   @Get()
 
   @Roles(
-    'ADMIN',
-    'VETERINARIO',
-    'RECEPCIONISTA',
+    Rol.ADMIN,
+    Rol.VETERINARIO,
+    Rol.RECEPCIONISTA,
   )
 
   @ApiOperation({
@@ -93,14 +86,13 @@ export class CitasController {
     );
   }
 
-  // GET ONE
+  
   @Get(':id')
 
   @Roles(
-    'ADMIN',
-    'VETERINARIO',
-    'RECEPCIONISTA',
-    'CLIENTE',
+    Rol.ADMIN,
+    Rol.VETERINARIO,
+    Rol.RECEPCIONISTA,
   )
   @ApiOperation({
     summary: 'obtener una cita',
@@ -118,16 +110,14 @@ export class CitasController {
     return this.citasService.findOne(+id);
   }
 
-  // UPDATE ESTADO
+  
   @Patch(':id/estado')
 
   @Roles(
-    'ADMIN',
-    'RECEPCIONISTA',
-    'VETERINARIO',
+    Rol.ADMIN,
+    Rol.VETERINARIO,
+    Rol.RECEPCIONISTA,
   )
-
-  @Patch(':id/estado')
 
   @ApiOperation({
     summary: 'actualizar el estado de la cita',
@@ -160,10 +150,9 @@ export class CitasController {
     );
   }
 
-  // DELETE
   @Delete(':id')
 
-  @Roles('ADMIN')
+  @Roles(Rol.ADMIN)
 
   @ApiOperation({
     summary: 'Eliminar una cita',

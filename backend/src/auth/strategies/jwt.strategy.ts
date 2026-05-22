@@ -1,5 +1,4 @@
 import { Injectable } from '@nestjs/common';
-
 import { PassportStrategy } from '@nestjs/passport';
 
 import {
@@ -9,6 +8,7 @@ import {
 
 @Injectable()
 export class JwtStrategy extends PassportStrategy(Strategy) {
+
   constructor() {
     super({
       jwtFromRequest:
@@ -16,14 +16,18 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
 
       ignoreExpiration: false,
 
-      secretOrKey:
-        process.env.JWT_SECRET || 'vetnova123',
+      secretOrKey: process.env.JWT_SECRET!,
     });
   }
 
-  async validate(payload: any) {
+  async validate(payload: {
+    sub: number;
+    email: string;
+    rol: string;
+  }) {
+
     return {
-      sub: payload.sub,
+      id: payload.sub,
       email: payload.email,
       rol: payload.rol,
     };

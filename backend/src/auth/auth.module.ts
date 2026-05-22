@@ -18,8 +18,10 @@ import { JwtStrategy } from './strategies/jwt.strategy';
     }),
 
     JwtModule.register({
-      secret: process.env.JWT_SECRET || 'vetnova123',
-      signOptions: { expiresIn: '10d' },
+      secret: process.env.JWT_SECRET!,
+      signOptions: {
+        expiresIn: '10d',
+      },
     }),
   ],
 
@@ -31,6 +33,10 @@ import { JwtStrategy } from './strategies/jwt.strategy';
     RolesGuard,
   ],
 
-  exports: [PassportModule, JwtModule],
+  exports: [
+    PassportModule,
+    JwtModule,
+    AuthService,
+  ],
 })
 export class AuthModule {}

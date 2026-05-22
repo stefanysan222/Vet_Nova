@@ -1,20 +1,34 @@
-import { IsDateString, IsInt, IsOptional, IsString } from 'class-validator';
+import {
+  IsDateString,
+  IsInt,
+  IsOptional,
+  IsString,
+  IsNotEmpty,
+  Min,
+  IsEnum,
+} from 'class-validator';
+
+import { EstadoCita } from '@prisma/client';
 
 export class CreateCitaDto {
+
   @IsDateString()
   fecha: string;
 
   @IsString()
+  @IsNotEmpty()
   hora: string;
 
   @IsOptional()
-  @IsString()
-  estado?: string;
+  @IsEnum(EstadoCita)
+  estado?: EstadoCita;
 
   @IsInt()
+  @Min(1)
   id_mascota: number;
 
   @IsInt()
+  @Min(1)
   id_usuario: number;
 
   @IsOptional()
