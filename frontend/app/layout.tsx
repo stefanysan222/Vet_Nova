@@ -14,14 +14,15 @@ const geistMono = Geist_Mono({
 
 export const metadata: Metadata = {
   title: "Vet Nova | Clínica Veterinaria",
-  description: "Página principal de Vet Nova, clínica veterinaria con servicios de urgencias, vacunación y estética para mascotas.",
+  description:
+    "Página principal de Vet Nova, clínica veterinaria con servicios de urgencias, vacunación y estética para mascotas.",
 };
 
 export default function RootLayout({
   children,
-}: Readonly<{
+}: {
   children: React.ReactNode;
-}>) {
+}) {
   return (
     <html
       lang="es"
