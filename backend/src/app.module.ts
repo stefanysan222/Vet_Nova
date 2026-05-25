@@ -16,6 +16,11 @@ import { VacunasModule } from './vacunas/vacunas.module';
 import { RecordatoriosModule } from './recordatorios/recordatorios.module';
 import { ConsultasModule } from './consultas/consultas.module';
 import { DocumentosMedicosModule } from './documentos-medicos/documentos-medicos.module';
+import { HistoriasClinicasModule } from './historias-clinicas/historias-clinicas.module';
+import { MovimientosInventarioModule } from './movimientos-inventario/movimientos-inventario.module';
+import { RegistroVacunasModule } from './registro-vacunas/registro-vacunas.module';
+import { DetalleServiciosModule } from './detalle-servicios/detalle-servicios.module';
+import { DetalleProductosModule } from './detalle-productos/detalle-productos.module';
 
 
 @Module({
@@ -34,6 +39,11 @@ import { DocumentosMedicosModule } from './documentos-medicos/documentos-medicos
     RecordatoriosModule,
     ConsultasModule,
     DocumentosMedicosModule,
+    HistoriasClinicasModule,
+    MovimientosInventarioModule,
+    RegistroVacunasModule,
+    DetalleServiciosModule,
+    DetalleProductosModule,
   ],
   controllers: [AppController],
   providers: [AppService],
