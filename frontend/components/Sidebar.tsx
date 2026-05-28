@@ -14,7 +14,7 @@ export default function Sidebar() {
       <div className="flex items-center gap-3 text-2xl font-bold text-slate-900">
         <div className="relative h-12 w-12 overflow-hidden rounded-2xl bg-slate-100">
           <Image
-            src="/Vetnova_logo.jpeg"
+            src="/logos/vetnova-logo-light.png"
             alt="VetNova logo"
             fill
             sizes="48px"

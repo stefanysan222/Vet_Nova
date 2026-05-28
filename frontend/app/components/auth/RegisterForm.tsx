@@ -2,15 +2,18 @@
 
 import type { FormEvent } from "react";
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 import { Eye, EyeOff, Lock, Mail, UserCircle } from "lucide-react";
 import Button from "../Button";
+import GoogleAuthButton from "./GoogleAuthButton";
+import { registerUser, setCurrentUser, loginOrRegisterGoogle, UserRole } from "../../../lib/auth";
 
 const initialState = {
   name: "",
   email: "",
   password: "",
   confirmPassword: "",
-  role: "Cliente/Usuario",
+  role: "Cliente" as UserRole,
   acceptTerms: false,
 };
 
@@ -56,6 +59,15 @@ export default function RegisterForm() {
     return nextErrors;
   };
 
+  const router = useRouter();
+  const [submitError, setSubmitError] = useState<string | null>(null);
+
+  const handleGoogleSuccess = (profile: { name: string; email: string; picture?: string }) => {
+    const { user } = loginOrRegisterGoogle(profile);
+    setCurrentUser(user);
+    router.push(user.role === "Administrador" ? "/admin" : user.role === "Veterinario" ? "/veterinario" : "/cliente");
+  };
+
   const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     const nextErrors = validate();
@@ -65,7 +77,25 @@ export default function RegisterForm() {
       return;
     }
 
+    const result = registerUser({
+      name: formData.name,
+      email: formData.email,
+      password: formData.password,
+      role: formData.role as UserRole,
+    });
+
+    if (result.error) {
+      setSubmitError(result.error);
+      return;
+    }
+
     setErrors({});
+    setSubmitError(null);
+
+    if (result.user) {
+      setCurrentUser(result.user);
+      router.push(result.user.role === "Administrador" ? "/admin" : result.user.role === "Veterinario" ? "/veterinario" : "/cliente");
+    }
   };
 
   return (
@@ -74,6 +104,14 @@ export default function RegisterForm() {
       className="space-y-8 rounded-[2rem] border border-slate-200/70 bg-slate-50 p-8 shadow-sm shadow-slate-200/50"
       noValidate
     >
+      <GoogleAuthButton label="Registrarse con Google" onSuccess={handleGoogleSuccess} />
+      <div className="relative flex items-center justify-center text-sm text-slate-500">
+        <span className="absolute left-0 right-0 h-px bg-slate-200"></span>
+        <span className="relative z-10 px-3 bg-slate-50">o crear cuenta manual</span>
+      </div>
+
+      {submitError ? <p className="rounded-2xl bg-rose-50 px-4 py-3 text-sm text-rose-700">{submitError}</p> : null}
+
       <div className="grid gap-8">
         <div className="space-y-4">
           <label className="text-base font-semibold text-slate-700" htmlFor="name">

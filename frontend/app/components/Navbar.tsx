@@ -28,7 +28,7 @@ export default function Navbar() {
         <a href="#" className={STYLES.logoLink}>
           <div className={STYLES.logoContainer}>
             <Image
-              src="/Vetnova_logo.jpeg"
+              src="/logos/vetnova-logo-light.png"
               alt="VetNova logo"
               width={40}
               height={40}

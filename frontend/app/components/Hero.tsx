@@ -80,7 +80,7 @@ export default function Hero() {
             <div className="flex items-center gap-3">
               <div className={STYLES.logoContainer}>
                 <Image
-                  src="/Vetnova_logo.jpeg"
+                  src="/logos/vetnova-logo-light.png"
                   alt="VetNova logo"
                   width={40}
                   height={40}

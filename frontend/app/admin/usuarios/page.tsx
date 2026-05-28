@@ -11,7 +11,7 @@ export default function UsuariosPage() {
   const [isRegisterModalOpen, setIsRegisterModalOpen] = useState(false);
 
   return (
-    <div className="min-h-screen bg-slate-50 text-slate-900">
+    <div className="min-h-screen bg-slate-50 text-slate-900 dark:bg-slate-950 dark:text-slate-100">
       <div className="lg:grid lg:grid-cols-[320px_minmax(0,1fr)]">
         <Sidebar />
 

@@ -70,7 +70,7 @@ export default function UsersTable() {
   const [showPermissions, setShowPermissions] = useState(false);
   const [showEdit, setShowEdit] = useState(false);
   return (
-    <section className="rounded-[2rem] border border-slate-200/70 bg-white p-6 shadow-sm shadow-slate-200/40">
+    <section className="rounded-[2rem] border border-slate-200/70 bg-white p-6 shadow-sm shadow-slate-200/40 dark:border-slate-700 dark:bg-slate-950 dark:shadow-slate-900/40">
       <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
         <div>
           <h2 className="text-2xl font-semibold tracking-tight text-slate-900">Usuarios activos</h2>
@@ -93,7 +93,7 @@ export default function UsersTable() {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.35, ease: "easeOut" }}
             whileHover={{ y: -4 }}
-            className="group rounded-[2rem] border border-slate-200 bg-white p-6 shadow-sm transition duration-300 hover:shadow-xl"
+            className="group rounded-[2rem] border border-slate-200 bg-white p-6 shadow-sm transition duration-300 hover:shadow-xl dark:border-slate-700 dark:bg-slate-950 dark:hover:shadow-slate-900/40"
           >
             <div className="flex flex-col gap-6 lg:flex-row lg:items-center lg:justify-between">
               <div className="flex flex-1 flex-col gap-4 sm:flex-row sm:items-center">
@@ -104,12 +104,12 @@ export default function UsersTable() {
                 <div className="min-w-0 flex-1">
                   <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
                     <div>
-                      <p className="text-lg font-semibold tracking-tight text-slate-900">{user.name}</p>
+                      <p className="text-lg font-semibold tracking-tight text-slate-900 dark:text-white">{user.name}</p>
                       <div className="mt-3 flex flex-wrap gap-2">
-                        <span className={`rounded-2xl border border-slate-200 px-3 py-1 text-xs font-semibold tracking-wide ${roleStyle(user.role)}`}>
+                        <span className={`rounded-2xl border border-slate-200 px-3 py-1 text-xs font-semibold tracking-wide ${roleStyle(user.role)} dark:border-slate-700`}>
                           {user.role}
                         </span>
-                        <span className={`rounded-2xl border border-slate-200 px-3 py-1 text-xs font-semibold tracking-wide ${statusStyle(user.status)}`}>
+                        <span className={`rounded-2xl border border-slate-200 px-3 py-1 text-xs font-semibold tracking-wide ${statusStyle(user.status)} dark:border-slate-700`}>
                           {user.status}
                         </span>
                       </div>
@@ -118,13 +118,13 @@ export default function UsersTable() {
 
                   <div className="mt-5 grid gap-3 sm:grid-cols-2">
                     <div>
-                      <p className="text-xs uppercase tracking-[0.2em] text-slate-400">Especialidad</p>
-                      <p className="mt-2 text-sm font-medium text-slate-700">{user.specialty}</p>
+                      <p className="text-xs uppercase tracking-[0.2em] text-slate-400 dark:text-slate-400">Especialidad</p>
+                      <p className="mt-2 text-sm font-medium text-slate-700 dark:text-slate-200">{user.specialty}</p>
                     </div>
                     <div>
-                      <p className="text-xs uppercase tracking-[0.2em] text-slate-400">Contacto</p>
-                      <p className="mt-2 text-sm text-slate-600">{user.email}</p>
-                      <p className="mt-1 text-sm text-slate-600">{user.phone}</p>
+                      <p className="text-xs uppercase tracking-[0.2em] text-slate-400 dark:text-slate-400">Contacto</p>
+                      <p className="mt-2 text-sm text-slate-600 dark:text-slate-300">{user.email}</p>
+                      <p className="mt-1 text-sm text-slate-600 dark:text-slate-300">{user.phone}</p>
                     </div>
                   </div>
                 </div>

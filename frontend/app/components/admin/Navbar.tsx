@@ -10,8 +10,8 @@ export default function Navbar() {
   const [darkMode, setDarkMode] = useState(false);
 
   useEffect(() => {
-    const savedStr = localStorage.getItem('darkMode');
-    if (savedStr === null) {
+    const savedTheme = localStorage.getItem('vetnova-theme');
+    if (savedTheme === null) {
       // No saved preference: follow system and listen for changes
       const prefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
       setDarkMode(prefersDark);
@@ -37,7 +37,7 @@ export default function Navbar() {
         }
       };
     } else {
-      const saved = savedStr === 'true';
+      const saved = savedTheme === 'dark';
       setDarkMode(saved);
       if (saved) document.documentElement.classList.add('dark');
     }
@@ -46,7 +46,7 @@ export default function Navbar() {
   const toggleDarkMode = () => {
     const newMode = !darkMode;
     setDarkMode(newMode);
-    localStorage.setItem('darkMode', newMode.toString());
+    localStorage.setItem('vetnova-theme', newMode ? 'dark' : 'light');
     if (newMode) document.documentElement.classList.add('dark');
     else document.documentElement.classList.remove('dark');
   };
@@ -80,15 +80,6 @@ export default function Navbar() {
               className="w-full rounded-3xl border border-slate-200 bg-slate-50 py-3 pl-14 pr-4 text-sm text-slate-900 outline-none transition focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
             />
           </label>
-
-          {/* Quick theme toggle */}
-          <button
-            onClick={toggleDarkMode}
-            aria-label="Toggle theme"
-            className="inline-flex h-12 items-center justify-center rounded-3xl bg-white px-4 text-slate-700 shadow-sm shadow-slate-200/60 transition hover:bg-slate-100 mr-2"
-          >
-            {darkMode ? <Sun className="h-5 w-5" /> : <Moon className="h-5 w-5" />}
-          </button>
 
           {/* Notifications Bell */}
           <div className="relative">
@@ -153,14 +144,19 @@ export default function Navbar() {
                 >
                   <button
                     onClick={toggleDarkMode}
-                    className="flex w-full items-center gap-3 px-4 py-3 text-left text-sm font-medium text-slate-700 hover:bg-slate-100 transition border-b border-slate-200"
+                    className="flex w-full items-center justify-between gap-3 px-4 py-3 text-left text-sm font-medium text-slate-700 hover:bg-slate-100 transition border-b border-slate-200"
                   >
-                    {darkMode ? (
-                      <Sun className="h-4 w-4" />
-                    ) : (
-                      <Moon className="h-4 w-4" />
-                    )}
-                    {darkMode ? "Modo claro" : "Modo oscuro"}
+                    <span className="flex items-center gap-3">
+                      {darkMode ? (
+                        <Sun className="h-4 w-4" />
+                      ) : (
+                        <Moon className="h-4 w-4" />
+                      )}
+                      {darkMode ? "Modo claro" : "Modo oscuro"}
+                    </span>
+                    <span className={`relative h-5 w-10 rounded-full transition ${darkMode ? "bg-blue-600" : "bg-slate-200"}`}>
+                      <span className={`absolute top-0.5 h-4 w-4 rounded-full bg-white shadow-sm transition ${darkMode ? "left-5" : "left-0.5"}`} />
+                    </span>
                   </button>
                   <a
                     href="/admin/configuracion"

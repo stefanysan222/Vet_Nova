@@ -19,6 +19,7 @@
   "homepage": "https://github.com/stefanysan222/Vet_Nova#readme",
   "dependencies": {
     "@prisma/client": "^7.8.0",
+    "lucide-react": "^1.14.0",
     "prisma": "^7.8.0"
   }
 }

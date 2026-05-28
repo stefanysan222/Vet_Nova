@@ -48,7 +48,7 @@ export default function ClientSidebar() {
             <div className="flex items-center gap-3">
               <div className="relative h-14 w-14 overflow-hidden rounded-full bg-gradient-to-br from-blue-500 to-blue-600">
                 <img
-                  src="/Vetnova_logo.jpeg"
+                  src="/logos/vetnova-logo-light.png"
                   alt="VetNova"
                   className="h-full w-full object-cover"
                 />
