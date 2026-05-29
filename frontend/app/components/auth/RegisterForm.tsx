@@ -101,83 +101,83 @@ export default function RegisterForm() {
   return (
     <form
       onSubmit={handleSubmit}
-      className="space-y-8 rounded-[2rem] border border-slate-200/70 bg-slate-50 p-8 shadow-sm shadow-slate-200/50"
+      className="space-y-4 rounded-[2rem] border border-slate-200/70 bg-slate-50 p-6 shadow-sm shadow-slate-200/50"
       noValidate
     >
       <GoogleAuthButton label="Registrarse con Google" onSuccess={handleGoogleSuccess} />
-      <div className="relative flex items-center justify-center text-sm text-slate-500">
+      <div className="relative flex items-center justify-center text-xs text-slate-500">
         <span className="absolute left-0 right-0 h-px bg-slate-200"></span>
         <span className="relative z-10 px-3 bg-slate-50">o crear cuenta manual</span>
       </div>
 
-      {submitError ? <p className="rounded-2xl bg-rose-50 px-4 py-3 text-sm text-rose-700">{submitError}</p> : null}
+      {submitError ? <p className="rounded-2xl bg-rose-50 px-4 py-2 text-sm text-rose-700">{submitError}</p> : null}
 
-      <div className="grid gap-8">
-        <div className="space-y-4">
-          <label className="text-base font-semibold text-slate-700" htmlFor="name">
+      <div className="grid gap-3">
+        <div className="space-y-2">
+          <label className="text-sm font-semibold text-slate-700" htmlFor="name">
             Nombre completo
           </label>
           <div className="relative">
-            <UserCircle className="pointer-events-none absolute left-5 top-1/2 h-5 w-5 -translate-y-1/2 text-slate-400" />
+            <UserCircle className="pointer-events-none absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
             <input
               id="name"
               type="text"
               value={formData.name}
               onChange={(event) => handleChange("name", event.target.value)}
-              className="w-full rounded-3xl border border-slate-200 bg-white pl-16 pr-7 py-6 text-lg text-slate-900 outline-none transition focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
+              className="w-full rounded-2xl border border-slate-200 bg-white pl-12 pr-4 py-2.5 text-sm text-slate-900 outline-none transition focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
               placeholder="Nombre completo"
             />
           </div>
-          {errors.name ? <p className="text-sm text-rose-600">{errors.name}</p> : null}
+          {errors.name ? <p className="text-xs text-rose-600">{errors.name}</p> : null}
         </div>
 
-        <div className="space-y-4">
-          <label className="text-base font-semibold text-slate-700" htmlFor="email">
+        <div className="space-y-2">
+          <label className="text-sm font-semibold text-slate-700" htmlFor="email">
             Correo electrónico
           </label>
           <div className="relative">
-            <Mail className="pointer-events-none absolute left-5 top-1/2 h-5 w-5 -translate-y-1/2 text-slate-400" />
+            <Mail className="pointer-events-none absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
             <input
               id="email"
               type="email"
               value={formData.email}
               onChange={(event) => handleChange("email", event.target.value)}
-              className="w-full rounded-3xl border border-slate-200 bg-white pl-16 pr-7 py-6 text-lg text-slate-900 outline-none transition focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
+              className="w-full rounded-2xl border border-slate-200 bg-white pl-12 pr-4 py-2.5 text-sm text-slate-900 outline-none transition focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
               placeholder="tucorreo@ejemplo.com"
             />
           </div>
-          {errors.email ? <p className="text-sm text-rose-600">{errors.email}</p> : null}
+          {errors.email ? <p className="text-xs text-rose-600">{errors.email}</p> : null}
         </div>
       </div>
 
-      <div className="grid gap-8">
-        <div className="space-y-4">
-          <label className="text-base font-semibold text-slate-700" htmlFor="password">
+      <div className="grid gap-3">
+        <div className="space-y-2">
+          <label className="text-sm font-semibold text-slate-700" htmlFor="password">
             Contraseña
           </label>
           <div className="relative">
-            <Lock className="pointer-events-none absolute left-5 top-1/2 h-5 w-5 -translate-y-1/2 text-slate-400" />
+            <Lock className="pointer-events-none absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
             <input
               id="password"
               type={showPassword ? "text" : "password"}
               value={formData.password}
               onChange={(event) => handleChange("password", event.target.value)}
-              className="w-full rounded-3xl border border-slate-200 bg-white pl-16 pr-7 py-6 text-lg text-slate-900 outline-none transition focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
+              className="w-full rounded-2xl border border-slate-200 bg-white pl-12 pr-10 py-2.5 text-sm text-slate-900 outline-none transition focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
               placeholder="Contraseña segura"
             />
             <button
               type="button"
               onClick={() => setShowPassword((current) => !current)}
-              className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-500 transition hover:text-slate-900"
+              className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-500 transition hover:text-slate-900"
             >
-              {showPassword ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
+              {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
             </button>
           </div>
-          {errors.password ? <p className="text-sm text-rose-600">{errors.password}</p> : null}
+          {errors.password ? <p className="text-xs text-rose-600">{errors.password}</p> : null}
         </div>
 
-        <div className="space-y-4">
-          <label className="text-base font-semibold text-slate-700" htmlFor="confirmPassword">
+        <div className="space-y-2">
+          <label className="text-sm font-semibold text-slate-700" htmlFor="confirmPassword">
             Confirmar contraseña
           </label>
           <div className="relative">
@@ -186,31 +186,31 @@ export default function RegisterForm() {
               type={showPassword ? "text" : "password"}
               value={formData.confirmPassword}
               onChange={(event) => handleChange("confirmPassword", event.target.value)}
-              className="w-full rounded-3xl border border-slate-200 bg-white pl-16 pr-7 py-6 text-lg text-slate-900 outline-none transition focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
+              className="w-full rounded-2xl border border-slate-200 bg-white pl-12 pr-10 py-2.5 text-sm text-slate-900 outline-none transition focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
               placeholder="Repite la contraseña"
             />
             <button
               type="button"
               onClick={() => setShowPassword((current) => !current)}
-              className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-500 transition hover:text-slate-900"
+              className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-500 transition hover:text-slate-900"
             >
-              {showPassword ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
+              {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
             </button>
           </div>
-          {errors.confirmPassword ? <p className="text-sm text-rose-600">{errors.confirmPassword}</p> : null}
+          {errors.confirmPassword ? <p className="text-xs text-rose-600">{errors.confirmPassword}</p> : null}
         </div>
       </div>
 
-      <div className="grid gap-8">
-        <div className="space-y-4">
-          <label className="text-base font-semibold text-slate-700" htmlFor="role">
+      <div className="grid gap-3">
+        <div className="space-y-2">
+          <label className="text-sm font-semibold text-slate-700" htmlFor="role">
             Rol
           </label>
           <select
             id="role"
             value={formData.role}
             onChange={(event) => handleChange("role", event.target.value)}
-            className="w-full rounded-3xl border border-slate-200 bg-white px-7 py-6 text-lg text-slate-900 outline-none transition focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
+            className="w-full rounded-2xl border border-slate-200 bg-white px-4 py-2.5 text-sm text-slate-900 outline-none transition focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
           >
             <option>Cliente/Usuario</option>
             <option>Administrador</option>
@@ -219,27 +219,27 @@ export default function RegisterForm() {
           </select>
         </div>
 
-        <div className="rounded-3xl border border-slate-200 bg-white p-6">
-          <label className="inline-flex items-start gap-3 text-base text-slate-600">
+        <div className="rounded-2xl border border-slate-200 bg-white p-4">
+          <label className="inline-flex items-start gap-2 text-sm text-slate-600">
             <input
               type="checkbox"
               checked={formData.acceptTerms}
               onChange={(event) => handleChange("acceptTerms", event.target.checked)}
-              className="mt-1 h-6 w-6 rounded-lg border border-slate-300 text-blue-600 focus:ring-blue-500"
+              className="mt-0.5 h-4 w-4 rounded border border-slate-300 text-blue-600 focus:ring-blue-500"
             />
             Acepto los términos
           </label>
         </div>
       </div>
-      {errors.acceptTerms ? <p className="text-sm text-rose-600">{errors.acceptTerms}</p> : null}
+      {errors.acceptTerms ? <p className="text-xs text-rose-600">{errors.acceptTerms}</p> : null}
 
-      <div className="space-y-4">
-        <Button type="submit" className="w-full justify-center py-4 text-sm font-semibold">
+      <div className="space-y-2">
+        <Button type="submit" className="w-full justify-center py-2.5 text-sm font-semibold">
           Crear cuenta
         </Button>
       </div>
 
-      <div className="text-center text-sm text-slate-600">
+      <div className="text-center text-xs text-slate-600">
         ¿Ya tienes cuenta?{' '}
         <a href="/login" className="font-semibold text-blue-600 transition hover:text-blue-700">
           Iniciar sesión
