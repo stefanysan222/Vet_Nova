@@ -1,43 +1,253 @@
 "use client";
 
 import Link from "next/link";
-import { usePathname } from "next/navigation";
-import { useEffect, useState, type ReactNode } from "react";
+import { usePathname, useRouter } from "next/navigation";
+import {
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+  type KeyboardEvent,
+  type ReactNode,
+} from "react";
 
-const navigation = [
-  { label: "Dashboard", href: "/veterinario", icon: <DashboardIcon /> },
-  { label: "Citas", href: "/veterinario/citas", icon: <CalendarIcon /> },
-  { label: "Mascotas", href: "/veterinario/mascotas", icon: <PawIcon /> },
+type IconName =
+  | "dashboard"
+  | "calendar"
+  | "patients"
+  | "consultation"
+  | "history"
+  | "profile"
+  | "search"
+  | "bell"
+  | "logout"
+  | "moon"
+  | "sun";
+
+type CategoriaResultado =
+  | "Paciente"
+  | "Historial clínico"
+  | "Consulta"
+  | "Módulo";
+
+interface ResultadoBusqueda {
+  id: string;
+  categoria: CategoriaResultado;
+  titulo: string;
+  descripcion: string;
+  palabrasClave: string;
+  href: string;
+  icon: IconName;
+}
+
+const navigation: {
+  label: string;
+  href: string;
+  icon: IconName;
+}[] = [
+  {
+    label: "Dashboard",
+    href: "/veterinario",
+    icon: "dashboard",
+  },
+  {
+    label: "Citas",
+    href: "/veterinario/citas",
+    icon: "calendar",
+  },
+  {
+    label: "Pacientes",
+    href: "/veterinario/mascotas",
+    icon: "patients",
+  },
   {
     label: "Historial Clínico",
     href: "/veterinario/historial",
-    icon: <HistoryIcon />,
+    icon: "history",
   },
   {
-    label: "Configuración",
+    label: "Mi perfil",
     href: "/veterinario/configuracion",
-    icon: <SettingsIcon />,
+    icon: "profile",
   },
 ];
 
 const notificationPreview = [
   {
-    title: "Cita próxima",
-    description: "Max tiene consulta general a las 09:00 AM.",
+    title: "Próxima consulta",
+    description: "Max tiene consulta general programada a las 09:00 AM.",
     time: "Hace 10 min",
     unread: true,
   },
   {
-    title: "Vacuna pendiente",
-    description: "Luna tiene vacuna de rabia pendiente esta semana.",
+    title: "Control pendiente",
+    description: "Rocky requiere seguimiento postoperatorio.",
     time: "Hace 1 hora",
     unread: true,
   },
   {
     title: "Historial actualizado",
-    description: "Se actualizó el historial clínico de Rocky.",
+    description: "Se registró una evolución clínica para Bella.",
     time: "Ayer",
     unread: false,
+  },
+];
+
+const elementosBusqueda: ResultadoBusqueda[] = [
+  {
+    id: "paciente-max",
+    categoria: "Paciente",
+    titulo: "Max",
+    descripcion: "Canino · Labrador Retriever · Juan Pérez",
+    palabrasClave:
+      "max canino labrador juan perez paciente consulta general",
+    href: "/veterinario/mascotas?buscar=Max",
+    icon: "patients",
+  },
+  {
+    id: "paciente-luna",
+    categoria: "Paciente",
+    titulo: "Luna",
+    descripcion: "Felino · Persa · María García",
+    palabrasClave: "luna felino persa maria garcia paciente vacunacion",
+    href: "/veterinario/mascotas?buscar=Luna",
+    icon: "patients",
+  },
+  {
+    id: "paciente-rocky",
+    categoria: "Paciente",
+    titulo: "Rocky",
+    descripcion: "Canino · Bulldog Francés · Carlos López",
+    palabrasClave:
+      "rocky canino bulldog frances carlos lopez paciente tratamiento control",
+    href: "/veterinario/mascotas?buscar=Rocky",
+    icon: "patients",
+  },
+  {
+    id: "paciente-bella",
+    categoria: "Paciente",
+    titulo: "Bella",
+    descripcion: "Canino · Golden Retriever · Ana Martínez",
+    palabrasClave:
+      "bella canino golden retriever ana martinez paciente seguimiento",
+    href: "/veterinario/mascotas?buscar=Bella",
+    icon: "patients",
+  },
+  {
+    id: "historial-max",
+    categoria: "Historial clínico",
+    titulo: "Historia clínica de Max",
+    descripcion: "Consultar expediente clínico completo",
+    palabrasClave:
+      "max historial historia clinica expediente antecedentes documento",
+    href: "/veterinario/historial?paciente=max",
+    icon: "history",
+  },
+  {
+    id: "historial-luna",
+    categoria: "Historial clínico",
+    titulo: "Historia clínica de Luna",
+    descripcion: "Consultar expediente clínico completo",
+    palabrasClave:
+      "luna historial historia clinica expediente antecedentes documento",
+    href: "/veterinario/historial?paciente=luna",
+    icon: "history",
+  },
+  {
+    id: "historial-rocky",
+    categoria: "Historial clínico",
+    titulo: "Historia clínica de Rocky",
+    descripcion: "Consultar tratamientos y evoluciones",
+    palabrasClave:
+      "rocky historial historia clinica expediente tratamiento evolucion",
+    href: "/veterinario/historial?paciente=rocky",
+    icon: "history",
+  },
+  {
+    id: "historial-bella",
+    categoria: "Historial clínico",
+    titulo: "Historia clínica de Bella",
+    descripcion: "Consultar seguimiento clínico",
+    palabrasClave:
+      "bella historial historia clinica expediente seguimiento evolucion",
+    href: "/veterinario/historial?paciente=bella",
+    icon: "history",
+  },
+  {
+    id: "consulta-max",
+    categoria: "Consulta",
+    titulo: "09:00 AM · Max",
+    descripcion: "Consulta general · Cita confirmada",
+    palabrasClave:
+      "max consulta atender cita confirmada tratamiento 09 general",
+    href: "/veterinario/consulta?paciente=max",
+    icon: "consultation",
+  },
+  {
+    id: "consulta-rocky",
+    categoria: "Consulta",
+    titulo: "11:00 AM · Rocky",
+    descripcion: "Control postoperatorio · Cita confirmada",
+    palabrasClave:
+      "rocky consulta atender cita confirmada tratamiento control postoperatorio",
+    href: "/veterinario/consulta?paciente=rocky",
+    icon: "consultation",
+  },
+  {
+    id: "modulo-dashboard",
+    categoria: "Módulo",
+    titulo: "Dashboard",
+    descripcion: "Resumen general del veterinario",
+    palabrasClave: "inicio dashboard panel resumen principal",
+    href: "/veterinario",
+    icon: "dashboard",
+  },
+  {
+    id: "modulo-citas",
+    categoria: "Módulo",
+    titulo: "Citas",
+    descripcion: "Consultar agenda veterinaria",
+    palabrasClave: "citas agenda diaria programadas solicitud",
+    href: "/veterinario/citas",
+    icon: "calendar",
+  },
+  {
+    id: "modulo-pacientes",
+    categoria: "Módulo",
+    titulo: "Pacientes",
+    descripcion: "Consultar pacientes asignados y atendidos",
+    palabrasClave: "pacientes mascotas atendidos asignados",
+    href: "/veterinario/mascotas",
+    icon: "patients",
+  },
+  {
+    id: "modulo-historial",
+    categoria: "Módulo",
+    titulo: "Historial Clínico",
+    descripcion: "Consultar expedientes médicos",
+    palabrasClave: "historial clinico historias expedientes documentos",
+    href: "/veterinario/historial",
+    icon: "history",
+  },
+  {
+    id: "modulo-consulta",
+    categoria: "Módulo",
+    titulo: "Registrar consulta",
+    descripcion: "Documentar atención y tratamiento",
+    palabrasClave:
+      "registrar consulta tratamiento atencion clinica diagnostico",
+    href: "/veterinario/consulta",
+    icon: "consultation",
+  },
+  {
+    id: "modulo-perfil",
+    categoria: "Módulo",
+    titulo: "Mi perfil",
+    descripcion: "Información personal y seguridad",
+    palabrasClave:
+      "perfil configuracion seguridad contraseña informacion personal",
+    href: "/veterinario/configuracion",
+    icon: "profile",
   },
 ];
 
@@ -47,198 +257,380 @@ export default function VeterinarioLayoutShell({
   children: ReactNode;
 }) {
   const pathname = usePathname();
+  const router = useRouter();
+  const buscadorRef = useRef<HTMLDivElement>(null);
+
   const [showNotifications, setShowNotifications] = useState(false);
   const [showUserMenu, setShowUserMenu] = useState(false);
   const [darkMode, setDarkMode] = useState(false);
 
-  useEffect(() => {
-    const savedTheme = localStorage.getItem("vetnova-theme");
+  const [busquedaGlobal, setBusquedaGlobal] = useState("");
+  const [mostrarResultados, setMostrarResultados] = useState(false);
 
-    if (savedTheme === "dark") {
-      setDarkMode(true);
-      document.documentElement.classList.add("dark");
+  const resultadosBusqueda = useMemo(() => {
+    const termino = normalizarTexto(busquedaGlobal.trim());
+
+    if (!termino) {
+      return [];
     }
+
+    return elementosBusqueda
+      .filter((resultado) => {
+        const contenido = normalizarTexto(
+          `${resultado.titulo} ${resultado.descripcion} ${resultado.palabrasClave}`
+        );
+
+        return contenido.includes(termino);
+      })
+      .slice(0, 8);
+  }, [busquedaGlobal]);
+
+  useEffect(() => {
+    const savedTheme = localStorage.getItem("vetnova-theme") === "dark";
+
+    setDarkMode(savedTheme);
+    document.documentElement.classList.toggle("dark", savedTheme);
+  }, []);
+
+  useEffect(() => {
+    setShowNotifications(false);
+    setShowUserMenu(false);
+    setMostrarResultados(false);
+    setBusquedaGlobal("");
+  }, [pathname]);
+
+  useEffect(() => {
+    function cerrarElementosAbiertos(event: MouseEvent) {
+      const target = event.target as Node;
+
+      if (
+        buscadorRef.current &&
+        !buscadorRef.current.contains(target)
+      ) {
+        setMostrarResultados(false);
+      }
+    }
+
+    document.addEventListener("mousedown", cerrarElementosAbiertos);
+
+    return () => {
+      document.removeEventListener("mousedown", cerrarElementosAbiertos);
+    };
   }, []);
 
   function toggleDarkMode() {
-    const nextValue = !darkMode;
+    const nuevoTema = !darkMode;
 
-    setDarkMode(nextValue);
-    document.documentElement.classList.toggle("dark", nextValue);
-    localStorage.setItem("vetnova-theme", nextValue ? "dark" : "light");
+    setDarkMode(nuevoTema);
+    document.documentElement.classList.toggle("dark", nuevoTema);
+    localStorage.setItem("vetnova-theme", nuevoTema ? "dark" : "light");
+  }
+
+  function isActive(href: string) {
+    if (href === "/veterinario") {
+      return pathname === "/veterinario";
+    }
+
+    return pathname.startsWith(href);
+  }
+
+  function limpiarBusqueda() {
+    setBusquedaGlobal("");
+    setMostrarResultados(false);
+  }
+
+  function abrirResultado(resultado: ResultadoBusqueda) {
+    limpiarBusqueda();
+    router.push(resultado.href);
+  }
+
+  function handleTeclaBuscador(event: KeyboardEvent<HTMLInputElement>) {
+    if (event.key === "Escape") {
+      setMostrarResultados(false);
+      return;
+    }
+
+    if (event.key === "Enter" && resultadosBusqueda.length > 0) {
+      event.preventDefault();
+      abrirResultado(resultadosBusqueda[0]);
+    }
   }
 
   return (
-    <main className="h-screen overflow-hidden bg-[#F5F7FB] text-[#10213A] dark:bg-[#0F172A] dark:text-white">
+    <main className="h-screen overflow-hidden bg-[#F5F7FB] text-[#10213A] dark:bg-[#0B1120] dark:text-white">
       <div className="flex h-screen overflow-hidden">
-        {/* Sidebar */}
-        <aside className="hidden h-screen w-[260px] shrink-0 border-r border-[#E5EAF2] bg-white dark:border-[#1E293B] dark:bg-[#111827] lg:flex lg:flex-col">
-          <div className="flex h-[78px] items-center gap-3 border-b border-[#E5EAF2] px-5 dark:border-[#1E293B]">
+        {/* SIDEBAR */}
+        <aside className="hidden h-screen w-[215px] shrink-0 border-r border-[#E5EAF2] bg-white dark:border-[#1E293B] dark:bg-[#111827] lg:flex lg:flex-col">
+          <div className="flex h-[78px] items-center gap-3 border-b border-[#E5EAF2] px-4 dark:border-[#1E293B]">
             <img
-              src={darkMode ? "/logos/vetnova-logo-dark.png" : "/logos/vetnova-logo-light.png"}
-              alt="VetNova Logo"
+              src={
+                darkMode
+                  ? "/logos/vetnova-logo-dark.png"
+                  : "/logos/vetnova-logo-light.png"
+              }
+              alt="VetNova"
               className="h-10 w-10 rounded-xl object-contain"
             />
 
             <div>
-              <h1 className="text-[22px] font-semibold leading-none text-[#10213A] dark:text-white">
+              <h1 className="text-[20px] font-bold leading-none text-[#10213A] dark:text-white">
                 VetNova
               </h1>
-              <p className="mt-1.5 text-[12px] text-[#64748B] dark:text-[#94A3B8]">
+
+              <p className="mt-1.5 text-[11px] text-[#64748B] dark:text-[#94A3B8]">
                 Sistema Veterinario
               </p>
             </div>
           </div>
 
-          <nav className="flex-1 px-4 py-4">
+          <nav className="flex-1 px-3 py-5">
             {navigation.map((item) => (
               <SidebarItem
                 key={item.href}
                 href={item.href}
+                label={item.label}
                 icon={item.icon}
-                active={
-                  pathname === item.href ||
-                  (item.href !== "/veterinario" &&
-                    pathname.startsWith(item.href))
-                }
-              >
-                {item.label}
-              </SidebarItem>
+                active={isActive(item.href)}
+              />
             ))}
           </nav>
 
-          <div className="border-t border-[#E5EAF2] px-5 py-5 dark:border-[#1E293B]">
+          <div className="border-t border-[#E5EAF2] px-3 py-5 dark:border-[#1E293B]">
             <Link
               href="/"
-              className="flex items-center gap-3 text-[15px] font-semibold text-[#10213A] hover:text-[#2F6BFF] dark:text-white"
+              className="flex items-center gap-3 rounded-xl px-4 py-3 text-[14px] font-semibold text-[#10213A] transition hover:bg-[#F1F5F9] dark:text-white dark:hover:bg-[#1E293B]"
             >
-              <LogoutIcon />
+              <AppIcon name="logout" />
               Cerrar Sesión
             </Link>
           </div>
         </aside>
 
-        {/* Main */}
+        {/* ÁREA PRINCIPAL */}
         <section className="min-w-0 flex-1">
-          {/* Topbar */}
-          <header className="relative flex h-[64px] items-center justify-between border-b border-[#E5EAF2] bg-white px-5 dark:border-[#1E293B] dark:bg-[#111827]">
-            <div className="w-full max-w-[505px]">
-              <div className="flex h-[38px] items-center gap-3 rounded-lg border border-[#CBD5E1] bg-white px-3 dark:border-[#334155] dark:bg-[#0F172A]">
-                <SearchIcon />
+          {/* TOPBAR */}
+          <header className="relative z-40 flex h-[64px] items-center justify-between border-b border-[#E5EAF2] bg-white px-5 dark:border-[#1E293B] dark:bg-[#111827]">
+            {/* BUSCADOR GLOBAL */}
+            <div ref={buscadorRef} className="relative w-full max-w-[520px]">
+              <div
+                className={`flex h-[42px] items-center gap-3 rounded-xl border bg-white px-3 transition duration-200 dark:bg-[#0F172A] ${
+                  mostrarResultados && busquedaGlobal.trim()
+                    ? "border-[#2F6BFF] shadow-[0_0_0_4px_rgba(47,107,255,0.10)] dark:border-[#2563EB]"
+                    : "border-[#CBD5E1] dark:border-[#334155]"
+                }`}
+              >
+                <AppIcon
+                  name="search"
+                  className="h-[18px] w-[18px] text-[#64748B]"
+                />
+
                 <input
                   type="text"
-                  placeholder="Buscar mascotas, citas..."
-                  className="w-full bg-transparent text-[14px] text-slate-700 outline-none placeholder:text-[#94A3B8] dark:text-white"
+                  value={busquedaGlobal}
+                  onChange={(event) => {
+                    setBusquedaGlobal(event.target.value);
+                    setMostrarResultados(true);
+                  }}
+                  onFocus={() => setMostrarResultados(true)}
+                  onKeyDown={handleTeclaBuscador}
+                  placeholder="Buscar pacientes, citas o historiales..."
+                  className="w-full bg-transparent text-[14px] text-[#10213A] outline-none placeholder:text-[#94A3B8] dark:text-white"
                 />
+
+                {busquedaGlobal && (
+                  <button
+                    type="button"
+                    onClick={limpiarBusqueda}
+                    className="flex h-7 w-7 items-center justify-center rounded-lg text-[19px] text-[#64748B] transition hover:bg-[#F1F5F9] dark:hover:bg-[#1E293B]"
+                    aria-label="Limpiar búsqueda"
+                  >
+                    ×
+                  </button>
+                )}
               </div>
-            </div>
 
-            <div className="ml-5 flex items-center gap-4">
-              {/* Notifications */}
-              <button
-                type="button"
-                onClick={() => {
-                  setShowNotifications(!showNotifications);
-                  setShowUserMenu(false);
-                }}
-                className="relative flex h-8 w-8 items-center justify-center rounded-lg hover:bg-[#F1F5F9] dark:hover:bg-[#1E293B]"
-              >
-                <BellIcon />
-                <span className="absolute right-[4px] top-[3px] h-2.5 w-2.5 rounded-full bg-[#EF4444]" />
-              </button>
-
-              {showNotifications && (
-                <div className="absolute right-[112px] top-[58px] z-50 w-[380px] overflow-hidden rounded-xl border border-[#CBD5E1] bg-white shadow-[0_12px_30px_rgba(15,23,42,0.16)] dark:border-[#334155] dark:bg-[#111827]">
-                  <div className="flex items-center justify-between border-b border-[#E2E8F0] px-5 py-4 dark:border-[#334155]">
+              {mostrarResultados && busquedaGlobal.trim() !== "" && (
+                <div className="absolute left-0 top-[50px] z-50 w-full overflow-hidden rounded-[18px] border border-[#E2E8F0] bg-white shadow-[0_18px_45px_rgba(15,23,42,0.16)] dark:border-[#334155] dark:bg-[#111827]">
+                  <div className="flex items-center justify-between border-b border-[#E2E8F0] px-4 py-3 dark:border-[#334155]">
                     <div>
-                      <h3 className="text-[16px] font-semibold text-[#10213A] dark:text-white">
-                        Notificaciones
-                      </h3>
-                      <p className="mt-1 text-[13px] text-[#64748B] dark:text-[#94A3B8]">
-                        Tienes 2 notificaciones nuevas
+                      <p className="text-[13px] font-semibold text-[#10213A] dark:text-white">
+                        Resultados de búsqueda
+                      </p>
+
+                      <p className="mt-1 text-[12px] text-[#64748B] dark:text-[#94A3B8]">
+                        Presiona Enter para abrir el primer resultado
                       </p>
                     </div>
 
-                    <span className="rounded-full bg-[#DBEAFE] px-3 py-1 text-[12px] font-semibold text-[#2563EB]">
-                      2 nuevas
+                    <span className="rounded-full bg-[#EEF4FF] px-3 py-1 text-[12px] font-semibold text-[#2563EB] dark:bg-[#1E293B] dark:text-[#93C5FD]">
+                      {resultadosBusqueda.length}
                     </span>
                   </div>
 
-                  <div className="max-h-[290px] divide-y divide-[#E2E8F0] overflow-y-auto dark:divide-[#334155]">
-                    {notificationPreview.map((item) => (
-                      <div
-                        key={item.title}
-                        className="flex gap-3 px-5 py-4 hover:bg-[#F8FAFC] dark:hover:bg-[#1E293B]"
-                      >
-                        <div className="mt-1 flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-[#DBEAFE] text-[#2563EB]">
-                          <BellSmallIcon />
-                        </div>
-
-                        <div className="min-w-0 flex-1">
-                          <div className="flex items-center gap-2">
-                            <h4 className="text-[14px] font-semibold text-[#10213A] dark:text-white">
-                              {item.title}
-                            </h4>
-
-                            {item.unread && (
-                              <span className="h-2 w-2 rounded-full bg-[#EF4444]" />
-                            )}
+                  {resultadosBusqueda.length > 0 ? (
+                    <div className="max-h-[390px] overflow-y-auto py-2">
+                      {resultadosBusqueda.map((resultado) => (
+                        <button
+                          key={resultado.id}
+                          type="button"
+                          onClick={() => abrirResultado(resultado)}
+                          className="group flex w-full items-center gap-3 px-4 py-3 text-left transition hover:bg-[#F5F9FF] dark:hover:bg-[#1E293B]"
+                        >
+                          <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-[#EEF4FF] text-[#2563EB] transition group-hover:bg-[#DBEAFE] dark:bg-[#172554] dark:text-[#93C5FD]">
+                            <AppIcon
+                              name={resultado.icon}
+                              className="h-[19px] w-[19px]"
+                            />
                           </div>
 
-                          <p className="mt-1 text-[13px] leading-5 text-[#64748B] dark:text-[#94A3B8]">
-                            {item.description}
-                          </p>
+                          <div className="min-w-0 flex-1">
+                            <p className="truncate text-[14px] font-semibold text-[#10213A] dark:text-white">
+                              {resultado.titulo}
+                            </p>
 
-                          <p className="mt-2 text-[12px] text-[#94A3B8]">
-                            {item.time}
-                          </p>
-                        </div>
+                            <p className="mt-1 truncate text-[12px] text-[#64748B] dark:text-[#94A3B8]">
+                              {resultado.descripcion}
+                            </p>
+                          </div>
+
+                          <span className="shrink-0 rounded-full bg-[#F1F5F9] px-2.5 py-1 text-[11px] font-semibold text-[#64748B] dark:bg-[#0F172A] dark:text-[#CBD5E1]">
+                            {resultado.categoria}
+                          </span>
+                        </button>
+                      ))}
+                    </div>
+                  ) : (
+                    <div className="px-5 py-8 text-center">
+                      <div className="mx-auto flex h-11 w-11 items-center justify-center rounded-full bg-[#F1F5F9] text-[#64748B] dark:bg-[#1E293B] dark:text-[#94A3B8]">
+                        <AppIcon name="search" className="h-5 w-5" />
                       </div>
-                    ))}
-                  </div>
 
-                  <div className="border-t border-[#E2E8F0] p-4 dark:border-[#334155]">
-                    <Link
-                      href="/veterinario/notificaciones"
-                      onClick={() => setShowNotifications(false)}
-                      className="flex h-[40px] w-full items-center justify-center rounded-xl bg-[#2F6BFF] text-[14px] font-semibold text-white"
-                    >
-                      Ver más
-                    </Link>
-                  </div>
+                      <p className="mt-3 text-[14px] font-semibold text-[#10213A] dark:text-white">
+                        No se encontraron resultados
+                      </p>
+
+                      <p className="mt-1 text-[12px] text-[#64748B] dark:text-[#94A3B8]">
+                        Busca por paciente, cita, historial o módulo.
+                      </p>
+                    </div>
+                  )}
                 </div>
               )}
+            </div>
+
+            <div className="ml-5 flex items-center gap-4">
+              {/* NOTIFICACIONES */}
+              <div className="relative">
+                <button
+                  type="button"
+                  aria-label="Ver notificaciones"
+                  onClick={() => {
+                    setShowNotifications(!showNotifications);
+                    setShowUserMenu(false);
+                    setMostrarResultados(false);
+                  }}
+                  className="relative flex h-10 w-10 items-center justify-center rounded-xl text-[#10213A] transition hover:bg-[#F1F5F9] dark:text-white dark:hover:bg-[#1E293B]"
+                >
+                  <AppIcon name="bell" />
+
+                  <span className="absolute right-[8px] top-[8px] h-2.5 w-2.5 rounded-full bg-[#EF4444]" />
+                </button>
+
+                {showNotifications && (
+                  <div className="absolute right-0 top-[52px] z-50 w-[380px] overflow-hidden rounded-2xl border border-[#E2E8F0] bg-white shadow-[0_18px_45px_rgba(15,23,42,0.15)] dark:border-[#334155] dark:bg-[#111827]">
+                    <div className="flex items-center justify-between border-b border-[#E2E8F0] px-5 py-4 dark:border-[#334155]">
+                      <div>
+                        <h3 className="text-[16px] font-semibold text-[#10213A] dark:text-white">
+                          Notificaciones
+                        </h3>
+
+                        <p className="mt-1 text-[13px] text-[#64748B] dark:text-[#94A3B8]">
+                          Tienes 2 notificaciones nuevas
+                        </p>
+                      </div>
+
+                      <span className="rounded-full bg-[#DBEAFE] px-3 py-1 text-[12px] font-semibold text-[#2563EB]">
+                        2 nuevas
+                      </span>
+                    </div>
+
+                    <div className="divide-y divide-[#E2E8F0] dark:divide-[#334155]">
+                      {notificationPreview.map((notification) => (
+                        <div
+                          key={notification.title}
+                          className="flex gap-3 px-5 py-4 transition hover:bg-[#F8FAFC] dark:hover:bg-[#1E293B]"
+                        >
+                          <div className="mt-1 flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-[#DBEAFE] text-[#2563EB]">
+                            <AppIcon name="bell" className="h-5 w-5" />
+                          </div>
+
+                          <div className="min-w-0 flex-1">
+                            <div className="flex items-center gap-2">
+                              <p className="text-[14px] font-semibold text-[#10213A] dark:text-white">
+                                {notification.title}
+                              </p>
+
+                              {notification.unread && (
+                                <span className="h-2 w-2 rounded-full bg-[#EF4444]" />
+                              )}
+                            </div>
+
+                            <p className="mt-1 text-[13px] leading-5 text-[#64748B] dark:text-[#94A3B8]">
+                              {notification.description}
+                            </p>
+
+                            <p className="mt-2 text-[12px] text-[#94A3B8]">
+                              {notification.time}
+                            </p>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+
+                    <div className="border-t border-[#E2E8F0] p-4 dark:border-[#334155]">
+                      <Link
+                        href="/veterinario/notificaciones"
+                        className="flex h-[42px] items-center justify-center rounded-xl bg-[#2F6BFF] text-[14px] font-semibold text-white transition hover:bg-[#2459DF]"
+                      >
+                        Ver todas las notificaciones
+                      </Link>
+                    </div>
+                  </div>
+                )}
+              </div>
 
               <div className="h-8 w-px bg-[#E2E8F0] dark:bg-[#334155]" />
 
-              {/* User menu */}
+              {/* USUARIO */}
               <div className="relative">
                 <button
                   type="button"
                   onClick={() => {
                     setShowUserMenu(!showUserMenu);
                     setShowNotifications(false);
+                    setMostrarResultados(false);
                   }}
-                  className="flex items-center gap-3 rounded-xl px-2 py-1.5 hover:bg-[#F8FAFC] dark:hover:bg-[#1E293B]"
+                  className="flex items-center gap-3 rounded-xl px-2 py-1.5 transition hover:bg-[#F8FAFC] dark:hover:bg-[#1E293B]"
                 >
                   <div className="text-right">
                     <p className="text-[14px] font-semibold leading-none text-[#10213A] dark:text-white">
                       Dr. Rodríguez
                     </p>
+
                     <p className="mt-1.5 text-[12px] text-[#64748B] dark:text-[#94A3B8]">
-                      Veterinarian
+                      Veterinario
                     </p>
                   </div>
 
-                  <div className="flex h-9 w-9 items-center justify-center rounded-full bg-[#2F6BFF] text-[15px] font-semibold text-white">
+                  <div className="flex h-10 w-10 items-center justify-center rounded-full bg-[#2F6BFF] text-[15px] font-semibold text-white">
                     D
                   </div>
                 </button>
 
                 {showUserMenu && (
-                  <div className="absolute right-0 top-[48px] z-50 w-[280px] overflow-hidden rounded-xl border border-[#CBD5E1] bg-white shadow-[0_12px_30px_rgba(15,23,42,0.16)] dark:border-[#334155] dark:bg-[#111827]">
+                  <div className="absolute right-0 top-[54px] z-50 w-[285px] overflow-hidden rounded-2xl border border-[#E2E8F0] bg-white shadow-[0_18px_45px_rgba(15,23,42,0.15)] dark:border-[#334155] dark:bg-[#111827]">
                     <div className="flex items-center gap-3 border-b border-[#E2E8F0] px-5 py-4 dark:border-[#334155]">
-                      <div className="flex h-11 w-11 items-center justify-center rounded-full bg-[#2F6BFF] text-[16px] font-semibold text-white">
+                      <div className="flex h-11 w-11 items-center justify-center rounded-full bg-[#2F6BFF] font-semibold text-white">
                         D
                       </div>
 
@@ -246,58 +638,45 @@ export default function VeterinarioLayoutShell({
                         <p className="text-[15px] font-semibold text-[#10213A] dark:text-white">
                           Dr. Rodríguez
                         </p>
+
                         <p className="mt-1 text-[13px] text-[#64748B] dark:text-[#94A3B8]">
-                          Veterinarian
+                          Veterinario
                         </p>
                       </div>
                     </div>
 
                     <div className="py-2">
-                      <UserMenuItem
-                        href="/veterinario/perfil"
-                        onClick={() => setShowUserMenu(false)}
-                        icon={<UserMenuIcon />}
-                      >
-                        Ver perfil
-                      </UserMenuItem>
-
-                      <UserMenuItem
-                        href="/veterinario/mascotas"
-                        onClick={() => setShowUserMenu(false)}
-                        icon={<PawIcon />}
-                      >
-                        Mis pacientes
-                      </UserMenuItem>
-
-                      <UserMenuItem
-                        href="/veterinario/citas"
-                        onClick={() => setShowUserMenu(false)}
-                        icon={<CalendarIcon />}
-                      >
-                        Agenda del día
-                      </UserMenuItem>
-
-                      <UserMenuItem
+                      <DropdownLink
                         href="/veterinario/configuracion"
-                        onClick={() => setShowUserMenu(false)}
-                        icon={<SettingsIcon />}
-                      >
-                        Configuración del perfil
-                      </UserMenuItem>
+                        icon="profile"
+                        label="Mi perfil"
+                      />
+
+                      <DropdownLink
+                        href="/veterinario/mascotas"
+                        icon="patients"
+                        label="Pacientes"
+                      />
+
+                      <DropdownLink
+                        href="/veterinario/citas"
+                        icon="calendar"
+                        label="Agenda diaria"
+                      />
 
                       <button
                         type="button"
                         onClick={toggleDarkMode}
-                        className="flex w-full items-center justify-between px-5 py-3 text-[14px] font-semibold text-[#10213A] hover:bg-[#F8FAFC] dark:text-white dark:hover:bg-[#1E293B]"
+                        className="flex w-full items-center justify-between px-5 py-3 text-[14px] font-semibold text-[#10213A] transition hover:bg-[#F8FAFC] dark:text-white dark:hover:bg-[#1E293B]"
                       >
                         <span className="flex items-center gap-3">
-                          {darkMode ? <SunIcon /> : <MoonIcon />}
+                          <AppIcon name={darkMode ? "sun" : "moon"} />
                           {darkMode ? "Modo claro" : "Modo oscuro"}
                         </span>
 
                         <span
                           className={`relative h-[22px] w-[40px] rounded-full transition ${
-                            darkMode ? "bg-[#2F6BFF]" : "bg-[#94A3B8]"
+                            darkMode ? "bg-[#2F6BFF]" : "bg-[#CBD5E1]"
                           }`}
                         >
                           <span
@@ -312,10 +691,9 @@ export default function VeterinarioLayoutShell({
                     <div className="border-t border-[#E2E8F0] py-2 dark:border-[#334155]">
                       <Link
                         href="/"
-                        onClick={() => setShowUserMenu(false)}
-                        className="flex items-center gap-3 px-5 py-3 text-[14px] font-semibold text-[#EF4444] hover:bg-[#FEF2F2] dark:hover:bg-[#3F1D1D]"
+                        className="flex items-center gap-3 px-5 py-3 text-[14px] font-semibold text-[#EF4444] transition hover:bg-[#FEF2F2] dark:hover:bg-[#3F1D1D]"
                       >
-                        <LogoutIcon />
+                        <AppIcon name="logout" />
                         Cerrar sesión
                       </Link>
                     </div>
@@ -325,6 +703,7 @@ export default function VeterinarioLayoutShell({
             </div>
           </header>
 
+          {/* CONTENIDO */}
           <div className="h-[calc(100vh-64px)] overflow-y-auto bg-[#F5F7FB] px-6 py-6 dark:bg-[#0B1120]">
             {children}
           </div>
@@ -335,360 +714,169 @@ export default function VeterinarioLayoutShell({
 }
 
 function SidebarItem({
-  children,
+  label,
   href,
   icon,
   active,
 }: {
-  children: ReactNode;
+  label: string;
   href: string;
-  icon: ReactNode;
+  icon: IconName;
   active: boolean;
 }) {
   return (
     <Link
       href={href}
-      className={`mb-2.5 flex w-full items-center gap-3 rounded-xl px-4 py-2.5 text-[15px] font-semibold transition ${
+      className={`mb-2 flex items-center gap-3 rounded-xl px-4 py-3 text-[14px] font-semibold transition ${
         active
           ? "bg-[#2F6BFF] text-white shadow-sm"
-          : "text-[#10213A] hover:bg-[#F8FAFC] dark:text-white dark:hover:bg-[#1E293B]"
+          : "text-[#10213A] hover:bg-[#F1F5F9] dark:text-white dark:hover:bg-[#1E293B]"
       }`}
     >
-      <span className={active ? "text-white" : "text-[#334155] dark:text-white"}>
-        {icon}
-      </span>
-      {children}
+      <AppIcon name={icon} />
+      {label}
     </Link>
   );
 }
 
-function UserMenuItem({
-  children,
+function DropdownLink({
   href,
   icon,
-  onClick,
+  label,
 }: {
-  children: ReactNode;
   href: string;
-  icon: ReactNode;
-  onClick: () => void;
+  icon: IconName;
+  label: string;
 }) {
   return (
     <Link
       href={href}
-      onClick={onClick}
-      className="flex items-center gap-3 px-5 py-3 text-[14px] font-semibold text-[#10213A] hover:bg-[#F8FAFC] dark:text-white dark:hover:bg-[#1E293B]"
+      className="flex items-center gap-3 px-5 py-3 text-[14px] font-semibold text-[#10213A] transition hover:bg-[#F8FAFC] dark:text-white dark:hover:bg-[#1E293B]"
     >
-      <span className="text-[#334155] dark:text-white">{icon}</span>
-      {children}
+      <AppIcon name={icon} />
+      {label}
     </Link>
   );
 }
 
-/* Icons */
+function AppIcon({
+  name,
+  className = "h-5 w-5",
+}: {
+  name: IconName;
+  className?: string;
+}) {
+  const svgProps = {
+    className,
+    viewBox: "0 0 24 24",
+    fill: "none",
+    stroke: "currentColor",
+    strokeWidth: 1.8,
+    strokeLinecap: "round" as const,
+    strokeLinejoin: "round" as const,
+  };
 
-function DashboardIcon() {
-  return (
-    <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
-      <rect
-        x="4"
-        y="4"
-        width="7"
-        height="7"
-        rx="1.5"
-        stroke="currentColor"
-        strokeWidth="1.8"
-      />
-      <rect
-        x="13"
-        y="4"
-        width="7"
-        height="7"
-        rx="1.5"
-        stroke="currentColor"
-        strokeWidth="1.8"
-      />
-      <rect
-        x="4"
-        y="13"
-        width="7"
-        height="7"
-        rx="1.5"
-        stroke="currentColor"
-        strokeWidth="1.8"
-      />
-      <rect
-        x="13"
-        y="13"
-        width="7"
-        height="7"
-        rx="1.5"
-        stroke="currentColor"
-        strokeWidth="1.8"
-      />
-    </svg>
-  );
+  switch (name) {
+    case "dashboard":
+      return (
+        <svg {...svgProps}>
+          <rect x="3.5" y="3.5" width="7" height="7" rx="1.5" />
+          <rect x="13.5" y="3.5" width="7" height="7" rx="1.5" />
+          <rect x="3.5" y="13.5" width="7" height="7" rx="1.5" />
+          <rect x="13.5" y="13.5" width="7" height="7" rx="1.5" />
+        </svg>
+      );
+
+    case "calendar":
+      return (
+        <svg {...svgProps}>
+          <rect x="3.5" y="5" width="17" height="15.5" rx="2.5" />
+          <path d="M7.5 3.5v3.5M16.5 3.5v3.5M3.5 9.5h17" />
+        </svg>
+      );
+
+    case "patients":
+      return (
+        <svg {...svgProps}>
+          <ellipse cx="8" cy="7" rx="2" ry="2.6" />
+          <ellipse cx="16" cy="7" rx="2" ry="2.6" />
+          <ellipse cx="6.5" cy="13" rx="2" ry="2.6" />
+          <ellipse cx="17.5" cy="13" rx="2" ry="2.6" />
+          <path d="M12 18.6c2.2 0 3.8-1.3 3.8-3 0-1.8-1.6-2.9-3.3-2.9-.8 0-1.5.2-2.1.7-.5.3-1 .4-1.5.4-1.5 0-2.7 1-2.7 2.4 0 1.4 1.2 2.4 2.8 2.4H12Z" />
+        </svg>
+      );
+
+    case "consultation":
+      return (
+        <svg {...svgProps}>
+          <path d="M9 4h6" />
+          <path d="M9 3.5h6a1.5 1.5 0 0 1 1.5 1.5v1H7.5V5A1.5 1.5 0 0 1 9 3.5Z" />
+          <rect x="5" y="6" width="14" height="15" rx="2" />
+          <path d="M9 11h6M9 15h6M9 18h4" />
+        </svg>
+      );
+
+    case "history":
+      return (
+        <svg {...svgProps}>
+          <path d="M12 7v5l3.5 2" />
+          <path d="M20.5 12a8.5 8.5 0 1 1-2.7-6.2" />
+          <path d="M20.5 4.5v5h-5" />
+        </svg>
+      );
+
+    case "profile":
+      return (
+        <svg {...svgProps}>
+          <path d="M12 12a4 4 0 1 0 0-8 4 4 0 0 0 0 8Z" />
+          <path d="M5 20c0-3.6 2.9-6 7-6s7 2.4 7 6" />
+        </svg>
+      );
+
+    case "search":
+      return (
+        <svg {...svgProps}>
+          <circle cx="11" cy="11" r="7" />
+          <path d="m20 20-3.8-3.8" />
+        </svg>
+      );
+
+    case "bell":
+      return (
+        <svg {...svgProps}>
+          <path d="M18 16.8H6c1-1 1.7-2.3 1.7-5 0-2.8 1.8-5 4.3-5s4.3 2.2 4.3 5c0 2.7.7 4 1.7 5Z" />
+          <path d="M10 19a2.2 2.2 0 0 0 4 0" />
+        </svg>
+      );
+
+    case "logout":
+      return (
+        <svg {...svgProps}>
+          <path d="M10 4H6a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h4" />
+          <path d="m14 16 4-4-4-4M18 12H9" />
+        </svg>
+      );
+
+    case "moon":
+      return (
+        <svg {...svgProps}>
+          <path d="M21 14.5A8.5 8.5 0 0 1 9.5 3 8.5 8.5 0 1 0 21 14.5Z" />
+        </svg>
+      );
+
+    case "sun":
+      return (
+        <svg {...svgProps}>
+          <circle cx="12" cy="12" r="4" />
+          <path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4" />
+        </svg>
+      );
+  }
 }
 
-function CalendarIcon() {
-  return (
-    <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
-      <rect
-        x="3.5"
-        y="5.5"
-        width="17"
-        height="15"
-        rx="2.5"
-        stroke="currentColor"
-        strokeWidth="2"
-      />
-      <path
-        d="M7 3.5v3M17 3.5v3M3.5 9.5h17"
-        stroke="currentColor"
-        strokeWidth="2"
-        strokeLinecap="round"
-      />
-    </svg>
-  );
-}
-
-function PawIcon() {
-  return (
-    <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
-      <ellipse
-        cx="8"
-        cy="7"
-        rx="2"
-        ry="2.7"
-        stroke="currentColor"
-        strokeWidth="1.8"
-      />
-      <ellipse
-        cx="16"
-        cy="7"
-        rx="2"
-        ry="2.7"
-        stroke="currentColor"
-        strokeWidth="1.8"
-      />
-      <ellipse
-        cx="17.5"
-        cy="13"
-        rx="2"
-        ry="2.7"
-        stroke="currentColor"
-        strokeWidth="1.8"
-      />
-      <ellipse
-        cx="6.5"
-        cy="13"
-        rx="2"
-        ry="2.7"
-        stroke="currentColor"
-        strokeWidth="1.8"
-      />
-      <path
-        d="M12 18.4c2 0 3.7-1.4 3.7-3.2 0-1.7-1.6-2.6-3.2-2.6-.8 0-1.5.2-2.1.6-.4.3-.9.4-1.5.4-1.5 0-2.7 1-2.7 2.4 0 1.3 1.1 2.3 2.6 2.3H12Z"
-        stroke="currentColor"
-        strokeWidth="1.8"
-        strokeLinejoin="round"
-      />
-    </svg>
-  );
-}
-
-function HistoryIcon() {
-  return (
-    <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
-      <path
-        d="M12 6v6l4 2"
-        stroke="currentColor"
-        strokeWidth="2"
-        strokeLinecap="round"
-      />
-      <path
-        d="M21 12a9 9 0 1 1-3.1-6.9"
-        stroke="currentColor"
-        strokeWidth="2"
-        strokeLinecap="round"
-      />
-    </svg>
-  );
-}
-
-function SettingsIcon() {
-  return (
-    <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
-      <path
-        d="M12 15.3a3.3 3.3 0 1 0 0-6.6 3.3 3.3 0 0 0 0 6.6Z"
-        stroke="currentColor"
-        strokeWidth="2"
-      />
-      <path
-        d="M19.4 12.1c.1-.4.1-.8.1-1.2s0-.8-.1-1.2l2-1.5-2-3.5-2.4 1a8 8 0 0 0-2-.9L14.7 3h-5.4L9 5.9a8 8 0 0 0-2 .9l-2.4-1-2 3.5 2 1.5a7 7 0 0 0 0 2.4l-2 1.5 2 3.5 2.4-1a8 8 0 0 0 2 .9L9.3 21h5.4l.3-2.9a8 8 0 0 0 2-.9l2.4 1 2-3.5-2-1.5Z"
-        stroke="currentColor"
-        strokeWidth="2"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-      />
-    </svg>
-  );
-}
-
-function VetIcon() {
-  return (
-    <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
-      <path
-        d="M15.5 8.2a2 2 0 1 0 0-4 2 2 0 0 0 0 4Z"
-        stroke="white"
-        strokeWidth="1.8"
-      />
-      <path
-        d="M7.7 12a2.1 2.1 0 1 0 0-4.2A2.1 2.1 0 0 0 7.7 12Z"
-        stroke="white"
-        strokeWidth="1.8"
-      />
-      <path
-        d="M16.8 15.8a1.7 1.7 0 1 0 0-3.4 1.7 1.7 0 0 0 0 3.4Z"
-        stroke="white"
-        strokeWidth="1.8"
-      />
-      <path
-        d="M10.6 19.1c2 0 3.7-1.4 3.7-3.2 0-1.7-1.6-2.6-3.2-2.6-.8 0-1.4.2-2 .6-.5.3-1 .4-1.6.4-1.6 0-2.9 1-2.9 2.5 0 1.4 1.2 2.3 2.8 2.3h3.2Z"
-        stroke="white"
-        strokeWidth="1.8"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-      />
-    </svg>
-  );
-}
-
-function SearchIcon() {
-  return (
-    <svg width="17" height="17" viewBox="0 0 24 24" fill="none">
-      <circle cx="11" cy="11" r="7" stroke="#64748B" strokeWidth="2" />
-      <path
-        d="m20 20-3.5-3.5"
-        stroke="#64748B"
-        strokeWidth="2"
-        strokeLinecap="round"
-      />
-    </svg>
-  );
-}
-
-function BellIcon() {
-  return (
-    <svg width="21" height="21" viewBox="0 0 24 24" fill="none">
-      <path
-        d="M15 18H6.5c.7-.8 1.5-2.2 1.5-4.8 0-3.2 1.8-5.2 4.5-5.2s4.5 2 4.5 5.2c0 2.6.8 4 1.5 4.8H15Z"
-        stroke="currentColor"
-        strokeWidth="1.9"
-        strokeLinejoin="round"
-      />
-      <path
-        d="M10 19.2a2.2 2.2 0 0 0 4 0"
-        stroke="currentColor"
-        strokeWidth="1.9"
-        strokeLinecap="round"
-      />
-    </svg>
-  );
-}
-
-function BellSmallIcon() {
-  return (
-    <svg width="19" height="19" viewBox="0 0 24 24" fill="none">
-      <path
-        d="M15 18H6.5c.7-.8 1.5-2.2 1.5-4.8 0-3.2 1.8-5.2 4.5-5.2s4.5 2 4.5 5.2c0 2.6.8 4 1.5 4.8H15Z"
-        stroke="currentColor"
-        strokeWidth="2"
-        strokeLinejoin="round"
-      />
-      <path
-        d="M10 19.2a2.2 2.2 0 0 0 4 0"
-        stroke="currentColor"
-        strokeWidth="2"
-        strokeLinecap="round"
-      />
-    </svg>
-  );
-}
-
-function UserMenuIcon() {
-  return (
-    <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
-      <path
-        d="M12 12a4 4 0 1 0 0-8 4 4 0 0 0 0 8Z"
-        stroke="currentColor"
-        strokeWidth="2"
-      />
-      <path
-        d="M5 20c0-3.5 2.9-6 7-6s7 2.5 7 6"
-        stroke="currentColor"
-        strokeWidth="2"
-        strokeLinecap="round"
-      />
-    </svg>
-  );
-}
-
-function LogoutIcon() {
-  return (
-    <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
-      <path
-        d="M10 4H6a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h4"
-        stroke="currentColor"
-        strokeWidth="2"
-        strokeLinecap="round"
-      />
-      <path
-        d="M14 16l4-4-4-4M18 12H9"
-        stroke="currentColor"
-        strokeWidth="2"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-      />
-    </svg>
-  );
-}
-
-function MoonIcon() {
-  return (
-    <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
-      <path
-        d="M21 14.5A8.5 8.5 0 0 1 9.5 3a7 7 0 1 0 11.5 11.5Z"
-        stroke="currentColor"
-        strokeWidth="2"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-      />
-    </svg>
-  );
-}
-
-function SunIcon() {
-  return (
-    <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
-      <circle cx="12" cy="12" r="4" stroke="currentColor" strokeWidth="2" />
-      <path
-        d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"
-        stroke="currentColor"
-        strokeWidth="2"
-        strokeLinecap="round"
-      />
-    </svg>
-  );
-}
-
-function LogoIcon() {
-  return (
-    <svg width="23" height="23" viewBox="0 0 24 24" fill="none">
-      <path d="M15.5 8.2a2 2 0 1 0 0-4 2 2 0 0 0 0 4Z" stroke="white" strokeWidth="1.8" />
-      <path d="M7.7 12a2.1 2.1 0 1 0 0-4.2A2.1 2.1 0 0 0 7.7 12Z" stroke="white" strokeWidth="1.8" />
-      <path d="M16.8 15.8a1.7 1.7 0 1 0 0-3.4 1.7 1.7 0 0 0 0 3.4Z" stroke="white" strokeWidth="1.8" />
-      <path d="M10.6 19.1c2 0 3.7-1.4 3.7-3.2 0-1.7-1.6-2.6-3.2-2.6-.8 0-1.4.2-2 .6-.5.3-1 .4-1.6.4-1.6 0-2.9 1-2.9 2.5 0 1.4 1.2 2.3 2.8 2.3h3.2Z" stroke="white" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
-    </svg>
-  );
+function normalizarTexto(texto: string) {
+  return texto
+    .toLowerCase()
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "");
 }

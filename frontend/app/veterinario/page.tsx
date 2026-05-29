@@ -1,163 +1,278 @@
+import Link from "next/link";
+
 const stats = [
-  { title: "Citas Hoy", value: "12" },
-  { title: "Mascotas Activas", value: "248" },
-  { title: "Ingresos del Mes", value: "$15,234" },
+  {
+    title: "Citas de hoy",
+    value: "12",
+    description: "Agenda programada",
+  },
+  {
+    title: "Pacientes atendidos",
+    value: "5",
+    description: "Consultas completadas hoy",
+  },
+  {
+    title: "Consultas pendientes",
+    value: "7",
+    description: "Pacientes por valorar",
+  },
+  {
+    title: "Tratamientos registrados",
+    value: "4",
+    description: "Actualizados hoy",
+  },
 ];
 
-const citasSemana = [
-  { dia: "Lun", valor: 18 },
-  { dia: "Mar", valor: 24 },
-  { dia: "Mie", valor: 20 },
-  { dia: "Jue", valor: 26 },
-  { dia: "Vie", valor: 22 },
-  { dia: "Sab", valor: 14 },
-  { dia: "Dom", valor: 10 },
-];
-
-const proximasCitas = [
+const agendaDiaria = [
+  {
+    hora: "08:00",
+    mascota: "Toby",
+    especie: "Canino",
+    propietario: "Laura Gómez",
+    motivo: "Control general",
+    estado: "Atendida",
+    badge: "bg-[#DCFCE7] text-[#15803D]",
+  },
   {
     hora: "09:00",
     mascota: "Max",
-    dueño: "Juan Pérez",
-    servicio: "Consulta General",
-    estado: "Confirmada",
-    badge: "bg-[#DDF5DE] text-[#2F9E44]",
+    especie: "Canino",
+    propietario: "Juan Pérez",
+    motivo: "Consulta general",
+    estado: "En consulta",
+    badge: "bg-[#DBEAFE] text-[#2563EB]",
   },
   {
     hora: "10:30",
     mascota: "Luna",
-    dueño: "María García",
-    servicio: "Vacunación",
+    especie: "Felino",
+    propietario: "María García",
+    motivo: "Vacunación",
     estado: "Pendiente",
-    badge: "bg-[#FBE9A9] text-[#9A6700]",
-  },
-  {
-    hora: "11:00",
-    mascota: "Rocky",
-    dueño: "Carlos López",
-    servicio: "Cirugía Menor",
-    estado: "Confirmada",
-    badge: "bg-[#DDF5DE] text-[#2F9E44]",
+    badge: "bg-[#FEF3C7] text-[#B45309]",
   },
   {
     hora: "14:00",
     mascota: "Bella",
-    dueño: "Ana Martínez",
-    servicio: "Control Post-Op",
-    estado: "En Proceso",
-    badge: "bg-[#DCE8FF] text-[#2F6BFF]",
+    especie: "Canino",
+    propietario: "Ana Martínez",
+    motivo: "Control postoperatorio",
+    estado: "Pendiente",
+    badge: "bg-[#FEF3C7] text-[#B45309]",
+  },
+];
+
+const pacientesAtendidos = [
+  {
+    nombre: "Toby",
+    propietario: "Laura Gómez",
+    diagnostico: "Dermatitis leve",
+    tratamiento: "Medicamento tópico",
+    hora: "08:45",
+  },
+  {
+    nombre: "Rocky",
+    propietario: "Carlos López",
+    diagnostico: "Control postoperatorio",
+    tratamiento: "Curación y antibiótico",
+    hora: "Ayer",
+  },
+  {
+    nombre: "Mía",
+    propietario: "Sofía Torres",
+    diagnostico: "Gastroenteritis",
+    tratamiento: "Dieta blanda y control",
+    hora: "Ayer",
   },
 ];
 
 export default function VeterinarioPage() {
   return (
     <div className="space-y-6">
-      <section className="rounded-[28px] bg-gradient-to-r from-[#2563EB] via-[#2385F3] to-[#06A7E9] p-8 text-white shadow-[0_22px_50px_rgba(37,99,235,0.22)] transition-all duration-300 ease-out hover:-translate-y-1 hover:shadow-[0_28px_60px_rgba(37,99,235,0.28)]">
-        <p className="mb-3 text-sm font-semibold uppercase tracking-[0.24em] text-white/80">
-          Veterinario
-        </p>
-        <h1 className="text-[38px] font-bold leading-tight">
-          Bienvenido, Dr. Rodríguez
-        </h1>
-        <p className="mt-4 max-w-2xl text-base leading-8 text-white/85">
-          Administra las citas del día, revisa el historial clínico y mantén el control completo de tus pacientes veterinarios.
-        </p>
+      {/* BANNER PRINCIPAL */}
+      <section className="rounded-[28px] bg-gradient-to-r from-[#2563EB] via-[#2385F3] to-[#06A7E9] px-8 py-8 text-white shadow-[0_22px_50px_rgba(37,99,235,0.20)]">
+        <div className="flex flex-col justify-between gap-6 xl:flex-row xl:items-center">
+          <div>
+            <p className="mb-3 text-sm font-semibold uppercase tracking-[0.24em] text-white/80">
+              Veterinario
+            </p>
+
+            <h1 className="text-[36px] font-bold leading-tight">
+              Bienvenido, Dr. Rodríguez
+            </h1>
+
+            <p className="mt-4 max-w-2xl text-base leading-7 text-white/90">
+              Consulta tu agenda diaria, registra valoraciones y tratamientos,
+              y revisa la historia clínica de tus pacientes.
+            </p>
+          </div>
+
+          <Link
+            href="/veterinario/consulta"
+            className="flex h-[50px] shrink-0 items-center justify-center rounded-xl bg-white px-6 text-[15px] font-semibold text-[#2563EB] shadow-sm transition hover:bg-[#EFF6FF]"
+          >
+            + Registrar nueva consulta
+          </Link>
+        </div>
       </section>
 
-      <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
-        {stats.map((item) => (
+      {/* ESTADÍSTICAS */}
+      <section className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
+        {stats.map((stat) => (
           <article
-            key={item.title}
-            className="group rounded-[16px] border border-[#CBD5E1] bg-white px-5 py-6 shadow-[0_4px_20px_rgba(15,23,42,0.06)] transition-all duration-300 ease-out hover:-translate-y-1 hover:shadow-[0_15px_35px_rgba(15,23,42,0.12)] dark:border-[#334155] dark:bg-[#111827]"
+            key={stat.title}
+            className="rounded-[18px] border border-[#E2E8F0] bg-white px-5 py-5 shadow-[0_4px_18px_rgba(15,23,42,0.05)] transition hover:-translate-y-1 hover:shadow-[0_12px_28px_rgba(15,23,42,0.09)] dark:border-[#334155] dark:bg-[#111827]"
           >
-            <p className="text-sm font-medium text-[#64748B] dark:text-[#94A3B8]">
-              {item.title}
+            <p className="text-[13px] font-medium text-[#64748B] dark:text-[#94A3B8]">
+              {stat.title}
             </p>
-            <p className="mt-4 text-3xl font-semibold text-[#10213A] dark:text-white">
-              {item.value}
+
+            <p className="mt-3 text-[30px] font-bold text-[#10213A] dark:text-white">
+              {stat.value}
+            </p>
+
+            <p className="mt-2 text-[12px] text-[#64748B] dark:text-[#94A3B8]">
+              {stat.description}
             </p>
           </article>
         ))}
-      </div>
+      </section>
 
-      <div className="grid gap-5 xl:grid-cols-[1.25fr_0.95fr]">
-        <section className="group rounded-[16px] border border-[#CBD5E1] bg-white p-6 shadow-[0_4px_20px_rgba(15,23,42,0.06)] transition-all duration-300 ease-out hover:-translate-y-1 hover:shadow-[0_15px_35px_rgba(15,23,42,0.12)] dark:border-[#334155] dark:bg-[#111827]">
-          <h2 className="mb-5 text-[18px] font-semibold text-[#10213A] dark:text-white">
-            Citas de la Semana
-          </h2>
-          <div className="relative h-[340px]">
-            <div className="absolute left-0 top-0 flex h-full flex-col justify-between text-sm text-[#64748B] dark:text-[#94A3B8]">
-              <span>28</span>
-              <span>21</span>
-              <span>14</span>
-              <span>7</span>
-              <span>0</span>
-            </div>
-            <div className="absolute left-16 right-0 top-0 h-full border-l border-b border-[#CBD5E1] dark:border-[#334155]">
-              <div className="absolute inset-0 grid grid-rows-5">
-                {[...Array(5)].map((_, index) => (
-                  <div
-                    key={index}
-                    className="border-b border-dashed border-[#E2E8F0] dark:border-[#334155]"
-                  />
-                ))}
-              </div>
-              <div className="absolute inset-x-0 bottom-0 top-0 flex items-end gap-4 px-3">
-                {citasSemana.map((item) => (
-                  <div key={item.dia} className="flex flex-1 flex-col items-center justify-end gap-3">
-                    <div
-                      className="w-full max-w-[48px] rounded-t-[12px] bg-[#2F6BFF] transition-all duration-300 ease-out"
-                      style={{ height: `${(item.valor / 28) * 100}%` }}
-                    />
-                    <span className="text-sm text-[#475569] dark:text-[#94A3B8]">
-                      {item.dia}
-                    </span>
-                  </div>
-                ))}
-              </div>
-            </div>
-          </div>
-        </section>
-
-        <section className="group rounded-[16px] border border-[#CBD5E1] bg-white p-6 shadow-[0_4px_20px_rgba(15,23,42,0.06)] transition-all duration-300 ease-out hover:-translate-y-1 hover:shadow-[0_15px_35px_rgba(15,23,42,0.12)] dark:border-[#334155] dark:bg-[#111827]">
-          <div className="mb-5 flex items-center justify-between">
+      {/* CONTENIDO */}
+      <section className="grid gap-5 xl:grid-cols-[1.25fr_0.95fr]">
+        {/* AGENDA DIARIA */}
+        <article className="rounded-[20px] border border-[#E2E8F0] bg-white p-6 shadow-[0_4px_18px_rgba(15,23,42,0.05)] dark:border-[#334155] dark:bg-[#111827]">
+          <div className="mb-6 flex items-center justify-between">
             <div>
-              <h2 className="text-[18px] font-semibold text-[#10213A] dark:text-white">
-                Próximas Citas
+              <h2 className="text-[19px] font-semibold text-[#10213A] dark:text-white">
+                Agenda diaria
               </h2>
-              <p className="mt-1 text-sm text-[#64748B] dark:text-[#94A3B8]">
-                Agenda veterinaria para el resto del día.
+
+              <p className="mt-1 text-[13px] text-[#64748B] dark:text-[#94A3B8]">
+                Consultas programadas para hoy.
               </p>
             </div>
-            <div className="rounded-2xl bg-[#EEF2FF] px-3 py-2 text-sm font-semibold text-[#2F6BFF] dark:bg-[#1E293B] dark:text-[#93C5FD]">
-              4 registros
-            </div>
+
+            <Link
+              href="/veterinario/citas"
+              className="text-[14px] font-semibold text-[#2563EB] transition hover:text-[#1D4ED8]"
+            >
+              Ver agenda completa
+            </Link>
           </div>
 
-          <div className="space-y-4">
-            {proximasCitas.map((item) => (
-              <article
-                key={`${item.hora}-${item.mascota}`}
-                className="rounded-[18px] border border-[#E5EAF2] bg-[#F8FAFC] p-4 transition-all duration-300 ease-out hover:-translate-y-1 hover:shadow-[0_10px_30px_rgba(15,23,42,0.08)] dark:border-[#334155] dark:bg-[#111827]"
+          <div className="space-y-3">
+            {agendaDiaria.map((cita) => (
+              <div
+                key={`${cita.hora}-${cita.mascota}`}
+                className="flex flex-col justify-between gap-4 rounded-[16px] border border-[#E5EAF2] bg-[#F8FAFC] px-4 py-4 dark:border-[#334155] dark:bg-[#0F172A] sm:flex-row sm:items-center"
               >
-                <div className="flex items-center justify-between gap-4">
+                <div className="flex items-center gap-4">
+                  <div className="flex h-[48px] w-[60px] shrink-0 items-center justify-center rounded-xl bg-[#EEF4FF] text-[14px] font-bold text-[#2563EB] dark:bg-[#1E293B] dark:text-[#93C5FD]">
+                    {cita.hora}
+                  </div>
+
                   <div>
                     <p className="text-[15px] font-semibold text-[#10213A] dark:text-white">
-                      {item.hora} - {item.mascota}
+                      {cita.mascota}{" "}
+                      <span className="font-normal text-[#64748B] dark:text-[#94A3B8]">
+                        · {cita.especie}
+                      </span>
                     </p>
-                    <p className="mt-1 text-sm text-[#64748B] dark:text-[#94A3B8]">
-                      {item.dueño} • {item.servicio}
+
+                    <p className="mt-1 text-[13px] text-[#64748B] dark:text-[#94A3B8]">
+                      {cita.propietario} · {cita.motivo}
                     </p>
                   </div>
-                  <span className={`rounded-full px-3 py-1.5 text-[12px] font-semibold ${item.badge}`}>
-                    {item.estado}
-                  </span>
                 </div>
-              </article>
+
+                <div className="flex items-center gap-3">
+                  <span
+                    className={`rounded-full px-3 py-1.5 text-[12px] font-semibold ${cita.badge}`}
+                  >
+                    {cita.estado}
+                  </span>
+
+                  {cita.estado !== "Atendida" && (
+                    <Link
+                      href="/veterinario/consulta"
+                      className="rounded-lg border border-[#D6E3FF] bg-white px-3 py-2 text-[12px] font-semibold text-[#2563EB] transition hover:bg-[#EFF6FF] dark:border-[#334155] dark:bg-[#111827]"
+                    >
+                      Atender
+                    </Link>
+                  )}
+                </div>
+              </div>
             ))}
           </div>
-        </section>
-      </div>
+        </article>
+
+        {/* PACIENTES ATENDIDOS */}
+        <article className="rounded-[20px] border border-[#E2E8F0] bg-white p-6 shadow-[0_4px_18px_rgba(15,23,42,0.05)] dark:border-[#334155] dark:bg-[#111827]">
+          <div className="mb-6 flex items-center justify-between">
+            <div>
+              <h2 className="text-[19px] font-semibold text-[#10213A] dark:text-white">
+                Pacientes atendidos
+              </h2>
+
+              <p className="mt-1 text-[13px] text-[#64748B] dark:text-[#94A3B8]">
+                Últimas valoraciones registradas.
+              </p>
+            </div>
+
+            <Link
+              href="/veterinario/mascotas"
+              className="text-[14px] font-semibold text-[#2563EB]"
+            >
+              Ver todos
+            </Link>
+          </div>
+
+          <div className="space-y-3">
+            {pacientesAtendidos.map((paciente) => (
+              <div
+                key={paciente.nombre}
+                className="rounded-[16px] border border-[#E5EAF2] px-4 py-4 dark:border-[#334155]"
+              >
+                <div className="flex items-start justify-between gap-3">
+                  <div>
+                    <p className="text-[15px] font-semibold text-[#10213A] dark:text-white">
+                      {paciente.nombre}
+                    </p>
+
+                    <p className="mt-1 text-[13px] text-[#64748B] dark:text-[#94A3B8]">
+                      Propietario: {paciente.propietario}
+                    </p>
+                  </div>
+
+                  <span className="text-[12px] text-[#94A3B8]">
+                    {paciente.hora}
+                  </span>
+                </div>
+
+                <div className="mt-3 rounded-xl bg-[#F8FAFC] px-3 py-3 text-[13px] dark:bg-[#0F172A]">
+                  <p className="text-[#475569] dark:text-[#CBD5E1]">
+                    <span className="font-semibold">Diagnóstico:</span>{" "}
+                    {paciente.diagnostico}
+                  </p>
+
+                  <p className="mt-1 text-[#475569] dark:text-[#CBD5E1]">
+                    <span className="font-semibold">Tratamiento:</span>{" "}
+                    {paciente.tratamiento}
+                  </p>
+                </div>
+
+                <Link
+                  href="/veterinario/historial"
+                  className="mt-3 inline-flex text-[13px] font-semibold text-[#2563EB]"
+                >
+                  Consultar historial clínico
+                </Link>
+              </div>
+            ))}
+          </div>
+        </article>
+      </section>
     </div>
   );
 }
