@@ -1,5 +1,7 @@
 ﻿import Link from "next/link";
 import type { ReactNode } from "react";
+import NombreCliente from "./NombreCliente";
+
 
 
 type Stat = {
@@ -96,7 +98,7 @@ export default function ClientePage() {
             </p>
 
             <h1 className="text-[42px] font-bold leading-tight text-white">
-              Bienvenido, Juan Pérez
+              Bienvenido, <NombreCliente />
             </h1>
 
             <p className="mt-5 max-w-[780px] text-[20px] leading-9 text-white/80">
@@ -105,12 +107,12 @@ export default function ClientePage() {
             </p>
           </div>
 
-          <a
-  href="/cliente/agendar"
-  className="hidden h-[58px] shrink-0 items-center justify-center rounded-full bg-white px-9 text-[17px] font-bold text-[#2F6BFF] shadow-[0_12px_24px_rgba(15,23,42,0.15)] transition-all duration-300 ease-out hover:-translate-y-0.5 hover:shadow-[0_16px_34px_rgba(15,23,42,0.22)] xl:flex"
+          <Link
+  href="/cliente/agendar/nueva"
+  className="inline-flex h-[64px] items-center justify-center rounded-full bg-white px-10 text-[18px] font-semibold text-[#2F6BFF] shadow-sm transition-all duration-300 hover:-translate-y-0.5 hover:shadow-[0_12px_25px_rgba(15,23,42,0.15)] active:translate-y-0"
 >
   Agendar nueva cita
-</a>
+</Link>
         </div>
       </section>
 
