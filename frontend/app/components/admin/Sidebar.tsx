@@ -1,8 +1,9 @@
 "use client";
 
+import Image from "next/image";
 import { useState } from "react";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import {
   BarChart3,
   Briefcase,
@@ -12,30 +13,34 @@ import {
   LogOut,
   Settings,
   ShieldCheck,
-  Smile,
   User,
   Users2,
-  PawPrint,
   Box,
   Layers,
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
+import { clearCurrentUser } from "../../../lib/auth";
 
 const menuItems = [
   { label: "Dashboard", icon: Home, href: "/admin" },
   { label: "Usuarios", icon: Users2, href: "/admin/usuarios" },
   { label: "Veterinarios", icon: User, href: "/admin/veterinarios" },
-  { label: "Mascotas", icon: PawPrint, href: "/admin/mascotas" },
   { label: "Citas", icon: CalendarDays, href: "/admin/citas" },
-  { label: "Inventario", icon: Box, href: "/admin/inventario" },
-  { label: "Facturación", icon: CreditCard, href: "/admin/facturacion" },
+  { label: "Inventario", icon: CreditCard, href: "/admin/facturacion" },
   { label: "Reportes", icon: BarChart3, href: "/admin/reportes" },
+  { label: "Recepcionista", icon: Layers, href: "/recepcionista" },
   { label: "Configuración", icon: Settings, href: "/admin/configuracion" },
 ];
 
 export default function Sidebar() {
   const [mobileOpen, setMobileOpen] = useState(false);
   const pathname = usePathname();
+  const router = useRouter();
+
+  const handleLogout = () => {
+    clearCurrentUser();
+    router.push("/login");
+  };
 
   return (
     <>
@@ -43,7 +48,7 @@ export default function Sidebar() {
         <div className="flex flex-col gap-8">
           <div className="space-y-3">
             <div className="inline-flex items-center gap-3 rounded-3xl bg-blue-600/10 px-4 py-3 text-blue-700 shadow-sm shadow-blue-500/10 ring-1 ring-blue-600/10">
-              <Briefcase className="h-5 w-5" />
+              <Image src="/logos/vetnova-logo-light.png" alt="VetNova" width={24} height={24} className="rounded-lg" />
               <span className="text-sm font-semibold">VetNova Admin</span>
             </div>
             <div className="rounded-[2rem] border border-slate-200/70 bg-slate-50 p-5 shadow-sm shadow-slate-200/50 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-100">
@@ -89,7 +94,7 @@ export default function Sidebar() {
             </div>
             <ShieldCheck className="h-5 w-5 text-blue-600" />
           </div>
-          <button className="w-full rounded-3xl bg-white px-4 py-3 text-sm font-semibold text-slate-900 shadow-sm transition hover:bg-slate-100 dark:bg-slate-800 dark:text-slate-100 dark:hover:bg-slate-700">
+          <button onClick={handleLogout} className="w-full rounded-3xl bg-white px-4 py-3 text-sm font-semibold text-slate-900 shadow-sm transition hover:bg-slate-100 dark:bg-slate-800 dark:text-slate-100 dark:hover:bg-slate-700">
             Cerrar sesión
           </button>
         </div>
@@ -170,7 +175,12 @@ export default function Sidebar() {
                     );
                   })}
                 </div>
-                <button className="w-full rounded-3xl bg-blue-600 px-4 py-3 text-sm font-semibold text-white shadow-lg shadow-blue-500/10 transition hover:bg-blue-700">
+                <button onClick={() => {
+                    handleLogout();
+                    setMobileOpen(false);
+                  }}
+                  className="w-full rounded-3xl bg-blue-600 px-4 py-3 text-sm font-semibold text-white shadow-lg shadow-blue-500/10 transition hover:bg-blue-700"
+                >
                   Cerrar sesión
                 </button>
               </div>

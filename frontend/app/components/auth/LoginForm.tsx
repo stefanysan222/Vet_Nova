@@ -45,10 +45,17 @@ export default function LoginForm() {
   const router = useRouter();
   const [submitError, setSubmitError] = useState<string | null>(null);
 
+  const getDashboardRoute = (role: string) => {
+    if (role === "Administrador") return "/admin";
+    if (role === "Veterinario") return "/veterinario";
+    if (role === "Recepcionista") return "/recepcionista";
+    return "/cliente";
+  };
+
   const handleGoogleSuccess = (profile: { name: string; email: string; picture?: string }) => {
     const { user } = loginOrRegisterGoogle(profile);
     setCurrentUser(user);
-    router.push(user.role === "Administrador" ? "/admin" : user.role === "Veterinario" ? "/veterinario" : "/cliente");
+    router.push(getDashboardRoute(user.role));
   };
 
   const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
@@ -69,7 +76,7 @@ export default function LoginForm() {
     setErrors({});
     if (result.user) {
       setCurrentUser(result.user);
-      router.push(result.user.role === "Administrador" ? "/admin" : result.user.role === "Veterinario" ? "/veterinario" : "/cliente");
+      router.push(getDashboardRoute(result.user.role));
     }
   };
 
