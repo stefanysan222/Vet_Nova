@@ -10,25 +10,25 @@ export class CreateMascotaDto {
 
   @IsString()
   @IsNotEmpty()
-  nombre: string;
+  nombre!: string;
 
   @IsString()
   @IsNotEmpty()
-  especie: string;
+  especie!: string;
 
   @IsString()
   @IsNotEmpty()
-  raza: string;
+  raza!: string;
 
   @IsInt()
   @Min(0)
-  edad: number;
+  edad!: number;
 
   @IsNumber()
   @Min(0)
-  peso: number;
+  peso!: number;
 
   @IsInt()
   @Min(1)
-  id_propietario: number;
+  id_propietario!: number;
 }
