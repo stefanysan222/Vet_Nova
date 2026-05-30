@@ -6,14 +6,13 @@ import { useRouter } from "next/navigation";
 import { Eye, EyeOff, Lock, Mail, UserCircle } from "lucide-react";
 import Button from "../Button";
 import GoogleAuthButton from "./GoogleAuthButton";
-import { registerUser, setCurrentUser, loginOrRegisterGoogle, UserRole } from "../../../lib/auth";
+import { registerUser, setCurrentUser, loginOrRegisterGoogle } from "../../../lib/auth";
 
 const initialState = {
   name: "",
   email: "",
   password: "",
   confirmPassword: "",
-  role: "Cliente" as UserRole,
   acceptTerms: false,
 };
 
@@ -81,7 +80,7 @@ export default function RegisterForm() {
       name: formData.name,
       email: formData.email,
       password: formData.password,
-      role: formData.role as UserRole,
+      role: "Cliente",
     });
 
     if (result.error) {
@@ -202,23 +201,6 @@ export default function RegisterForm() {
       </div>
 
       <div className="grid gap-3">
-        <div className="space-y-2">
-          <label className="text-sm font-semibold text-slate-700" htmlFor="role">
-            Rol
-          </label>
-          <select
-            id="role"
-            value={formData.role}
-            onChange={(event) => handleChange("role", event.target.value)}
-            className="w-full rounded-2xl border border-slate-200 bg-white px-4 py-2.5 text-sm text-slate-900 outline-none transition focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
-          >
-            <option>Cliente/Usuario</option>
-            <option>Administrador</option>
-            <option>Veterinario</option>
-            <option>Recepcionista</option>
-          </select>
-        </div>
-
         <div className="rounded-2xl border border-slate-200 bg-white p-4">
           <label className="inline-flex items-start gap-2 text-sm text-slate-600">
             <input

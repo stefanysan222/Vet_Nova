@@ -1,3 +1,7 @@
+"use client";
+
+import { useMemo, useState } from "react";
+
 type Notification = {
   title: string;
   description: string;
@@ -57,7 +61,22 @@ const notifications: Notification[] = [
 ];
 
 export default function NotificacionesPage() {
+  const [selectedNotification, setSelectedNotification] = useState<Notification | null>(null);
+  const [filter, setFilter] = useState<"all" | "unread" | "read">("all");
+
   const unreadCount = notifications.filter((item) => item.unread).length;
+  const filteredNotifications = useMemo(() => {
+    if (filter === "unread") return notifications.filter((item) => item.unread);
+    if (filter === "read") return notifications.filter((item) => !item.unread);
+    return notifications;
+  }, [filter]);
+
+  const selected = selectedNotification || null;
+
+  const handleViewAll = () => {
+    setFilter("all");
+    setSelectedNotification(null);
+  };
 
   return (
     <div className="h-full overflow-y-auto bg-[#F5F7FB] px-6 py-8">
@@ -120,20 +139,32 @@ export default function NotificacionesPage() {
             </div>
 
             <div className="hidden items-center gap-2 md:flex">
-              <button className="rounded-xl bg-[#2F6BFF] px-4 py-2 text-[14px] font-semibold text-white">
+              <button
+                type="button"
+                onClick={() => setFilter("all")}
+                className={`rounded-xl px-4 py-2 text-[14px] font-semibold ${filter === "all" ? "bg-[#2F6BFF] text-white" : "text-[#10213A] hover:bg-[#F1F5F9]"}`}
+              >
                 Todas
               </button>
-              <button className="rounded-xl px-4 py-2 text-[14px] font-semibold text-[#10213A] hover:bg-[#F1F5F9]">
+              <button
+                type="button"
+                onClick={() => setFilter("unread")}
+                className={`rounded-xl px-4 py-2 text-[14px] font-semibold ${filter === "unread" ? "bg-[#2F6BFF] text-white" : "text-[#10213A] hover:bg-[#F1F5F9]"}`}
+              >
                 No leídas
               </button>
-              <button className="rounded-xl px-4 py-2 text-[14px] font-semibold text-[#10213A] hover:bg-[#F1F5F9]">
+              <button
+                type="button"
+                onClick={() => setFilter("read")}
+                className={`rounded-xl px-4 py-2 text-[14px] font-semibold ${filter === "read" ? "bg-[#2F6BFF] text-white" : "text-[#10213A] hover:bg-[#F1F5F9]"}`}
+              >
                 Leídas
               </button>
             </div>
           </div>
 
           <div className="divide-y divide-[#E2E8F0]">
-            {notifications.map((item) => (
+            {filteredNotifications.map((item) => (
               <article
                 key={`${item.title}-${item.time}`}
                 className="flex items-start justify-between gap-5 py-5 first:pt-0 last:pb-0"
@@ -174,13 +205,65 @@ export default function NotificacionesPage() {
                   </div>
                 </div>
 
-                <button className="shrink-0 rounded-lg px-3 py-2 text-[13px] font-semibold text-[#2F6BFF] hover:bg-[#EFF6FF]">
+                <button
+                  type="button"
+                  onClick={() => setSelectedNotification(item)}
+                  className="shrink-0 rounded-lg px-3 py-2 text-[13px] font-semibold text-[#2F6BFF] hover:bg-[#EFF6FF]"
+                >
                   Ver
                 </button>
               </article>
             ))}
           </div>
         </section>
+
+        {/* Detalle de notificación */}
+        <aside className="rounded-xl border border-[#CBD5E1] bg-white p-6 shadow-sm xl:min-h-[520px]">
+          {selected ? (
+            <div>
+              <div className="mb-4 flex items-center justify-between gap-4">
+                <div>
+                  <p className="text-sm font-semibold uppercase tracking-[0.24em] text-[#2563EB]">
+                    Detalle de notificación
+                  </p>
+                  <h2 className="mt-2 text-2xl font-semibold text-[#10213A]">{selected.title}</h2>
+                </div>
+                <span className={`rounded-2xl px-3 py-2 text-sm font-semibold ${selected.unread ? "bg-[#FEF3C7] text-[#92400E]" : "bg-[#E2E8F0] text-[#475569]"}`}>
+                  {selected.unread ? "No leída" : "Leída"}
+                </span>
+              </div>
+
+              <div className="rounded-3xl border border-[#E2E8F0] bg-[#F8FAFC] p-5">
+                <p className="text-sm font-semibold text-[#334155]">Categoría</p>
+                <p className="mt-2 text-base text-[#10213A]">{selected.category}</p>
+              </div>
+
+              <div className="mt-6 space-y-4">
+                <div>
+                  <p className="text-sm font-semibold text-[#334155]">Descripción</p>
+                  <p className="mt-2 text-base leading-7 text-[#475569]">{selected.description}</p>
+                </div>
+
+                <div>
+                  <p className="text-sm font-semibold text-[#334155]">Fecha</p>
+                  <p className="mt-2 text-base leading-7 text-[#475569]">{selected.time}</p>
+                </div>
+              </div>
+            </div>
+          ) : (
+            <div className="flex h-full flex-col items-center justify-center rounded-3xl border border-dashed border-[#CBD5E1] bg-[#F8FAFC] p-8 text-center">
+              <p className="text-xl font-semibold text-[#10213A]">Selecciona una notificación</p>
+              <p className="mt-3 text-sm text-[#64748B]">Haz clic en "Ver" para ver todo el detalle de la notificación.</p>
+              <button
+                type="button"
+                onClick={handleViewAll}
+                className="mt-6 rounded-full bg-[#2F6BFF] px-5 py-3 text-sm font-semibold text-white transition hover:bg-[#2358d8]"
+              >
+                Volver a todas
+              </button>
+            </div>
+          )}
+        </aside>
 
         {/* Settings card */}
         <aside className="space-y-7">
