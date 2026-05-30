@@ -1,4 +1,5 @@
 import React from "react";
+import Link from "next/link";
 import { Bell } from "lucide-react";
 
 const notifications = [
@@ -39,9 +40,12 @@ const NotificationsPanel: React.FC = () => {
         ))}
       </div>
 
-      <button className="mt-6 w-full rounded-2xl bg-slate-100 px-4 py-3 text-sm font-semibold text-slate-700 transition hover:bg-slate-200 dark:bg-slate-800 dark:text-slate-200 dark:hover:bg-slate-700">
+      <Link
+        href="/admin/notificaciones"
+        className="mt-6 inline-flex w-full items-center justify-center rounded-2xl bg-slate-100 px-4 py-3 text-sm font-semibold text-slate-700 transition hover:bg-slate-200 dark:bg-slate-800 dark:text-slate-200 dark:hover:bg-slate-700"
+      >
         Ver todas las notificaciones
-      </button>
+      </Link>
     </div>
   );
 };

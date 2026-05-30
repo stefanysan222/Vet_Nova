@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import Link from "next/link";
 import { Bell, ChevronDown, Search, LogOut, Settings, Moon, Sun } from "lucide-react";
 import { AnimatePresence, motion } from "framer-motion";
 
@@ -113,9 +114,9 @@ export default function Navbar() {
                     ))}
                   </div>
                   <div className="border-t border-slate-200 p-3">
-                    <button className="w-full text-center text-sm font-semibold text-blue-600 hover:text-blue-700">
+                    <Link href="/admin/notificaciones" className="w-full block text-center text-sm font-semibold text-blue-600 hover:text-blue-700">
                       Ver todas
-                    </button>
+                    </Link>
                   </div>
                 </motion.div>
               )}

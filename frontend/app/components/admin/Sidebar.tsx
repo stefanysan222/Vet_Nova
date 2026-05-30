@@ -6,6 +6,7 @@ import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import {
   BarChart3,
+  Bell,
   Briefcase,
   CalendarDays,
   CreditCard,
@@ -28,7 +29,8 @@ const menuItems = [
   { label: "Citas", icon: CalendarDays, href: "/admin/citas" },
   { label: "Inventario", icon: CreditCard, href: "/admin/facturacion" },
   { label: "Reportes", icon: BarChart3, href: "/admin/reportes" },
-  { label: "Recepcionista", icon: Layers, href: "/recepcionista" },
+  { label: "Notificaciones", icon: Bell, href: "/admin/notificaciones" },
+  { label: "Recepcionista", icon: Layers, href: "/admin/recepcionista" },
   { label: "Configuración", icon: Settings, href: "/admin/configuracion" },
 ];
 

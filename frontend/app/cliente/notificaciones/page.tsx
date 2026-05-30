@@ -91,9 +91,13 @@ export default function NotificacionesPage() {
           </p>
         </div>
 
-        <button className="inline-flex h-[45px] items-center gap-2 rounded-xl bg-[#2F6BFF] px-5 text-[16px] font-semibold text-white shadow-sm">
+        <button
+          type="button"
+          onClick={handleViewAll}
+          className="inline-flex h-[45px] items-center gap-2 rounded-xl bg-[#2F6BFF] px-5 text-[16px] font-semibold text-white shadow-sm"
+        >
           <CheckIcon />
-          Marcar como leídas
+          Ver todas las notificaciones
         </button>
       </div>
 
@@ -163,58 +167,74 @@ export default function NotificacionesPage() {
             </div>
           </div>
 
-          <div className="divide-y divide-[#E2E8F0]">
-            {filteredNotifications.map((item) => (
-              <article
-                key={`${item.title}-${item.time}`}
-                className="flex items-start justify-between gap-5 py-5 first:pt-0 last:pb-0"
+          {filteredNotifications.length === 0 ? (
+            <div className="rounded-3xl border border-dashed border-[#CBD5E1] bg-[#F8FAFC] p-10 text-center">
+              <p className="text-lg font-semibold text-[#10213A]">No hay notificaciones con este filtro.</p>
+              <p className="mt-3 text-sm text-[#64748B]">
+                Presiona "Ver todas" para regresar al listado completo.
+              </p>
+              <button
+                type="button"
+                onClick={handleViewAll}
+                className="mt-6 rounded-full bg-[#2F6BFF] px-5 py-3 text-sm font-semibold text-white transition hover:bg-[#2358d8]"
               >
-                <div className="flex min-w-0 gap-4">
-                  <div
-                    className={`flex h-12 w-12 shrink-0 items-center justify-center rounded-xl ${item.color}`}
-                  >
-                    {item.icon === "calendar" && <CalendarIcon />}
-                    {item.icon === "vaccine" && <VaccineIcon />}
-                    {item.icon === "payment" && <PaymentIcon />}
-                    {item.icon === "system" && <SystemIcon />}
-                  </div>
-
-                  <div className="min-w-0">
-                    <div className="flex items-center gap-2">
-                      <h3 className="text-[16px] font-semibold text-[#10213A]">
-                        {item.title}
-                      </h3>
-
-                      {item.unread && (
-                        <span className="h-2.5 w-2.5 rounded-full bg-[#EF4444]" />
-                      )}
-                    </div>
-
-                    <p className="mt-2 max-w-[720px] text-[14px] leading-6 text-[#64748B]">
-                      {item.description}
-                    </p>
-
-                    <div className="mt-3 flex items-center gap-3">
-                      <span className="rounded-full bg-[#F1F5F9] px-3 py-1 text-[12px] font-semibold text-[#52698A]">
-                        {item.category}
-                      </span>
-                      <span className="text-[13px] text-[#94A3B8]">
-                        {item.time}
-                      </span>
-                    </div>
-                  </div>
-                </div>
-
-                <button
-                  type="button"
-                  onClick={() => setSelectedNotification(item)}
-                  className="shrink-0 rounded-lg px-3 py-2 text-[13px] font-semibold text-[#2F6BFF] hover:bg-[#EFF6FF]"
+                Ver todas
+              </button>
+            </div>
+          ) : (
+            <div className="divide-y divide-[#E2E8F0]">
+              {filteredNotifications.map((item) => (
+                <article
+                  key={`${item.title}-${item.time}`}
+                  className="flex items-start justify-between gap-5 py-5 first:pt-0 last:pb-0"
                 >
-                  Ver
-                </button>
-              </article>
-            ))}
-          </div>
+                  <div className="flex min-w-0 gap-4">
+                    <div
+                      className={`flex h-12 w-12 shrink-0 items-center justify-center rounded-xl ${item.color}`}
+                    >
+                      {item.icon === "calendar" && <CalendarIcon />}
+                      {item.icon === "vaccine" && <VaccineIcon />}
+                      {item.icon === "payment" && <PaymentIcon />}
+                      {item.icon === "system" && <SystemIcon />}
+                    </div>
+
+                    <div className="min-w-0">
+                      <div className="flex items-center gap-2">
+                        <h3 className="text-[16px] font-semibold text-[#10213A]">
+                          {item.title}
+                        </h3>
+
+                        {item.unread && (
+                          <span className="h-2.5 w-2.5 rounded-full bg-[#EF4444]" />
+                        )}
+                      </div>
+
+                      <p className="mt-2 max-w-[720px] text-[14px] leading-6 text-[#64748B]">
+                        {item.description}
+                      </p>
+
+                      <div className="mt-3 flex items-center gap-3">
+                        <span className="rounded-full bg-[#F1F5F9] px-3 py-1 text-[12px] font-semibold text-[#52698A]">
+                          {item.category}
+                        </span>
+                        <span className="text-[13px] text-[#94A3B8]">
+                          {item.time}
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+
+                  <button
+                    type="button"
+                    onClick={() => setSelectedNotification(item)}
+                    className="shrink-0 rounded-lg px-3 py-2 text-[13px] font-semibold text-[#2F6BFF] hover:bg-[#EFF6FF]"
+                  >
+                    Ver
+                  </button>
+                </article>
+              ))}
+            </div>
+          )}
         </section>
 
         {/* Detalle de notificación */}
@@ -248,6 +268,16 @@ export default function NotificacionesPage() {
                   <p className="text-sm font-semibold text-[#334155]">Fecha</p>
                   <p className="mt-2 text-base leading-7 text-[#475569]">{selected.time}</p>
                 </div>
+              </div>
+
+              <div className="mt-8">
+                <button
+                  type="button"
+                  onClick={handleViewAll}
+                  className="rounded-full bg-[#2F6BFF] px-5 py-3 text-sm font-semibold text-white transition hover:bg-[#2358d8]"
+                >
+                  Ver todas las notificaciones
+                </button>
               </div>
             </div>
           ) : (
