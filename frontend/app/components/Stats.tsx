@@ -1,4 +1,4 @@
-import { COMMON_STYLES } from "../constants";
+import { LANDING_STYLES } from "../constants/index";
 import type { Stat } from "../types";
 
 // Constants
@@ -26,7 +26,7 @@ const STATS: Stat[] = [
 ] as const;
 
 const STYLES = {
-  section: COMMON_STYLES.section,
+  section: LANDING_STYLES.section,
   container: "mx-auto max-w-6xl rounded-[2.5rem] bg-blue-600 px-6 py-10 text-white shadow-xl shadow-blue-600/20 sm:px-12 lg:px-12",
   grid: "grid gap-6 sm:grid-cols-2 xl:grid-cols-4",
   statCard: "rounded-[2rem] border border-white/10 bg-white/5 p-6 backdrop-blur-sm transition hover:bg-white/10",

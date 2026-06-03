@@ -7,9 +7,14 @@ interface GoogleAuthButtonProps {
   onSuccess: (profile: { name: string; email: string; picture?: string }) => void;
 }
 
+interface GoogleAccountsId {
+  initialize: (config: { client_id: string; callback: (response: { credential?: string }) => void }) => void;
+  prompt: () => void;
+}
+
 declare global {
   interface Window {
-    google?: any;
+    google?: { accounts?: { id?: GoogleAccountsId } };
   }
 }
 
@@ -71,20 +76,18 @@ export default function GoogleAuthButton({ label, onSuccess }: GoogleAuthButtonP
 
   const handleGoogleSignIn = () => {
     if (!clientId) {
-      const email = window.prompt("Ingresa tu correo de Google para iniciar sesión:");
-      if (!email) return;
-      onSuccess({ name: email.split("@")[0], email });
+      setError("Autenticación con Google no está configurada en este entorno.");
       return;
     }
 
-    if (!window.google || !window.google.accounts?.id) {
+    if (!window.google?.accounts?.id) {
       setError("Google Auth aún no está listo. Intenta de nuevo en unos segundos.");
       return;
     }
 
     window.google.accounts.id.initialize({
       client_id: clientId,
-      callback: (response: any) => {
+      callback: (response: { credential?: string }) => {
         if (!response?.credential) {
           setError("No se pudo autenticar con Google.");
           return;
@@ -107,12 +110,16 @@ export default function GoogleAuthButton({ label, onSuccess }: GoogleAuthButtonP
     window.google.accounts.id.prompt();
   };
 
+  const disabled = !clientId;
+
   return (
     <div className="space-y-3">
       <button
         type="button"
         onClick={handleGoogleSignIn}
-        className="flex w-full items-center justify-center gap-3 rounded-3xl border border-slate-200 bg-white px-5 py-4 text-sm font-semibold text-slate-700 shadow-sm transition hover:bg-slate-50"
+        disabled={disabled}
+        title={disabled ? "Google Sign-In no configurado" : undefined}
+        className="flex w-full items-center justify-center gap-3 rounded-3xl border border-slate-200 bg-white px-5 py-4 text-sm font-semibold text-slate-700 shadow-sm transition hover:bg-slate-50 disabled:cursor-not-allowed disabled:opacity-50"
       >
         <GoogleIcon className="h-5 w-5" />
         {label}

@@ -1,5 +1,5 @@
 import type { ComponentType, ReactNode } from "react";
-import { COMMON_STYLES } from "../constants";
+import { LANDING_STYLES } from "../constants/index";
 
 interface ButtonProps {
   children: ReactNode;
@@ -22,7 +22,7 @@ export default function Button({
   icon: Icon,
   className = "",
 }: ButtonProps) {
-  const baseStyles = COMMON_STYLES.button[variant];
+  const baseStyles = LANDING_STYLES.button[variant];
   const combinedClassName = `${baseStyles} ${className}`.trim();
 
   const content = (

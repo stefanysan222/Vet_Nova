@@ -1,5 +1,5 @@
 import { BarChart3, Box, CalendarCheck, ClipboardList } from "lucide-react";
-import { COMMON_STYLES } from "../constants";
+import { LANDING_STYLES } from "../constants/index";
 import type { Service } from "../types";
 
 // Constants
@@ -31,16 +31,16 @@ const SERVICES: Service[] = [
 ] as const;
 
 const STYLES = {
-  section: COMMON_STYLES.section,
-  container: COMMON_STYLES.container,
+  section: LANDING_STYLES.section,
+  container: LANDING_STYLES.container,
   header: "mb-10 max-w-2xl",
-  sectionTitle: COMMON_STYLES.text.caption,
-  sectionHeading: COMMON_STYLES.text.heading,
+  sectionTitle: LANDING_STYLES.text.caption,
+  sectionHeading: LANDING_STYLES.text.heading,
   grid: "grid gap-6 md:grid-cols-2 xl:grid-cols-4",
   card: "group overflow-hidden rounded-[2rem] border border-gray-200/80 bg-white p-7 shadow-lg shadow-gray-200/50 transition hover:-translate-y-1 hover:border-blue-200 hover:shadow-2xl hover:shadow-gray-200/40",
   iconContainer: "inline-flex h-14 w-14 items-center justify-center rounded-3xl",
-  cardTitle: COMMON_STYLES.text.subheading,
-  cardDescription: COMMON_STYLES.text.body,
+  cardTitle: LANDING_STYLES.text.subheading,
+  cardDescription: LANDING_STYLES.text.body,
 } as const;
 
 export default function Services() {
