@@ -12,53 +12,7 @@ type Notification = {
   color: string;
 };
 
-const notifications: Notification[] = [
-  {
-    title: "Cita confirmada",
-    description: "Tu cita para Max fue confirmada para hoy a las 09:00 AM.",
-    time: "Hace 10 min",
-    category: "Citas",
-    unread: true,
-    icon: "calendar",
-    color: "bg-[#DBEAFE] text-[#2563EB]",
-  },
-  {
-    title: "Recordatorio de vacunación",
-    description: "Luna tiene una vacuna pendiente programada para esta semana.",
-    time: "Hace 1 hora",
-    category: "Vacunas",
-    unread: true,
-    icon: "vaccine",
-    color: "bg-[#DDF5DE] text-[#2F9E44]",
-  },
-  {
-    title: "Pago registrado",
-    description: "Se registró correctamente el pago de la consulta general.",
-    time: "Ayer",
-    category: "Pagos",
-    unread: false,
-    icon: "payment",
-    color: "bg-[#FBE9A9] text-[#9A6700]",
-  },
-  {
-    title: "Historial actualizado",
-    description: "El historial clínico de Rocky fue actualizado por el veterinario.",
-    time: "2 días",
-    category: "Sistema",
-    unread: false,
-    icon: "system",
-    color: "bg-[#EDE9FE] text-[#6D28D9]",
-  },
-  {
-    title: "Cita reagendada",
-    description: "La cita de Bella fue movida para el viernes a las 02:00 PM.",
-    time: "3 días",
-    category: "Citas",
-    unread: false,
-    icon: "calendar",
-    color: "bg-[#DBEAFE] text-[#2563EB]",
-  },
-];
+const notifications: Notification[] = [];
 
 export default function NotificacionesPage() {
   const [selectedNotification, setSelectedNotification] = useState<Notification | null>(null);

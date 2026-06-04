@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import Sidebar from "../../components/admin/Sidebar";
 import Navbar from "../../components/admin/Navbar";
+import { getCurrentUser } from "../../../lib/auth";
 
 interface AdminSettings {
   username: string;
@@ -13,23 +14,25 @@ interface AdminSettings {
   notificationsApp: boolean;
 }
 
-const DEFAULT_SETTINGS: AdminSettings = {
-  username: "Administrador",
-  email: "admin@vetnova.com",
-  language: "Español",
-  theme: "dark",
-  notificationsEmail: true,
-  notificationsApp: true,
-};
-
 export default function ConfiguracionPage() {
-  const [settings, setSettings] = useState<AdminSettings>(DEFAULT_SETTINGS);
+  const [settings, setSettings] = useState<AdminSettings>({
+    username: "",
+    email: "",
+    language: "Español",
+    theme: "dark",
+    notificationsEmail: true,
+    notificationsApp: true,
+  });
   const [savedMessage, setSavedMessage] = useState("");
 
   useEffect(() => {
-    const raw = window.localStorage.getItem("vetnova-admin-settings");
-    if (raw) {
-      setSettings(JSON.parse(raw));
+    const user = getCurrentUser();
+    if (user) {
+      setSettings((prev) => ({
+        ...prev,
+        username: user.name,
+        email: user.email,
+      }));
     }
   }, []);
 
@@ -38,7 +41,6 @@ export default function ConfiguracionPage() {
   };
 
   const saveSettings = () => {
-    window.localStorage.setItem("vetnova-admin-settings", JSON.stringify(settings));
     setSavedMessage("Configuración guardada correctamente.");
     window.setTimeout(() => setSavedMessage(""), 3000);
   };

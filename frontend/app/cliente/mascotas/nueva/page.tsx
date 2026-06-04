@@ -4,8 +4,10 @@ import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { ChangeEvent, FormEvent, useEffect, useState } from "react";
+import { getCurrentUser } from "../../../../lib/auth";
+import { fetchPropietarioByUsuario } from "../../../../lib/api/propietarios";
+import { createMascota } from "../../../../lib/api/mascotas";
 
-const PETS_STORAGE_KEY = "vetnova_mascotas_cliente";
 const PROFILE_STORAGE_KEY = "vetnova_cliente_perfil";
 const MAX_IMAGE_SIZE = 5 * 1024 * 1024; // 5 MB
 const MAX_DOCUMENT_SIZE = 5 * 1024 * 1024; // 5 MB
@@ -35,25 +37,6 @@ type PropietarioActual = {
 const propietarioInicial: PropietarioActual = {
   nombreCompleto: "Cliente",
   foto: null,
-};
-
-type MascotaGuardada = {
-  id: string;
-  nombre: string;
-  tipo: "perro" | "gato" | "otro";
-  especie: string;
-  raza: string;
-  edad: string;
-  dueño: string;
-  ultimaVisita: string;
-  estado: "Activo" | "En Tratamiento";
-  foto: string | null;
-  sexo: string;
-  fechaNacimiento: string;
-  peso: string;
-  color: string;
-  observaciones: string;
-  documentosClinicos: DocumentoClinicoAdjunto[];
 };
 
 type FormularioMascota = {
@@ -101,6 +84,7 @@ export default function NuevaMascotaPage() {
   const [subiendoFoto, setSubiendoFoto] = useState(false);
   const [errorFoto, setErrorFoto] = useState("");
   const [errorFormulario, setErrorFormulario] = useState("");
+  const [guardando, setGuardando] = useState(false);
   const [documentosClinicos, setDocumentosClinicos] = useState<DocumentoClinicoAdjunto[]>([]);
   const [errorDocumentos, setErrorDocumentos] = useState("");
 
@@ -293,7 +277,7 @@ export default function NuevaMascotaPage() {
     setErrorDocumentos("");
   };
 
-  const guardarMascota = (event: FormEvent<HTMLFormElement>) => {
+  const guardarMascota = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     setErrorFormulario("");
 
@@ -307,57 +291,53 @@ export default function NuevaMascotaPage() {
       return;
     }
 
-    /*
-      Se vuelve a consultar el perfil justo al guardar para asegurar
-      que el dueño sea el cliente actualmente guardado en Configuración.
-    */
-    const propietarioActual = leerPropietarioActual();
+    const user = getCurrentUser();
+    if (!user) {
+      setErrorFormulario("No se encontró la sesión activa.");
+      return;
+    }
 
-    const nuevaMascota: MascotaGuardada = {
-      id: crypto.randomUUID(),
-      nombre: formulario.nombre.trim(),
-      tipo: formulario.especie,
-      especie:
+    setGuardando(true);
+
+    try {
+      const propietario = await fetchPropietarioByUsuario(user.id);
+      if (!propietario) {
+        setErrorFormulario("No se encontró el propietario asociado a tu cuenta.");
+        return;
+      }
+
+      const sexoMapeado: "Macho" | "Hembra" | "No especificado" =
+        formulario.sexo === "macho"
+          ? "Macho"
+          : formulario.sexo === "hembra"
+          ? "Hembra"
+          : "No especificado";
+
+      const especieMapeada =
         formulario.especie === "perro"
           ? "Perro"
           : formulario.especie === "gato"
           ? "Gato"
-          : formulario.especieOtra.trim(),
-      raza: formulario.raza.trim(),
-      edad: calcularEdad(formulario.fechaNacimiento),
-      dueño: propietarioActual.nombreCompleto,
-      ultimaVisita: "Sin visitas",
-      estado:
-        formulario.estado === "tratamiento" ? "En Tratamiento" : "Activo",
-      foto,
-      sexo: formulario.sexo,
-      fechaNacimiento: formulario.fechaNacimiento,
-      peso: formulario.peso.trim(),
-      color: formulario.color.trim(),
-      observaciones: formulario.observaciones.trim(),
-      documentosClinicos,
-    };
+          : formulario.especieOtra.trim();
 
-    let mascotasGuardadas: MascotaGuardada[] = [];
+      await createMascota({
+        nombre: formulario.nombre.trim(),
+        especie: especieMapeada,
+        raza: formulario.raza.trim(),
+        edad: calcularEdad(formulario.fechaNacimiento),
+        peso: formulario.peso.trim(),
+        sexo: sexoMapeado,
+        fechaNacimiento: formulario.fechaNacimiento || undefined,
+        foto: foto || undefined,
+        propietarioId: propietario.id,
+      });
 
-    try {
-      const registroActual = localStorage.getItem(PETS_STORAGE_KEY);
-
-      mascotasGuardadas = registroActual
-        ? (JSON.parse(registroActual) as MascotaGuardada[])
-        : [];
+      router.push("/cliente/mascotas");
     } catch {
-      mascotasGuardadas = [];
+      setErrorFormulario("No se pudo guardar la mascota. Intenta de nuevo.");
+    } finally {
+      setGuardando(false);
     }
-
-    localStorage.setItem(
-      PETS_STORAGE_KEY,
-      JSON.stringify([nuevaMascota, ...mascotasGuardadas])
-    );
-
-    window.dispatchEvent(new Event("vetnova-pets-updated"));
-
-    router.push("/cliente/mascotas");
   };
 
   return (
@@ -617,9 +597,10 @@ export default function NuevaMascotaPage() {
           <section className="rounded-xl border border-[#CBD5E1] bg-white p-6 shadow-sm dark:border-[#334155] dark:bg-[#111827]">
             <button
               type="submit"
-              className="inline-flex h-[48px] w-full items-center justify-center gap-2 rounded-xl bg-[#2F6BFF] px-6 text-[15px] font-semibold text-white shadow-sm transition-all hover:-translate-y-0.5 hover:bg-[#2457D6] hover:shadow-[0_10px_20px_rgba(47,107,255,0.28)]"
+              disabled={guardando || subiendoFoto}
+              className="inline-flex h-[48px] w-full items-center justify-center gap-2 rounded-xl bg-[#2F6BFF] px-6 text-[15px] font-semibold text-white shadow-sm transition-all hover:-translate-y-0.5 hover:bg-[#2457D6] hover:shadow-[0_10px_20px_rgba(47,107,255,0.28)] disabled:opacity-60 disabled:cursor-not-allowed disabled:hover:translate-y-0"
             >
-              Guardar Mascota
+              {guardando ? "Guardando..." : "Guardar Mascota"}
             </button>
 
             <Link

@@ -1,10 +1,11 @@
 "use client";
 
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { useEffect, useState, type ReactNode } from "react";
 import AvatarCliente from "./AvatarCliente";
 import BuscadorCliente from "./BuscadorCliente";
+import { getCurrentUser, clearCurrentUser } from "../../lib/auth";
 
 const PROFILE_STORAGE_KEY = "vetnova_cliente_perfil";
 
@@ -13,31 +14,7 @@ type PerfilCliente = {
   apellido: string;
 };
 
-const perfilInicial: PerfilCliente = {
-  nombre: "Juan",
-  apellido: "Pérez",
-};
-
-const notificationPreview = [
-  {
-    title: "Cita confirmada",
-    description: "Tu cita para Max fue confirmada para hoy a las 09:00 AM.",
-    time: "Hace 10 min",
-    unread: true,
-  },
-  {
-    title: "Recordatorio de vacunación",
-    description: "Luna tiene una vacuna pendiente programada esta semana.",
-    time: "Hace 1 hora",
-    unread: true,
-  },
-  {
-    title: "Pago registrado",
-    description: "Se registró correctamente el pago de la consulta general.",
-    time: "Ayer",
-    unread: false,
-  },
-];
+const notificationPreview: { title: string; description: string; time: string; unread: boolean }[] = [];
 
 export default function ClientLayoutShell({
   children,
@@ -45,11 +22,34 @@ export default function ClientLayoutShell({
   children: ReactNode;
 }) {
   const pathname = usePathname();
+  const router = useRouter();
 
   const [showNotifications, setShowNotifications] = useState(false);
   const [showUserMenu, setShowUserMenu] = useState(false);
   const [darkMode, setDarkMode] = useState(false);
-  const [perfil, setPerfil] = useState<PerfilCliente>(perfilInicial);
+  const [perfil, setPerfil] = useState<PerfilCliente>({ nombre: "", apellido: "" });
+
+  useEffect(() => {
+    const user = getCurrentUser();
+    if (!user) {
+      router.replace("/login");
+      return;
+    }
+    if (user.role !== "Cliente") {
+      const routes: Record<string, string> = {
+        Administrador: "/admin",
+        Veterinario: "/veterinario",
+        Recepcionista: "/recepcionista",
+      };
+      router.replace(routes[user.role] ?? "/login");
+      return;
+    }
+    const partes = user.name.trim().split(" ");
+    setPerfil({
+      nombre: partes[0] ?? user.name,
+      apellido: partes.slice(1).join(" ") || "",
+    });
+  }, [router]);
 
   useEffect(() => {
     const savedTheme = localStorage.getItem("vetnova-theme");
@@ -66,30 +66,21 @@ export default function ClientLayoutShell({
   useEffect(() => {
     const cargarPerfil = () => {
       const informacionGuardada = localStorage.getItem(PROFILE_STORAGE_KEY);
-
-      if (!informacionGuardada) {
-        setPerfil(perfilInicial);
-        return;
-      }
-
+      if (!informacionGuardada) return;
       try {
         const datos = JSON.parse(informacionGuardada) as Partial<PerfilCliente>;
-
-        setPerfil({
-          nombre: datos.nombre || "Juan",
-          apellido: datos.apellido || "Pérez",
-        });
+        setPerfil((prev) => ({
+          nombre: datos.nombre || prev.nombre,
+          apellido: datos.apellido ?? prev.apellido,
+        }));
       } catch {
         localStorage.removeItem(PROFILE_STORAGE_KEY);
-        setPerfil(perfilInicial);
       }
     };
 
     cargarPerfil();
-
     window.addEventListener("vetnova-profile-updated", cargarPerfil);
     window.addEventListener("storage", cargarPerfil);
-
     return () => {
       window.removeEventListener("vetnova-profile-updated", cargarPerfil);
       window.removeEventListener("storage", cargarPerfil);
@@ -173,13 +164,14 @@ export default function ClientLayoutShell({
           </nav>
 
           <div className="border-t border-[#E5EAF2] px-5 py-5 dark:border-[#1E293B]">
-            <Link
-              href="/"
+            <button
+              type="button"
+              onClick={() => { clearCurrentUser(); router.push("/login"); }}
               className="flex items-center gap-3 text-[15px] font-semibold text-[#10213A] transition-colors hover:text-[#2F6BFF] dark:text-white dark:hover:text-[#60A5FA]"
             >
               <LogoutIcon />
               Cerrar Sesión
-            </Link>
+            </button>
           </div>
         </aside>
 
@@ -370,14 +362,14 @@ export default function ClientLayoutShell({
                     </div>
 
                     <div className="border-t border-[#E2E8F0] py-2 dark:border-[#334155]">
-                      <UserMenuItem
-                        href="/"
-                        onClick={() => setShowUserMenu(false)}
-                        icon={<LogoutIcon />}
-                        danger
+                      <button
+                        type="button"
+                        onClick={() => { setShowUserMenu(false); clearCurrentUser(); router.push("/login"); }}
+                        className="flex w-full items-center gap-3 px-5 py-3 text-[14px] font-semibold text-[#EF4444] transition-colors hover:bg-[#FEF2F2] dark:hover:bg-[#28171B]"
                       >
+                        <LogoutIcon />
                         Cerrar sesión
-                      </UserMenuItem>
+                      </button>
                     </div>
                   </div>
                 )}

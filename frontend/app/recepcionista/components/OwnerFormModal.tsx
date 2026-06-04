@@ -16,6 +16,7 @@ const initialState = {
   email: "",
   phone: "",
   address: "",
+  documento: "",
 };
 
 function isValidEmail(email: string) {
@@ -38,44 +39,44 @@ export default function OwnerFormModal({
         email: initialOwner.email,
         phone: initialOwner.phone,
         address: initialOwner.address,
+        documento: initialOwner.documento ?? "",
       });
       setError("");
       return;
     }
-
     setFormState(initialState);
     setError("");
   }, [initialOwner, isOpen]);
 
-  if (!isOpen) {
-    return null;
-  }
+  if (!isOpen) return null;
 
   const handleChange = (field: keyof typeof formState, value: string) => {
     setFormState((prev) => ({ ...prev, [field]: value }));
   };
 
   const handleSubmit = () => {
-    if (!formState.name.trim() || !formState.email.trim()) {
-      setError("Nombre y correo son obligatorios.");
+    if (!formState.name.trim()) {
+      setError("El nombre es obligatorio.");
       return;
     }
 
-    if (!isValidEmail(formState.email)) {
+    if (formState.email.trim() && !isValidEmail(formState.email)) {
       setError("Ingresa un correo válido.");
       return;
     }
 
     const owner: Owner = {
-      id: initialOwner?.id ?? `o-${Date.now()}`,
+      id: initialOwner?.id ?? "",
       name: formState.name.trim(),
       email: formState.email.trim().toLowerCase(),
       phone: formState.phone.trim(),
       address: formState.address.trim(),
+      documento: formState.documento.trim(),
+      estado: initialOwner?.estado ?? "activo",
+      mascotas: initialOwner?.mascotas ?? [],
     };
 
     onSave(owner);
-    onClose();
   };
 
   return (
@@ -84,10 +85,10 @@ export default function OwnerFormModal({
         <div className="flex items-center justify-between gap-4">
           <div>
             <p className="text-sm font-semibold uppercase tracking-[0.28em] text-slate-500 dark:text-slate-400">
-              {initialOwner ? "Editar propietario" : "Registrar propietario"}
+              {initialOwner?.id ? "Editar propietario" : "Registrar propietario"}
             </p>
             <h2 className="mt-2 text-2xl font-semibold text-slate-900 dark:text-white">
-              {initialOwner ? "Actualizar datos" : "Nuevo propietario"}
+              {initialOwner?.id ? "Actualizar datos" : "Nuevo propietario"}
             </h2>
           </div>
           <button
@@ -102,12 +103,22 @@ export default function OwnerFormModal({
 
         <div className="mt-6 grid gap-4 sm:grid-cols-2">
           <label className="space-y-2 text-sm text-slate-700 dark:text-slate-200">
-            Nombre completo
+            Nombre completo *
             <input
               value={formState.name}
               onChange={(event) => handleChange("name", event.target.value)}
               className="w-full rounded-3xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100 dark:border-slate-700 dark:bg-slate-900 dark:text-white"
-              placeholder="Claudia Ríos"
+              placeholder="Laura Gómez"
+            />
+          </label>
+
+          <label className="space-y-2 text-sm text-slate-700 dark:text-slate-200">
+            Documento
+            <input
+              value={formState.documento}
+              onChange={(event) => handleChange("documento", event.target.value)}
+              className="w-full rounded-3xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100 dark:border-slate-700 dark:bg-slate-900 dark:text-white"
+              placeholder="1020304050"
             />
           </label>
 
@@ -117,7 +128,7 @@ export default function OwnerFormModal({
               value={formState.email}
               onChange={(event) => handleChange("email", event.target.value)}
               className="w-full rounded-3xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100 dark:border-slate-700 dark:bg-slate-900 dark:text-white"
-              placeholder="claudia.rios@mail.com"
+              placeholder="laura@email.com"
             />
           </label>
 
@@ -131,13 +142,13 @@ export default function OwnerFormModal({
             />
           </label>
 
-          <label className="space-y-2 text-sm text-slate-700 dark:text-slate-200">
+          <label className="space-y-2 text-sm text-slate-700 dark:text-slate-200 sm:col-span-2">
             Dirección
             <input
               value={formState.address}
               onChange={(event) => handleChange("address", event.target.value)}
               className="w-full rounded-3xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100 dark:border-slate-700 dark:bg-slate-900 dark:text-white"
-              placeholder="Carrera 10 #7-89"
+              placeholder="Carrera 10 #7-89, Medellín"
             />
           </label>
         </div>
@@ -156,7 +167,6 @@ export default function OwnerFormModal({
           >
             Cancelar
           </button>
-
           <button
             type="button"
             onClick={handleSubmit}

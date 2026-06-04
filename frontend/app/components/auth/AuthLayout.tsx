@@ -1,9 +1,10 @@
 "use client";
 
 import type { ReactNode } from "react";
+import Link from "next/link";
 import Image from "next/image";
 import { motion } from "framer-motion";
-import { PawPrint } from "lucide-react";
+import { ArrowLeft, PawPrint } from "lucide-react";
 
 interface AuthLayoutProps {
   title: string;
@@ -19,6 +20,23 @@ export default function AuthLayout({
   return (
     <section className="min-h-screen bg-slate-50 py-4 dark:bg-slate-950 dark:text-slate-100">
       <div className="mx-auto flex w-full max-w-lg flex-col items-center gap-4 px-4 sm:px-6">
+
+        {/* Botón volver al inicio */}
+        <motion.div
+          initial={{ opacity: 0, x: -10 }}
+          animate={{ opacity: 1, x: 0 }}
+          transition={{ duration: 0.3 }}
+          className="w-full"
+        >
+          <Link
+            href="/"
+            className="inline-flex items-center gap-1.5 rounded-xl px-3 py-1.5 text-sm font-medium text-slate-500 transition-colors hover:bg-slate-100 hover:text-blue-600 dark:text-slate-400 dark:hover:bg-slate-800 dark:hover:text-blue-400"
+          >
+            <ArrowLeft className="h-4 w-4" />
+            Volver al inicio
+          </Link>
+        </motion.div>
+
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}

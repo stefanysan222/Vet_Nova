@@ -6,7 +6,7 @@ import { useRouter } from "next/navigation";
 import { Eye, EyeOff, Lock, Mail, UserCircle } from "lucide-react";
 import Button from "../Button";
 import GoogleAuthButton from "./GoogleAuthButton";
-import { registerUser, setCurrentUser, loginOrRegisterGoogle } from "../../../lib/auth";
+import { registerUser, loginOrRegisterGoogle, setToken } from "../../../lib/auth";
 
 const initialState = {
   name: "",
@@ -20,6 +20,10 @@ export default function RegisterForm() {
   const [formData, setFormData] = useState(initialState);
   const [showPassword, setShowPassword] = useState(false);
   const [errors, setErrors] = useState<Record<string, string>>({});
+  const [submitError, setSubmitError] = useState<string | null>(null);
+  const [loading, setLoading] = useState(false);
+
+  const router = useRouter();
 
   const handleChange = (field: string, value: string | boolean) => {
     setFormData((current) => ({ ...current, [field]: value }));
@@ -28,60 +32,65 @@ export default function RegisterForm() {
 
   const validate = () => {
     const nextErrors: Record<string, string> = {};
-
-    if (!formData.name.trim()) {
-      nextErrors.name = "El nombre completo es obligatorio.";
-    }
-
+    if (!formData.name.trim()) nextErrors.name = "El nombre completo es obligatorio.";
     if (!formData.email.trim()) {
       nextErrors.email = "El correo es obligatorio.";
     } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) {
       nextErrors.email = "Ingresa un correo válido.";
     }
-
     if (!formData.password) {
       nextErrors.password = "La contraseña es obligatoria.";
     } else if (formData.password.length < 6) {
       nextErrors.password = "La contraseña debe tener al menos 6 caracteres.";
     }
-
     if (!formData.confirmPassword) {
       nextErrors.confirmPassword = "Confirma tu contraseña.";
     } else if (formData.confirmPassword !== formData.password) {
       nextErrors.confirmPassword = "Las contraseñas no coinciden.";
     }
-
-    if (!formData.acceptTerms) {
-      nextErrors.acceptTerms = "Debes aceptar los términos.";
-    }
-
+    if (!formData.acceptTerms) nextErrors.acceptTerms = "Debes aceptar los términos.";
     return nextErrors;
   };
 
-  const router = useRouter();
-  const [submitError, setSubmitError] = useState<string | null>(null);
-
-  const handleGoogleSuccess = (profile: { name: string; email: string; picture?: string }) => {
-    const { user } = loginOrRegisterGoogle(profile);
-    setCurrentUser(user);
-    router.push(user.role === "Administrador" ? "/admin" : user.role === "Veterinario" ? "/veterinario" : "/cliente");
+  const getDashboardRoute = (role: string) => {
+    if (role === "Administrador") return "/admin";
+    if (role === "Veterinario") return "/veterinario";
+    if (role === "Recepcionista") return "/recepcionista";
+    return "/cliente";
   };
 
-  const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
+  const handleGoogleSuccess = async (profile: { name: string; email: string; picture?: string }) => {
+    setLoading(true);
+    setSubmitError(null);
+    const result = await loginOrRegisterGoogle(profile);
+    setLoading(false);
+    if (result.error) {
+      setSubmitError(result.error);
+      return;
+    }
+    if (result.token && result.user) {
+      setToken(result.token);
+      router.push(getDashboardRoute(result.user.role));
+    }
+  };
+
+  const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     const nextErrors = validate();
-
     if (Object.keys(nextErrors).length > 0) {
       setErrors(nextErrors);
       return;
     }
 
-    const result = registerUser({
-      name: formData.name,
+    setLoading(true);
+    setSubmitError(null);
+    const result = await registerUser({
+      nombre: formData.name,
       email: formData.email,
       password: formData.password,
-      role: "Cliente",
+      rol: "Cliente",
     });
+    setLoading(false);
 
     if (result.error) {
       setSubmitError(result.error);
@@ -89,11 +98,9 @@ export default function RegisterForm() {
     }
 
     setErrors({});
-    setSubmitError(null);
-
-    if (result.user) {
-      setCurrentUser(result.user);
-      router.push(result.user.role === "Administrador" ? "/admin" : result.user.role === "Veterinario" ? "/veterinario" : "/cliente");
+    if (result.token && result.user) {
+      setToken(result.token);
+      router.push(getDashboardRoute(result.user.role));
     }
   };
 
@@ -216,8 +223,8 @@ export default function RegisterForm() {
       {errors.acceptTerms ? <p className="text-xs text-rose-600">{errors.acceptTerms}</p> : null}
 
       <div className="space-y-2">
-        <Button type="submit" className="w-full justify-center py-2.5 text-sm font-semibold">
-          Crear cuenta
+        <Button type="submit" disabled={loading} className="w-full justify-center py-2.5 text-sm font-semibold">
+          {loading ? "Creando cuenta..." : "Crear cuenta"}
         </Button>
       </div>
 

@@ -10,6 +10,7 @@ import {
   type KeyboardEvent,
   type ReactNode,
 } from "react";
+import { getCurrentUser, clearCurrentUser } from "../../lib/auth";
 
 type IconName =
   | "dashboard"
@@ -72,127 +73,9 @@ const navigation: {
   },
 ];
 
-const notificationPreview = [
-  {
-    title: "Próxima consulta",
-    description: "Max tiene consulta general programada a las 09:00 AM.",
-    time: "Hace 10 min",
-    unread: true,
-  },
-  {
-    title: "Control pendiente",
-    description: "Rocky requiere seguimiento postoperatorio.",
-    time: "Hace 1 hora",
-    unread: true,
-  },
-  {
-    title: "Historial actualizado",
-    description: "Se registró una evolución clínica para Bella.",
-    time: "Ayer",
-    unread: false,
-  },
-];
+const notificationPreview: { title: string; description: string; time: string; unread: boolean }[] = [];
 
 const elementosBusqueda: ResultadoBusqueda[] = [
-  {
-    id: "paciente-max",
-    categoria: "Paciente",
-    titulo: "Max",
-    descripcion: "Canino · Labrador Retriever · Juan Pérez",
-    palabrasClave:
-      "max canino labrador juan perez paciente consulta general",
-    href: "/veterinario/mascotas?buscar=Max",
-    icon: "patients",
-  },
-  {
-    id: "paciente-luna",
-    categoria: "Paciente",
-    titulo: "Luna",
-    descripcion: "Felino · Persa · María García",
-    palabrasClave: "luna felino persa maria garcia paciente vacunacion",
-    href: "/veterinario/mascotas?buscar=Luna",
-    icon: "patients",
-  },
-  {
-    id: "paciente-rocky",
-    categoria: "Paciente",
-    titulo: "Rocky",
-    descripcion: "Canino · Bulldog Francés · Carlos López",
-    palabrasClave:
-      "rocky canino bulldog frances carlos lopez paciente tratamiento control",
-    href: "/veterinario/mascotas?buscar=Rocky",
-    icon: "patients",
-  },
-  {
-    id: "paciente-bella",
-    categoria: "Paciente",
-    titulo: "Bella",
-    descripcion: "Canino · Golden Retriever · Ana Martínez",
-    palabrasClave:
-      "bella canino golden retriever ana martinez paciente seguimiento",
-    href: "/veterinario/mascotas?buscar=Bella",
-    icon: "patients",
-  },
-  {
-    id: "historial-max",
-    categoria: "Historial clínico",
-    titulo: "Historia clínica de Max",
-    descripcion: "Consultar expediente clínico completo",
-    palabrasClave:
-      "max historial historia clinica expediente antecedentes documento",
-    href: "/veterinario/historial?paciente=max",
-    icon: "history",
-  },
-  {
-    id: "historial-luna",
-    categoria: "Historial clínico",
-    titulo: "Historia clínica de Luna",
-    descripcion: "Consultar expediente clínico completo",
-    palabrasClave:
-      "luna historial historia clinica expediente antecedentes documento",
-    href: "/veterinario/historial?paciente=luna",
-    icon: "history",
-  },
-  {
-    id: "historial-rocky",
-    categoria: "Historial clínico",
-    titulo: "Historia clínica de Rocky",
-    descripcion: "Consultar tratamientos y evoluciones",
-    palabrasClave:
-      "rocky historial historia clinica expediente tratamiento evolucion",
-    href: "/veterinario/historial?paciente=rocky",
-    icon: "history",
-  },
-  {
-    id: "historial-bella",
-    categoria: "Historial clínico",
-    titulo: "Historia clínica de Bella",
-    descripcion: "Consultar seguimiento clínico",
-    palabrasClave:
-      "bella historial historia clinica expediente seguimiento evolucion",
-    href: "/veterinario/historial?paciente=bella",
-    icon: "history",
-  },
-  {
-    id: "consulta-max",
-    categoria: "Consulta",
-    titulo: "09:00 AM · Max",
-    descripcion: "Consulta general · Cita confirmada",
-    palabrasClave:
-      "max consulta atender cita confirmada tratamiento 09 general",
-    href: "/veterinario/consulta?paciente=max",
-    icon: "consultation",
-  },
-  {
-    id: "consulta-rocky",
-    categoria: "Consulta",
-    titulo: "11:00 AM · Rocky",
-    descripcion: "Control postoperatorio · Cita confirmada",
-    palabrasClave:
-      "rocky consulta atender cita confirmada tratamiento control postoperatorio",
-    href: "/veterinario/consulta?paciente=rocky",
-    icon: "consultation",
-  },
   {
     id: "modulo-dashboard",
     categoria: "Módulo",
@@ -234,8 +117,7 @@ const elementosBusqueda: ResultadoBusqueda[] = [
     categoria: "Módulo",
     titulo: "Registrar consulta",
     descripcion: "Documentar atención y tratamiento",
-    palabrasClave:
-      "registrar consulta tratamiento atencion clinica diagnostico",
+    palabrasClave: "registrar consulta tratamiento atencion clinica diagnostico",
     href: "/veterinario/consulta",
     icon: "consultation",
   },
@@ -244,8 +126,7 @@ const elementosBusqueda: ResultadoBusqueda[] = [
     categoria: "Módulo",
     titulo: "Mi perfil",
     descripcion: "Información personal y seguridad",
-    palabrasClave:
-      "perfil configuracion seguridad contraseña informacion personal",
+    palabrasClave: "perfil configuracion seguridad contraseña informacion personal",
     href: "/veterinario/configuracion",
     icon: "profile",
   },
@@ -284,6 +165,22 @@ export default function VeterinarioLayoutShell({
       })
       .slice(0, 8);
   }, [busquedaGlobal]);
+
+  useEffect(() => {
+    const user = getCurrentUser();
+    if (!user) {
+      router.replace("/login");
+      return;
+    }
+    if (user.role !== "Veterinario") {
+      const routes: Record<string, string> = {
+        Administrador: "/admin",
+        Cliente: "/cliente",
+        Recepcionista: "/recepcionista",
+      };
+      router.replace(routes[user.role] ?? "/login");
+    }
+  }, [router]);
 
   useEffect(() => {
     const savedTheme = localStorage.getItem("vetnova-theme") === "dark";
@@ -396,13 +293,14 @@ export default function VeterinarioLayoutShell({
           </nav>
 
           <div className="border-t border-[#E5EAF2] px-3 py-5 dark:border-[#1E293B]">
-            <Link
-              href="/"
-              className="flex items-center gap-3 rounded-xl px-4 py-3 text-[14px] font-semibold text-[#10213A] transition hover:bg-[#F1F5F9] dark:text-white dark:hover:bg-[#1E293B]"
+            <button
+              type="button"
+              onClick={() => { clearCurrentUser(); router.push("/login"); }}
+              className="flex w-full items-center gap-3 rounded-xl px-4 py-3 text-[14px] font-semibold text-[#10213A] transition hover:bg-[#F1F5F9] dark:text-white dark:hover:bg-[#1E293B]"
             >
               <AppIcon name="logout" />
               Cerrar Sesión
-            </Link>
+            </button>
           </div>
         </aside>
 
@@ -689,13 +587,14 @@ export default function VeterinarioLayoutShell({
                     </div>
 
                     <div className="border-t border-[#E2E8F0] py-2 dark:border-[#334155]">
-                      <Link
-                        href="/"
-                        className="flex items-center gap-3 px-5 py-3 text-[14px] font-semibold text-[#EF4444] transition hover:bg-[#FEF2F2] dark:hover:bg-[#3F1D1D]"
+                      <button
+                        type="button"
+                        onClick={() => { setShowUserMenu(false); clearCurrentUser(); router.push("/login"); }}
+                        className="flex w-full items-center gap-3 px-5 py-3 text-[14px] font-semibold text-[#EF4444] transition hover:bg-[#FEF2F2] dark:hover:bg-[#3F1D1D]"
                       >
                         <AppIcon name="logout" />
                         Cerrar sesión
-                      </Link>
+                      </button>
                     </div>
                   </div>
                 )}

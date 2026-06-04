@@ -6,7 +6,7 @@ import { useRouter } from "next/navigation";
 import { Eye, EyeOff, Lock, Mail } from "lucide-react";
 import Button from "../Button";
 import GoogleAuthButton from "./GoogleAuthButton";
-import { loginUser, loginOrRegisterGoogle, setCurrentUser } from "../../../lib/auth";
+import { loginUser, loginOrRegisterGoogle, setToken } from "../../../lib/auth";
 
 const initialState = {
   email: "",
@@ -18,6 +18,10 @@ export default function LoginForm() {
   const [formData, setFormData] = useState(initialState);
   const [showPassword, setShowPassword] = useState(false);
   const [errors, setErrors] = useState<Record<string, string>>({});
+  const [submitError, setSubmitError] = useState<string | null>(null);
+  const [loading, setLoading] = useState(false);
+
+  const router = useRouter();
 
   const handleChange = (field: string, value: string | boolean) => {
     setFormData((current) => ({ ...current, [field]: value }));
@@ -26,24 +30,18 @@ export default function LoginForm() {
 
   const validate = () => {
     const nextErrors: Record<string, string> = {};
-
     if (!formData.email.trim()) {
       nextErrors.email = "El correo es obligatorio.";
     } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) {
       nextErrors.email = "Ingresa un correo válido.";
     }
-
     if (!formData.password) {
       nextErrors.password = "La contraseña es obligatoria.";
     } else if (formData.password.length < 6) {
       nextErrors.password = "La contraseña debe tener al menos 6 caracteres.";
     }
-
     return nextErrors;
   };
-
-  const router = useRouter();
-  const [submitError, setSubmitError] = useState<string | null>(null);
 
   const getDashboardRoute = (role: string) => {
     if (role === "Administrador") return "/admin";
@@ -52,30 +50,42 @@ export default function LoginForm() {
     return "/cliente";
   };
 
-  const handleGoogleSuccess = (profile: { name: string; email: string; picture?: string }) => {
-    const { user } = loginOrRegisterGoogle(profile);
-    setCurrentUser(user);
-    router.push(getDashboardRoute(user.role));
+  const handleGoogleSuccess = async (profile: { name: string; email: string; picture?: string }) => {
+    setLoading(true);
+    setSubmitError(null);
+    const result = await loginOrRegisterGoogle(profile);
+    setLoading(false);
+    if (result.error) {
+      setSubmitError(result.error);
+      return;
+    }
+    if (result.token && result.user) {
+      setToken(result.token);
+      router.push(getDashboardRoute(result.user.role));
+    }
   };
 
-  const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     const nextErrors = validate();
-
     if (Object.keys(nextErrors).length > 0) {
       setErrors(nextErrors);
       return;
     }
 
-    const result = loginUser(formData.email, formData.password);
+    setLoading(true);
+    setSubmitError(null);
+    const result = await loginUser(formData.email, formData.password);
+    setLoading(false);
+
     if (result.error) {
       setSubmitError(result.error);
       return;
     }
 
     setErrors({});
-    if (result.user) {
-      setCurrentUser(result.user);
+    if (result.token && result.user) {
+      setToken(result.token);
       router.push(getDashboardRoute(result.user.role));
     }
   };
@@ -153,8 +163,8 @@ export default function LoginForm() {
       </div>
 
       <div className="space-y-4">
-        <Button type="submit" className="w-full justify-center py-4 text-sm font-semibold">
-          Iniciar sesión
+        <Button type="submit" disabled={loading} className="w-full justify-center py-4 text-sm font-semibold">
+          {loading ? "Iniciando sesión..." : "Iniciar sesión"}
         </Button>
       </div>
 

@@ -1,5 +1,5 @@
 import type { ReactNode } from "react";
-import RecepcionistaLayoutShell from "./RecepcionistaLayoutShell";
+import { RecepcionistaLayoutShell } from "./RecepcionistaLayoutShell";
 
 export default function RecepcionistaLayout({
   children,

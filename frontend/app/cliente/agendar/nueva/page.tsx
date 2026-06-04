@@ -3,10 +3,10 @@
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { ChangeEvent, FormEvent, useEffect, useMemo, useState } from "react";
-
-const PETS_STORAGE_KEY = "vetnova_mascotas_cliente";
-const APPOINTMENTS_STORAGE_KEY = "vetnova_citas_cliente";
-const PROFILE_STORAGE_KEY = "vetnova_cliente_perfil";
+import { getCurrentUser } from "../../../../lib/auth";
+import { fetchMascotas } from "../../../../lib/api/mascotas";
+import { fetchPropietarioByUsuario } from "../../../../lib/api/propietarios";
+import { createCita } from "../../../../lib/api/citas";
 
 type EstadoCita = "Pendiente" | "Confirmada" | "Cancelada";
 
@@ -21,11 +21,6 @@ type Mascota = {
   foto?: string | null;
 };
 
-type PerfilCliente = {
-  nombre?: string;
-  apellido?: string;
-};
-
 type FormularioCita = {
   mascotaId: string;
   servicio: string;
@@ -35,37 +30,13 @@ type FormularioCita = {
   observaciones: string;
 };
 
-type CitaGuardada = {
-  id: string;
-  mascotaId: string;
-  mascota: string;
-  mascotaNombre: string;
-  especie: string;
-  raza: string;
-  propietario: string;
-  servicio: string;
-  tipoCita: string;
-  fecha: string;
-  hora: string;
-  motivo: string;
-  observaciones: string;
-  veterinario: string;
-  estado: EstadoCita;
-  fechaCreacion: string;
-};
 
-const mascotasIniciales: Mascota[] = [
-  {
-    id: "max",
-    nombre: "Max",
-    tipo: "perro",
-    especie: "Perro",
-    raza: "Golden Retriever",
-    edad: "3 años",
-    dueño: "Anderson Ibáñez",
-    foto: null,
-  },
-];
+function espécieToTipo(especie: string): "perro" | "gato" | "otro" {
+  const lower = especie.toLowerCase();
+  if (lower.includes("perro") || lower.includes("canino")) return "perro";
+  if (lower.includes("gato") || lower.includes("felino")) return "gato";
+  return "otro";
+}
 
 const servicios = [
   "Consulta general",
@@ -119,50 +90,36 @@ export default function NuevaCitaPage() {
   const [guardando, setGuardando] = useState(false);
 
   useEffect(() => {
-    const cargarDatos = () => {
-      setPropietario(leerNombrePropietario());
+    const user = getCurrentUser();
+    if (!user) return;
 
+    setPropietario(user.name);
+
+    const cargarMascotas = async () => {
       try {
-        const registroGuardado = localStorage.getItem(PETS_STORAGE_KEY);
-
-        const mascotasRegistradas: Mascota[] = registroGuardado
-          ? (JSON.parse(registroGuardado) as Mascota[])
-          : [];
-
-        const mascotasDisponibles = eliminarDuplicados([
-          ...mascotasRegistradas,
-          ...mascotasIniciales,
-        ]);
-
-        setMascotas(mascotasDisponibles);
-
-        if (mascotasDisponibles.length > 0) {
-          setFormulario((actual) => ({
-            ...actual,
-            mascotaId: actual.mascotaId || mascotasDisponibles[0].id,
-          }));
+        const prop = await fetchPropietarioByUsuario(user.id);
+        if (!prop) return;
+        const apiMascotas = await fetchMascotas(parseInt(prop.id, 10));
+        const mapped: Mascota[] = apiMascotas.map((m) => ({
+          id: m.id,
+          nombre: m.nombre,
+          tipo: espécieToTipo(m.especie),
+          especie: m.especie || "Otro",
+          raza: m.raza || "—",
+          edad: m.edad,
+          dueño: prop.name,
+          foto: m.foto || null,
+        }));
+        setMascotas(mapped);
+        if (mapped.length > 0) {
+          setFormulario((prev) => ({ ...prev, mascotaId: prev.mascotaId || mapped[0].id }));
         }
       } catch {
-        setMascotas(mascotasIniciales);
-
-        setFormulario((actual) => ({
-          ...actual,
-          mascotaId: actual.mascotaId || mascotasIniciales[0].id,
-        }));
+        setMascotas([]);
       }
     };
 
-    cargarDatos();
-
-    window.addEventListener("vetnova-pets-updated", cargarDatos);
-    window.addEventListener("vetnova-profile-updated", cargarDatos);
-    window.addEventListener("storage", cargarDatos);
-
-    return () => {
-      window.removeEventListener("vetnova-pets-updated", cargarDatos);
-      window.removeEventListener("vetnova-profile-updated", cargarDatos);
-      window.removeEventListener("storage", cargarDatos);
-    };
+    cargarMascotas();
   }, []);
 
   const mascotaSeleccionada = useMemo(
@@ -185,7 +142,7 @@ export default function NuevaCitaPage() {
     setError("");
   };
 
-  const agendarCita = (event: FormEvent<HTMLFormElement>) => {
+  const agendarCita = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     setError("");
 
@@ -219,55 +176,24 @@ export default function NuevaCitaPage() {
 
     setGuardando(true);
 
-    const nuevaCita: CitaGuardada = {
-      id: crypto.randomUUID(),
-      mascotaId: mascotaSeleccionada.id,
-      mascota: mascotaSeleccionada.nombre,
-      mascotaNombre: mascotaSeleccionada.nombre,
-      especie: mascotaSeleccionada.especie,
-      raza: mascotaSeleccionada.raza,
-      propietario,
-      servicio: formulario.servicio,
-      tipoCita: formulario.servicio,
-      fecha: formulario.fecha,
-      hora: formulario.hora,
-      motivo: formulario.motivo.trim() || formulario.servicio,
-      observaciones: formulario.observaciones.trim(),
-      veterinario: "Por asignar",
-      estado: "Pendiente",
-      fechaCreacion: new Date().toISOString(),
-    };
-
     try {
-      const citasGuardadas = leerCitasGuardadas();
-
-      const horarioOcupado = citasGuardadas.some(
-        (cita) =>
-          cita.fecha === nuevaCita.fecha &&
-          cita.hora === nuevaCita.hora &&
-          cita.estado !== "Cancelada"
-      );
-
-      if (horarioOcupado) {
-        setError(
-          "Ya tienes una cita registrada en esa fecha y hora. Selecciona otro horario."
-        );
-        setGuardando(false);
-        return;
-      }
-
-      localStorage.setItem(
-        APPOINTMENTS_STORAGE_KEY,
-        JSON.stringify([nuevaCita, ...citasGuardadas])
-      );
-
-      window.dispatchEvent(new Event("vetnova-appointments-updated"));
-      window.dispatchEvent(new Event("vetnova-citas-updated"));
+      const user = getCurrentUser();
+      await createCita({
+        date: formulario.fecha,
+        time: formulario.hora,
+        petId: mascotaSeleccionada.id,
+        ownerId: "",
+        petName: mascotaSeleccionada.nombre,
+        ownerName: propietario,
+        service: formulario.servicio,
+        status: "Pendiente",
+        notes: [formulario.motivo.trim(), formulario.observaciones.trim()].filter(Boolean).join(" | ") || undefined,
+      }, user?.id);
 
       router.push("/cliente/agendar");
-    } catch {
+    } catch (err) {
       setGuardando(false);
-      setError("No fue posible guardar la cita. Intenta nuevamente.");
+      setError(err instanceof Error ? err.message : "No fue posible guardar la cita. Verifica que el servidor esté activo.");
     }
   };
 
@@ -536,50 +462,6 @@ export default function NuevaCitaPage() {
   );
 }
 
-function leerNombrePropietario() {
-  try {
-    const informacionGuardada = localStorage.getItem(PROFILE_STORAGE_KEY);
-
-    if (!informacionGuardada) {
-      return "Anderson Ibáñez";
-    }
-
-    const perfil = JSON.parse(informacionGuardada) as PerfilCliente;
-
-    const nombreCompleto = `${perfil.nombre?.trim() || ""} ${
-      perfil.apellido?.trim() || ""
-    }`.trim();
-
-    return nombreCompleto || "Anderson Ibáñez";
-  } catch {
-    return "Anderson Ibáñez";
-  }
-}
-
-function leerCitasGuardadas(): CitaGuardada[] {
-  try {
-    const registroGuardado = localStorage.getItem(APPOINTMENTS_STORAGE_KEY);
-
-    return registroGuardado
-      ? (JSON.parse(registroGuardado) as CitaGuardada[])
-      : [];
-  } catch {
-    return [];
-  }
-}
-
-function eliminarDuplicados(mascotas: Mascota[]) {
-  const idsRegistrados = new Set<string>();
-
-  return mascotas.filter((mascota) => {
-    if (idsRegistrados.has(mascota.id)) {
-      return false;
-    }
-
-    idsRegistrados.add(mascota.id);
-    return true;
-  });
-}
 
 function obtenerFechaActual() {
   const hoy = new Date();

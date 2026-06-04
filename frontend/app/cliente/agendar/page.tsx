@@ -2,6 +2,10 @@
 
 import Link from "next/link";
 import { type ReactNode, useEffect, useMemo, useState } from "react";
+import { getCurrentUser } from "../../../lib/auth";
+import { fetchCitas } from "../../../lib/api/citas";
+import { updateCitaEstado } from "../../../lib/api/citas";
+import type { Appointment } from "../../../lib/recepcionista/types";
 
 
 type EstadoCita = "Confirmada" | "Pendiente" | "Completada" | "Cancelada";
@@ -21,36 +25,31 @@ type Cita = {
   estado: EstadoCita;
 };
 
-const CITAS_STORAGE_KEY = "vetnova_citas_cliente";
+const MONTHS = ["ENE","FEB","MAR","ABR","MAY","JUN","JUL","AGO","SEP","OCT","NOV","DIC"];
 
-const citasIniciales: Cita[] = [
-  {
-    id: "cita-max",
-    mascota: "Max",
-    especie: "Perro · Golden Retriever",
-    servicio: "Consulta general",
-    fecha: "26 de mayo de 2026",
-    fechaCorta: "26",
-    dia: "MAY",
-    hora: "09:00 AM",
-    veterinario: "Dra. Laura Gómez",
-    motivo: "Control general y revisión de peso.",
-    estado: "Confirmada",
-  },
-  {
-    id: "cita-luna",
-    mascota: "Luna",
-    especie: "Gato · Siamés",
-    servicio: "Vacunación",
-    fecha: "29 de mayo de 2026",
-    fechaCorta: "29",
-    dia: "MAY",
-    hora: "03:30 PM",
-    veterinario: "Dr. Carlos Ramírez",
-    motivo: "Aplicación de vacuna pendiente.",
-    estado: "Pendiente",
-  },
-];
+function appointmentToCita(a: Appointment): Cita {
+  const d = a.date ? new Date(a.date + "T00:00:00") : new Date();
+  const especie = [a.petEspecie, a.petRaza].filter(Boolean).join(" · ");
+  const estadoMap: Record<string, EstadoCita> = {
+    Confirmada: "Confirmada",
+    Pendiente: "Pendiente",
+    Finalizada: "Completada",
+    Cancelada: "Cancelada",
+  };
+  return {
+    id: a.id,
+    mascota: a.petName,
+    especie: especie || a.petName,
+    servicio: a.service || "Consulta",
+    fecha: d.toLocaleDateString("es-CO", { day: "numeric", month: "long", year: "numeric" }),
+    fechaCorta: String(d.getDate()),
+    dia: MONTHS[d.getMonth()],
+    hora: a.time,
+    veterinario: a.veterinarian || "Por asignar",
+    motivo: a.notes || "",
+    estado: estadoMap[a.status] ?? "Pendiente",
+  };
+}
 
 export default function AgendarPage() {
   const [citas, setCitas] = useState<Cita[]>([]);
@@ -59,32 +58,21 @@ export default function AgendarPage() {
   const [citaSeleccionada, setCitaSeleccionada] = useState<Cita | null>(null);
   const [cargado, setCargado] = useState(false);
 
-  useEffect(() => {
+  const cargarCitas = async () => {
+    const user = getCurrentUser();
+    if (!user) { setCargado(true); return; }
     try {
-      const citasGuardadas = localStorage.getItem(CITAS_STORAGE_KEY);
-
-      if (citasGuardadas) {
-        const datos = JSON.parse(citasGuardadas) as Cita[];
-
-        if (Array.isArray(datos) && datos.length > 0) {
-          setCitas(datos);
-        } else {
-          setCitas(citasIniciales);
-          localStorage.setItem(
-            CITAS_STORAGE_KEY,
-            JSON.stringify(citasIniciales)
-          );
-        }
-      } else {
-        setCitas(citasIniciales);
-        localStorage.setItem(CITAS_STORAGE_KEY, JSON.stringify(citasIniciales));
-      }
+      const apiCitas = await fetchCitas();
+      setCitas(apiCitas.map(appointmentToCita));
     } catch {
-      setCitas(citasIniciales);
-      localStorage.setItem(CITAS_STORAGE_KEY, JSON.stringify(citasIniciales));
+      setCitas([]);
     } finally {
       setCargado(true);
     }
+  };
+
+  useEffect(() => {
+    cargarCitas();
   }, []);
 
   const citasFiltradas = useMemo(() => {
@@ -122,18 +110,14 @@ export default function AgendarPage() {
     (cita) => cita.estado === "Pendiente"
   ).length;
 
-  const guardarCitas = (citasActualizadas: Cita[]) => {
-    setCitas(citasActualizadas);
-    localStorage.setItem(CITAS_STORAGE_KEY, JSON.stringify(citasActualizadas));
-    window.dispatchEvent(new Event("vetnova-appointments-updated"));
-  };
-
-  const cancelarCita = (id: string) => {
-    const citasActualizadas = citas.map((cita) =>
-      cita.id === id ? { ...cita, estado: "Cancelada" as EstadoCita } : cita
-    );
-
-    guardarCitas(citasActualizadas);
+  const cancelarCita = async (id: string) => {
+    try {
+      await updateCitaEstado(id, "Cancelada");
+      await cargarCitas();
+    } catch {
+      // update local state optimistically if API fails
+      setCitas((prev) => prev.map((c) => c.id === id ? { ...c, estado: "Cancelada" as EstadoCita } : c));
+    }
 
     setCitaSeleccionada((actual) =>
       actual?.id === id

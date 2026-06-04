@@ -4,6 +4,9 @@ export type Owner = {
   email: string;
   phone: string;
   address: string;
+  documento?: string;
+  estado?: string;
+  mascotas?: string[];
 };
 
 export type PetRecord = {
@@ -23,8 +26,11 @@ export type PetRecord = {
 export type AppointmentStatus =
   | "Pendiente"
   | "Confirmada"
-  | "Completada"
+  | "En espera"
+  | "En atención"
+  | "Finalizada"
   | "Cancelada"
+  | "No asistió"
   | "Reprogramada";
 
 export type Appointment = {
@@ -37,8 +43,11 @@ export type Appointment = {
   ownerName: string;
   service: string;
   status: AppointmentStatus;
+  veterinarianId?: number;
   veterinarian?: string;
   notes?: string;
+  petEspecie?: string;
+  petRaza?: string;
 };
 
 export type InventoryCategory = "Inventario" | "Servicio";

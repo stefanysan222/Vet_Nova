@@ -3,6 +3,9 @@
 import Image from "next/image";
 import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
+import { getCurrentUser } from "../../../lib/auth";
+import { fetchPropietarioByUsuario } from "../../../lib/api/propietarios";
+import { fetchMascotas } from "../../../lib/api/mascotas";
 
 type DocumentoClinicoAdjunto = {
   id: string;
@@ -34,123 +37,55 @@ type Pet = {
 
 type SpeciesFilter = "todas" | "perro" | "gato" | "otro";
 
-const PETS_STORAGE_KEY = "vetnova_mascotas_cliente";
-
-const mascotasIniciales: Pet[] = [
-  {
-    id: "max",
-    nombre: "Max",
-    tipo: "perro",
-    especie: "Perro",
-    raza: "Golden Retriever",
-    edad: "3 años",
-    dueño: "Juan Pérez",
-    ultimaVisita: "15 Abr 2026",
-    estado: "Activo",
-    foto: null,
-    documentosClinicos: [],
-  },
-  {
-    id: "luna",
-    nombre: "Luna",
-    tipo: "gato",
-    especie: "Gato",
-    raza: "Siamés",
-    edad: "2 años",
-    dueño: "María García",
-    ultimaVisita: "20 Abr 2026",
-    estado: "Activo",
-    foto: null,
-    documentosClinicos: [],
-  },
-  {
-    id: "rocky",
-    nombre: "Rocky",
-    tipo: "perro",
-    especie: "Perro",
-    raza: "Pastor Alemán",
-    edad: "5 años",
-    dueño: "Carlos López",
-    ultimaVisita: "02 May 2026",
-    estado: "En Tratamiento",
-    foto: null,
-    documentosClinicos: [],
-  },
-  {
-    id: "bella",
-    nombre: "Bella",
-    tipo: "gato",
-    especie: "Gato",
-    raza: "Persa",
-    edad: "4 años",
-    dueño: "Ana Martínez",
-    ultimaVisita: "28 Abr 2026",
-    estado: "Activo",
-    foto: null,
-    documentosClinicos: [],
-  },
-  {
-    id: "charlie",
-    nombre: "Charlie",
-    tipo: "perro",
-    especie: "Perro",
-    raza: "Labrador",
-    edad: "1 año",
-    dueño: "Luis Ramírez",
-    ultimaVisita: "30 Abr 2026",
-    estado: "Activo",
-    foto: null,
-    documentosClinicos: [],
-  },
-  {
-    id: "mia",
-    nombre: "Mia",
-    tipo: "gato",
-    especie: "Gato",
-    raza: "Angora",
-    edad: "6 meses",
-    dueño: "Sofía Torres",
-    ultimaVisita: "01 May 2026",
-    estado: "Activo",
-    foto: null,
-    documentosClinicos: [],
-  },
-];
+function espécieToTipo(especie: string): "perro" | "gato" | "otro" {
+  const lower = especie.toLowerCase();
+  if (lower.includes("perro") || lower.includes("canino")) return "perro";
+  if (lower.includes("gato") || lower.includes("felino")) return "gato";
+  return "otro";
+}
 
 export default function MascotasPage() {
-  const [mascotas, setMascotas] = useState<Pet[]>(mascotasIniciales);
+  const [mascotas, setMascotas] = useState<Pet[]>([]);
+  const [loading, setLoading] = useState(true);
   const [busqueda, setBusqueda] = useState("");
   const [especieSeleccionada, setEspecieSeleccionada] =
     useState<SpeciesFilter>("todas");
 
   useEffect(() => {
-    const cargarMascotas = () => {
+    const user = getCurrentUser();
+    if (!user) { setLoading(false); return; }
+
+    const cargarMascotas = async () => {
       try {
-        const registroGuardado = localStorage.getItem(PETS_STORAGE_KEY);
+        const propietario = await fetchPropietarioByUsuario(user.id);
+        if (!propietario) { setMascotas([]); return; }
 
-        if (!registroGuardado) {
-          setMascotas(mascotasIniciales);
-          return;
-        }
-
-        const mascotasCreadas = JSON.parse(registroGuardado) as Pet[];
-
-        setMascotas([...mascotasCreadas, ...mascotasIniciales]);
+        const apiMascotas = await fetchMascotas(parseInt(propietario.id, 10));
+        const mapped: Pet[] = apiMascotas.map((m) => ({
+          id: m.id,
+          nombre: m.nombre,
+          tipo: espécieToTipo(m.especie),
+          especie: m.especie || "Otro",
+          raza: m.raza || "—",
+          edad: m.edad || "—",
+          dueño: propietario.name,
+          ultimaVisita: "—",
+          estado: "Activo",
+          foto: m.foto || null,
+          sexo: m.sexo,
+          fechaNacimiento: m.fechaNacimiento,
+          peso: m.peso,
+          documentosClinicos: [],
+        }));
+        setMascotas(mapped);
       } catch {
-        localStorage.removeItem(PETS_STORAGE_KEY);
-        setMascotas(mascotasIniciales);
+        setMascotas([]);
+      } finally {
+        setLoading(false);
       }
     };
 
     cargarMascotas();
-
-    window.addEventListener("vetnova-pets-updated", cargarMascotas);
-    window.addEventListener("storage", cargarMascotas);
-
-    return () => {
-      window.removeEventListener("vetnova-pets-updated", cargarMascotas);
-      window.removeEventListener("storage", cargarMascotas);
-    };
   }, []);
 
   const mascotasFiltradas = useMemo(() => {

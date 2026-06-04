@@ -1,117 +1,92 @@
 import type { Appointment, InventoryItem, Owner, PetRecord } from "./types";
 import {
-  INITIAL_APPOINTMENTS,
-  INITIAL_INVENTORY,
-  INITIAL_OWNERS,
-  INITIAL_PETS,
-} from "./mockData";
+  fetchPropietarios,
+  createPropietario,
+  updatePropietario,
+  deletePropietario,
+} from "../api/propietarios";
+import {
+  fetchMascotas,
+  createMascota,
+  updateMascota as updateMascotaApi,
+  deleteMascota,
+} from "../api/mascotas";
+import {
+  fetchCitas,
+  createCita,
+  updateCita,
+  updateCitaEstado,
+  deleteCita,
+} from "../api/citas";
+import { fetchProductos } from "../api/productos";
 
-const OWNERS_KEY = "vetnova_recepcionista_owners";
-const PETS_KEY = "vetnova_recepcionista_pets";
-const APPOINTMENTS_KEY = "vetnova_recepcionista_appointments";
-const INVENTORY_KEY = "vetnova_recepcionista_inventory";
+// ─── Owners / Propietarios ────────────────────────────────────────────────────
 
-function isBrowser() {
-  return typeof window !== "undefined";
+export async function getOwners(): Promise<Owner[]> {
+  return fetchPropietarios();
 }
 
-function readStorage<T>(key: string, fallback: T): T {
-  if (!isBrowser()) return fallback;
-  try {
-    const raw = window.localStorage.getItem(key);
-    return raw ? (JSON.parse(raw) as T) : fallback;
-  } catch {
-    return fallback;
-  }
+export async function addOwner(owner: Omit<Owner, "id" | "mascotas">): Promise<Owner> {
+  return createPropietario(owner);
 }
 
-function writeStorage<T>(key: string, value: T) {
-  if (!isBrowser()) return;
-  window.localStorage.setItem(key, JSON.stringify(value));
+export async function saveOwner(owner: Owner): Promise<Owner> {
+  return updatePropietario(owner);
 }
 
-function broadcastUpdate() {
-  if (!isBrowser()) return;
-  window.dispatchEvent(new Event("vetnova-recepcionista-updated"));
+export async function removeOwner(id: string): Promise<void> {
+  return deletePropietario(id);
 }
 
-export function getOwners(): Owner[] {
-  return readStorage<Owner[]>(OWNERS_KEY, INITIAL_OWNERS);
+// ─── Pets / Mascotas ─────────────────────────────────────────────────────────
+
+export async function getPets(): Promise<PetRecord[]> {
+  return fetchMascotas();
 }
 
-export function saveOwners(owners: Owner[]) {
-  writeStorage<Owner[]>(OWNERS_KEY, owners);
-  broadcastUpdate();
+export async function addPet(
+  pet: Omit<PetRecord, "id" | "propietarioNombre">,
+): Promise<PetRecord> {
+  return createMascota(pet);
 }
 
-export function addOwner(owner: Owner) {
-  saveOwners([owner, ...getOwners()]);
+export async function updatePet(pet: PetRecord): Promise<PetRecord> {
+  return updateMascotaApi(pet);
 }
 
-export function updateOwner(owner: Owner) {
-  saveOwners(getOwners().map((item) => (item.id === owner.id ? owner : item)));
+export async function removePet(id: string): Promise<void> {
+  return deleteMascota(id);
 }
 
-export function getOwnerById(id: string) {
-  return getOwners().find((owner) => owner.id === id);
+// ─── Appointments / Citas ────────────────────────────────────────────────────
+
+export async function getAppointments(): Promise<Appointment[]> {
+  return fetchCitas();
 }
 
-export function getPets(): PetRecord[] {
-  const owners = getOwners();
-  return readStorage<PetRecord[]>(PETS_KEY, INITIAL_PETS).map((pet) => ({
-    ...pet,
-    propietarioNombre:
-      owners.find((owner) => owner.id === pet.propietarioId)?.name ??
-      pet.propietarioNombre,
-  }));
+export async function addAppointment(
+  appointment: Omit<Appointment, "id">,
+): Promise<Appointment> {
+  return createCita(appointment);
 }
 
-export function savePets(pets: PetRecord[]) {
-  writeStorage<PetRecord[]>(PETS_KEY, pets);
-  broadcastUpdate();
+export async function updateAppointment(appointment: Appointment): Promise<Appointment> {
+  return updateCita(appointment);
 }
 
-export function addPet(pet: PetRecord) {
-  savePets([pet, ...getPets()]);
+export async function setAppointmentStatus(
+  id: string,
+  status: Appointment["status"],
+): Promise<Appointment> {
+  return updateCitaEstado(id, status);
 }
 
-export function updatePet(pet: PetRecord) {
-  savePets(getPets().map((item) => (item.id === pet.id ? pet : item)));
+export async function removeAppointment(id: string): Promise<void> {
+  return deleteCita(id);
 }
 
-export function getPetById(id: string) {
-  return getPets().find((pet) => pet.id === id);
-}
+// ─── Inventory / Productos ───────────────────────────────────────────────────
 
-export function getAppointments(): Appointment[] {
-  return readStorage<Appointment[]>(APPOINTMENTS_KEY, INITIAL_APPOINTMENTS);
-}
-
-export function saveAppointments(appointments: Appointment[]) {
-  writeStorage<Appointment[]>(APPOINTMENTS_KEY, appointments);
-  broadcastUpdate();
-}
-
-export function addAppointment(appointment: Appointment) {
-  saveAppointments([appointment, ...getAppointments()]);
-}
-
-export function updateAppointment(appointment: Appointment) {
-  saveAppointments(
-    getAppointments().map((item) =>
-      item.id === appointment.id ? appointment : item,
-    ),
-  );
-}
-
-export function getAppointmentById(id: string) {
-  return getAppointments().find((appointment) => appointment.id === id);
-}
-
-export function getInventoryItems(): InventoryItem[] {
-  return readStorage<InventoryItem[]>(INVENTORY_KEY, INITIAL_INVENTORY);
-}
-
-export function saveInventoryItems(items: InventoryItem[]) {
-  writeStorage<InventoryItem[]>(INVENTORY_KEY, items);
+export async function getInventoryItems(): Promise<InventoryItem[]> {
+  return fetchProductos();
 }

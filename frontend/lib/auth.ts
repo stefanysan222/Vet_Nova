@@ -1,135 +1,134 @@
 export type UserRole = "Administrador" | "Veterinario" | "Cliente" | "Recepcionista";
 
 export interface AuthUser {
-  id: string;
+  id: number;
   name: string;
   email: string;
-  password?: string;
   role: UserRole;
-  provider: "local" | "google";
-  picture?: string;
 }
 
-const USERS_KEY = "vetnova-users";
-const CURRENT_USER_KEY = "vetnova-current-user";
+const TOKEN_KEY = "vetnova-token";
 
 function isBrowser() {
   return typeof window !== "undefined";
 }
 
-function readStorage<T>(key: string, fallback: T): T {
-  if (!isBrowser()) return fallback;
-  try {
-    const raw = window.localStorage.getItem(key);
-    return raw ? (JSON.parse(raw) as T) : fallback;
-  } catch {
-    return fallback;
-  }
+export function getToken(): string | null {
+  if (!isBrowser()) return null;
+  return localStorage.getItem(TOKEN_KEY);
 }
 
-function writeStorage<T>(key: string, value: T) {
+export function setToken(token: string) {
   if (!isBrowser()) return;
-  window.localStorage.setItem(key, JSON.stringify(value));
-}
-
-export function getStoredUsers(): AuthUser[] {
-  return readStorage<AuthUser[]>(USERS_KEY, []);
-}
-
-export function saveStoredUsers(users: AuthUser[]) {
-  writeStorage<AuthUser[]>(USERS_KEY, users);
-}
-
-export function getCurrentUser(): AuthUser | null {
-  return readStorage<AuthUser | null>(CURRENT_USER_KEY, null);
-}
-
-export function setCurrentUser(user: AuthUser) {
-  writeStorage<AuthUser>(CURRENT_USER_KEY, user);
+  localStorage.setItem(TOKEN_KEY, token);
 }
 
 export function clearCurrentUser() {
   if (!isBrowser()) return;
-  window.localStorage.removeItem(CURRENT_USER_KEY);
+  localStorage.removeItem(TOKEN_KEY);
 }
 
-function generateId() {
-  if (isBrowser() && typeof crypto !== "undefined" && typeof crypto.randomUUID === "function") {
-    return crypto.randomUUID();
+function decodeToken(token: string): { sub: number; name: string; email: string; role: UserRole; exp: number } | null {
+  try {
+    const payload = token.split(".")[1];
+    const base64 = payload.replace(/-/g, "+").replace(/_/g, "/");
+    return JSON.parse(
+      decodeURIComponent(
+        atob(base64)
+          .split("")
+          .map((c) => `%${`00${c.charCodeAt(0).toString(16)}`.slice(-2)}`)
+          .join("")
+      )
+    );
+  } catch {
+    return null;
   }
-  return `${Date.now()}-${Math.random().toString(16).slice(2)}`;
 }
 
-export function registerUser(data: {
-  name: string;
+export function getCurrentUser(): AuthUser | null {
+  const token = getToken();
+  if (!token) return null;
+  const decoded = decodeToken(token);
+  if (!decoded) return null;
+  if (decoded.exp * 1000 < Date.now()) {
+    clearCurrentUser();
+    return null;
+  }
+  return {
+    id: decoded.sub,
+    name: decoded.name,
+    email: decoded.email,
+    role: decoded.role,
+  };
+}
+
+const API_URL =
+  typeof window !== "undefined"
+    ? process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:3000"
+    : process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:3000";
+
+export async function registerUser(data: {
+  nombre: string;
   email: string;
   password: string;
-  role: UserRole;
-  provider?: "local" | "google";
-  picture?: string;
-}): { user?: AuthUser; error?: string } {
-  const users = getStoredUsers();
-  const normalizedEmail = data.email.trim().toLowerCase();
-  if (users.some((user) => user.email.toLowerCase() === normalizedEmail)) {
-    return { error: "Ya existe una cuenta con ese correo." };
+  rol?: string;
+}): Promise<{ token?: string; user?: AuthUser; error?: string }> {
+  try {
+    const res = await fetch(`${API_URL}/auth/register`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(data),
+    });
+    const json = await res.json();
+    if (!res.ok) {
+      const msg = Array.isArray(json.message) ? json.message[0] : json.message;
+      return { error: msg ?? "Error al registrar usuario." };
+    }
+    return { token: json.token, user: json.user };
+  } catch {
+    return { error: "No se pudo conectar con el servidor." };
   }
-
-  const user: AuthUser = {
-    id: generateId(),
-    name: data.name.trim(),
-    email: normalizedEmail,
-    password: data.provider === "google" ? undefined : data.password,
-    role: data.role,
-    provider: data.provider ?? "local",
-    picture: data.picture,
-  };
-
-  saveStoredUsers([user, ...users]);
-  return { user };
 }
 
-export function loginUser(email: string, password: string): { user?: AuthUser; error?: string } {
-  const users = getStoredUsers();
-  const normalizedEmail = email.trim().toLowerCase();
-  const user = users.find((item) => item.email.toLowerCase() === normalizedEmail);
-
-  if (!user) {
-    return { error: "No existe una cuenta con ese correo." };
+export async function loginUser(
+  email: string,
+  password: string
+): Promise<{ token?: string; user?: AuthUser; error?: string }> {
+  try {
+    const res = await fetch(`${API_URL}/auth/login`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ email, password }),
+    });
+    const json = await res.json();
+    if (!res.ok) {
+      const msg = Array.isArray(json.message) ? json.message[0] : json.message;
+      return { error: msg ?? "Credenciales incorrectas." };
+    }
+    return { token: json.token, user: json.user };
+  } catch {
+    return { error: "No se pudo conectar con el servidor." };
   }
-
-  if (user.provider === "google") {
-    return { error: "Esta cuenta está registrada con Google. Usa el botón de Google para iniciar sesión." };
-  }
-
-  if (user.password !== password) {
-    return { error: "Contraseña incorrecta." };
-  }
-
-  return { user };
 }
 
-export function loginOrRegisterGoogle(profile: {
+export async function loginOrRegisterGoogle(profile: {
   name: string;
   email: string;
   picture?: string;
-}): { user: AuthUser } {
-  const users = getStoredUsers();
-  const normalizedEmail = profile.email.trim().toLowerCase();
-  const existing = users.find((item) => item.email.toLowerCase() === normalizedEmail);
-
-  if (existing) {
-    return { user: existing };
+}): Promise<{ token?: string; user?: AuthUser; error?: string }> {
+  try {
+    const res = await fetch(`${API_URL}/auth/google`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(profile),
+    });
+    const json = await res.json();
+    if (!res.ok) {
+      const msg = Array.isArray(json.message) ? json.message[0] : json.message;
+      return { error: msg ?? "Error con autenticación de Google." };
+    }
+    return { token: json.token, user: json.user };
+  } catch {
+    return { error: "No se pudo conectar con el servidor." };
   }
-
-  const user: AuthUser = {
-    id: generateId(),
-    name: profile.name,
-    email: normalizedEmail,
-    role: "Cliente",
-    provider: "google",
-    picture: profile.picture,
-  };
-
-  saveStoredUsers([user, ...users]);
-  return { user };
 }
