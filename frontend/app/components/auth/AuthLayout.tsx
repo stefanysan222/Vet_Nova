@@ -3,8 +3,9 @@
 import type { ReactNode } from "react";
 import Link from "next/link";
 import Image from "next/image";
+import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
-import { ArrowLeft, PawPrint } from "lucide-react";
+import { ArrowLeft, Moon, Sun } from "lucide-react";
 
 interface AuthLayoutProps {
   title: string;
@@ -12,36 +13,104 @@ interface AuthLayoutProps {
   children: ReactNode;
 }
 
-export default function AuthLayout({ title, description, children }: AuthLayoutProps) {
-  return (
-    <section className="min-h-screen bg-surface-50 py-6 dark:bg-surface-950">
-      <div className="mx-auto flex w-full max-w-md flex-col items-center gap-5 px-4 sm:px-6">
+function PetPattern() {
+  const icons = ["🐾", "🐶", "🐱", "🦮", "🐕", "🐈", "🩺", "💊", "🦴", "❤️"];
+  const items = Array.from({ length: 30 }, (_, i) => ({
+    id: i,
+    icon: icons[i % icons.length],
+    x: Math.round((i * 37 + 11) % 95),
+    y: Math.round((i * 53 + 7) % 95),
+    size: 0.7 + (i % 5) * 0.15,
+    delay: (i % 8) * 0.4,
+    duration: 4 + (i % 4),
+  }));
 
-        {/* Volver */}
+  return (
+    <div className="pointer-events-none absolute inset-0 overflow-hidden">
+      {items.map((item) => (
+        <motion.span
+          key={item.id}
+          className="absolute select-none opacity-[0.06] dark:opacity-[0.04]"
+          style={{
+            left: `${item.x}%`,
+            top: `${item.y}%`,
+            fontSize: `${item.size}rem`,
+          }}
+          animate={{ y: [0, -8, 0], rotate: [0, 6, -6, 0] }}
+          transition={{
+            duration: item.duration,
+            delay: item.delay,
+            repeat: Infinity,
+            ease: "easeInOut",
+          }}
+        >
+          {item.icon}
+        </motion.span>
+      ))}
+    </div>
+  );
+}
+
+export default function AuthLayout({ title, description, children }: AuthLayoutProps) {
+  const [dark, setDark] = useState(false);
+
+  useEffect(() => {
+    const saved = localStorage.getItem("vetnova-theme");
+    const prefersDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
+    const isDark = saved ? saved === "dark" : prefersDark;
+    setDark(isDark);
+    document.documentElement.classList.toggle("dark", isDark);
+  }, []);
+
+  const toggleDark = () => {
+    const next = !dark;
+    setDark(next);
+    document.documentElement.classList.toggle("dark", next);
+    localStorage.setItem("vetnova-theme", next ? "dark" : "light");
+  };
+
+  return (
+    <section className="relative min-h-screen overflow-hidden bg-gradient-to-br from-blue-50 via-white to-indigo-50 py-6 dark:from-slate-950 dark:via-slate-900 dark:to-slate-950">
+      <PetPattern />
+
+      <div className="relative mx-auto flex w-full max-w-md flex-col items-center gap-5 px-4 sm:px-6">
+
+        {/* Top bar */}
         <motion.div
-          initial={{ opacity: 0, x: -10 }}
-          animate={{ opacity: 1, x: 0 }}
+          initial={{ opacity: 0, y: -10 }}
+          animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.25 }}
-          className="w-full"
+          className="flex w-full items-center justify-between"
         >
           <Link
             href="/"
-            className="inline-flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-sm font-medium text-surface-500 transition hover:bg-surface-100 hover:text-surface-900 dark:text-surface-400 dark:hover:bg-surface-800"
+            className="inline-flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-sm font-medium text-slate-500 transition hover:bg-white/70 hover:text-slate-900 dark:text-slate-400 dark:hover:bg-slate-800 dark:hover:text-white"
           >
             <ArrowLeft className="h-4 w-4" />
             Volver al inicio
           </Link>
+
+          <motion.button
+            type="button"
+            onClick={toggleDark}
+            whileTap={{ scale: 0.9 }}
+            whileHover={{ scale: 1.05 }}
+            className="flex h-9 w-9 items-center justify-center rounded-xl border border-slate-200 bg-white/80 text-slate-600 shadow-sm backdrop-blur-sm transition hover:bg-white dark:border-slate-700 dark:bg-slate-800/80 dark:text-slate-300 dark:hover:bg-slate-700"
+            aria-label="Cambiar tema"
+          >
+            {dark ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
+          </motion.button>
         </motion.div>
 
         {/* Card */}
         <motion.div
-          initial={{ opacity: 0, y: 16 }}
+          initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.35 }}
-          className="w-full overflow-hidden rounded-2xl border border-surface-200 bg-white shadow-card-lg dark:border-surface-800 dark:bg-surface-950"
+          transition={{ duration: 0.4, ease: [0.25, 0.1, 0.25, 1] }}
+          className="w-full overflow-hidden rounded-2xl border border-white/80 bg-white/90 shadow-xl backdrop-blur-md dark:border-slate-700/60 dark:bg-slate-900/90"
         >
-          {/* Header de la tarjeta */}
-          <div className="flex items-center justify-between border-b border-surface-100 px-6 py-4 dark:border-surface-800">
+          {/* Header */}
+          <div className="flex items-center justify-between border-b border-slate-100 px-6 py-4 dark:border-slate-800">
             <Link href="/" className="inline-flex items-center gap-2">
               <div className="relative h-8 w-8 shrink-0">
                 <Image
@@ -59,27 +128,41 @@ export default function AuthLayout({ title, description, children }: AuthLayoutP
                   className="hidden rounded-lg object-contain dark:block"
                 />
               </div>
-              <span className="text-sm font-semibold text-surface-900 dark:text-white">VetNova</span>
+              <span className="text-sm font-semibold text-slate-900 dark:text-white">VetNova</span>
             </Link>
-            <div className="flex items-center gap-1.5 rounded-lg bg-vet-50 px-3 py-1.5 text-xs font-medium text-vet-700 dark:bg-vet-900/30 dark:text-vet-400">
-              <PawPrint className="h-3.5 w-3.5" />
-              Clínica veterinaria
+            <div className="flex items-center gap-1.5 rounded-lg bg-blue-50 px-3 py-1.5 text-xs font-medium text-blue-700 dark:bg-blue-900/30 dark:text-blue-400">
+              🐾 Clínica veterinaria
             </div>
           </div>
 
-          {/* Contenido */}
+          {/* Content */}
           <div className="px-6 py-7 sm:px-8">
-            <h1 className="text-2xl font-bold tracking-tight text-surface-900 dark:text-white">
-              {title}
-            </h1>
-            {description && (
-              <p className="mt-2 text-sm leading-6 text-surface-500 dark:text-surface-400">
-                {description}
-              </p>
-            )}
+            <motion.div
+              initial={{ opacity: 0, x: -10 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ duration: 0.3, delay: 0.15 }}
+            >
+              <h1 className="text-2xl font-bold tracking-tight text-slate-900 dark:text-white">
+                {title}
+              </h1>
+              {description && (
+                <p className="mt-2 text-sm leading-6 text-slate-500 dark:text-slate-400">
+                  {description}
+                </p>
+              )}
+            </motion.div>
             <div className="mt-6">{children}</div>
           </div>
         </motion.div>
+
+        <motion.p
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 0.5 }}
+          className="text-xs text-slate-400 dark:text-slate-600"
+        >
+          © {new Date().getFullYear()} VetNova · Todos los derechos reservados
+        </motion.p>
       </div>
     </section>
   );

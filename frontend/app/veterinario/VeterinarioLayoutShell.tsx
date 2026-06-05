@@ -146,6 +146,7 @@ export default function VeterinarioLayoutShell({
   const [showNotifications, setShowNotifications] = useState(false);
   const [showUserMenu, setShowUserMenu] = useState(false);
   const [darkMode, setDarkMode] = useState(false);
+  const [mobileOpen, setMobileOpen] = useState(false);
 
   const [busquedaGlobal, setBusquedaGlobal] = useState("");
   const [mostrarResultados, setMostrarResultados] = useState(false);
@@ -314,6 +315,16 @@ export default function VeterinarioLayoutShell({
         <section className="min-w-0 flex-1">
           {/* TOPBAR */}
           <header className="relative z-40 flex h-[64px] items-center justify-between border-b border-[#E5EAF2] bg-white px-5 dark:border-[#1E293B] dark:bg-[#111827]">
+            <button
+              type="button"
+              onClick={() => setMobileOpen(true)}
+              className="mr-3 flex h-9 w-9 shrink-0 items-center justify-center rounded-xl border border-[#E5EAF2] bg-white lg:hidden dark:border-[#1E293B] dark:bg-[#111827]"
+              aria-label="Abrir menú"
+            >
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
+                <path d="M4 6h16M4 12h16M4 18h16" />
+              </svg>
+            </button>
             {/* BUSCADOR GLOBAL */}
             <div ref={buscadorRef} className="relative w-full max-w-[520px]">
               <div
@@ -614,6 +625,41 @@ export default function VeterinarioLayoutShell({
           </div>
         </section>
       </div>
+
+      {/* Drawer mobile */}
+      {mobileOpen && (
+        <div className="fixed inset-0 z-50 lg:hidden" onClick={() => setMobileOpen(false)}>
+          <div className="absolute inset-0 bg-black/40" />
+          <div
+            className="absolute left-0 top-0 h-full w-[215px] bg-white dark:bg-[#111827]"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="flex h-[78px] items-center justify-between border-b border-[#E5EAF2] px-4 dark:border-[#1E293B]">
+              <div className="flex items-center gap-3">
+                <img src={darkMode ? "/logos/vetnova-logo-dark.png" : "/logos/vetnova-logo-light.png"} alt="VetNova" className="h-10 w-10 rounded-xl object-contain" />
+                <div>
+                  <h1 className="text-[20px] font-bold leading-none text-[#10213A] dark:text-white">VetNova</h1>
+                  <p className="mt-1.5 text-[11px] text-[#64748B] dark:text-[#94A3B8]">Sistema Veterinario</p>
+                </div>
+              </div>
+              <button onClick={() => setMobileOpen(false)} className="flex h-8 w-8 items-center justify-center rounded-lg text-[#64748B] hover:bg-[#F1F5F9] dark:hover:bg-[#1E293B]">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><path d="M18 6 6 18M6 6l12 12" /></svg>
+              </button>
+            </div>
+            <nav className="px-3 py-5">
+              {navigation.map((item) => (
+                <SidebarItem key={item.href} href={item.href} label={item.label} icon={item.icon} active={isActive(item.href)} onClick={() => setMobileOpen(false)} />
+              ))}
+            </nav>
+            <div className="border-t border-[#E5EAF2] px-3 py-5 dark:border-[#1E293B]">
+              <button type="button" onClick={() => { clearCurrentUser(); router.push("/login"); }} className="flex w-full items-center gap-3 rounded-xl px-4 py-3 text-[14px] font-semibold text-[#10213A] transition hover:bg-[#F1F5F9] dark:text-white dark:hover:bg-[#1E293B]">
+                <AppIcon name="logout" />
+                Cerrar Sesión
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </main>
   );
 }
@@ -623,15 +669,18 @@ function SidebarItem({
   href,
   icon,
   active,
+  onClick,
 }: {
   label: string;
   href: string;
   icon: IconName;
   active: boolean;
+  onClick?: () => void;
 }) {
   return (
     <Link
       href={href}
+      onClick={onClick}
       className={`mb-2 flex items-center gap-3 rounded-xl px-4 py-3 text-[14px] font-semibold transition ${
         active
           ? "bg-[#2F6BFF] text-white shadow-sm"

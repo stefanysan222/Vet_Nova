@@ -135,7 +135,7 @@ export default function Sidebar() {
         <button
           type="button"
           onClick={() => setMobileOpen(true)}
-          className="fixed left-4 top-4 z-40 inline-flex items-center gap-2 rounded-xl bg-white px-3 py-2 text-sm font-semibold text-slate-900 shadow-card ring-1 ring-slate-200 dark:bg-slate-900 dark:text-white dark:ring-slate-700"
+          className="fixed left-4 top-4 z-50 inline-flex items-center gap-2 rounded-xl bg-white px-3 py-2 text-sm font-semibold text-slate-900 shadow-card ring-1 ring-slate-200 dark:bg-slate-900 dark:text-white dark:ring-slate-700"
         >
           <BarChart3 className="h-4 w-4 text-brand-600" />
           Menú

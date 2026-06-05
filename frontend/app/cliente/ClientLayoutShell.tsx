@@ -29,6 +29,7 @@ export default function ClientLayoutShell({
   const [showUserMenu, setShowUserMenu] = useState(false);
   const [darkMode, setDarkMode] = useState(false);
   const [perfil, setPerfil] = useState<PerfilCliente>({ nombre: "", apellido: "" });
+  const [mobileOpen, setMobileOpen] = useState(false);
 
   useEffect(() => {
     const user = getCurrentUser();
@@ -179,6 +180,16 @@ export default function ClientLayoutShell({
         <section className="min-w-0 flex-1">
           {/* Barra superior */}
           <header className="relative flex h-[64px] items-center justify-between border-b border-[#E5EAF2] bg-white px-5 dark:border-[#1E293B] dark:bg-[#111827]">
+            <button
+              type="button"
+              onClick={() => setMobileOpen(true)}
+              className="mr-3 flex h-9 w-9 shrink-0 items-center justify-center rounded-xl border border-[#E5EAF2] bg-white lg:hidden dark:border-[#1E293B] dark:bg-[#111827]"
+              aria-label="Abrir menú"
+            >
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
+                <path d="M4 6h16M4 12h16M4 18h16" />
+              </svg>
+            </button>
             <BuscadorCliente />
 
             <div className="ml-5 flex items-center gap-4">
@@ -394,6 +405,39 @@ export default function ClientLayoutShell({
           </div>
         </section>
       </div>
+
+      {/* Drawer mobile */}
+      {mobileOpen && (
+        <div className="fixed inset-0 z-50 lg:hidden" onClick={() => setMobileOpen(false)}>
+          <div className="absolute inset-0 bg-black/40" />
+          <div
+            className="absolute left-0 top-0 h-full w-[260px] bg-white dark:bg-[#111827]"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="flex h-[64px] items-center justify-between border-b border-[#E5EAF2] px-5 dark:border-[#1E293B]">
+              <div className="flex items-center gap-3">
+                <img src={darkMode ? "/logos/vetnova-logo-dark.png" : "/logos/vetnova-logo-light.png"} alt="VetNova" className="h-8 w-8 rounded-xl object-contain" />
+                <span className="text-[18px] font-semibold text-[#10213A] dark:text-white">VetNova</span>
+              </div>
+              <button onClick={() => setMobileOpen(false)} className="flex h-8 w-8 items-center justify-center rounded-lg text-[#64748B] hover:bg-[#F1F5F9] dark:hover:bg-[#1E293B]">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><path d="M18 6 6 18M6 6l12 12" /></svg>
+              </button>
+            </div>
+            <nav className="flex-1 px-4 py-4">
+              <SidebarItem href="/cliente" active={pathname === "/cliente"} icon={<HomeIcon />} onClick={() => setMobileOpen(false)}>Dashboard</SidebarItem>
+              <SidebarItem href="/cliente/agendar" active={pathname.startsWith("/cliente/agendar")} icon={<CalendarMenuIcon />} onClick={() => setMobileOpen(false)}>Citas</SidebarItem>
+              <SidebarItem href="/cliente/mascotas" active={pathname.startsWith("/cliente/mascotas")} icon={<PawMenuIcon />} onClick={() => setMobileOpen(false)}>Mascotas</SidebarItem>
+              <SidebarItem href="/cliente/configuracion" active={pathname.startsWith("/cliente/configuracion")} icon={<SettingsIcon />} onClick={() => setMobileOpen(false)}>Configuración</SidebarItem>
+            </nav>
+            <div className="border-t border-[#E5EAF2] px-5 py-5 dark:border-[#1E293B]">
+              <button type="button" onClick={() => { clearCurrentUser(); router.push("/login"); }} className="flex items-center gap-3 text-[15px] font-semibold text-[#10213A] transition-colors hover:text-[#2F6BFF] dark:text-white">
+                <LogoutIcon />
+                Cerrar Sesión
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </main>
   );
 }
@@ -403,15 +447,18 @@ function SidebarItem({
   active,
   icon,
   children,
+  onClick,
 }: {
   href: string;
   active: boolean;
   icon: ReactNode;
   children: ReactNode;
+  onClick?: () => void;
 }) {
   return (
     <Link
       href={href}
+      onClick={onClick}
       className={`mb-2 flex h-[44px] items-center gap-3 rounded-xl px-4 text-[15px] font-semibold transition-all ${
         active
           ? "bg-brand-600 text-white shadow-brand-sm"
