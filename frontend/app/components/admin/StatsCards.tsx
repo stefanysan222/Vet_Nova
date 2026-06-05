@@ -1,94 +1,118 @@
 "use client";
 
-import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
-import { Users, User, Clipboard, Shield, ArrowUpRight } from "lucide-react";
+import { Users, Stethoscope, PawPrint, CalendarDays, Clock } from "lucide-react";
+import { motion } from "framer-motion";
 import { fetchStatsAdmin } from "../../../lib/api/usuarios";
+import { fetchMascotas } from "../../../lib/api/mascotas";
+import { fetchCitas } from "../../../lib/api/citas";
 
-interface Stats {
-  totalUsuarios: number;
+interface AllStats {
+  clientes: number;
   veterinarios: number;
-  recepcionistas: number;
-  administradores: number;
+  mascotas: number;
+  citasHoy: number;
+  citasPendientes: number;
 }
 
-const StatsCards: React.FC = () => {
-  const router = useRouter();
-  const [stats, setStats] = useState<Stats | null>(null);
+const StatsCards: React.FC<{ refreshTrigger?: number }> = ({ refreshTrigger = 0 }) => {
+  const [stats, setStats] = useState<AllStats | null>(null);
 
   useEffect(() => {
-    fetchStatsAdmin()
-      .then(setStats)
-      .catch(() => setStats({ totalUsuarios: 0, veterinarios: 0, recepcionistas: 0, administradores: 0 }));
-  }, []);
+    const hoy = new Date().toISOString().slice(0, 10);
+    Promise.all([fetchStatsAdmin(), fetchMascotas(), fetchCitas()])
+      .then(([usuarios, mascotas, citas]) => {
+        setStats({
+          clientes: usuarios.clientes,
+          veterinarios: usuarios.veterinarios,
+          mascotas: mascotas.length,
+          citasHoy: citas.filter((c) => c.date === hoy && c.status !== "Cancelada").length,
+          citasPendientes: citas.filter((c) => c.status === "Pendiente").length,
+        });
+      })
+      .catch(() => setStats({ clientes: 0, veterinarios: 0, mascotas: 0, citasHoy: 0, citasPendientes: 0 }));
+  }, [refreshTrigger]);
 
   const cards = [
     {
-      title: "Total usuarios",
-      value: stats ? String(stats.totalUsuarios) : "—",
+      title: "Total clientes",
+      value: stats?.clientes,
       icon: Users,
-      bgColor: "bg-blue-100",
-      iconColor: "text-blue-600",
-      href: "/admin/usuarios",
+      accentBar: "bg-brand-500",
+      iconBg: "bg-brand-50 text-brand-600 dark:bg-brand-950/50 dark:text-brand-400",
+      valueCls: "text-brand-700 dark:text-brand-300",
     },
     {
       title: "Veterinarios",
-      value: stats ? String(stats.veterinarios) : "—",
-      icon: User,
-      bgColor: "bg-emerald-100",
-      iconColor: "text-emerald-600",
-      href: "/admin/veterinarios",
+      value: stats?.veterinarios,
+      icon: Stethoscope,
+      accentBar: "bg-emerald-500",
+      iconBg: "bg-emerald-50 text-emerald-600 dark:bg-emerald-950/50 dark:text-emerald-400",
+      valueCls: "text-emerald-700 dark:text-emerald-300",
     },
     {
-      title: "Recepcionistas",
-      value: stats ? String(stats.recepcionistas) : "—",
-      icon: Clipboard,
-      bgColor: "bg-amber-100",
-      iconColor: "text-amber-600",
+      title: "Mascotas",
+      value: stats?.mascotas,
+      icon: PawPrint,
+      accentBar: "bg-amber-500",
+      iconBg: "bg-amber-50 text-amber-600 dark:bg-amber-950/50 dark:text-amber-400",
+      valueCls: "text-amber-700 dark:text-amber-300",
     },
     {
-      title: "Administradores",
-      value: stats ? String(stats.administradores) : "—",
-      icon: Shield,
-      bgColor: "bg-rose-100",
-      iconColor: "text-rose-600",
+      title: "Citas hoy",
+      value: stats?.citasHoy,
+      icon: CalendarDays,
+      accentBar: "bg-violet-500",
+      iconBg: "bg-violet-50 text-violet-600 dark:bg-violet-950/50 dark:text-violet-400",
+      valueCls: "text-violet-700 dark:text-violet-300",
+    },
+    {
+      title: "Pendientes",
+      value: stats?.citasPendientes,
+      icon: Clock,
+      accentBar: "bg-rose-500",
+      iconBg: "bg-rose-50 text-rose-600 dark:bg-rose-950/50 dark:text-rose-400",
+      valueCls: "text-rose-700 dark:text-rose-300",
     },
   ];
 
   return (
-    <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
-      {cards.map((card) => {
+    <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-5">
+      {cards.map((card, i) => {
         const Icon = card.icon;
-        const isLink = card.href !== undefined;
-
+        const isLoading = stats === null;
         return (
-          <button
+          <motion.article
             key={card.title}
-            type="button"
-            onClick={() => { if (card.href) router.push(card.href); }}
-            className={
-              `group text-left rounded-3xl border border-slate-200/70 bg-white p-6 shadow-sm shadow-slate-200/40 transition hover:shadow-xl dark:border-slate-700 dark:bg-slate-900 dark:shadow-slate-900/40 ${
-                isLink ? "cursor-pointer hover:border-blue-300" : "cursor-default"
-              }`
-            }
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.4, delay: i * 0.07 }}
+            className="group relative overflow-hidden rounded-2xl border border-slate-200/70 bg-white shadow-sm transition-all duration-200 hover:-translate-y-1 hover:shadow-md dark:border-slate-700 dark:bg-slate-900"
           >
-            <div className="flex items-center justify-between">
-              <h3 className="text-sm font-semibold text-slate-600">{card.title}</h3>
-              <div className={`${card.bgColor} rounded-full p-3`}>
-                <Icon className={`h-6 w-6 ${card.iconColor}`} />
-              </div>
-            </div>
+            {/* Borde de acento izquierdo */}
+            <div className={`absolute inset-y-0 left-0 w-1 rounded-l-2xl ${card.accentBar}`} />
 
-            <div className="mt-4">
-              <p className="text-3xl font-semibold tracking-tight text-slate-900 dark:text-white">{card.value}</p>
-              {isLink && (
-                <div className="mt-2 flex items-center gap-1 text-sm font-medium text-blue-600">
-                  <ArrowUpRight className="h-4 w-4" />
-                  Ver todos
+            <div className="px-5 py-4 pl-6">
+              {/* Icono + valor en la misma fila */}
+              <div className="flex items-start justify-between gap-2">
+                <div className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-xl ${card.iconBg}`}>
+                  <Icon className="h-4 w-4" />
                 </div>
-              )}
+              </div>
+
+              {/* Número */}
+              <p className={`mt-3 text-3xl font-bold tracking-tight ${card.valueCls}`}>
+                {isLoading ? (
+                  <span className="inline-block h-8 w-10 animate-pulse rounded-lg bg-slate-100 dark:bg-slate-800" />
+                ) : (
+                  card.value ?? 0
+                )}
+              </p>
+
+              {/* Label */}
+              <p className="mt-1 text-xs font-medium text-slate-500 dark:text-slate-400">{card.title}</p>
             </div>
-          </button>
+          </motion.article>
         );
       })}
     </div>

@@ -140,6 +140,8 @@ export default function VeterinarioLayoutShell({
   const pathname = usePathname();
   const router = useRouter();
   const buscadorRef = useRef<HTMLDivElement>(null);
+  const [userName, setUserName] = useState("Veterinario");
+  const [userInitials, setUserInitials] = useState("V");
 
   const [showNotifications, setShowNotifications] = useState(false);
   const [showUserMenu, setShowUserMenu] = useState(false);
@@ -176,10 +178,14 @@ export default function VeterinarioLayoutShell({
       const routes: Record<string, string> = {
         Administrador: "/admin",
         Cliente: "/cliente",
-        Recepcionista: "/recepcionista",
       };
       router.replace(routes[user.role] ?? "/login");
+      return;
     }
+    // Actualizar nombre e iniciales una vez confirmada la sesión
+    const name = user.name ?? "Veterinario";
+    setUserName(name);
+    setUserInitials(name.split(" ").map((p: string) => p[0]).slice(0, 2).join("").toUpperCase());
   }, [router]);
 
   useEffect(() => {
@@ -512,7 +518,7 @@ export default function VeterinarioLayoutShell({
                 >
                   <div className="text-right">
                     <p className="text-[14px] font-semibold leading-none text-[#10213A] dark:text-white">
-                      Dr. Rodríguez
+                      {userName}
                     </p>
 
                     <p className="mt-1.5 text-[12px] text-[#64748B] dark:text-[#94A3B8]">
@@ -521,7 +527,7 @@ export default function VeterinarioLayoutShell({
                   </div>
 
                   <div className="flex h-10 w-10 items-center justify-center rounded-full bg-[#2F6BFF] text-[15px] font-semibold text-white">
-                    D
+                    {userInitials}
                   </div>
                 </button>
 
@@ -529,12 +535,12 @@ export default function VeterinarioLayoutShell({
                   <div className="absolute right-0 top-[54px] z-50 w-[285px] overflow-hidden rounded-2xl border border-[#E2E8F0] bg-white shadow-[0_18px_45px_rgba(15,23,42,0.15)] dark:border-[#334155] dark:bg-[#111827]">
                     <div className="flex items-center gap-3 border-b border-[#E2E8F0] px-5 py-4 dark:border-[#334155]">
                       <div className="flex h-11 w-11 items-center justify-center rounded-full bg-[#2F6BFF] font-semibold text-white">
-                        D
+                        {userInitials}
                       </div>
 
                       <div>
                         <p className="text-[15px] font-semibold text-[#10213A] dark:text-white">
-                          Dr. Rodríguez
+                          {userName}
                         </p>
 
                         <p className="mt-1 text-[13px] text-[#64748B] dark:text-[#94A3B8]">

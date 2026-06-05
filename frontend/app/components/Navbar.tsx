@@ -1,59 +1,66 @@
 import Image from "next/image";
-import Button from "./Button";
+import Link from "next/link";
 import type { NavLink } from "../types";
 
-// Constants
 const NAV_LINKS: NavLink[] = [
-  { label: "Inicio", href: "#" },
+  { label: "Inicio",    href: "#" },
   { label: "Servicios", href: "#servicios" },
-  { label: "Nosotros", href: "#nosotros" },
-  { label: "Contacto", href: "#contacto" },
+  { label: "Nosotros",  href: "#nosotros" },
+  { label: "Contacto",  href: "#contacto" },
 ] as const;
-
-const STYLES = {
-  header: "fixed inset-x-0 top-0 z-50 border-b border-gray-200/80 bg-white/95 backdrop-blur-xl",
-  container: "mx-auto flex max-w-7xl items-center justify-between px-6 py-4 sm:px-8 lg:px-12",
-  logoLink: "inline-flex items-center gap-2 font-semibold text-blue-600",
-  logoContainer: "h-12 w-12 rounded-2xl bg-blue-100 p-2 shadow-sm",
-  logoImage: "h-full w-full rounded-lg object-cover",
-  logoText: "text-lg",
-  nav: "hidden items-center gap-8 md:flex",
-  navLink: "text-sm font-medium text-gray-600 transition hover:text-blue-600",
-} as const;
 
 export default function Navbar() {
   return (
-    <header className={STYLES.header}>
-      <div className={STYLES.container}>
-        <a href="#" className={STYLES.logoLink}>
-          <div className={STYLES.logoContainer}>
+    <header className="fixed inset-x-0 top-0 z-50 border-b border-surface-200/80 bg-white/95 backdrop-blur-xl">
+      <div className="mx-auto flex max-w-7xl items-center justify-between px-6 py-4 sm:px-8 lg:px-12">
+
+        <a href="#" className="inline-flex items-center gap-2.5">
+          <div className="relative h-8 w-8 shrink-0">
             <Image
               src="/logos/vetnova-logo-light.png"
-              alt="VetNova logo"
-              width={40}
-              height={40}
-              className={STYLES.logoImage}
+              alt="VetNova"
+              width={32}
+              height={32}
+              className="block rounded-lg object-contain dark:hidden"
+              priority
+            />
+            <Image
+              src="/logos/vetnova-logo-dark.png"
+              alt="VetNova"
+              width={32}
+              height={32}
+              className="hidden rounded-lg object-contain dark:block"
               priority
             />
           </div>
-          <span className={STYLES.logoText}>VetNova</span>
+          <span className="text-base font-semibold text-surface-900 dark:text-white">VetNova</span>
         </a>
 
-        <nav className={STYLES.nav}>
+        <nav className="hidden items-center gap-8 md:flex">
           {NAV_LINKS.map((link) => (
-            <a key={link.label} href={link.href} className={STYLES.navLink}>
+            <a
+              key={link.label}
+              href={link.href}
+              className="text-sm font-medium text-surface-500 transition hover:text-surface-900"
+            >
               {link.label}
             </a>
           ))}
         </nav>
 
         <div className="hidden items-center gap-3 md:flex">
-          <Button href="/login" className="rounded-full px-5 py-2.5 text-sm font-semibold" >
+          <Link
+            href="/login"
+            className="rounded-xl px-4 py-2 text-sm font-semibold text-surface-700 transition hover:bg-surface-100"
+          >
             Iniciar sesión
-          </Button>
-          <Button href="/register" variant="secondary" className="rounded-full px-5 py-2.5 text-sm font-semibold">
+          </Link>
+          <Link
+            href="/register"
+            className="rounded-xl bg-brand-600 px-4 py-2 text-sm font-semibold text-white shadow-sm transition hover:bg-brand-700"
+          >
             Registrarse
-          </Button>
+          </Link>
         </div>
       </div>
     </header>

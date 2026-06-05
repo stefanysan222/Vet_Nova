@@ -9,186 +9,197 @@ import {
   Bell,
   Briefcase,
   CalendarDays,
-  CreditCard,
   Home,
   LogOut,
   Settings,
   ShieldCheck,
-  User,
   Users2,
   Box,
-  Layers,
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
-import { clearCurrentUser } from "../../../lib/auth";
+import { clearCurrentUser, getCurrentUser } from "../../../lib/auth";
 
 const menuItems = [
-  { label: "Dashboard", icon: Home, href: "/admin" },
-  { label: "Usuarios", icon: Users2, href: "/admin/usuarios" },
-  { label: "Veterinarios", icon: User, href: "/admin/veterinarios" },
-  { label: "Citas", icon: CalendarDays, href: "/admin/citas" },
-  { label: "Inventario", icon: CreditCard, href: "/admin/facturacion" },
-  { label: "Reportes", icon: BarChart3, href: "/admin/reportes" },
-  { label: "Notificaciones", icon: Bell, href: "/admin/notificaciones" },
-  { label: "Recepcionista", icon: Layers, href: "/admin/recepcionista" },
-  { label: "Configuración", icon: Settings, href: "/admin/configuracion" },
+  { label: "Dashboard",      icon: Home,        href: "/admin" },
+  { label: "Usuarios",       icon: Users2,      href: "/admin/usuarios" },
+  { label: "Citas",          icon: CalendarDays, href: "/admin/citas" },
+  { label: "Mascotas",       icon: Box,         href: "/admin/mascotas" },
+  { label: "Reportes",       icon: BarChart3,   href: "/admin/reportes" },
+  { label: "Notificaciones", icon: Bell,        href: "/admin/notificaciones" },
+  { label: "Configuración",  icon: Settings,    href: "/admin/configuracion" },
 ];
+
+function ThemeLogo({ size = 28 }: { size?: number }) {
+  return (
+    <>
+      <Image
+        src="/logos/vetnova-logo-light.png"
+        alt="VetNova"
+        width={size}
+        height={size}
+        className="block rounded-lg object-cover dark:hidden"
+      />
+      <Image
+        src="/logos/vetnova-logo-dark.png"
+        alt="VetNova"
+        width={size}
+        height={size}
+        className="hidden rounded-lg object-cover dark:block"
+      />
+    </>
+  );
+}
 
 export default function Sidebar() {
   const [mobileOpen, setMobileOpen] = useState(false);
   const pathname = usePathname();
   const router = useRouter();
+  const user = getCurrentUser();
 
   const handleLogout = () => {
     clearCurrentUser();
     router.push("/login");
   };
 
+  const NavLinks = ({ onItemClick }: { onItemClick?: () => void }) => (
+    <nav className="space-y-1">
+      {menuItems.map((item) => {
+        const Icon = item.icon;
+        const isActive = pathname === item.href;
+        return (
+          <Link
+            key={item.label}
+            href={item.href}
+            onClick={onItemClick}
+            className={`flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium transition ${
+              isActive
+                ? "bg-brand-600 text-white shadow-sm"
+                : "text-slate-600 hover:bg-slate-100 hover:text-slate-900 dark:text-slate-300 dark:hover:bg-slate-800 dark:hover:text-white"
+            }`}
+          >
+            <Icon className="h-4 w-4 shrink-0" />
+            {item.label}
+          </Link>
+        );
+      })}
+    </nav>
+  );
+
   return (
     <>
-      <aside className="hidden lg:flex lg:h-screen lg:w-[320px] lg:flex-col lg:border-r lg:border-slate-200/70 lg:bg-white lg:px-6 lg:py-8 lg:shadow-[0_30px_80px_rgba(15,23,42,0.08)] dark:lg:border-slate-800 dark:lg:bg-slate-950 dark:text-slate-100">
-        <div className="flex flex-col gap-8">
-          <div className="space-y-3">
-            <div className="inline-flex items-center gap-3 rounded-3xl bg-blue-600/10 px-4 py-3 text-blue-700 shadow-sm shadow-blue-500/10 ring-1 ring-blue-600/10">
-              <Image src="/logos/vetnova-logo-light.png" alt="VetNova" width={24} height={24} className="rounded-lg" />
-              <span className="text-sm font-semibold">VetNova Admin</span>
+      {/* Sidebar desktop */}
+      <aside className="hidden lg:flex lg:h-screen lg:w-[260px] lg:flex-col lg:border-r lg:border-slate-200/70 lg:bg-white lg:px-4 lg:py-6 dark:lg:border-slate-800 dark:lg:bg-slate-950">
+
+        {/* Perfil del usuario */}
+        <div className="mb-6 rounded-xl border border-slate-200/80 bg-slate-50 px-3 py-3 dark:border-slate-700 dark:bg-slate-900">
+          <div className="flex items-center gap-3">
+            <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-brand-600 text-xs font-bold text-white">
+              {user?.name
+                ? user.name.split(" ").map((p) => p[0]).slice(0, 2).join("").toUpperCase()
+                : "A"}
             </div>
-            <div className="rounded-[2rem] border border-slate-200/70 bg-slate-50 p-5 shadow-sm shadow-slate-200/50 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-100">
-              <div className="flex items-center gap-4">
-                <div className="flex h-14 w-14 items-center justify-center rounded-3xl bg-blue-600 text-white shadow-md shadow-blue-500/10">
-                  <Users2 className="h-7 w-7" />
-                </div>
-                <div>
-                  <p className="text-sm font-semibold text-slate-900 dark:text-white">Ana Pérez</p>
-                  <p className="text-sm text-slate-500 dark:text-slate-400">Administrador</p>
-                </div>
-              </div>
+            <div className="min-w-0">
+              <p className="truncate text-sm font-semibold text-slate-900 dark:text-white">
+                {user?.name ?? "Administrador"}
+              </p>
+              <p className="text-xs text-slate-500 dark:text-slate-400">Administrador</p>
             </div>
           </div>
-
-          <nav className="space-y-2">
-            {menuItems.map((item) => {
-              const Icon = item.icon;
-              const isActive = pathname === item.href;
-              return (
-                <Link
-                  key={item.label}
-                  href={item.href}
-                  className={`flex w-full items-center gap-3 rounded-3xl px-4 py-3 text-left text-sm font-semibold transition ${
-                    isActive
-                      ? "bg-blue-600 text-white shadow-lg shadow-blue-500/10"
-                      : "text-slate-700 hover:bg-slate-100 hover:text-slate-900 dark:text-slate-200 dark:hover:bg-slate-800 dark:hover:text-white"
-                  }`}
-                >
-                  <Icon className="h-5 w-5" />
-                  {item.label}
-                </Link>
-              );
-            })}
-          </nav>
         </div>
 
-        <div className="mt-auto space-y-4 rounded-[2rem] border border-slate-200/70 bg-slate-50 p-5 shadow-sm shadow-slate-200/50 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-100">
-          <div className="flex items-center justify-between gap-3">
-            <div>
-              <p className="text-sm font-semibold text-slate-900 dark:text-white">Soporte 24/7</p>
-              <p className="text-sm text-slate-500 dark:text-slate-400">Monitoreo en vivo</p>
+        {/* Navegación */}
+        <div className="flex-1 overflow-y-auto">
+          <NavLinks />
+        </div>
+
+        {/* Footer del sidebar */}
+        <div className="mt-6 space-y-3 border-t border-slate-200/70 pt-4 dark:border-slate-800">
+          <div className="flex items-center justify-between rounded-xl border border-slate-200/70 bg-slate-50 px-3 py-2.5 dark:border-slate-700 dark:bg-slate-900">
+            <div className="flex items-center gap-2">
+              <ShieldCheck className="h-4 w-4 text-brand-600" />
+              <p className="text-xs font-medium text-slate-600 dark:text-slate-400">Soporte 24/7</p>
             </div>
-            <ShieldCheck className="h-5 w-5 text-blue-600" />
           </div>
-          <button onClick={handleLogout} className="w-full rounded-3xl bg-white px-4 py-3 text-sm font-semibold text-slate-900 shadow-sm transition hover:bg-slate-100 dark:bg-slate-800 dark:text-slate-100 dark:hover:bg-slate-700">
+          <button
+            onClick={handleLogout}
+            className="flex w-full items-center gap-2 rounded-xl px-3 py-2.5 text-sm font-medium text-slate-600 transition hover:bg-slate-100 hover:text-slate-900 dark:text-slate-400 dark:hover:bg-slate-800 dark:hover:text-white"
+          >
+            <LogOut className="h-4 w-4" />
             Cerrar sesión
           </button>
         </div>
       </aside>
 
+      {/* Botón menú mobile */}
       <div className="lg:hidden">
         <button
           type="button"
           onClick={() => setMobileOpen(true)}
-          className="fixed left-4 top-4 z-40 inline-flex items-center gap-2 rounded-3xl bg-white px-4 py-3 text-sm font-semibold text-slate-900 shadow-lg shadow-slate-900/10 ring-1 ring-slate-200"
+          className="fixed left-4 top-4 z-40 inline-flex items-center gap-2 rounded-xl bg-white px-3 py-2 text-sm font-semibold text-slate-900 shadow-card ring-1 ring-slate-200 dark:bg-slate-900 dark:text-white dark:ring-slate-700"
         >
-          <BarChart3 className="h-5 w-5 text-blue-600" />
-          Menu
+          <BarChart3 className="h-4 w-4 text-brand-600" />
+          Menú
         </button>
       </div>
 
+      {/* Sidebar mobile */}
       <AnimatePresence>
-        {mobileOpen ? (
+        {mobileOpen && (
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="fixed inset-0 z-50 bg-slate-900/50"
+            className="fixed inset-0 z-50 bg-slate-900/50 backdrop-blur-sm"
             onClick={() => setMobileOpen(false)}
           >
             <motion.aside
-              initial={{ x: -320 }}
+              initial={{ x: -280 }}
               animate={{ x: 0 }}
-              exit={{ x: -320 }}
-              transition={{ type: "spring", bounce: 0, duration: 0.35 }}
-              className="absolute left-0 top-0 bottom-0 w-[280px] bg-white px-5 py-8 shadow-2xl dark:bg-slate-950"
-              onClick={(event) => event.stopPropagation()}
+              exit={{ x: -280 }}
+              transition={{ type: "spring", bounce: 0, duration: 0.3 }}
+              className="absolute bottom-0 left-0 top-0 w-[260px] bg-white px-4 py-6 shadow-2xl dark:bg-slate-950"
+              onClick={(e) => e.stopPropagation()}
             >
-              <div className="flex items-center justify-between">
-                <div className="inline-flex items-center gap-3 rounded-3xl bg-blue-600/10 px-4 py-3 text-blue-700 shadow-sm shadow-blue-500/10">
-                  <Briefcase className="h-5 w-5" />
-                  <span className="text-sm font-semibold">VetNova</span>
-                </div>
+              {/* Cerrar mobile */}
+              <div className="mb-6 flex items-center justify-end">
                 <button
                   type="button"
                   onClick={() => setMobileOpen(false)}
-                  className="rounded-full bg-slate-100 p-2 text-slate-600 transition hover:bg-slate-200"
+                  className="rounded-lg p-1.5 text-slate-500 transition hover:bg-slate-100 dark:hover:bg-slate-800"
                 >
                   ×
                 </button>
               </div>
 
-              <div className="mt-8 space-y-5">
-                <div className="rounded-[2rem] border border-slate-200/70 bg-slate-50 p-4 shadow-sm shadow-slate-200/50">
-                  <div className="flex items-center gap-3">
-                    <div className="flex h-12 w-12 items-center justify-center rounded-3xl bg-blue-600 text-white shadow-md shadow-blue-500/10">
-                      <Users2 className="h-5 w-5" />
-                    </div>
-                    <div>
-                      <p className="text-sm font-semibold text-slate-900">Ana Pérez</p>
-                      <p className="text-sm text-slate-500">Administrador</p>
-                    </div>
+              {/* Perfil mobile */}
+              <div className="mb-5 rounded-xl border border-slate-200 bg-slate-50 px-3 py-3 dark:border-slate-700 dark:bg-slate-900">
+                <div className="flex items-center gap-3">
+                  <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-brand-600 text-xs font-bold text-white">
+                    {user?.name
+                      ? user.name.split(" ").map((p) => p[0]).slice(0, 2).join("").toUpperCase()
+                      : "A"}
+                  </div>
+                  <div>
+                    <p className="text-sm font-semibold text-slate-900 dark:text-white">{user?.name ?? "Administrador"}</p>
+                    <p className="text-xs text-slate-500">Administrador</p>
                   </div>
                 </div>
-                <div className="space-y-2">
-                  {menuItems.map((item) => {
-                    const Icon = item.icon;
-                    const isActive = pathname === item.href;
-                    return (
-                      <Link
-                        key={item.label}
-                        href={item.href}
-                        onClick={() => setMobileOpen(false)}
-                        className={`flex w-full items-center gap-3 rounded-3xl px-4 py-3 text-left text-sm font-semibold transition ${
-                          isActive
-                            ? "bg-blue-600 text-white"
-                            : "text-slate-700 hover:bg-slate-100 hover:text-slate-900"
-                        }`}
-                      >
-                        <Icon className="h-5 w-5" />
-                        {item.label}
-                      </Link>
-                    );
-                  })}
-                </div>
-                <button onClick={() => {
-                    handleLogout();
-                    setMobileOpen(false);
-                  }}
-                  className="w-full rounded-3xl bg-blue-600 px-4 py-3 text-sm font-semibold text-white shadow-lg shadow-blue-500/10 transition hover:bg-blue-700"
+              </div>
+
+              <NavLinks onItemClick={() => setMobileOpen(false)} />
+
+              <div className="mt-6 border-t border-slate-200 pt-4 dark:border-slate-800">
+                <button
+                  onClick={() => { handleLogout(); setMobileOpen(false); }}
+                  className="flex w-full items-center gap-2 rounded-xl px-3 py-2.5 text-sm font-medium text-slate-600 transition hover:bg-slate-100 dark:text-slate-400 dark:hover:bg-slate-800"
                 >
+                  <LogOut className="h-4 w-4" />
                   Cerrar sesión
                 </button>
               </div>
             </motion.aside>
           </motion.div>
-        ) : null}
+        )}
       </AnimatePresence>
     </>
   );

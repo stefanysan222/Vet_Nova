@@ -1,4 +1,4 @@
-// frontend/app/components/admin/AdminView.tsx
+﻿// frontend/app/components/admin/AdminView.tsx
 import React from "react";
 import Sidebar from "./Sidebar";  // Correcta importación desde la misma carpeta
 import Navbar from "./Navbar";  // Correcta importación desde la misma carpeta
@@ -17,14 +17,14 @@ const AdminView: React.FC = () => {
         <Navbar />
 
         {/* Banner de bienvenida */}
-        <div className="m-6 bg-blue-50 p-6 rounded-2xl flex justify-between items-center shadow">
+        <div className="m-6 bg-brand-50 p-6 rounded-2xl flex justify-between items-center shadow">
           <div>
             <h1 className="text-2xl font-semibold text-gray-800">Bienvenido, Administrador</h1>
             <p className="text-gray-500 mt-1">
               Supervisa y gestiona toda la operación de VetNova desde un solo lugar.
             </p>
           </div>
-          <button className="bg-blue-600 text-white px-5 py-2 rounded-lg hover:bg-blue-700">
+          <button className="bg-brand-600 text-white px-5 py-2 rounded-lg hover:bg-brand-700">
             Registrar nuevo usuario
           </button>
         </div>

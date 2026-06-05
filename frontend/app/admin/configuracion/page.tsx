@@ -1,185 +1,228 @@
-"use client";
+﻿"use client";
 
 import { useEffect, useState } from "react";
-import Sidebar from "../../components/admin/Sidebar";
-import Navbar from "../../components/admin/Navbar";
+import { User, Mail, Lock, Eye, EyeOff } from "lucide-react";
 import { getCurrentUser } from "../../../lib/auth";
+import { updateUsuario } from "../../../lib/api/usuarios";
+import { useToast } from "../../components/ui/Toast";
 
-interface AdminSettings {
-  username: string;
-  email: string;
-  language: string;
-  theme: "light" | "dark";
-  notificationsEmail: boolean;
-  notificationsApp: boolean;
-}
+const inputClass =
+  "w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-2.5 text-sm text-slate-900 outline-none transition focus:border-brand-500 focus:ring-2 focus:ring-brand-100 dark:border-slate-700 dark:bg-slate-800 dark:text-white dark:placeholder-slate-500";
 
 export default function ConfiguracionPage() {
-  const [settings, setSettings] = useState<AdminSettings>({
-    username: "",
-    email: "",
-    language: "Español",
-    theme: "dark",
-    notificationsEmail: true,
-    notificationsApp: true,
-  });
-  const [savedMessage, setSavedMessage] = useState("");
+  const user = getCurrentUser();
+  const { success, error } = useToast();
+
+  const [nombre, setNombre] = useState("");
+  const [email, setEmail] = useState("");
+  const [currentPassword, setCurrentPassword] = useState("");
+  const [newPassword, setNewPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
+  const [showNew, setShowNew] = useState(false);
+  const [showConfirm, setShowConfirm] = useState(false);
+
+  const [savingNombre, setSavingNombre] = useState(false);
+  const [savingEmail, setSavingEmail] = useState(false);
+  const [savingPassword, setSavingPassword] = useState(false);
 
   useEffect(() => {
-    const user = getCurrentUser();
     if (user) {
-      setSettings((prev) => ({
-        ...prev,
-        username: user.name,
-        email: user.email,
-      }));
+      setNombre(user.name);
+      setEmail(user.email);
     }
   }, []);
 
-  const handleChange = (field: keyof AdminSettings, value: string | boolean) => {
-    setSettings((current) => ({ ...current, [field]: value }));
+  const handleSaveNombre = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!nombre.trim()) return;
+    if (!user) return;
+    setSavingNombre(true);
+    try {
+      await updateUsuario(user.id, { nombre: nombre.trim() });
+      success("Nombre actualizado", "El nombre de usuario se actualizó correctamente. Vuelve a iniciar sesión para ver los cambios reflejados.");
+    } catch (err) {
+      error("Error al actualizar", err instanceof Error ? err.message : "No se pudo actualizar el nombre.");
+    } finally {
+      setSavingNombre(false);
+    }
   };
 
-  const saveSettings = () => {
-    setSavedMessage("Configuración guardada correctamente.");
-    window.setTimeout(() => setSavedMessage(""), 3000);
+  const handleSaveEmail = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!email.trim()) return;
+    if (!user) return;
+    setSavingEmail(true);
+    try {
+      await updateUsuario(user.id, { email: email.trim() });
+      success("Correo actualizado", "El correo electrónico se actualizó correctamente. Vuelve a iniciar sesión para aplicar el cambio.");
+    } catch (err) {
+      error("Error al actualizar", err instanceof Error ? err.message : "No se pudo actualizar el correo.");
+    } finally {
+      setSavingEmail(false);
+    }
+  };
+
+  const handleSavePassword = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!newPassword || !confirmPassword) return;
+    if (newPassword.length < 8) {
+      error("Contraseña muy corta", "La nueva contraseña debe tener al menos 8 caracteres.");
+      return;
+    }
+    if (newPassword !== confirmPassword) {
+      error("Las contraseñas no coinciden", "Verifica que la nueva contraseña y la confirmación sean iguales.");
+      return;
+    }
+    if (!user) return;
+    setSavingPassword(true);
+    try {
+      await updateUsuario(user.id, { password: newPassword });
+      success("Contraseña actualizada", "La contraseña se cambió correctamente. Usa la nueva contraseña en tu próximo inicio de sesión.");
+      setCurrentPassword("");
+      setNewPassword("");
+      setConfirmPassword("");
+    } catch (err) {
+      error("Error al actualizar", err instanceof Error ? err.message : "No se pudo actualizar la contraseña.");
+    } finally {
+      setSavingPassword(false);
+    }
   };
 
   return (
-    <div className="min-h-screen bg-slate-50 text-slate-900 dark:bg-slate-950 dark:text-slate-100">
-      <div className="lg:grid lg:grid-cols-[320px_minmax(0,1fr)]">
-        <Sidebar />
-        <div className="lg:order-2">
-          <Navbar />
-          <main className="mx-auto max-w-7xl px-6 pb-12 pt-6 lg:px-10">
-            <section className="rounded-[2rem] border border-slate-200/60 bg-white/95 p-6 shadow-[0_28px_80px_rgba(15,23,42,0.08)] dark:border-slate-700 dark:bg-slate-950">
-              <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-                <div>
-                  <p className="text-sm font-semibold uppercase tracking-[0.3em] text-blue-600 dark:text-blue-400">Configuración</p>
-                  <h1 className="mt-3 text-4xl font-semibold tracking-tight text-slate-900 dark:text-white">Ajustes de la plataforma</h1>
-                  <p className="mt-3 max-w-2xl text-base leading-7 text-slate-600 dark:text-slate-400">
-                    Administra el perfil, preferencias de idioma, tema y notificaciones desde el panel.
-                  </p>
-                </div>
-                <button
-                  onClick={saveSettings}
-                  className="inline-flex items-center justify-center rounded-2xl bg-blue-600 px-7 py-4 text-sm font-semibold text-white shadow-[0_18px_55px_rgba(37,99,235,0.22)] transition duration-300 hover:bg-blue-700"
-                >
-                  Guardar cambios
-                </button>
-              </div>
+    <div className="admin-page">
+      <section className="admin-card-padded">
 
-              <div className="mt-8 grid gap-6 lg:grid-cols-[1fr_320px]">
-                <div className="space-y-6 rounded-[2rem] border border-slate-200/70 bg-slate-50 p-6 dark:border-slate-700 dark:bg-slate-900">
-                  <div className="rounded-[1.5rem] border border-slate-200 bg-white p-6 shadow-sm dark:border-slate-700 dark:bg-slate-950">
-                    <h2 className="text-xl font-semibold text-slate-900 dark:text-white">Perfil de administrador</h2>
-                    <div className="mt-6 grid gap-4">
-                      <label className="space-y-2 text-sm text-slate-700 dark:text-slate-300">
-                        <span>Nombre de usuario</span>
-                        <input
-                          type="text"
-                          value={settings.username}
-                          onChange={(event) => handleChange("username", event.target.value)}
-                          className="w-full rounded-3xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-slate-900 outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100 dark:border-slate-700 dark:bg-slate-950 dark:text-white"
-                        />
-                      </label>
-                      <label className="space-y-2 text-sm text-slate-700 dark:text-slate-300">
-                        <span>Correo electrónico</span>
-                        <input
-                          type="email"
-                          value={settings.email}
-                          onChange={(event) => handleChange("email", event.target.value)}
-                          className="w-full rounded-3xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-slate-900 outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100 dark:border-slate-700 dark:bg-slate-950 dark:text-white"
-                        />
-                      </label>
-                    </div>
-                  </div>
-
-                  <div className="rounded-[1.5rem] border border-slate-200 bg-white p-6 shadow-sm dark:border-slate-700 dark:bg-slate-950">
-                    <h2 className="text-xl font-semibold text-slate-900 dark:text-white">Preferencias de la app</h2>
-                    <div className="mt-6 grid gap-4">
-                      <label className="space-y-2 text-sm text-slate-700 dark:text-slate-300">
-                        <span>Idioma</span>
-                        <select
-                          value={settings.language}
-                          onChange={(event) => handleChange("language", event.target.value)}
-                          className="w-full rounded-3xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-slate-900 outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100 dark:border-slate-700 dark:bg-slate-950 dark:text-white"
-                        >
-                          <option>Español</option>
-                          <option>Inglés</option>
-                        </select>
-                      </label>
-                      <label className="flex items-center justify-between rounded-3xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-slate-700 dark:border-slate-700 dark:bg-slate-950 dark:text-white">
-                        <span>Tema oscuro</span>
-                        <input
-                          type="checkbox"
-                          checked={settings.theme === "dark"}
-                          onChange={(event) => handleChange("theme", event.target.checked ? "dark" : "light")}
-                          className="h-5 w-5 rounded border-slate-300 text-blue-600"
-                        />
-                      </label>
-                    </div>
-                  </div>
-
-                  <div className="rounded-[1.5rem] border border-slate-200 bg-white p-6 shadow-sm dark:border-slate-700 dark:bg-slate-950">
-                    <h2 className="text-xl font-semibold text-slate-900 dark:text-white">Notificaciones</h2>
-                    <div className="mt-6 space-y-4">
-                      <label className="flex items-center justify-between rounded-3xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-slate-700 dark:border-slate-700 dark:bg-slate-950 dark:text-white">
-                        <span>Correo electrónico</span>
-                        <input
-                          type="checkbox"
-                          checked={settings.notificationsEmail}
-                          onChange={(event) => handleChange("notificationsEmail", event.target.checked)}
-                          className="h-5 w-5 rounded border-slate-300 text-blue-600"
-                        />
-                      </label>
-                      <label className="flex items-center justify-between rounded-3xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-slate-700 dark:border-slate-700 dark:bg-slate-950 dark:text-white">
-                        <span>En la aplicación</span>
-                        <input
-                          type="checkbox"
-                          checked={settings.notificationsApp}
-                          onChange={(event) => handleChange("notificationsApp", event.target.checked)}
-                          className="h-5 w-5 rounded border-slate-300 text-blue-600"
-                        />
-                      </label>
-                    </div>
-                  </div>
-                </div>
-
-                <aside className="rounded-[2rem] border border-slate-200/70 bg-slate-50 p-6 text-sm text-slate-600 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-300">
-                  <h2 className="text-xl font-semibold text-slate-900 dark:text-white">Configuración rápida</h2>
-                  <p className="mt-3">Aquí puedes ajustar los elementos más importantes del panel administrador.</p>
-
-                  <div className="mt-6 space-y-4">
-                    <div className="rounded-3xl border border-slate-200 bg-white p-4 dark:border-slate-700 dark:bg-slate-950">
-                      <p className="text-sm font-semibold text-slate-900 dark:text-white">Tema actual</p>
-                      <p className="mt-1">{settings.theme === "dark" ? "Oscuro" : "Claro"}</p>
-                    </div>
-                    <div className="rounded-3xl border border-slate-200 bg-white p-4 dark:border-slate-700 dark:bg-slate-950">
-                      <p className="text-sm font-semibold text-slate-900 dark:text-white">Idioma</p>
-                      <p className="mt-1">{settings.language}</p>
-                    </div>
-                    <div className="rounded-3xl border border-slate-200 bg-white p-4 dark:border-slate-700 dark:bg-slate-950">
-                      <p className="text-sm font-semibold text-slate-900 dark:text-white">Notificaciones por correo</p>
-                      <p className="mt-1">{settings.notificationsEmail ? "Activadas" : "Desactivadas"}</p>
-                    </div>
-                    <div className="rounded-3xl border border-slate-200 bg-white p-4 dark:border-slate-700 dark:bg-slate-950">
-                      <p className="text-sm font-semibold text-slate-900 dark:text-white">Notificaciones en la app</p>
-                      <p className="mt-1">{settings.notificationsApp ? "Activadas" : "Desactivadas"}</p>
-                    </div>
-                  </div>
-                </aside>
-              </div>
-
-              {savedMessage ? (
-                <div className="mt-6 rounded-3xl border border-emerald-200 bg-emerald-50 px-6 py-4 text-sm text-emerald-800 dark:border-emerald-700 dark:bg-emerald-950 dark:text-emerald-200">
-                  {savedMessage}
-                </div>
-              ) : null}
-            </section>
-          </main>
+        {/* Header */}
+        <div>
+          <p className="text-eyebrow">Configuración</p>
+          <h1 className="mt-2 text-page-title">Perfil de cuenta</h1>
+          <p className="mt-1 text-subtitle">
+            Actualiza tu nombre de usuario, correo electrónico y contraseña.
+          </p>
         </div>
-      </div>
+
+        <div className="mt-8 max-w-lg space-y-6">
+
+          {/* Nombre de usuario */}
+          <form onSubmit={handleSaveNombre} className="rounded-2xl border border-slate-200/70 bg-white p-5 shadow-xs dark:border-slate-700 dark:bg-slate-800/50">
+            <div className="mb-4 flex items-center gap-2">
+              <User className="h-4 w-4 text-brand-600 dark:text-brand-400" />
+              <h2 className="text-sm font-semibold text-slate-900 dark:text-white">Nombre de usuario</h2>
+            </div>
+            <input
+              type="text"
+              value={nombre}
+              onChange={(e) => setNombre(e.target.value)}
+              placeholder="Tu nombre completo"
+              required
+              className={inputClass}
+            />
+            <div className="mt-4 flex justify-end">
+              <button
+                type="submit"
+                disabled={savingNombre || !nombre.trim() || nombre.trim() === user?.name}
+                className="btn-primary disabled:opacity-50 disabled:hover:translate-y-0"
+              >
+                {savingNombre ? "Guardando..." : "Guardar nombre"}
+              </button>
+            </div>
+          </form>
+
+          {/* Correo electrónico */}
+          <form onSubmit={handleSaveEmail} className="rounded-2xl border border-slate-200/70 bg-white p-5 shadow-xs dark:border-slate-700 dark:bg-slate-800/50">
+            <div className="mb-4 flex items-center gap-2">
+              <Mail className="h-4 w-4 text-brand-600 dark:text-brand-400" />
+              <h2 className="text-sm font-semibold text-slate-900 dark:text-white">Correo electrónico</h2>
+            </div>
+            <input
+              type="email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              placeholder="correo@ejemplo.com"
+              required
+              className={inputClass}
+            />
+            <div className="mt-4 flex justify-end">
+              <button
+                type="submit"
+                disabled={savingEmail || !email.trim() || email.trim() === user?.email}
+                className="btn-primary disabled:opacity-50 disabled:hover:translate-y-0"
+              >
+                {savingEmail ? "Guardando..." : "Guardar correo"}
+              </button>
+            </div>
+          </form>
+
+          {/* Contraseña */}
+          <form onSubmit={handleSavePassword} className="rounded-2xl border border-slate-200/70 bg-white p-5 shadow-xs dark:border-slate-700 dark:bg-slate-800/50">
+            <div className="mb-4 flex items-center gap-2">
+              <Lock className="h-4 w-4 text-brand-600 dark:text-brand-400" />
+              <h2 className="text-sm font-semibold text-slate-900 dark:text-white">Contraseña</h2>
+            </div>
+            <div className="space-y-3">
+              <div>
+                <label className="mb-1 block text-xs font-medium text-slate-500 dark:text-slate-400">Nueva contraseña</label>
+                <div className="relative">
+                  <input
+                    type={showNew ? "text" : "password"}
+                    value={newPassword}
+                    onChange={(e) => setNewPassword(e.target.value)}
+                    placeholder="Mínimo 8 caracteres"
+                    className={inputClass + " pr-10"}
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowNew(!showNew)}
+                    className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200"
+                  >
+                    {showNew ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                  </button>
+                </div>
+              </div>
+              <div>
+                <label className="mb-1 block text-xs font-medium text-slate-500 dark:text-slate-400">Confirmar contraseña</label>
+                <div className="relative">
+                  <input
+                    type={showConfirm ? "text" : "password"}
+                    value={confirmPassword}
+                    onChange={(e) => setConfirmPassword(e.target.value)}
+                    placeholder="Repite la nueva contraseña"
+                    className={inputClass + " pr-10"}
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowConfirm(!showConfirm)}
+                    className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200"
+                  >
+                    {showConfirm ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                  </button>
+                </div>
+              </div>
+
+              {/* Indicador de coincidencia */}
+              {newPassword && confirmPassword && (
+                <p className={`text-xs font-medium ${newPassword === confirmPassword ? "text-emerald-600 dark:text-emerald-400" : "text-rose-600 dark:text-rose-400"}`}>
+                  {newPassword === confirmPassword ? "✓ Las contraseñas coinciden" : "✗ Las contraseñas no coinciden"}
+                </p>
+              )}
+            </div>
+            <div className="mt-4 flex justify-end">
+              <button
+                type="submit"
+                disabled={savingPassword || !newPassword || !confirmPassword}
+                className="btn-primary disabled:opacity-50 disabled:hover:translate-y-0"
+              >
+                {savingPassword ? "Guardando..." : "Cambiar contraseña"}
+              </button>
+            </div>
+          </form>
+
+          {/* Aviso re-login */}
+          <p className="text-xs text-slate-400 dark:text-slate-500">
+            Los cambios de nombre y correo se aplican en la próxima sesión iniciada.
+          </p>
+        </div>
+      </section>
     </div>
   );
 }

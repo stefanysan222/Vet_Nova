@@ -1,183 +1,192 @@
-"use client";
+﻿"use client";
 
-import { useState } from "react";
-import Sidebar from "../../components/admin/Sidebar";
-import Navbar from "../../components/admin/Navbar";
-import { CalendarDays, FileText, CheckCircle } from "lucide-react";
+import { useEffect, useState } from "react";
+import { fetchCitas } from "../../../lib/api/citas";
+import { CalendarDays, CheckCircle } from "lucide-react";
+import type { Appointment } from "../../../lib/recepcionista/types";
 
-type NotificationItem = {
+type NotificacionItem = {
+  id: string;
   title: string;
   description: string;
-  category: string;
+  category: "Citas" | "Sistema";
   time: string;
   icon: typeof CalendarDays;
+  urgente: boolean;
 };
 
-const notifications: NotificationItem[] = [
-  {
-    title: "Nueva cita agendada",
-    description: "Se creó una nueva cita para el paciente Max a las 10:00 AM.",
-    category: "Citas",
-    time: "Hace 5 min",
-    icon: CalendarDays,
-  },
-  {
-    title: "Inventario bajo",
-    description: "El inventario de alimento premium está por debajo de 10 unidades.",
-    category: "Alertas",
-    time: "Hace 25 min",
-    icon: FileText,
-  },
-  {
-    title: "Usuario registrado",
-    description: "Se agregó un nuevo recepcionista al sistema.",
-    category: "Usuarios",
-    time: "Hace 1 hora",
-    icon: CheckCircle,
-  },
-];
+function tiempoRelativo(fecha: string): string {
+  const diff = Date.now() - new Date(fecha + "T00:00:00").getTime();
+  const dias = Math.floor(diff / 86400000);
+  if (dias === 0) return "Hoy";
+  if (dias === 1) return "Ayer";
+  return `Hace ${dias} días`;
+}
 
 export default function AdminNotificationsPage() {
-  const [selectedNotification, setSelectedNotification] = useState<NotificationItem | null>(null);
+  const [notificaciones, setNotificaciones] = useState<NotificacionItem[]>([]);
+  const [selected, setSelected] = useState<NotificacionItem | null>(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    fetchCitas()
+      .then((citas) => {
+        const items: NotificacionItem[] = [];
+
+        // Citas pendientes de confirmar
+        const pendientes = citas.filter((c: Appointment) => c.status === "Pendiente");
+        if (pendientes.length > 0) {
+          items.push({
+            id: "citas-pendientes",
+            title: `${pendientes.length} cita${pendientes.length > 1 ? "s" : ""} pendiente${pendientes.length > 1 ? "s" : ""} de confirmación`,
+            description: `Las siguientes citas están esperando tu confirmación: ${pendientes.slice(0, 3).map((c) => c.petName).join(", ")}${pendientes.length > 3 ? " y más..." : "."} Ve a la sección de Citas para gestionarlas.`,
+            category: "Citas",
+            time: "Actualizado ahora",
+            icon: CalendarDays,
+            urgente: pendientes.length >= 3,
+          });
+        }
+
+        // Citas de hoy
+        const hoy = new Date().toISOString().slice(0, 10);
+        const citasHoy = citas.filter((c: Appointment) => c.date === hoy && c.status !== "Cancelada");
+        if (citasHoy.length > 0) {
+          items.push({
+            id: "citas-hoy",
+            title: `${citasHoy.length} cita${citasHoy.length > 1 ? "s" : ""} programada${citasHoy.length > 1 ? "s" : ""} para hoy`,
+            description: `Pacientes de hoy: ${citasHoy.slice(0, 3).map((c) => `${c.petName} (${c.time})`).join(", ")}${citasHoy.length > 3 ? "..." : "."}`,
+            category: "Citas",
+            time: "Hoy",
+            icon: CheckCircle,
+            urgente: false,
+          });
+        }
+
+        if (items.length === 0) {
+          items.push({
+            id: "sistema-ok",
+            title: "Todo en orden",
+            description: "No hay alertas activas en este momento. El sistema funciona con normalidad.",
+            category: "Sistema",
+            time: "Ahora",
+            icon: CheckCircle,
+            urgente: false,
+          });
+        }
+
+        setNotificaciones(items);
+      })
+      .catch(() => setNotificaciones([]))
+      .finally(() => setLoading(false));
+  }, []);
+
+  const urgentes = notificaciones.filter((n) => n.urgente).length;
 
   return (
-    <div className="flex min-h-screen bg-slate-50 text-slate-900 dark:bg-slate-950 dark:text-slate-100">
-      <Sidebar />
-
-      <div className="flex-1 flex flex-col">
-        <Navbar />
-
-        <main className="flex-1 px-6 py-8">
-          <section className="mb-8 rounded-3xl bg-white p-8 shadow-sm shadow-slate-200/40 dark:bg-slate-900 dark:shadow-slate-950/40">
-            <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+    <div className="admin-page">
+          <section className="admin-card-padded mb-6">
+            <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
               <div>
-                <p className="text-sm font-semibold uppercase tracking-[0.3em] text-blue-600 dark:text-blue-400">
-                  Notificaciones administrativas
-                </p>
-                <h1 className="mt-3 text-4xl font-semibold text-slate-900 dark:text-white">
-                  Todas las notificaciones
-                </h1>
-                <p className="mt-4 max-w-2xl text-base leading-7 text-slate-600 dark:text-slate-400">
-                  Revisa los avisos más recientes y mantente al día con los eventos críticos del sistema.
+                <p className="text-eyebrow">Notificaciones</p>
+                <h1 className="mt-2 text-page-title">Alertas del sistema</h1>
+                <p className="mt-1 text-subtitle max-w-2xl">
+                  Alertas generadas en tiempo real a partir de los datos del sistema.
                 </p>
               </div>
-              <div className="rounded-3xl bg-slate-100 px-5 py-4 text-slate-900 dark:bg-slate-800 dark:text-slate-100">
-                <p className="text-sm text-slate-500 dark:text-slate-400">Total de notificaciones</p>
-                <p className="mt-2 text-3xl font-semibold">{notifications.length}</p>
+              <div className="flex gap-3">
+                <div className="rounded-2xl border border-slate-200 bg-slate-50 px-5 py-4 shadow-xs dark:border-slate-700 dark:bg-slate-800">
+                  <p className="text-label">Total alertas</p>
+                  <p className="mt-1 text-stat text-slate-900 dark:text-white">{loading ? "—" : notificaciones.length}</p>
+                </div>
+                {urgentes > 0 && (
+                  <div className="rounded-2xl border border-red-200 bg-red-50 px-5 py-4 shadow-xs dark:border-red-800 dark:bg-red-950/60">
+                    <p className="text-label text-red-500 dark:text-red-400">Urgentes</p>
+                    <p className="mt-1 text-stat text-red-700 dark:text-red-300">{urgentes}</p>
+                  </div>
+                )}
               </div>
             </div>
           </section>
 
-          <section className="grid gap-6 xl:grid-cols-[1fr_360px]">
-            <div className="space-y-6">
-              {notifications.map((notification) => {
-                const Icon = notification.icon;
-                const isSelected = selectedNotification?.title === notification.title;
-                return (
-                  <article
-                    key={notification.title}
-                    onClick={() => setSelectedNotification(notification)}
-                    className={`cursor-pointer rounded-3xl border p-6 shadow-sm transition-colors hover:border-blue-400 hover:bg-blue-50 dark:hover:border-blue-500 dark:hover:bg-slate-900 ${
-                      isSelected
-                        ? "border-blue-400 bg-blue-50 dark:border-blue-500 dark:bg-slate-900"
-                        : "border-slate-200 bg-white dark:border-slate-800 dark:bg-slate-950"
-                    }`}
-                  >
-                    <div className="flex items-start gap-4">
-                      <div className="mt-1 flex h-12 w-12 items-center justify-center rounded-3xl bg-blue-600 text-white">
-                        <Icon className="h-5 w-5" />
-                      </div>
-                      <div className="min-w-0">
-                        <div className="flex items-center justify-between gap-3">
-                          <h2 className="text-xl font-semibold text-slate-900 dark:text-white">
-                            {notification.title}
-                          </h2>
-                          <span className="rounded-full bg-slate-100 px-3 py-1 text-sm font-semibold text-slate-700 dark:bg-slate-800 dark:text-slate-300">
-                            {notification.category}
-                          </span>
-                        </div>
-                        <p className="mt-3 text-sm leading-6 text-slate-600 dark:text-slate-400">
-                          {notification.description}
-                        </p>
-                        <p className="mt-4 text-sm text-slate-500 dark:text-slate-500">
-                          {notification.time}
-                        </p>
-                      </div>
-                    </div>
-                  </article>
-                );
-              })}
-            </div>
-
-            <aside className="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm dark:border-slate-800 dark:bg-slate-950">
-              {selectedNotification ? (
-                <div>
-                  <div className="mb-6 flex items-center justify-between gap-4">
-                    <div>
-                      <p className="text-sm font-semibold uppercase tracking-[0.24em] text-blue-600 dark:text-blue-400">
-                        Detalle de notificación
-                      </p>
-                      <h2 className="mt-3 text-2xl font-semibold text-slate-900 dark:text-white">
-                        {selectedNotification.title}
-                      </h2>
-                    </div>
-                    <span className="rounded-full bg-slate-100 px-3 py-1 text-sm font-semibold text-slate-700 dark:bg-slate-800 dark:text-slate-300">
-                      {selectedNotification.category}
-                    </span>
-                  </div>
-
-                  <div className="space-y-5">
-                    <div className="rounded-3xl bg-slate-50 p-5 dark:bg-slate-900">
-                      <p className="text-sm font-semibold text-slate-500 dark:text-slate-400">Descripción</p>
-                      <p className="mt-3 text-base leading-7 text-slate-700 dark:text-slate-300">
-                        {selectedNotification.description}
-                      </p>
-                    </div>
-
-                    <div className="rounded-3xl bg-slate-50 p-5 dark:bg-slate-900">
-                      <p className="text-sm font-semibold text-slate-500 dark:text-slate-400">Hora</p>
-                      <p className="mt-3 text-base leading-7 text-slate-700 dark:text-slate-300">
-                        {selectedNotification.time}
-                      </p>
-                    </div>
-
-                    <button
-                      type="button"
-                      onClick={() => setSelectedNotification(null)}
-                      className="w-full rounded-2xl bg-blue-600 px-4 py-3 text-sm font-semibold text-white transition hover:bg-blue-700"
+          {loading ? (
+            <p className="text-sm text-slate-500">Cargando notificaciones...</p>
+          ) : (
+            <section className="grid gap-6 xl:grid-cols-[1fr_360px]">
+              <div className="space-y-6">
+                {notificaciones.map((n) => {
+                  const Icon = n.icon;
+                  const isSelected = selected?.id === n.id;
+                  return (
+                    <article
+                      key={n.id}
+                      onClick={() => setSelected(n)}
+                      className={`cursor-pointer rounded-2xl border p-6 shadow-sm transition-colors hover:border-brand-400 hover:bg-brand-50 dark:hover:border-brand-500 dark:hover:bg-slate-900 ${
+                        isSelected
+                          ? "border-brand-400 bg-brand-50 dark:border-brand-500 dark:bg-slate-900"
+                          : n.urgente
+                          ? "border-red-200 bg-white dark:border-red-800 dark:bg-slate-950"
+                          : "border-slate-200 bg-white dark:border-slate-800 dark:bg-slate-950"
+                      }`}
                     >
-                      Volver al listado
-                    </button>
+                      <div className="flex items-start gap-4">
+                        <div className={`mt-1 flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl ${n.urgente ? "bg-red-500" : "bg-brand-600"} text-white`}>
+                          <Icon className="h-5 w-5" />
+                        </div>
+                        <div className="min-w-0">
+                          <div className="flex items-center justify-between gap-3">
+                            <h2 className="text-xl font-semibold text-slate-900 dark:text-white">{n.title}</h2>
+                            <span className={`rounded-full px-3 py-1 text-sm font-semibold ${n.urgente ? "bg-red-100 text-red-700" : "bg-slate-100 text-slate-700"} dark:bg-slate-800 dark:text-slate-300`}>
+                              {n.category}
+                            </span>
+                          </div>
+                          <p className="mt-3 text-sm leading-6 text-slate-600 dark:text-slate-400">{n.description}</p>
+                          <p className="mt-4 text-sm text-slate-500">{n.time}</p>
+                        </div>
+                      </div>
+                    </article>
+                  );
+                })}
+              </div>
+
+              <aside className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm dark:border-slate-800 dark:bg-slate-950">
+                {selected ? (
+                  <div>
+                    <div className="mb-6 flex items-center justify-between gap-4">
+                      <div>
+                        <p className="text-sm font-semibold uppercase tracking-[0.24em] text-brand-600 dark:text-brand-400">Detalle</p>
+                        <h2 className="mt-3 text-2xl font-semibold text-slate-900 dark:text-white">{selected.title}</h2>
+                      </div>
+                      <span className="rounded-full bg-slate-100 px-3 py-1 text-sm font-semibold text-slate-700 dark:bg-slate-800 dark:text-slate-300">
+                        {selected.category}
+                      </span>
+                    </div>
+                    <div className="space-y-5">
+                      <div className="rounded-2xl bg-slate-50 p-5 dark:bg-slate-900">
+                        <p className="text-sm font-semibold text-slate-500 dark:text-slate-400">Descripción</p>
+                        <p className="mt-3 text-base leading-7 text-slate-700 dark:text-slate-300">{selected.description}</p>
+                      </div>
+                      <button type="button" onClick={() => setSelected(null)} className="w-full rounded-2xl bg-brand-600 px-4 py-3 text-sm font-semibold text-white transition hover:bg-brand-700">
+                        Cerrar
+                      </button>
+                    </div>
                   </div>
-                </div>
-              ) : (
-                <div>
-                  <p className="text-sm font-semibold uppercase tracking-[0.24em] text-slate-500 dark:text-slate-400">
-                    Resumen
-                  </p>
-                  <h2 className="mt-3 text-2xl font-semibold text-slate-900 dark:text-white">
-                    Actividad reciente
-                  </h2>
-                  <div className="mt-6 space-y-4">
-                    <div className="rounded-3xl bg-slate-50 p-4 dark:bg-slate-900">
-                      <p className="text-sm text-slate-500 dark:text-slate-400">Citas nuevas</p>
-                      <p className="mt-2 text-2xl font-semibold text-slate-900 dark:text-white">1</p>
-                    </div>
-                    <div className="rounded-3xl bg-slate-50 p-4 dark:bg-slate-900">
-                      <p className="text-sm text-slate-500 dark:text-slate-400">Alertas de inventario</p>
-                      <p className="mt-2 text-2xl font-semibold text-slate-900 dark:text-white">1</p>
-                    </div>
-                    <div className="rounded-3xl bg-slate-50 p-4 dark:bg-slate-900">
-                      <p className="text-sm text-slate-500 dark:text-slate-400">Usuarios registrados</p>
-                      <p className="mt-2 text-2xl font-semibold text-slate-900 dark:text-white">1</p>
+                ) : (
+                  <div>
+                    <p className="text-sm font-semibold uppercase tracking-[0.24em] text-slate-500 dark:text-slate-400">Resumen</p>
+                    <h2 className="mt-3 text-2xl font-semibold text-slate-900 dark:text-white">Actividad del sistema</h2>
+                    <div className="mt-6 space-y-4">
+                      {notificaciones.map((n) => (
+                        <div key={n.id} className="rounded-2xl bg-slate-50 p-4 dark:bg-slate-900">
+                          <p className="text-sm text-slate-500 dark:text-slate-400">{n.category}</p>
+                          <p className="mt-1 text-sm font-semibold text-slate-900 dark:text-white">{n.title}</p>
+                        </div>
+                      ))}
                     </div>
                   </div>
-                </div>
-              )}
-            </aside>
-          </section>
-        </main>
-      </div>
+                )}
+              </aside>
+            </section>
+          )}
     </div>
   );
 }

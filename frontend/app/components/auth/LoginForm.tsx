@@ -46,7 +46,6 @@ export default function LoginForm() {
   const getDashboardRoute = (role: string) => {
     if (role === "Administrador") return "/admin";
     if (role === "Veterinario") return "/veterinario";
-    if (role === "Recepcionista") return "/recepcionista";
     return "/cliente";
   };
 
@@ -90,90 +89,93 @@ export default function LoginForm() {
     }
   };
 
+  const inputBase =
+    "w-full rounded-xl border border-surface-200 bg-white py-3 text-sm text-surface-900 outline-none transition placeholder:text-surface-400 focus:border-brand-500 focus:ring-2 focus:ring-brand-100 dark:border-surface-700 dark:bg-surface-900 dark:text-white";
+
   return (
-    <form
-      onSubmit={handleSubmit}
-      className="space-y-8 rounded-[2rem] border border-slate-200/70 bg-slate-50 p-8 shadow-sm shadow-slate-200/50"
-      noValidate
-    >
-      <GoogleAuthButton label="Iniciar sesión con Google" onSuccess={handleGoogleSuccess} />
-      <div className="relative flex items-center justify-center text-sm text-slate-500">
-        <span className="absolute left-0 right-0 h-px bg-slate-200"></span>
-        <span className="relative z-10 px-3 bg-slate-50">o con correo</span>
+    <form onSubmit={handleSubmit} className="space-y-5" noValidate>
+      <GoogleAuthButton label="Continuar con Google" onSuccess={handleGoogleSuccess} />
+
+      <div className="relative flex items-center gap-3 text-xs text-surface-400">
+        <span className="h-px flex-1 bg-surface-200 dark:bg-surface-700" />
+        o con correo electrónico
+        <span className="h-px flex-1 bg-surface-200 dark:bg-surface-700" />
       </div>
 
-      {submitError ? <p className="rounded-2xl bg-rose-50 px-4 py-3 text-sm text-rose-700">{submitError}</p> : null}
+      {submitError && (
+        <div className="rounded-xl border border-red-100 bg-red-50 px-4 py-3 text-sm text-red-700 dark:border-red-900 dark:bg-red-950 dark:text-red-400">
+          {submitError}
+        </div>
+      )}
 
-      <div className="space-y-4">
-        <label className="text-base font-semibold text-slate-700" htmlFor="email">
+      <div className="space-y-1.5">
+        <label className="block text-sm font-medium text-surface-700 dark:text-surface-300" htmlFor="email">
           Correo electrónico
         </label>
         <div className="relative">
-          <Mail className="pointer-events-none absolute left-5 top-1/2 h-5 w-5 -translate-y-1/2 text-slate-400" />
+          <Mail className="pointer-events-none absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-surface-400" />
           <input
             id="email"
             type="email"
             value={formData.email}
             onChange={(event) => handleChange("email", event.target.value)}
-            className="w-full rounded-3xl border border-slate-200 bg-white pl-16 pr-7 py-6 text-lg text-slate-900 outline-none transition focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
+            className={`${inputBase} pl-10 pr-4`}
             placeholder="tucorreo@ejemplo.com"
           />
         </div>
-        {errors.email ? <p className="text-sm text-rose-600">{errors.email}</p> : null}
+        {errors.email && <p className="text-xs text-red-600">{errors.email}</p>}
       </div>
 
-      <div className="space-y-4">
-        <label className="text-base font-semibold text-slate-700" htmlFor="password">
+      <div className="space-y-1.5">
+        <label className="block text-sm font-medium text-surface-700 dark:text-surface-300" htmlFor="password">
           Contraseña
         </label>
         <div className="relative">
-          <Lock className="pointer-events-none absolute left-5 top-1/2 h-5 w-5 -translate-y-1/2 text-slate-400" />
+          <Lock className="pointer-events-none absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-surface-400" />
           <input
             id="password"
             type={showPassword ? "text" : "password"}
             value={formData.password}
             onChange={(event) => handleChange("password", event.target.value)}
-            className="w-full rounded-3xl border border-slate-200 bg-white pl-16 pr-7 py-6 text-lg text-slate-900 outline-none transition focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
-            placeholder="Contraseña segura"
+            className={`${inputBase} pl-10 pr-10`}
+            placeholder="••••••••"
           />
           <button
             type="button"
-            onClick={() => setShowPassword((current) => !current)}
-            className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-500 transition hover:text-slate-900"
+            onClick={() => setShowPassword((c) => !c)}
+            className="absolute right-3.5 top-1/2 -translate-y-1/2 text-surface-400 transition hover:text-surface-700"
           >
-            {showPassword ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
+            {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
           </button>
         </div>
-        {errors.password ? <p className="text-sm text-rose-600">{errors.password}</p> : null}
+        {errors.password && <p className="text-xs text-red-600">{errors.password}</p>}
       </div>
 
-      <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-        <label className="inline-flex items-center gap-2 text-sm text-slate-600">
+      <div className="flex items-center justify-between">
+        <label className="inline-flex items-center gap-2 text-sm text-surface-600 dark:text-surface-400">
           <input
             type="checkbox"
             checked={formData.remember}
             onChange={(event) => handleChange("remember", event.target.checked)}
-            className="h-5 w-5 rounded-lg border border-slate-300 text-blue-600 focus:ring-blue-500"
+            className="h-4 w-4 rounded border-surface-300 text-brand-600 focus:ring-brand-500"
           />
           Recordarme
         </label>
-        <a href="#" className="text-sm font-semibold text-blue-600 transition hover:text-blue-700">
+        <a href="#" className="text-sm font-medium text-brand-600 transition hover:text-brand-700">
           ¿Olvidaste tu contraseña?
         </a>
       </div>
 
-      <div className="space-y-4">
-        <Button type="submit" disabled={loading} className="w-full justify-center py-4 text-sm font-semibold">
-          {loading ? "Iniciando sesión..." : "Iniciar sesión"}
-        </Button>
-      </div>
+      <Button type="submit" disabled={loading} className="w-full justify-center py-3">
+        {loading ? "Iniciando sesión..." : "Iniciar sesión"}
+      </Button>
 
-      <div className="text-center text-sm text-slate-600">
-        ¿Aún no tienes cuenta?{' '}
-        <a href="/register" className="font-semibold text-blue-600 transition hover:text-blue-700">
+      <p className="text-center text-sm text-surface-500 dark:text-surface-400">
+        ¿Aún no tienes cuenta?{" "}
+        <a href="/register" className="font-semibold text-brand-600 transition hover:text-brand-700">
           Crear cuenta
         </a>
-      </div>
+      </p>
     </form>
   );
 }

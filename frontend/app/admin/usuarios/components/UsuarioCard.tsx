@@ -1,4 +1,4 @@
-// frontend/app/admin/usuarios/components/UsuarioCard.tsx
+﻿// frontend/app/admin/usuarios/components/UsuarioCard.tsx
 "use client";
 
 import { useState } from "react";
@@ -13,7 +13,7 @@ interface UsuarioCardProps {
 
 export default function UsuarioCard({ usuario, onToggleStatus, onChangeRole, onEdit }: UsuarioCardProps) {
   // Filtrar solo roles válidos
-  const rolesValidos = ["Recepcionista", "Cliente", "Veterinario"];
+  const rolesValidos = ["Cliente", "Veterinario"];
   if (!rolesValidos.includes(usuario.cargo)) return null;
 
   const [showDetails, setShowDetails] = useState(false);
@@ -23,7 +23,7 @@ export default function UsuarioCard({ usuario, onToggleStatus, onChangeRole, onE
       <div className="flex justify-between items-center">
         <h3 className="font-semibold text-lg text-white">{usuario.cargo}</h3>
         <button
-          className="text-sm text-blue-400 hover:underline"
+          className="text-sm text-brand-400 hover:underline"
           onClick={() => setShowDetails(!showDetails)}
         >
           {showDetails ? "Ocultar detalles" : "Ver detalles"}
@@ -54,7 +54,7 @@ export default function UsuarioCard({ usuario, onToggleStatus, onChangeRole, onE
             </button>
             <button
               onClick={() => onToggleStatus(usuario.id)}
-              className="rounded-lg px-3 py-1 text-sm bg-blue-600 text-white hover:bg-blue-500"
+              className="rounded-lg px-3 py-1 text-sm bg-brand-600 text-white hover:bg-brand-500"
             >
               {usuario.estado === "Activo" ? "Inactivar" : "Activar"}
             </button>

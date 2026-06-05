@@ -1,73 +1,68 @@
-import { BarChart3, Box, CalendarCheck, ClipboardList } from "lucide-react";
-import { LANDING_STYLES } from "../constants/index";
-import type { Service } from "../types";
+import { CalendarCheck, ClipboardList, Users, BarChart3 } from "lucide-react";
 
-// Constants
-const SERVICES: Service[] = [
+const SERVICES = [
   {
-    title: "Gestión de citas",
-    description: "Agenda y organiza consultas con recordatorios inteligentes.",
     icon: CalendarCheck,
-    color: "bg-blue-100 text-blue-700",
+    title: "Agenda inteligente",
+    description:
+      "Los clientes solicitan citas desde su cuenta. El administrador las confirma. Sin llamadas, sin confusiones.",
+    accent: "bg-brand-50 text-brand-600",
+    border: "hover:border-brand-200",
   },
   {
-    title: "Historia clínica",
-    description: "Registra consultas, vacunas y datos médicos con total trazabilidad.",
     icon: ClipboardList,
-    color: "bg-blue-50 text-blue-600",
+    title: "Historia clínica",
+    description:
+      "Registra consultas, diagnósticos, vacunas y tratamientos. Todo queda guardado y accesible para el veterinario.",
+    accent: "bg-vet-50 text-vet-600",
+    border: "hover:border-vet-200",
   },
   {
-    title: "Inventario",
-    description: "Controla medicamentos y productos con alertas de stock.",
-    icon: Box,
-    color: "bg-gray-100 text-gray-700",
+    icon: Users,
+    title: "Gestión de pacientes",
+    description:
+      "Cada mascota tiene su perfil completo: especie, raza, edad, peso, alergias y su propietario vinculado.",
+    accent: "bg-amber-50 text-amber-600",
+    border: "hover:border-amber-200",
   },
   {
-    title: "Reportes y estadísticas",
-    description: "Visualiza métricas de atención, ingresos y satisfacción.",
     icon: BarChart3,
-    color: "bg-gray-50 text-gray-600",
+    title: "Reportes y control",
+    description:
+      "Estadísticas de citas, usuarios activos y actividad del sistema, disponibles para el administrador en tiempo real.",
+    accent: "bg-surface-100 text-surface-600",
+    border: "hover:border-surface-300",
   },
 ] as const;
 
-const STYLES = {
-  section: LANDING_STYLES.section,
-  container: LANDING_STYLES.container,
-  header: "mb-10 max-w-2xl",
-  sectionTitle: LANDING_STYLES.text.caption,
-  sectionHeading: LANDING_STYLES.text.heading,
-  grid: "grid gap-6 md:grid-cols-2 xl:grid-cols-4",
-  card: "group overflow-hidden rounded-[2rem] border border-gray-200/80 bg-white p-7 shadow-lg shadow-gray-200/50 transition hover:-translate-y-1 hover:border-blue-200 hover:shadow-2xl hover:shadow-gray-200/40",
-  iconContainer: "inline-flex h-14 w-14 items-center justify-center rounded-3xl",
-  cardTitle: LANDING_STYLES.text.subheading,
-  cardDescription: LANDING_STYLES.text.body,
-} as const;
-
 export default function Services() {
   return (
-    <section id="servicios" className={STYLES.section}>
-      <div className={STYLES.container}>
-        <div className={STYLES.header}>
-          <p className={STYLES.sectionTitle}>Servicios</p>
-          <h2 className={STYLES.sectionHeading}>
-            Todo lo que necesitas para gestionar tu clínica en una sola plataforma.
-          </h2>
-        </div>
+    <section id="servicios" className="mx-auto max-w-6xl px-5 py-20 sm:px-6 lg:px-8">
+      <div className="mb-12 max-w-xl">
+        <p className="text-sm font-semibold uppercase tracking-[0.28em] text-brand-600">
+          Módulos del sistema
+        </p>
+        <h2 className="mt-3 text-3xl font-bold tracking-tight text-surface-900 sm:text-4xl">
+          Todo lo que necesita una clínica veterinaria moderna.
+        </h2>
+        <p className="mt-4 text-base leading-7 text-surface-500">
+          Cada módulo está diseñado para un rol específico: el administrador gestiona, el veterinario atiende y el cliente hace seguimiento.
+        </p>
+      </div>
 
-        <div className={STYLES.grid}>
-          {SERVICES.map((service) => {
-            const Icon = service.icon;
-            return (
-              <article key={service.title} className={STYLES.card}>
-                <div className={`${STYLES.iconContainer} ${service.color}`}>
-                  <Icon className="h-7 w-7" />
-                </div>
-                <h3 className={STYLES.cardTitle}>{service.title}</h3>
-                <p className={STYLES.cardDescription}>{service.description}</p>
-              </article>
-            );
-          })}
-        </div>
+      <div className="grid gap-5 md:grid-cols-2 lg:grid-cols-4">
+        {SERVICES.map(({ icon: Icon, title, description, accent, border }) => (
+          <article
+            key={title}
+            className={`group rounded-2xl border border-surface-200 bg-white p-6 shadow-card transition hover:-translate-y-0.5 hover:shadow-card-md ${border}`}
+          >
+            <div className={`mb-5 inline-flex h-11 w-11 items-center justify-center rounded-xl ${accent}`}>
+              <Icon className="h-5 w-5" />
+            </div>
+            <h3 className="text-base font-semibold text-surface-900">{title}</h3>
+            <p className="mt-3 text-sm leading-6 text-surface-500">{description}</p>
+          </article>
+        ))}
       </div>
     </section>
   );

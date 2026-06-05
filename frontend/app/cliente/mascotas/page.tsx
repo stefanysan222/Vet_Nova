@@ -3,6 +3,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
+import { motion } from "framer-motion";
 import { getCurrentUser } from "../../../lib/auth";
 import { fetchPropietarioByUsuario } from "../../../lib/api/propietarios";
 import { fetchMascotas } from "../../../lib/api/mascotas";
@@ -112,33 +113,25 @@ export default function MascotasPage() {
   };
 
   return (
-    <div className="h-full overflow-y-auto bg-[#F5F7FB] px-6 py-8 dark:bg-[#0F172A]">
+    <div className="h-full overflow-y-auto admin-page">
       <div className="mb-8 flex items-start justify-between gap-4">
         <div>
-          <h1 className="text-[24px] font-semibold leading-none text-[#10213A] dark:text-white">
-            Gestión de Mascotas
-          </h1>
-
-          <p className="mt-4 text-[16px] text-[#64748B] dark:text-[#94A3B8]">
+          <h1 className="text-page-title">Mis mascotas</h1>
+          <p className="mt-2 text-subtitle">
             {mascotasFiltradas.length}{" "}
-            {mascotasFiltradas.length === 1
-              ? "mascota registrada"
-              : "mascotas registradas"}
+            {mascotasFiltradas.length === 1 ? "mascota registrada" : "mascotas registradas"}
           </p>
         </div>
 
-        <Link
-          href="/cliente/mascotas/nueva"
-          className="inline-flex h-[45px] items-center gap-2 rounded-xl bg-[#2F6BFF] px-5 text-[16px] font-semibold text-white shadow-sm transition-all hover:-translate-y-0.5 hover:bg-[#2457D6] hover:shadow-[0_10px_20px_rgba(47,107,255,0.28)]"
-        >
+        <Link href="/cliente/mascotas/nueva" className="btn-primary whitespace-nowrap">
           <PlusIcon />
-          Nueva Mascota
+          Nueva mascota
         </Link>
       </div>
 
-      <div className="mb-7 rounded-xl border border-[#CBD5E1] bg-white p-4 shadow-sm dark:border-[#334155] dark:bg-[#111827]">
+      <div className="admin-card mb-6 p-4">
         <div className="flex flex-col items-stretch gap-3 sm:flex-row sm:items-center">
-          <div className="flex h-[46px] flex-1 items-center gap-3 rounded-xl border border-[#CBD5E1] bg-white px-4 transition-colors focus-within:border-[#2F6BFF] focus-within:ring-2 focus-within:ring-[#2F6BFF]/10 dark:border-[#334155] dark:bg-[#0F172A]">
+          <div className="flex h-[46px] flex-1 items-center gap-3 rounded-xl border border-slate-200 bg-white px-4 transition-colors focus-within:border-brand-400 focus-within:ring-2 focus-within:ring-brand-400/10 dark:border-slate-700 dark:bg-slate-900">
             <SearchIcon />
 
             <input
@@ -146,14 +139,14 @@ export default function MascotasPage() {
               value={busqueda}
               onChange={(event) => setBusqueda(event.target.value)}
               placeholder="Buscar por nombre, dueño o raza..."
-              className="w-full bg-transparent text-[15px] text-[#10213A] outline-none placeholder:text-[#94A3B8] dark:text-white"
+              className="w-full bg-transparent text-sm text-slate-900 outline-none placeholder:text-slate-400 dark:text-white"
             />
 
             {busqueda && (
               <button
                 type="button"
                 onClick={() => setBusqueda("")}
-                className="text-[#94A3B8] transition-colors hover:text-[#2F6BFF]"
+                className="text-slate-400 transition-colors hover:text-brand-600"
                 aria-label="Limpiar búsqueda"
               >
                 <CloseIcon />
@@ -167,7 +160,7 @@ export default function MascotasPage() {
               onChange={(event) =>
                 setEspecieSeleccionada(event.target.value as SpeciesFilter)
               }
-              className="h-[46px] w-full cursor-pointer appearance-none rounded-xl border border-[#CBD5E1] bg-white px-5 pr-11 text-[15px] text-[#10213A] outline-none transition-all hover:border-[#2F6BFF] focus:border-[#2F6BFF] dark:border-[#334155] dark:bg-[#0F172A] dark:text-white"
+              className="h-[46px] w-full cursor-pointer appearance-none rounded-xl border border-slate-200 bg-white px-5 pr-11 text-sm text-slate-900 outline-none transition-all hover:border-brand-400 focus:border-brand-400 dark:border-slate-700 dark:bg-slate-900 dark:text-white"
             >
               <option value="todas">Todas las especies</option>
               <option value="perro">Perros</option>
@@ -184,15 +177,18 @@ export default function MascotasPage() {
 
       {mascotasFiltradas.length > 0 ? (
         <div className="grid grid-cols-1 gap-5 md:grid-cols-2 xl:grid-cols-3">
-          {mascotasFiltradas.map((mascota) => (
-            <article
+          {mascotasFiltradas.map((mascota, i) => (
+            <motion.article
               key={mascota.id}
-              className="group relative flex min-h-[220px] flex-col rounded-xl border border-[#CBD5E1] bg-white p-5 shadow-sm transition-all hover:-translate-y-1 hover:border-[#2F6BFF]/60 hover:shadow-[0_14px_30px_rgba(15,23,42,0.14)] dark:border-[#334155] dark:bg-[#111827] dark:hover:border-[#2F6BFF]"
+              initial={{ opacity: 0, y: 16 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.35, delay: i * 0.05 }}
+              className="group relative flex min-h-[220px] flex-col admin-card p-5 transition-all duration-200 hover:-translate-y-1 hover:shadow-card-hover"
             >
               <StatusBadge estado={mascota.estado} />
 
               <div className="flex items-start gap-4 pr-[76px]">
-                <div className="relative flex h-[56px] w-[56px] shrink-0 items-center justify-center overflow-hidden rounded-xl bg-[#DBEAFE] text-[#2563EB] transition-all group-hover:scale-105 dark:bg-[#1E3A8A] dark:text-[#93C5FD]">
+                <div className="relative flex h-[56px] w-[56px] shrink-0 items-center justify-center overflow-hidden rounded-xl bg-brand-50 text-brand-600 transition-all group-hover:scale-105 dark:bg-brand-900/30 dark:text-brand-400">
                   {mascota.foto ? (
                     <Image
                       src={mascota.foto}
@@ -211,37 +207,31 @@ export default function MascotasPage() {
                 </div>
 
                 <div className="min-w-0">
-                  <h2 className="truncate text-[17px] font-semibold leading-none text-[#10213A] dark:text-white">
+                  <h2 className="truncate text-base font-semibold text-slate-900 dark:text-white">
                     {mascota.nombre}
                   </h2>
 
-                  <p className="mt-3 truncate text-[13px] text-[#52698A] dark:text-[#94A3B8]">
+                  <p className="mt-2 truncate text-sm text-slate-500 dark:text-slate-400">
                     {mascota.especie} · {mascota.raza}
                   </p>
 
-                  <p className="mt-2 text-[13px] text-[#52698A] dark:text-[#94A3B8]">
+                  <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">
                     {mascota.edad}
                   </p>
                 </div>
               </div>
 
-              <div className="mt-5 flex items-end justify-between gap-4 border-t border-[#E2E8F0] pt-4 dark:border-[#334155]">
+              <div className="mt-4 flex items-end justify-between gap-4 border-t border-slate-200/80 pt-4 dark:border-slate-700">
                 <div className="min-w-0">
-                  <p className="text-[12px] text-[#64748B] dark:text-[#94A3B8]">
-                    Propietario
-                  </p>
-
-                  <p className="mt-1 truncate text-[13px] font-semibold text-[#10213A] dark:text-white">
+                  <p className="text-label">Propietario</p>
+                  <p className="mt-1 truncate text-sm font-semibold text-slate-900 dark:text-white">
                     {mascota.dueño}
                   </p>
                 </div>
 
                 <div className="shrink-0 text-right">
-                  <p className="text-[12px] text-[#64748B] dark:text-[#94A3B8]">
-                    Última visita
-                  </p>
-
-                  <p className="mt-1 text-[13px] font-semibold text-[#10213A] dark:text-white">
+                  <p className="text-label">Última visita</p>
+                  <p className="mt-1 text-sm font-semibold text-slate-900 dark:text-white">
                     {mascota.ultimaVisita}
                   </p>
                 </div>
@@ -249,33 +239,24 @@ export default function MascotasPage() {
 
               <Link
                 href={`/cliente/mascotas/${encodeURIComponent(mascota.id)}`}
-                className="mt-auto inline-flex items-center justify-center gap-1.5 pt-4 text-[13px] font-medium text-[#2F6BFF] transition-colors hover:text-[#2457D6] dark:text-[#60A5FA]"
+                className="mt-auto inline-flex items-center justify-center gap-1.5 pt-4 text-sm font-medium text-brand-600 transition-colors hover:text-brand-700 dark:text-brand-400"
               >
                 Ver perfil completo
                 <ChevronRightIcon />
               </Link>
-            </article>
+            </motion.article>
           ))}
         </div>
       ) : (
-        <div className="flex min-h-[300px] flex-col items-center justify-center rounded-xl border border-dashed border-[#CBD5E1] bg-white px-6 text-center dark:border-[#334155] dark:bg-[#111827]">
-          <div className="mb-5 flex h-[68px] w-[68px] items-center justify-center rounded-full bg-[#DBEAFE] text-[#2563EB] dark:bg-[#1E3A8A] dark:text-[#93C5FD]">
+        <div className="flex min-h-[280px] flex-col items-center justify-center rounded-2xl border border-dashed border-slate-300 bg-white px-6 text-center shadow-xs dark:border-slate-700 dark:bg-slate-900">
+          <div className="mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-brand-50 text-brand-600 dark:bg-brand-900/30 dark:text-brand-400">
             <SearchIcon />
           </div>
-
-          <h2 className="text-[20px] font-semibold text-[#10213A] dark:text-white">
-            No se encontraron mascotas
-          </h2>
-
-          <p className="mt-3 text-[15px] text-[#64748B] dark:text-[#94A3B8]">
+          <h2 className="text-section-title">No se encontraron mascotas</h2>
+          <p className="mt-2 text-sm text-slate-500 dark:text-slate-400">
             Intenta buscar con otro nombre, dueño, raza o especie.
           </p>
-
-          <button
-            type="button"
-            onClick={limpiarFiltros}
-            className="mt-6 inline-flex h-[44px] items-center rounded-xl border border-[#CBD5E1] bg-white px-5 text-[15px] font-semibold text-[#10213A] transition-all hover:border-[#2F6BFF] hover:text-[#2F6BFF] dark:border-[#334155] dark:bg-[#0F172A] dark:text-white"
-          >
+          <button type="button" onClick={limpiarFiltros} className="mt-5 btn-secondary">
             Limpiar filtros
           </button>
         </div>
@@ -292,15 +273,14 @@ function normalizarTexto(texto: string) {
 }
 
 function StatusBadge({ estado }: { estado: Pet["estado"] }) {
-  const estilos =
+  const { badge, dot } =
     estado === "Activo"
-      ? "bg-[#DDF5DE] text-[#008B35] dark:bg-[#123B22] dark:text-[#86EFAC]"
-      : "bg-[#FBE9A9] text-[#9A6700] dark:bg-[#4A3412] dark:text-[#FACC15]";
+      ? { badge: "bg-emerald-50 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400", dot: "bg-emerald-500" }
+      : { badge: "bg-amber-50 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400", dot: "bg-amber-500" };
 
   return (
-    <span
-      className={`absolute right-4 top-4 rounded-full px-3 py-[5px] text-[11px] font-semibold leading-none ${estilos}`}
-    >
+    <span className={`absolute right-4 top-4 inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-xs font-semibold ${badge}`}>
+      <span className={`h-1.5 w-1.5 rounded-full ${dot}`} />
       {estado}
     </span>
   );

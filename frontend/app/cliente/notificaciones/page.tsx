@@ -33,30 +33,22 @@ export default function NotificacionesPage() {
   };
 
   return (
-    <div className="h-full overflow-y-auto bg-[#F5F7FB] px-6 py-8">
+    <div className="h-full overflow-y-auto admin-page">
       {/* Header */}
       <div className="mb-8 flex items-start justify-between gap-4">
         <div>
-          <h1 className="text-[24px] font-semibold leading-none text-[#10213A]">
-            Notificaciones
-          </h1>
-          <p className="mt-4 text-[16px] text-[#64748B]">
-            Centro de alertas y recordatorios
-          </p>
+          <h1 className="text-page-title">Notificaciones</h1>
+          <p className="mt-2 text-subtitle">Centro de alertas y recordatorios</p>
         </div>
 
-        <button
-          type="button"
-          onClick={handleViewAll}
-          className="inline-flex h-[45px] items-center gap-2 rounded-xl bg-[#2F6BFF] px-5 text-[16px] font-semibold text-white shadow-sm"
-        >
+        <button type="button" onClick={handleViewAll} className="btn-primary whitespace-nowrap">
           <CheckIcon />
-          Ver todas las notificaciones
+          Ver todas
         </button>
       </div>
 
       {/* Summary cards */}
-      <div className="mb-7 grid grid-cols-1 gap-5 md:grid-cols-2 xl:grid-cols-4">
+      <div className="mb-6 grid grid-cols-2 gap-4 xl:grid-cols-4">
         <SummaryCard
           title="Total"
           value={notifications.length.toString()}
@@ -83,69 +75,48 @@ export default function NotificacionesPage() {
       </div>
 
       {/* Main content */}
-      <div className="grid grid-cols-1 gap-7 xl:grid-cols-[1fr_0.35fr]">
+      <div className="grid grid-cols-1 gap-6 xl:grid-cols-[1fr_0.38fr]">
         {/* Notifications list */}
-        <section className="rounded-xl border border-[#CBD5E1] bg-white p-6 shadow-sm">
+        <section className="admin-card-padded">
           <div className="mb-6 flex items-center justify-between gap-4">
             <div>
-              <h2 className="text-[20px] font-semibold text-[#10213A]">
-                Notificaciones recientes
-              </h2>
-              <p className="mt-2 text-[14px] text-[#64748B]">
-                Revisa las novedades relacionadas con tus mascotas y citas.
-              </p>
+              <h2 className="text-section-title">Notificaciones recientes</h2>
+              <p className="mt-1 text-subtitle">Revisa las novedades relacionadas con tus mascotas y citas.</p>
             </div>
 
             <div className="hidden items-center gap-2 md:flex">
-              <button
-                type="button"
-                onClick={() => setFilter("all")}
-                className={`rounded-xl px-4 py-2 text-[14px] font-semibold ${filter === "all" ? "bg-[#2F6BFF] text-white" : "text-[#10213A] hover:bg-[#F1F5F9]"}`}
-              >
-                Todas
-              </button>
-              <button
-                type="button"
-                onClick={() => setFilter("unread")}
-                className={`rounded-xl px-4 py-2 text-[14px] font-semibold ${filter === "unread" ? "bg-[#2F6BFF] text-white" : "text-[#10213A] hover:bg-[#F1F5F9]"}`}
-              >
-                No leídas
-              </button>
-              <button
-                type="button"
-                onClick={() => setFilter("read")}
-                className={`rounded-xl px-4 py-2 text-[14px] font-semibold ${filter === "read" ? "bg-[#2F6BFF] text-white" : "text-[#10213A] hover:bg-[#F1F5F9]"}`}
-              >
-                Leídas
-              </button>
+              {(["all", "unread", "read"] as const).map((f) => (
+                <button
+                  key={f}
+                  type="button"
+                  onClick={() => setFilter(f)}
+                  className={`rounded-xl px-4 py-2 text-sm font-semibold transition-all ${
+                    filter === f
+                      ? "bg-brand-600 text-white shadow-brand-sm"
+                      : "text-slate-600 hover:bg-slate-100 dark:text-slate-400 dark:hover:bg-slate-800"
+                  }`}
+                >
+                  {f === "all" ? "Todas" : f === "unread" ? "No leídas" : "Leídas"}
+                </button>
+              ))}
             </div>
           </div>
 
           {filteredNotifications.length === 0 ? (
-            <div className="rounded-3xl border border-dashed border-[#CBD5E1] bg-[#F8FAFC] p-10 text-center">
-              <p className="text-lg font-semibold text-[#10213A]">No hay notificaciones con este filtro.</p>
-              <p className="mt-3 text-sm text-[#64748B]">
-                Presiona "Ver todas" para regresar al listado completo.
-              </p>
-              <button
-                type="button"
-                onClick={handleViewAll}
-                className="mt-6 rounded-full bg-[#2F6BFF] px-5 py-3 text-sm font-semibold text-white transition hover:bg-[#2358d8]"
-              >
-                Ver todas
-              </button>
+            <div className="rounded-2xl border border-dashed border-slate-300 bg-slate-50 p-10 text-center dark:border-slate-700 dark:bg-slate-800/50">
+              <p className="text-section-title">No hay notificaciones con este filtro.</p>
+              <p className="mt-2 text-subtitle">Presiona "Ver todas" para regresar al listado completo.</p>
+              <button type="button" onClick={handleViewAll} className="mt-5 btn-primary">Ver todas</button>
             </div>
           ) : (
-            <div className="divide-y divide-[#E2E8F0]">
+            <div className="divide-y divide-slate-200 dark:divide-slate-700">
               {filteredNotifications.map((item) => (
                 <article
                   key={`${item.title}-${item.time}`}
                   className="flex items-start justify-between gap-5 py-5 first:pt-0 last:pb-0"
                 >
                   <div className="flex min-w-0 gap-4">
-                    <div
-                      className={`flex h-12 w-12 shrink-0 items-center justify-center rounded-xl ${item.color}`}
-                    >
+                    <div className={`flex h-12 w-12 shrink-0 items-center justify-center rounded-xl ${item.color}`}>
                       {item.icon === "calendar" && <CalendarIcon />}
                       {item.icon === "vaccine" && <VaccineIcon />}
                       {item.icon === "payment" && <PaymentIcon />}
@@ -154,26 +125,15 @@ export default function NotificacionesPage() {
 
                     <div className="min-w-0">
                       <div className="flex items-center gap-2">
-                        <h3 className="text-[16px] font-semibold text-[#10213A]">
-                          {item.title}
-                        </h3>
-
-                        {item.unread && (
-                          <span className="h-2.5 w-2.5 rounded-full bg-[#EF4444]" />
-                        )}
+                        <h3 className="text-sm font-semibold text-slate-900 dark:text-white">{item.title}</h3>
+                        {item.unread && <span className="h-2 w-2 rounded-full bg-red-500" />}
                       </div>
-
-                      <p className="mt-2 max-w-[720px] text-[14px] leading-6 text-[#64748B]">
-                        {item.description}
-                      </p>
-
-                      <div className="mt-3 flex items-center gap-3">
-                        <span className="rounded-full bg-[#F1F5F9] px-3 py-1 text-[12px] font-semibold text-[#52698A]">
+                      <p className="mt-1 max-w-[720px] text-sm leading-6 text-slate-500 dark:text-slate-400">{item.description}</p>
+                      <div className="mt-2 flex items-center gap-3">
+                        <span className="rounded-full bg-slate-100 px-2.5 py-0.5 text-xs font-semibold text-slate-600 dark:bg-slate-800 dark:text-slate-300">
                           {item.category}
                         </span>
-                        <span className="text-[13px] text-[#94A3B8]">
-                          {item.time}
-                        </span>
+                        <span className="text-xs text-slate-400">{item.time}</span>
                       </div>
                     </div>
                   </div>
@@ -181,7 +141,7 @@ export default function NotificacionesPage() {
                   <button
                     type="button"
                     onClick={() => setSelectedNotification(item)}
-                    className="shrink-0 rounded-lg px-3 py-2 text-[13px] font-semibold text-[#2F6BFF] hover:bg-[#EFF6FF]"
+                    className="shrink-0 rounded-lg px-3 py-1.5 text-xs font-semibold text-brand-600 hover:bg-brand-50 dark:text-brand-400 dark:hover:bg-brand-900/30"
                   >
                     Ver
                   </button>
@@ -191,72 +151,57 @@ export default function NotificacionesPage() {
           )}
         </section>
 
-        {/* Detalle de notificación */}
-        <aside className="rounded-xl border border-[#CBD5E1] bg-white p-6 shadow-sm xl:min-h-[520px]">
-          {selected ? (
-            <div>
-              <div className="mb-4 flex items-center justify-between gap-4">
-                <div>
-                  <p className="text-sm font-semibold uppercase tracking-[0.24em] text-[#2563EB]">
-                    Detalle de notificación
-                  </p>
-                  <h2 className="mt-2 text-2xl font-semibold text-[#10213A]">{selected.title}</h2>
-                </div>
-                <span className={`rounded-2xl px-3 py-2 text-sm font-semibold ${selected.unread ? "bg-[#FEF3C7] text-[#92400E]" : "bg-[#E2E8F0] text-[#475569]"}`}>
-                  {selected.unread ? "No leída" : "Leída"}
-                </span>
-              </div>
-
-              <div className="rounded-3xl border border-[#E2E8F0] bg-[#F8FAFC] p-5">
-                <p className="text-sm font-semibold text-[#334155]">Categoría</p>
-                <p className="mt-2 text-base text-[#10213A]">{selected.category}</p>
-              </div>
-
-              <div className="mt-6 space-y-4">
-                <div>
-                  <p className="text-sm font-semibold text-[#334155]">Descripción</p>
-                  <p className="mt-2 text-base leading-7 text-[#475569]">{selected.description}</p>
+        {/* Detalle + Preferencias */}
+        <div className="space-y-5">
+          {/* Detalle de notificación */}
+          <aside className="admin-card-padded xl:min-h-[300px]">
+            {selected ? (
+              <div>
+                <div className="mb-4 flex items-center justify-between gap-4">
+                  <div>
+                    <p className="text-eyebrow">Detalle</p>
+                    <h2 className="mt-1 text-section-title">{selected.title}</h2>
+                  </div>
+                  <span className={`rounded-full px-2.5 py-1 text-xs font-semibold ${selected.unread ? "bg-amber-50 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400" : "bg-slate-100 text-slate-600 dark:bg-slate-800 dark:text-slate-300"}`}>
+                    {selected.unread ? "No leída" : "Leída"}
+                  </span>
                 </div>
 
-                <div>
-                  <p className="text-sm font-semibold text-[#334155]">Fecha</p>
-                  <p className="mt-2 text-base leading-7 text-[#475569]">{selected.time}</p>
+                <div className="rounded-xl border border-slate-200 bg-slate-50 p-4 dark:border-slate-700 dark:bg-slate-800/50">
+                  <p className="text-label">Categoría</p>
+                  <p className="mt-1 text-sm font-semibold text-slate-900 dark:text-white">{selected.category}</p>
                 </div>
-              </div>
 
-              <div className="mt-8">
-                <button
-                  type="button"
-                  onClick={handleViewAll}
-                  className="rounded-full bg-[#2F6BFF] px-5 py-3 text-sm font-semibold text-white transition hover:bg-[#2358d8]"
-                >
+                <div className="mt-4 space-y-3">
+                  <div>
+                    <p className="text-label">Descripción</p>
+                    <p className="mt-1 text-sm leading-6 text-slate-600 dark:text-slate-300">{selected.description}</p>
+                  </div>
+                  <div>
+                    <p className="text-label">Fecha</p>
+                    <p className="mt-1 text-sm text-slate-600 dark:text-slate-300">{selected.time}</p>
+                  </div>
+                </div>
+
+                <button type="button" onClick={handleViewAll} className="mt-5 btn-primary w-full justify-center">
                   Ver todas las notificaciones
                 </button>
               </div>
-            </div>
-          ) : (
-            <div className="flex h-full flex-col items-center justify-center rounded-3xl border border-dashed border-[#CBD5E1] bg-[#F8FAFC] p-8 text-center">
-              <p className="text-xl font-semibold text-[#10213A]">Selecciona una notificación</p>
-              <p className="mt-3 text-sm text-[#64748B]">Haz clic en "Ver" para ver todo el detalle de la notificación.</p>
-              <button
-                type="button"
-                onClick={handleViewAll}
-                className="mt-6 rounded-full bg-[#2F6BFF] px-5 py-3 text-sm font-semibold text-white transition hover:bg-[#2358d8]"
-              >
-                Volver a todas
-              </button>
-            </div>
-          )}
-        </aside>
+            ) : (
+              <div className="flex h-full min-h-[200px] flex-col items-center justify-center rounded-xl border border-dashed border-slate-300 bg-slate-50 p-8 text-center dark:border-slate-700 dark:bg-slate-800/50">
+                <p className="text-section-title">Selecciona una notificación</p>
+                <p className="mt-2 text-subtitle">Haz clic en "Ver" para ver el detalle.</p>
+                <button type="button" onClick={handleViewAll} className="mt-4 btn-secondary">
+                  Volver a todas
+                </button>
+              </div>
+            )}
+          </aside>
 
-        {/* Settings card */}
-        <aside className="space-y-7">
-          <section className="rounded-xl border border-[#CBD5E1] bg-white p-6 shadow-sm">
-            <h2 className="text-[18px] font-semibold text-[#10213A]">
-              Preferencias
-            </h2>
-
-            <div className="mt-6 space-y-5">
+          {/* Preferencias */}
+          <section className="admin-card-padded">
+            <h2 className="text-section-title">Preferencias</h2>
+            <div className="mt-4 space-y-4">
               <PreferenceRow title="Citas" enabled />
               <PreferenceRow title="Vacunas" enabled />
               <PreferenceRow title="Pagos" enabled={false} />
@@ -264,18 +209,15 @@ export default function NotificacionesPage() {
             </div>
           </section>
 
-          <section className="rounded-xl border border-[#CBD5E1] bg-white p-6 shadow-sm">
-            <h2 className="text-[18px] font-semibold text-[#10213A]">
-              Resumen
-            </h2>
-
-            <div className="mt-5 space-y-4">
+          <section className="admin-card-padded">
+            <h2 className="text-section-title">Resumen</h2>
+            <div className="mt-4 space-y-3">
               <SummaryLine label="Notificaciones nuevas" value="2" />
               <SummaryLine label="Esta semana" value="5" />
               <SummaryLine label="Recordatorios activos" value="3" />
             </div>
           </section>
-        </aside>
+        </div>
       </div>
     </div>
   );
@@ -291,41 +233,27 @@ function SummaryCard({
   icon: React.ReactNode;
 }) {
   return (
-    <article className="flex h-[86px] items-center justify-between rounded-xl border border-[#CBD5E1] bg-white px-5 shadow-sm">
+    <article className="admin-card flex items-center justify-between px-5 py-4">
       <div>
-        <p className="text-[13px] leading-none text-[#64748B]">{title}</p>
-        <h3 className="mt-3 text-[22px] font-semibold leading-none text-[#10213A]">
-          {value}
-        </h3>
+        <p className="text-label">{title}</p>
+        <h3 className="mt-2 text-2xl font-bold text-slate-900 dark:text-white">{value}</h3>
       </div>
-
-      <div className="flex h-11 w-11 items-center justify-center rounded-lg bg-[#DBEAFE] text-[#2563EB]">
+      <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-brand-50 text-brand-600 dark:bg-brand-900/30 dark:text-brand-400">
         {icon}
       </div>
     </article>
   );
 }
 
-function PreferenceRow({
-  title,
-  enabled,
-}: {
-  title: string;
-  enabled: boolean;
-}) {
+function PreferenceRow({ title, enabled }: { title: string; enabled: boolean }) {
   return (
     <div className="flex items-center justify-between gap-4">
-      <p className="text-[15px] font-semibold text-[#10213A]">{title}</p>
-
+      <p className="text-sm font-semibold text-slate-900 dark:text-white">{title}</p>
       <button
-        className={`relative h-[24px] w-[44px] rounded-full transition ${
-          enabled ? "bg-[#2F6BFF]" : "bg-[#94A3B8]"
-        }`}
+        className={`relative h-6 w-11 rounded-full transition ${enabled ? "bg-brand-600" : "bg-slate-300 dark:bg-slate-600"}`}
       >
         <span
-          className={`absolute top-[2px] h-[20px] w-[20px] rounded-full bg-white shadow-sm transition ${
-            enabled ? "left-[22px]" : "left-[2px]"
-          }`}
+          className={`absolute top-[2px] h-5 w-5 rounded-full bg-white shadow-xs transition ${enabled ? "left-[22px]" : "left-[2px]"}`}
         />
       </button>
     </div>
@@ -334,9 +262,9 @@ function PreferenceRow({
 
 function SummaryLine({ label, value }: { label: string; value: string }) {
   return (
-    <div className="flex items-center justify-between border-b border-[#E2E8F0] pb-3 last:border-b-0 last:pb-0">
-      <span className="text-[14px] text-[#64748B]">{label}</span>
-      <span className="text-[15px] font-semibold text-[#10213A]">{value}</span>
+    <div className="flex items-center justify-between border-b border-slate-200 pb-3 last:border-b-0 last:pb-0 dark:border-slate-700">
+      <span className="text-sm text-slate-500 dark:text-slate-400">{label}</span>
+      <span className="text-sm font-semibold text-slate-900 dark:text-white">{value}</span>
     </div>
   );
 }

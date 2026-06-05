@@ -1,11 +1,13 @@
 "use client";
 
 import Link from "next/link";
-import { type ReactNode, useEffect, useMemo, useState } from "react";
+import { useSearchParams } from "next/navigation";
+import { type ReactNode, useEffect, useMemo, useState, Suspense } from "react";
+import { motion } from "framer-motion";
 import { getCurrentUser } from "../../../lib/auth";
-import { fetchCitas } from "../../../lib/api/citas";
-import { updateCitaEstado } from "../../../lib/api/citas";
+import { fetchCitas, updateCitaEstado } from "../../../lib/api/citas";
 import type { Appointment } from "../../../lib/recepcionista/types";
+import { getStatusStyle } from "../../../lib/utils/status";
 
 
 type EstadoCita = "Confirmada" | "Pendiente" | "Completada" | "Cancelada";
@@ -52,11 +54,27 @@ function appointmentToCita(a: Appointment): Cita {
 }
 
 export default function AgendarPage() {
+  return (
+    <Suspense fallback={
+      <div className="flex h-full items-center justify-center bg-slate-50 dark:bg-slate-950">
+        <p className="text-sm text-slate-500 dark:text-slate-400">Cargando citas...</p>
+      </div>
+    }>
+      <AgendarContent />
+    </Suspense>
+  );
+}
+
+function AgendarContent() {
+  const searchParams = useSearchParams();
+  const solicitudEnviada = searchParams.get("solicitud") === "enviada";
+
   const [citas, setCitas] = useState<Cita[]>([]);
   const [busqueda, setBusqueda] = useState("");
   const [filtro, setFiltro] = useState<FiltroCita>("todas");
   const [citaSeleccionada, setCitaSeleccionada] = useState<Cita | null>(null);
   const [cargado, setCargado] = useState(false);
+  const [bannerVisible, setBannerVisible] = useState(solicitudEnviada);
 
   const cargarCitas = async () => {
     const user = getCurrentUser();
@@ -133,65 +151,76 @@ export default function AgendarPage() {
 
   if (!cargado) {
     return (
-      <div className="flex h-full items-center justify-center bg-[#F5F7FB] dark:bg-[#0F172A]">
-        <p className="text-[15px] text-[#64748B] dark:text-[#94A3B8]">
-          Cargando citas...
-        </p>
+      <div className="flex h-full items-center justify-center bg-slate-50 dark:bg-slate-950">
+        <p className="text-sm text-slate-500 dark:text-slate-400">Cargando citas...</p>
       </div>
     );
   }
 
   return (
-    <div className="h-full overflow-y-auto bg-[#F5F7FB] px-6 py-8 dark:bg-[#0F172A]">
+    <div className="h-full overflow-y-auto admin-page">
+
+      {/* Banner de solicitud enviada */}
+      {bannerVisible && (
+        <div className="mb-6 flex items-start justify-between gap-4 rounded-xl border border-emerald-200 bg-emerald-50 px-5 py-4 dark:border-emerald-800 dark:bg-emerald-950/30">
+          <div className="flex items-start gap-3">
+            <svg className="mt-0.5 h-5 w-5 shrink-0 text-[#15803D]" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <circle cx="12" cy="12" r="9" /><path d="m8 12 2.5 2.5L16 9" />
+            </svg>
+            <div>
+              <p className="text-sm font-semibold text-emerald-700 dark:text-emerald-300">
+                Solicitud enviada correctamente
+              </p>
+              <p className="mt-1 text-sm leading-6 text-emerald-700 dark:text-emerald-300">
+                Tu cita quedó registrada como <strong>Pendiente</strong>. La clínica la revisará y te notificará cuando sea confirmada.
+              </p>
+            </div>
+          </div>
+          <button
+            type="button"
+            onClick={() => setBannerVisible(false)}
+            className="shrink-0 text-lg font-semibold text-emerald-700 dark:text-emerald-300"
+            aria-label="Cerrar"
+          >
+            ×
+          </button>
+        </div>
+      )}
+
       {/* Encabezado */}
       <div className="mb-8 flex flex-col justify-between gap-5 sm:flex-row sm:items-start">
         <div>
-          <h1 className="text-[24px] font-semibold leading-none text-[#10213A] dark:text-white">
-            Mis citas
-          </h1>
-
-          <p className="mt-4 text-[16px] text-[#64748B] dark:text-[#94A3B8]">
-            Consulta y administra las citas programadas para tus mascotas
-          </p>
+          <h1 className="text-page-title">Mis citas</h1>
+          <p className="mt-2 text-subtitle">Consulta y administra las citas programadas para tus mascotas</p>
         </div>
-
-        <Link
-          href="/cliente/agendar/nueva"
-          className="inline-flex h-[46px] items-center justify-center gap-2 rounded-xl bg-[#2F6BFF] px-5 text-[15px] font-semibold text-white shadow-sm transition-all duration-300 hover:-translate-y-0.5 hover:bg-[#2457D6] hover:shadow-[0_10px_20px_rgba(47,107,255,0.28)]"
-        >
+        <Link href="/cliente/agendar/nueva" className="btn-primary whitespace-nowrap">
           <PlusIcon />
           Nueva cita
         </Link>
       </div>
 
       {/* Tarjetas de resumen */}
-      <div className="mb-7 grid grid-cols-1 gap-5 md:grid-cols-3">
-        <SummaryCard
-          title="Próximas citas"
-          value={totalProximas}
-          description="Citas por atender"
-          icon={<CalendarIcon />}
-        />
-
-        <SummaryCard
-          title="Confirmadas"
-          value={totalConfirmadas}
-          description="Horario confirmado"
-          icon={<CalendarCheckIcon />}
-        />
-
-        <SummaryCard
-          title="Pendientes"
-          value={totalPendientes}
-          description="En espera de confirmación"
-          icon={<ClockIcon />}
-        />
+      <div className="mb-6 grid grid-cols-1 gap-4 md:grid-cols-3">
+        {[
+          { title: "Próximas citas", value: totalProximas, desc: "Citas por atender", icon: <CalendarIcon />, accent: "bg-brand-500" },
+          { title: "Confirmadas", value: totalConfirmadas, desc: "Horario confirmado", icon: <CalendarCheckIcon />, accent: "bg-emerald-500" },
+          { title: "Pendientes", value: totalPendientes, desc: "En espera de confirmación", icon: <ClockIcon />, accent: "bg-amber-500" },
+        ].map((s, i) => (
+          <motion.div
+            key={s.title}
+            initial={{ opacity: 0, y: 16 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.35, delay: i * 0.07 }}
+          >
+            <SummaryCard title={s.title} value={s.value} description={s.desc} icon={s.icon} accent={s.accent} />
+          </motion.div>
+        ))}
       </div>
 
       {/* Buscador y filtros */}
-      <section className="mb-7 rounded-xl border border-[#CBD5E1] bg-white p-4 shadow-sm dark:border-[#334155] dark:bg-[#111827]">
+      <section className="admin-card mb-6 p-4">
         <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
-          <div className="flex h-[46px] flex-1 items-center gap-3 rounded-xl border border-[#CBD5E1] bg-white px-4 transition-all focus-within:border-[#2F6BFF] focus-within:ring-2 focus-within:ring-[#2F6BFF]/10 dark:border-[#334155] dark:bg-[#0F172A]">
+          <div className="flex h-[46px] flex-1 items-center gap-3 rounded-xl border border-slate-200 bg-white px-4 transition-all focus-within:border-brand-400 focus-within:ring-2 focus-within:ring-brand-400/10 dark:border-slate-700 dark:bg-slate-900">
             <SearchIcon />
 
             <input
@@ -199,7 +228,7 @@ export default function AgendarPage() {
               value={busqueda}
               onChange={(event) => setBusqueda(event.target.value)}
               placeholder="Buscar por mascota, servicio o veterinario..."
-              className="w-full bg-transparent text-[15px] text-[#10213A] outline-none placeholder:text-[#94A3B8] dark:text-white"
+              className="w-full bg-transparent text-sm text-slate-900 outline-none placeholder:text-slate-400 dark:text-white"
             />
 
             {busqueda && (
@@ -207,7 +236,7 @@ export default function AgendarPage() {
                 type="button"
                 onClick={() => setBusqueda("")}
                 aria-label="Limpiar búsqueda"
-                className="text-[#94A3B8] transition-colors hover:text-[#2F6BFF]"
+                className="text-slate-400 transition-colors hover:text-brand-600"
               >
                 <CloseIcon />
               </button>
@@ -248,14 +277,10 @@ export default function AgendarPage() {
 
       {/* Listado de citas */}
       <section>
-        <div className="mb-5 flex items-center justify-between">
-          <h2 className="text-[18px] font-semibold text-[#10213A] dark:text-white">
-            Citas programadas
-          </h2>
-
-          <p className="text-[14px] text-[#64748B] dark:text-[#94A3B8]">
-            {citasFiltradas.length}{" "}
-            {citasFiltradas.length === 1 ? "resultado" : "resultados"}
+        <div className="mb-4 flex items-center justify-between">
+          <h2 className="text-section-title">Citas programadas</h2>
+          <p className="text-sm text-slate-500 dark:text-slate-400">
+            {citasFiltradas.length} {citasFiltradas.length === 1 ? "resultado" : "resultados"}
           </p>
         </div>
 
@@ -264,11 +289,11 @@ export default function AgendarPage() {
             {citasFiltradas.map((cita) => (
               <article
                 key={cita.id}
-                className="rounded-xl border border-[#CBD5E1] bg-white p-5 shadow-sm transition-all duration-300 hover:border-[#2F6BFF]/50 hover:shadow-[0_12px_26px_rgba(15,23,42,0.08)] dark:border-[#334155] dark:bg-[#111827] dark:hover:border-[#2F6BFF]"
+                className="admin-card p-5 transition-all duration-200 hover:-translate-y-0.5 hover:shadow-card-hover"
               >
                 <div className="flex flex-col gap-5 xl:flex-row xl:items-center xl:justify-between">
                   <div className="flex flex-col gap-5 sm:flex-row sm:items-center">
-                    <div className="flex h-[92px] w-[92px] shrink-0 flex-col items-center justify-center rounded-xl bg-[#E9F1FF] text-[#2F6BFF] dark:bg-[#1E3A8A] dark:text-[#93C5FD]">
+                    <div className="flex h-[92px] w-[92px] shrink-0 flex-col items-center justify-center rounded-xl bg-brand-50 text-brand-600 dark:bg-brand-900/30 dark:text-brand-400">
                       <span className="text-[28px] font-bold leading-none">
                         {cita.fechaCorta}
                       </span>
@@ -280,18 +305,18 @@ export default function AgendarPage() {
 
                     <div>
                       <div className="flex flex-wrap items-center gap-3">
-                        <h3 className="text-[20px] font-semibold text-[#10213A] dark:text-white">
+                        <h3 className="text-lg font-semibold text-slate-900 dark:text-white">
                           {cita.mascota}
                         </h3>
 
                         <StatusBadge estado={cita.estado} />
                       </div>
 
-                      <p className="mt-3 text-[15px] text-[#52698A] dark:text-[#94A3B8]">
+                      <p className="mt-2 text-sm text-slate-500 dark:text-slate-400">
                         {cita.especie}
                       </p>
 
-                      <div className="mt-5 flex flex-wrap gap-x-7 gap-y-3 text-[14px] text-[#52698A] dark:text-[#94A3B8]">
+                      <div className="mt-4 flex flex-wrap gap-x-6 gap-y-2 text-sm text-slate-500 dark:text-slate-400">
                         <DetailItem
                           icon={<MedicalIcon />}
                           text={cita.servicio}
@@ -310,11 +335,11 @@ export default function AgendarPage() {
                     </div>
                   </div>
 
-                  <div className="flex flex-col gap-3 border-t border-[#E2E8F0] pt-5 sm:flex-row xl:border-l xl:border-t-0 xl:pl-8 xl:pt-0 dark:border-[#334155]">
+                  <div className="flex flex-col gap-3 border-t border-slate-200 pt-5 sm:flex-row xl:border-l xl:border-t-0 xl:pl-8 xl:pt-0 dark:border-slate-700">
                     <button
                       type="button"
                       onClick={() => setCitaSeleccionada(cita)}
-                      className="inline-flex h-[48px] items-center justify-center rounded-xl border border-[#CBD5E1] bg-white px-6 text-[14px] font-semibold text-[#10213A] transition-all hover:border-[#2F6BFF] hover:text-[#2F6BFF] dark:border-[#334155] dark:bg-[#0F172A] dark:text-white dark:hover:border-[#2F6BFF] dark:hover:text-[#60A5FA]"
+                      className="btn-secondary"
                     >
                       Ver detalle
                     </button>
@@ -324,7 +349,7 @@ export default function AgendarPage() {
                         <button
                           type="button"
                           onClick={() => cancelarCita(cita.id)}
-                          className="inline-flex h-[48px] items-center justify-center rounded-xl border border-[#F1CDD1] bg-white px-6 text-[14px] font-semibold text-[#DC3545] transition-all hover:bg-[#FFF2F3] dark:border-[#67333B] dark:bg-[#0F172A] dark:hover:bg-[#28171B]"
+                          className="btn-danger"
                         >
                           Cancelar cita
                         </button>
@@ -332,11 +357,9 @@ export default function AgendarPage() {
                   </div>
                 </div>
 
-                <div className="mt-6 rounded-xl bg-[#F8FAFD] px-4 py-4 text-[14px] text-[#52698A] dark:bg-[#0F172A] dark:text-[#94A3B8]">
-                  <span className="font-semibold text-[#10213A] dark:text-white">
-                    Motivo:
-                  </span>{" "}
-                  {cita.motivo}
+                <div className="mt-5 rounded-xl bg-slate-50 px-4 py-3 text-sm text-slate-500 dark:bg-slate-800/60 dark:text-slate-400">
+                  <span className="font-semibold text-slate-700 dark:text-slate-200">Motivo:</span>{" "}
+                  {cita.motivo || "Sin motivo registrado"}
                 </div>
               </article>
             ))}
@@ -395,23 +418,23 @@ function DetalleCitaModal({
         aria-modal="true"
         aria-labelledby="titulo-detalle-cita"
         onClick={(event) => event.stopPropagation()}
-        className="max-h-full w-full max-w-[680px] overflow-y-auto rounded-2xl border border-[#CBD5E1] bg-white shadow-[0_22px_55px_rgba(15,23,42,0.30)] dark:border-[#334155] dark:bg-[#111827]"
+        className="max-h-full w-full max-w-[680px] overflow-y-auto rounded-2xl border border-slate-200 bg-white shadow-modal dark:border-slate-700 dark:bg-slate-900"
       >
-        <div className="flex items-start justify-between border-b border-[#E2E8F0] px-7 py-6 dark:border-[#334155]">
+        <div className="flex items-start justify-between border-b border-slate-200 px-7 py-6 dark:border-slate-700">
           <div className="flex items-start gap-4">
-            <div className="flex h-[52px] w-[52px] shrink-0 items-center justify-center rounded-xl bg-[#DBEAFE] text-[#2563EB] dark:bg-[#1E3A8A] dark:text-[#93C5FD]">
+            <div className="flex h-[52px] w-[52px] shrink-0 items-center justify-center rounded-xl bg-brand-50 text-brand-600 dark:bg-brand-900/30 dark:text-brand-400">
               <CalendarIcon />
             </div>
 
             <div>
               <h2
                 id="titulo-detalle-cita"
-                className="text-[21px] font-semibold text-[#10213A] dark:text-white"
+                className="text-section-title text-xl"
               >
                 Detalle de la cita
               </h2>
 
-              <p className="mt-1 text-[14px] text-[#64748B] dark:text-[#94A3B8]">
+              <p className="mt-1 text-subtitle">
                 Información completa de la atención programada
               </p>
             </div>
@@ -421,85 +444,69 @@ function DetalleCitaModal({
             type="button"
             onClick={onClose}
             aria-label="Cerrar detalle"
-            className="flex h-[38px] w-[38px] items-center justify-center rounded-lg text-[#64748B] transition-colors hover:bg-[#F1F5F9] hover:text-[#10213A] dark:text-[#94A3B8] dark:hover:bg-[#1E293B] dark:hover:text-white"
+            className="flex h-9 w-9 items-center justify-center rounded-lg text-slate-400 transition-colors hover:bg-slate-100 hover:text-slate-700 dark:hover:bg-slate-800 dark:hover:text-white"
           >
             <CloseIcon />
           </button>
         </div>
 
         <div className="px-7 py-6">
-          <div className="flex flex-col justify-between gap-4 rounded-xl bg-[#F5F7FB] p-5 sm:flex-row sm:items-center dark:bg-[#0F172A]">
+          <div className="flex flex-col justify-between gap-4 rounded-xl bg-slate-50 p-5 sm:flex-row sm:items-center dark:bg-slate-800/50">
             <div>
-              <p className="text-[13px] font-medium text-[#64748B] dark:text-[#94A3B8]">
-                Mascota
-              </p>
-
-              <h3 className="mt-2 text-[22px] font-semibold text-[#10213A] dark:text-white">
-                {cita.mascota}
-              </h3>
-
-              <p className="mt-2 text-[14px] text-[#52698A] dark:text-[#94A3B8]">
-                {cita.especie}
-              </p>
+              <p className="text-label">Mascota</p>
+              <h3 className="mt-2 text-xl font-semibold text-slate-900 dark:text-white">{cita.mascota}</h3>
+              <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">{cita.especie}</p>
             </div>
 
             <StatusBadge estado={cita.estado} />
           </div>
 
-          <div className="mt-6 grid grid-cols-1 gap-4 sm:grid-cols-2">
-            <ModalInfoItem
-              label="Fecha"
-              value={cita.fecha}
-              icon={<CalendarSmallIcon />}
-            />
-
-            <ModalInfoItem
-              label="Hora"
-              value={cita.hora}
-              icon={<ClockSmallIcon />}
-            />
-
-            <ModalInfoItem
-              label="Tipo de atención"
-              value={cita.servicio}
-              icon={<MedicalIcon />}
-            />
-
-            <ModalInfoItem
-              label="Veterinario"
-              value={cita.veterinario}
-              icon={<UserIcon />}
-            />
+          <div className="mt-5 grid grid-cols-1 gap-3 sm:grid-cols-2">
+            <ModalInfoItem label="Fecha"          value={cita.fecha}      icon={<CalendarSmallIcon />} />
+            <ModalInfoItem label="Hora"           value={cita.hora}       icon={<ClockSmallIcon />} />
+            <ModalInfoItem label="Tipo de atención" value={cita.servicio} icon={<MedicalIcon />} />
+            <ModalInfoItem label="Veterinario"    value={cita.veterinario} icon={<UserIcon />} />
           </div>
 
-          <div className="mt-6 rounded-xl border border-[#E2E8F0] bg-white p-5 dark:border-[#334155] dark:bg-[#0F172A]">
-            <p className="text-[13px] font-medium text-[#64748B] dark:text-[#94A3B8]">
-              Motivo de la cita
-            </p>
-
-            <p className="mt-3 text-[15px] leading-6 text-[#10213A] dark:text-white">
-              {cita.motivo}
+          <div className="mt-5 rounded-xl border border-slate-200 bg-slate-50 p-4 dark:border-slate-700 dark:bg-slate-800/50">
+            <p className="text-label">Motivo de la cita</p>
+            <p className="mt-2 text-sm leading-6 text-slate-900 dark:text-white">
+              {cita.motivo || "Sin motivo registrado"}
             </p>
           </div>
+
+          {cita.estado === "Pendiente" && (
+            <div className="mt-4 flex items-start gap-3 rounded-xl border border-amber-200 bg-amber-50 px-4 py-4 dark:border-amber-800 dark:bg-amber-950/30">
+              <svg className="mt-0.5 h-5 w-5 shrink-0 text-amber-600" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round">
+                <circle cx="12" cy="12" r="9" /><path d="M12 8v4M12 16h.01" />
+              </svg>
+              <p className="text-sm leading-6 text-amber-700 dark:text-amber-300">
+                <strong>En revisión:</strong> tu solicitud fue recibida. La clínica la revisará y te confirmará el horario a la brevedad.
+              </p>
+            </div>
+          )}
+
+          {cita.estado === "Confirmada" && (
+            <div className="mt-4 flex items-start gap-3 rounded-xl border border-emerald-200 bg-emerald-50 px-4 py-4 dark:border-emerald-800 dark:bg-emerald-950/30">
+              <svg className="mt-0.5 h-5 w-5 shrink-0 text-emerald-600" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <circle cx="12" cy="12" r="9" /><path d="m8 12 2.5 2.5L16 9" />
+              </svg>
+              <p className="text-sm leading-6 text-emerald-700 dark:text-emerald-300">
+                <strong>Cita confirmada.</strong> Recuerda asistir a tiempo con tu mascota.
+              </p>
+            </div>
+          )}
         </div>
 
-        <div className="flex flex-col-reverse justify-end gap-3 border-t border-[#E2E8F0] px-7 py-5 sm:flex-row dark:border-[#334155]">
+        <div className="flex flex-col-reverse justify-end gap-3 border-t border-slate-200 px-7 py-5 sm:flex-row dark:border-slate-700">
           {cita.estado !== "Cancelada" &&
             cita.estado !== "Completada" && (
-              <button
-                type="button"
-                onClick={onCancel}
-                className="inline-flex h-[45px] items-center justify-center rounded-xl border border-[#F1CDD1] bg-white px-6 text-[15px] font-semibold text-[#DC3545] transition-all hover:bg-[#FFF2F3] dark:border-[#67333B] dark:bg-[#0F172A] dark:hover:bg-[#28171B]"
-              >
+              <button type="button" onClick={onCancel} className="btn-danger">
                 Cancelar cita
               </button>
             )}
 
-          <button
-            type="button"
-            onClick={onClose}
-            className="inline-flex h-[45px] items-center justify-center rounded-xl bg-[#2F6BFF] px-7 text-[15px] font-semibold text-white transition-all hover:bg-[#2457D6]"
-          >
+          <button type="button" onClick={onClose} className="btn-primary">
             Cerrar
           </button>
         </div>
@@ -513,30 +520,24 @@ function SummaryCard({
   value,
   description,
   icon,
+  accent = "bg-brand-500",
 }: {
   title: string;
   value: number;
   description: string;
   icon: ReactNode;
+  accent?: string;
 }) {
   return (
-    <article className="rounded-xl border border-[#CBD5E1] bg-white p-5 shadow-sm dark:border-[#334155] dark:bg-[#111827]">
+    <article className="relative overflow-hidden admin-card p-5">
+      <div className={`absolute inset-y-0 left-0 w-1 rounded-l-2xl ${accent}`} />
       <div className="flex items-center justify-between">
         <div>
-          <p className="text-[14px] font-medium text-[#64748B] dark:text-[#94A3B8]">
-            {title}
-          </p>
-
-          <p className="mt-3 text-[30px] font-semibold leading-none text-[#10213A] dark:text-white">
-            {value}
-          </p>
-
-          <p className="mt-3 text-[13px] text-[#64748B] dark:text-[#94A3B8]">
-            {description}
-          </p>
+          <p className="text-label">{title}</p>
+          <p className="mt-2 text-stat text-slate-900 dark:text-white">{value}</p>
+          <p className="mt-2 text-xs text-slate-500 dark:text-slate-400">{description}</p>
         </div>
-
-        <div className="flex h-[52px] w-[52px] items-center justify-center rounded-xl bg-[#DBEAFE] text-[#2563EB] dark:bg-[#1E3A8A] dark:text-[#93C5FD]">
+        <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-brand-50 text-brand-600 dark:bg-brand-900/30 dark:text-brand-400">
           {icon}
         </div>
       </div>
@@ -557,10 +558,10 @@ function FilterButton({
     <button
       type="button"
       onClick={onClick}
-      className={`h-[42px] rounded-xl px-4 text-[14px] font-semibold transition-all ${
+      className={`rounded-xl px-4 py-2 text-sm font-semibold transition-all ${
         active
-          ? "bg-[#2F6BFF] text-white"
-          : "border border-[#CBD5E1] bg-white text-[#52698A] hover:border-[#2F6BFF] hover:text-[#2F6BFF] dark:border-[#334155] dark:bg-[#0F172A] dark:text-[#94A3B8] dark:hover:border-[#2F6BFF] dark:hover:text-[#60A5FA]"
+          ? "bg-brand-600 text-white shadow-brand-sm"
+          : "border border-slate-200 bg-white text-slate-600 hover:border-brand-300 hover:text-brand-600 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-400 dark:hover:border-brand-600 dark:hover:text-brand-400"
       }`}
     >
       {children}
@@ -569,22 +570,12 @@ function FilterButton({
 }
 
 function StatusBadge({ estado }: { estado: EstadoCita }) {
-  const estilos: Record<EstadoCita, string> = {
-    Confirmada:
-      "bg-[#DDF5DE] text-[#008B35] dark:bg-[#123B22] dark:text-[#86EFAC]",
-    Pendiente:
-      "bg-[#FFF1CC] text-[#9A6700] dark:bg-[#4A3412] dark:text-[#FACC15]",
-    Completada:
-      "bg-[#DBEAFE] text-[#2563EB] dark:bg-[#1E3A8A] dark:text-[#93C5FD]",
-    Cancelada:
-      "bg-[#FFE1E4] text-[#DC3545] dark:bg-[#432027] dark:text-[#FDA4AF]",
-  };
-
+  const label = estado === "Pendiente" ? "Pendiente" : estado;
+  const style = getStatusStyle(estado);
   return (
-    <span
-      className={`inline-flex rounded-full px-3 py-[5px] text-[12px] font-semibold leading-none ${estilos[estado]}`}
-    >
-      {estado}
+    <span className={`inline-flex items-center gap-1.5 rounded-full px-2.5 py-0.5 text-xs font-semibold ${style.badge}`}>
+      <span className={`h-1.5 w-1.5 shrink-0 rounded-full ${style.dot}`} />
+      {label}
     </span>
   );
 }
@@ -604,29 +595,15 @@ function DetailItem({
   );
 }
 
-function ModalInfoItem({
-  label,
-  value,
-  icon,
-}: {
-  label: string;
-  value: string;
-  icon: ReactNode;
-}) {
+function ModalInfoItem({ label, value, icon }: { label: string; value: string; icon: ReactNode }) {
   return (
-    <div className="flex items-start gap-3 rounded-xl border border-[#E2E8F0] p-4 dark:border-[#334155]">
-      <div className="flex h-[39px] w-[39px] shrink-0 items-center justify-center rounded-lg bg-[#DBEAFE] text-[#2563EB] dark:bg-[#1E3A8A] dark:text-[#93C5FD]">
+    <div className="flex items-start gap-3 rounded-xl border border-slate-200 p-4 dark:border-slate-700">
+      <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-brand-50 text-brand-600 dark:bg-brand-900/30 dark:text-brand-400">
         {icon}
       </div>
-
       <div>
-        <p className="text-[12px] text-[#64748B] dark:text-[#94A3B8]">
-          {label}
-        </p>
-
-        <p className="mt-1 text-[14px] font-semibold text-[#10213A] dark:text-white">
-          {value}
-        </p>
+        <p className="text-label">{label}</p>
+        <p className="mt-1 text-sm font-semibold text-slate-900 dark:text-white">{value}</p>
       </div>
     </div>
   );
@@ -634,25 +611,15 @@ function ModalInfoItem({
 
 function EmptyState({ onReset }: { onReset: () => void }) {
   return (
-    <div className="flex min-h-[285px] flex-col items-center justify-center rounded-xl border border-dashed border-[#CBD5E1] bg-white px-6 text-center shadow-sm dark:border-[#334155] dark:bg-[#111827]">
-      <div className="mb-5 flex h-[68px] w-[68px] items-center justify-center rounded-full bg-[#DBEAFE] text-[#2563EB] dark:bg-[#1E3A8A] dark:text-[#93C5FD]">
+    <div className="flex min-h-[260px] flex-col items-center justify-center rounded-2xl border border-dashed border-slate-300 bg-white px-6 text-center shadow-xs dark:border-slate-700 dark:bg-slate-900">
+      <div className="mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-brand-50 text-brand-600 dark:bg-brand-900/30 dark:text-brand-400">
         <CalendarEmptyIcon />
       </div>
-
-      <h3 className="text-[19px] font-semibold text-[#10213A] dark:text-white">
-        No se encontraron citas
-      </h3>
-
-      <p className="mt-3 max-w-[400px] text-[14px] leading-6 text-[#64748B] dark:text-[#94A3B8]">
-        No hay citas que coincidan con la búsqueda o con el filtro
-        seleccionado.
+      <h3 className="text-section-title">No se encontraron citas</h3>
+      <p className="mt-2 max-w-sm text-sm text-slate-500 dark:text-slate-400">
+        No hay citas que coincidan con la búsqueda o filtro seleccionado.
       </p>
-
-      <button
-        type="button"
-        onClick={onReset}
-        className="mt-6 inline-flex h-[44px] items-center rounded-xl border border-[#CBD5E1] bg-white px-5 text-[14px] font-semibold text-[#10213A] transition-all hover:border-[#2F6BFF] hover:text-[#2F6BFF] dark:border-[#334155] dark:bg-[#0F172A] dark:text-white dark:hover:border-[#2F6BFF] dark:hover:text-[#60A5FA]"
-      >
+      <button type="button" onClick={onReset} className="mt-5 btn-secondary">
         Limpiar filtros
       </button>
     </div>

@@ -2,6 +2,7 @@
 
 import Image from "next/image";
 import { useEffect, useState } from "react";
+import { getCurrentUser } from "@/lib/auth";
 
 const PROFILE_STORAGE_KEY = "vetnova_cliente_perfil";
 
@@ -17,23 +18,22 @@ type AvatarClienteProps = {
   size?: AvatarSize;
 };
 
-const perfilInicial: PerfilCliente = {
-  nombre: "Juan",
-  apellido: "Pérez",
-  foto: null,
-};
-
 export default function AvatarCliente({
   size = "medium",
 }: AvatarClienteProps) {
-  const [perfil, setPerfil] = useState<PerfilCliente>(perfilInicial);
+  const [perfil, setPerfil] = useState<PerfilCliente>({ nombre: "", apellido: "", foto: null });
 
   useEffect(() => {
     const cargarPerfil = () => {
+      const user = getCurrentUser();
+      const partes = (user?.name ?? "").trim().split(" ");
+      const nombreJWT = partes[0] ?? "";
+      const apellidoJWT = partes.slice(1).join(" ");
+
       const informacionGuardada = localStorage.getItem(PROFILE_STORAGE_KEY);
 
       if (!informacionGuardada) {
-        setPerfil(perfilInicial);
+        setPerfil({ nombre: nombreJWT, apellido: apellidoJWT, foto: null });
         return;
       }
 
@@ -41,13 +41,13 @@ export default function AvatarCliente({
         const datos = JSON.parse(informacionGuardada) as Partial<PerfilCliente>;
 
         setPerfil({
-          nombre: datos.nombre || "Juan",
-          apellido: datos.apellido || "Pérez",
+          nombre: datos.nombre || nombreJWT,
+          apellido: datos.apellido || apellidoJWT,
           foto: datos.foto || null,
         });
       } catch {
         localStorage.removeItem(PROFILE_STORAGE_KEY);
-        setPerfil(perfilInicial);
+        setPerfil({ nombre: nombreJWT, apellido: apellidoJWT, foto: null });
       }
     };
 
@@ -71,7 +71,7 @@ export default function AvatarCliente({
 
   return (
     <div
-      className={`relative flex shrink-0 items-center justify-center overflow-hidden rounded-full bg-[#2F6BFF] font-semibold text-white ${sizeClass}`}
+      className={`relative flex shrink-0 items-center justify-center overflow-hidden rounded-full bg-brand-600 font-semibold text-white ${sizeClass}`}
     >
       {perfil.foto ? (
         <Image

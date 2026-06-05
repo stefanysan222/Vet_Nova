@@ -1,6 +1,61 @@
+"use client";
+
 import Link from "next/link";
+import { useEffect, useState } from "react";
+import { getCurrentUser } from "@/lib/auth";
+import { fetchMascotas } from "@/lib/api/mascotas";
+import { fetchCitas } from "@/lib/api/citas";
+import type { Appointment, PetRecord } from "@/lib/recepcionista/types";
+
+type Stats = { mascotas: number; citas: number };
 
 export default function PerfilPage() {
+  const user = getCurrentUser();
+  const partes = (user?.name ?? "").trim().split(" ");
+  const nombre = partes[0] ?? "";
+  const apellido = partes.slice(1).join(" ");
+  const iniciales = `${nombre[0] ?? ""}${apellido[0] ?? ""}`.toUpperCase() || "U";
+  const email = user?.email ?? "";
+
+  const [stats, setStats] = useState<Stats>({ mascotas: 0, citas: 0 });
+  const [ultimaCita, setUltimaCita] = useState<Appointment | null>(null);
+  const [ultimaMascota, setUltimaMascota] = useState<PetRecord | null>(null);
+  const [perfilTelefono, setPerfilTelefono] = useState("");
+
+  useEffect(() => {
+    const stored = localStorage.getItem("vetnova_cliente_perfil");
+    if (stored) {
+      try {
+        const parsed = JSON.parse(stored);
+        setPerfilTelefono(parsed.telefono ?? "");
+      } catch {}
+    }
+
+    const uid = user?.id ? Number(user.id) : undefined;
+
+    Promise.all([
+      fetchMascotas(uid).catch(() => [] as PetRecord[]),
+      fetchCitas(uid).catch(() => [] as Appointment[]),
+    ]).then(([mascotas, citas]) => {
+      const citasActivas = citas.filter(
+        (c) => c.status !== "Cancelada" && c.status !== "Finalizada" && c.status !== "No asistió"
+      );
+      setStats({ mascotas: mascotas.length, citas: citasActivas.length });
+
+      const sorted = [...citas].sort((a, b) => {
+        const da = new Date(`${a.date}T${a.time}`).getTime();
+        const db = new Date(`${b.date}T${b.time}`).getTime();
+        return db - da;
+      });
+      setUltimaCita(sorted[0] ?? null);
+
+      const sortedMascotas = [...mascotas].sort((a, b) =>
+        (b.id ?? "").toString().localeCompare((a.id ?? "").toString())
+      );
+      setUltimaMascota(sortedMascotas[0] ?? null);
+    });
+  }, []);
+
   return (
     <div className="h-full overflow-y-auto bg-[#F5F7FB] px-6 py-8 dark:bg-[#0F172A]">
       <div className="mb-8">
@@ -15,12 +70,12 @@ export default function PerfilPage() {
       <div className="grid grid-cols-1 gap-7 xl:grid-cols-[0.75fr_1fr]">
         <section className="rounded-xl border border-[#CBD5E1] bg-white p-7 shadow-sm dark:border-[#334155] dark:bg-[#111827]">
           <div className="flex flex-col items-center text-center">
-            <div className="flex h-[92px] w-[92px] items-center justify-center rounded-full bg-[#2F6BFF] text-[36px] font-semibold text-white">
-              J
+            <div className="flex h-[92px] w-[92px] items-center justify-center rounded-full bg-brand-600 text-[36px] font-semibold text-white">
+              {iniciales}
             </div>
 
             <h2 className="mt-5 text-[24px] font-semibold text-[#10213A] dark:text-white">
-              Juan Pérez
+              {nombre} {apellido}
             </h2>
 
             <p className="mt-2 text-[15px] text-[#64748B] dark:text-[#94A3B8]">
@@ -33,25 +88,22 @@ export default function PerfilPage() {
           </div>
 
           <div className="mt-8 space-y-4 border-t border-[#E2E8F0] pt-6 dark:border-[#334155]">
-            <InfoRow label="Email" value="usuario@vetnova.com" />
-            <InfoRow label="Teléfono" value="+52 555 1234 5678" />
-            <InfoRow label="Ubicación" value="Ciudad de México" />
-            <InfoRow label="Miembro desde" value="Abril 2026" />
+            <InfoRow label="Email" value={email || "—"} />
+            <InfoRow label="Teléfono" value={perfilTelefono || "—"} />
           </div>
 
           <Link
             href="/cliente/configuracion"
-            className="mt-8 flex h-[45px] w-full items-center justify-center rounded-xl bg-[#2F6BFF] text-[15px] font-semibold text-white shadow-sm"
+            className="mt-8 flex h-[45px] w-full items-center justify-center rounded-xl bg-brand-600 text-[15px] font-semibold text-white shadow-sm hover:bg-brand-700 transition-colors"
           >
             Configuración del perfil
           </Link>
         </section>
 
         <section className="space-y-7">
-          <div className="grid grid-cols-1 gap-5 md:grid-cols-3">
-            <ProfileStat title="Mascotas" value="6" />
-            <ProfileStat title="Citas activas" value="2" />
-            <ProfileStat title="Notificaciones" value="3" />
+          <div className="grid grid-cols-1 gap-5 md:grid-cols-2">
+            <ProfileStat title="Mascotas" value={String(stats.mascotas)} />
+            <ProfileStat title="Citas activas" value={String(stats.citas)} />
           </div>
 
           <div className="rounded-xl border border-[#CBD5E1] bg-white p-7 shadow-sm dark:border-[#334155] dark:bg-[#111827]">
@@ -60,18 +112,29 @@ export default function PerfilPage() {
             </h3>
 
             <div className="mt-6 space-y-5">
-              <ActivityItem
-                title="Última cita registrada"
-                description="Consulta general de Max · 09:00 AM"
-              />
-              <ActivityItem
-                title="Mascota más reciente"
-                description="Mia · Gato Angora · Registrada el 01 May 2026"
-              />
-              <ActivityItem
-                title="Última notificación"
-                description="Recordatorio de vacunación pendiente para Luna"
-              />
+              {ultimaCita ? (
+                <ActivityItem
+                  title="Última cita registrada"
+                  description={`${ultimaCita.petName ?? "Mascota"} · ${ultimaCita.date} ${ultimaCita.time}`}
+                />
+              ) : (
+                <ActivityItem
+                  title="Citas"
+                  description="Sin citas registradas aún"
+                />
+              )}
+
+              {ultimaMascota ? (
+                <ActivityItem
+                  title="Mascota más reciente"
+                  description={`${ultimaMascota.nombre} · ${ultimaMascota.especie}`}
+                />
+              ) : (
+                <ActivityItem
+                  title="Mascotas"
+                  description="Sin mascotas registradas aún"
+                />
+              )}
             </div>
           </div>
 

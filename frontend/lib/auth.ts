@@ -1,4 +1,4 @@
-export type UserRole = "Administrador" | "Veterinario" | "Cliente" | "Recepcionista";
+export type UserRole = "Administrador" | "Veterinario" | "Cliente";
 
 export interface AuthUser {
   id: number;
@@ -26,6 +26,7 @@ export function setToken(token: string) {
 export function clearCurrentUser() {
   if (!isBrowser()) return;
   localStorage.removeItem(TOKEN_KEY);
+  localStorage.removeItem("vetnova_cliente_perfil");
 }
 
 function decodeToken(token: string): { sub: number; name: string; email: string; role: UserRole; exp: number } | null {

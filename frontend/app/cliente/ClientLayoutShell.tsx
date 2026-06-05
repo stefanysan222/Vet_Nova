@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { useEffect, useState, type ReactNode } from "react";
+import { AnimatePresence, motion } from "framer-motion";
 import AvatarCliente from "./AvatarCliente";
 import BuscadorCliente from "./BuscadorCliente";
 import { getCurrentUser, clearCurrentUser } from "../../lib/auth";
@@ -39,7 +40,6 @@ export default function ClientLayoutShell({
       const routes: Record<string, string> = {
         Administrador: "/admin",
         Veterinario: "/veterinario",
-        Recepcionista: "/recepcionista",
       };
       router.replace(routes[user.role] ?? "/login");
       return;
@@ -378,7 +378,20 @@ export default function ClientLayoutShell({
           </header>
 
           {/* Página activa */}
-          <div className="h-[calc(100vh-64px)] overflow-hidden">{children}</div>
+          <div className="h-[calc(100vh-64px)] overflow-hidden">
+            <AnimatePresence mode="wait" initial={false}>
+              <motion.div
+                key={pathname}
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -6 }}
+                transition={{ duration: 0.22, ease: [0.25, 0.1, 0.25, 1] }}
+                className="h-full"
+              >
+                {children}
+              </motion.div>
+            </AnimatePresence>
+          </div>
         </section>
       </div>
     </main>
@@ -401,8 +414,8 @@ function SidebarItem({
       href={href}
       className={`mb-2 flex h-[44px] items-center gap-3 rounded-xl px-4 text-[15px] font-semibold transition-all ${
         active
-          ? "bg-[#2F6BFF] text-white"
-          : "text-[#10213A] hover:bg-[#F1F5F9] dark:text-white dark:hover:bg-[#1E293B]"
+          ? "bg-brand-600 text-white shadow-brand-sm"
+          : "text-slate-700 hover:bg-slate-100 dark:text-white dark:hover:bg-slate-800"
       }`}
     >
       {icon}

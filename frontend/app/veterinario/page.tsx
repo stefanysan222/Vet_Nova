@@ -1,107 +1,86 @@
+"use client";
+
 import Link from "next/link";
+import { useEffect, useState } from "react";
+import { getCurrentUser } from "../../lib/auth";
+import { fetchCitas } from "../../lib/api/citas";
+import type { Appointment } from "../../lib/recepcionista/types";
+import { getStatusStyle } from "../../lib/utils/status";
 
-const stats = [
-  {
-    title: "Citas de hoy",
-    value: "12",
-    description: "Agenda programada",
-  },
-  {
-    title: "Pacientes atendidos",
-    value: "5",
-    description: "Consultas completadas hoy",
-  },
-  {
-    title: "Consultas pendientes",
-    value: "7",
-    description: "Pacientes por valorar",
-  },
-  {
-    title: "Tratamientos registrados",
-    value: "4",
-    description: "Actualizados hoy",
-  },
-];
+function fechaHoy(): string {
+  return new Date().toISOString().slice(0, 10);
+}
 
-const agendaDiaria = [
-  {
-    hora: "08:00",
-    mascota: "Toby",
-    especie: "Canino",
-    propietario: "Laura Gómez",
-    motivo: "Control general",
-    estado: "Atendida",
-    badge: "bg-[#DCFCE7] text-[#15803D]",
-  },
-  {
-    hora: "09:00",
-    mascota: "Max",
-    especie: "Canino",
-    propietario: "Juan Pérez",
-    motivo: "Consulta general",
-    estado: "En consulta",
-    badge: "bg-[#DBEAFE] text-[#2563EB]",
-  },
-  {
-    hora: "10:30",
-    mascota: "Luna",
-    especie: "Felino",
-    propietario: "María García",
-    motivo: "Vacunación",
-    estado: "Pendiente",
-    badge: "bg-[#FEF3C7] text-[#B45309]",
-  },
-  {
-    hora: "14:00",
-    mascota: "Bella",
-    especie: "Canino",
-    propietario: "Ana Martínez",
-    motivo: "Control postoperatorio",
-    estado: "Pendiente",
-    badge: "bg-[#FEF3C7] text-[#B45309]",
-  },
-];
-
-const pacientesAtendidos = [
-  {
-    nombre: "Toby",
-    propietario: "Laura Gómez",
-    diagnostico: "Dermatitis leve",
-    tratamiento: "Medicamento tópico",
-    hora: "08:45",
-  },
-  {
-    nombre: "Rocky",
-    propietario: "Carlos López",
-    diagnostico: "Control postoperatorio",
-    tratamiento: "Curación y antibiótico",
-    hora: "Ayer",
-  },
-  {
-    nombre: "Mía",
-    propietario: "Sofía Torres",
-    diagnostico: "Gastroenteritis",
-    tratamiento: "Dieta blanda y control",
-    hora: "Ayer",
-  },
-];
+function parseNotas(raw: string | undefined): { diagnostico?: string; tratamiento?: string } {
+  if (!raw) return {};
+  try {
+    return JSON.parse(raw);
+  } catch {
+    return { diagnostico: raw };
+  }
+}
 
 export default function VeterinarioPage() {
+  const [citas, setCitas] = useState<Appointment[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [userName, setUserName] = useState("Veterinario");
+
+  useEffect(() => {
+    const u = getCurrentUser();
+    if (u?.name) setUserName(u.name);
+  }, []);
+
+  useEffect(() => {
+    fetchCitas()
+      .then(setCitas)
+      .catch(console.error)
+      .finally(() => setLoading(false));
+  }, []);
+
+  const hoy = fechaHoy();
+  const citasHoy = citas.filter((c) => c.date === hoy);
+  const atendidas = citasHoy.filter((c) => c.status === "Finalizada");
+  const pendientes = citasHoy.filter(
+    (c) => c.status !== "Finalizada" && c.status !== "Cancelada"
+  );
+  const conNotas = citas.filter((c) => c.notes);
+
+  const stats = [
+    { title: "Citas de hoy", value: String(citasHoy.length), description: "Agenda programada" },
+    { title: "Pacientes atendidos", value: String(atendidas.length), description: "Consultas completadas hoy" },
+    { title: "Consultas pendientes", value: String(pendientes.length), description: "Pacientes por valorar" },
+    { title: "Tratamientos registrados", value: String(conNotas.length), description: "Con registro clínico" },
+  ];
+
+  const agendaDiaria = citasHoy.slice(0, 5);
+
+  const pacientesAtendidos = citas
+    .filter((c) => c.status === "Finalizada")
+    .slice(0, 3);
+
+  if (loading) {
+    return (
+      <div className="flex min-h-[400px] items-center justify-center">
+        <p className="text-[14px] text-[#64748B] dark:text-[#94A3B8]">Cargando agenda...</p>
+      </div>
+    );
+  }
+
   return (
     <div className="space-y-6">
       {/* BANNER PRINCIPAL */}
-      <section className="rounded-[28px] bg-gradient-to-r from-[#2563EB] via-[#2385F3] to-[#06A7E9] px-8 py-8 text-white shadow-[0_22px_50px_rgba(37,99,235,0.20)]">
-        <div className="flex flex-col justify-between gap-6 xl:flex-row xl:items-center">
+      <section className="overflow-hidden rounded-2xl border border-brand-200 bg-gradient-to-br from-brand-600 to-brand-700 px-8 py-7 text-white shadow-brand">
+        <div className="flex flex-col justify-between gap-5 xl:flex-row xl:items-center">
           <div>
-            <p className="mb-3 text-sm font-semibold uppercase tracking-[0.24em] text-white/80">
-              Veterinario
+            <p className="mb-2 text-xs font-semibold uppercase tracking-[0.24em] text-brand-200">
+              Módulo veterinario
             </p>
 
-            <h1 className="text-[36px] font-bold leading-tight">
-              Bienvenido, Dr. Rodríguez
+            <h1 className="text-[28px] font-bold leading-tight">
+              Hola, {userName} 👋
             </h1>
 
-            <p className="mt-4 max-w-2xl text-base leading-7 text-white/90">
+            <p className="mt-3 max-w-2xl text-sm leading-6 text-brand-100">
               Consulta tu agenda diaria, registra valoraciones y tratamientos,
               y revisa la historia clínica de tus pacientes.
             </p>
@@ -109,9 +88,9 @@ export default function VeterinarioPage() {
 
           <Link
             href="/veterinario/consulta"
-            className="flex h-[50px] shrink-0 items-center justify-center rounded-xl bg-white px-6 text-[15px] font-semibold text-[#2563EB] shadow-sm transition hover:bg-[#EFF6FF]"
+            className="flex h-[44px] shrink-0 items-center justify-center rounded-xl bg-white px-6 text-sm font-semibold text-brand-700 shadow-sm transition hover:bg-brand-50"
           >
-            + Registrar nueva consulta
+            + Registrar consulta
           </Link>
         </div>
       </section>
@@ -162,48 +141,52 @@ export default function VeterinarioPage() {
           </div>
 
           <div className="space-y-3">
-            {agendaDiaria.map((cita) => (
-              <div
-                key={`${cita.hora}-${cita.mascota}`}
-                className="flex flex-col justify-between gap-4 rounded-[16px] border border-[#E5EAF2] bg-[#F8FAFC] px-4 py-4 dark:border-[#334155] dark:bg-[#0F172A] sm:flex-row sm:items-center"
-              >
-                <div className="flex items-center gap-4">
-                  <div className="flex h-[48px] w-[60px] shrink-0 items-center justify-center rounded-xl bg-[#EEF4FF] text-[14px] font-bold text-[#2563EB] dark:bg-[#1E293B] dark:text-[#93C5FD]">
-                    {cita.hora}
+            {agendaDiaria.length === 0 ? (
+              <p className="py-8 text-center text-[14px] text-[#64748B] dark:text-[#94A3B8]">
+                No hay citas programadas para hoy.
+              </p>
+            ) : (
+              agendaDiaria.map((cita) => (
+                <div
+                  key={cita.id}
+                  className="flex flex-col justify-between gap-4 rounded-[16px] border border-[#E5EAF2] bg-[#F8FAFC] px-4 py-4 dark:border-[#334155] dark:bg-[#0F172A] sm:flex-row sm:items-center"
+                >
+                  <div className="flex items-center gap-4">
+                    <div className="flex h-[48px] w-[60px] shrink-0 items-center justify-center rounded-xl bg-[#EEF4FF] text-[14px] font-bold text-[#2563EB] dark:bg-[#1E293B] dark:text-[#93C5FD]">
+                      {cita.time}
+                    </div>
+
+                    <div>
+                      <p className="text-[15px] font-semibold text-[#10213A] dark:text-white">
+                        {cita.petName}{" "}
+                        <span className="font-normal text-[#64748B] dark:text-[#94A3B8]">
+                          · {cita.petEspecie ?? ""}
+                        </span>
+                      </p>
+
+                      <p className="mt-1 text-[13px] text-[#64748B] dark:text-[#94A3B8]">
+                        {cita.ownerName} · {cita.service}
+                      </p>
+                    </div>
                   </div>
 
-                  <div>
-                    <p className="text-[15px] font-semibold text-[#10213A] dark:text-white">
-                      {cita.mascota}{" "}
-                      <span className="font-normal text-[#64748B] dark:text-[#94A3B8]">
-                        · {cita.especie}
-                      </span>
-                    </p>
+                  <div className="flex items-center gap-3">
+                    <span className={`inline-flex items-center rounded-full px-3 py-1.5 text-[12px] font-semibold ${getStatusStyle(cita.status).badge}`}>
+                      {cita.status}
+                    </span>
 
-                    <p className="mt-1 text-[13px] text-[#64748B] dark:text-[#94A3B8]">
-                      {cita.propietario} · {cita.motivo}
-                    </p>
+                    {cita.status !== "Finalizada" && cita.status !== "Cancelada" && (
+                      <Link
+                        href="/veterinario/consulta"
+                        className="rounded-lg border border-[#D6E3FF] bg-white px-3 py-2 text-[12px] font-semibold text-[#2563EB] transition hover:bg-[#EFF6FF] dark:border-[#334155] dark:bg-[#111827]"
+                      >
+                        Atender
+                      </Link>
+                    )}
                   </div>
                 </div>
-
-                <div className="flex items-center gap-3">
-                  <span
-                    className={`rounded-full px-3 py-1.5 text-[12px] font-semibold ${cita.badge}`}
-                  >
-                    {cita.estado}
-                  </span>
-
-                  {cita.estado !== "Atendida" && (
-                    <Link
-                      href="/veterinario/consulta"
-                      className="rounded-lg border border-[#D6E3FF] bg-white px-3 py-2 text-[12px] font-semibold text-[#2563EB] transition hover:bg-[#EFF6FF] dark:border-[#334155] dark:bg-[#111827]"
-                    >
-                      Atender
-                    </Link>
-                  )}
-                </div>
-              </div>
-            ))}
+              ))
+            )}
           </div>
         </article>
 
@@ -229,47 +212,58 @@ export default function VeterinarioPage() {
           </div>
 
           <div className="space-y-3">
-            {pacientesAtendidos.map((paciente) => (
-              <div
-                key={paciente.nombre}
-                className="rounded-[16px] border border-[#E5EAF2] px-4 py-4 dark:border-[#334155]"
-              >
-                <div className="flex items-start justify-between gap-3">
-                  <div>
-                    <p className="text-[15px] font-semibold text-[#10213A] dark:text-white">
-                      {paciente.nombre}
-                    </p>
+            {pacientesAtendidos.length === 0 ? (
+              <p className="py-8 text-center text-[14px] text-[#64748B] dark:text-[#94A3B8]">
+                No hay pacientes atendidos recientemente.
+              </p>
+            ) : (
+              pacientesAtendidos.map((cita) => {
+                const notas = parseNotas(cita.notes);
+                return (
+                  <div
+                    key={cita.id}
+                    className="rounded-[16px] border border-[#E5EAF2] px-4 py-4 dark:border-[#334155]"
+                  >
+                    <div className="flex items-start justify-between gap-3">
+                      <div>
+                        <p className="text-[15px] font-semibold text-[#10213A] dark:text-white">
+                          {cita.petName}
+                        </p>
 
-                    <p className="mt-1 text-[13px] text-[#64748B] dark:text-[#94A3B8]">
-                      Propietario: {paciente.propietario}
-                    </p>
+                        <p className="mt-1 text-[13px] text-[#64748B] dark:text-[#94A3B8]">
+                          Propietario: {cita.ownerName}
+                        </p>
+                      </div>
+
+                      <span className="text-[12px] text-[#94A3B8]">
+                        {cita.date}
+                      </span>
+                    </div>
+
+                    <div className="mt-3 rounded-xl bg-[#F8FAFC] px-3 py-3 text-[13px] dark:bg-[#0F172A]">
+                      <p className="text-[#475569] dark:text-[#CBD5E1]">
+                        <span className="font-semibold">Diagnóstico:</span>{" "}
+                        {notas.diagnostico ?? cita.service}
+                      </p>
+
+                      {notas.tratamiento && (
+                        <p className="mt-1 text-[#475569] dark:text-[#CBD5E1]">
+                          <span className="font-semibold">Tratamiento:</span>{" "}
+                          {notas.tratamiento}
+                        </p>
+                      )}
+                    </div>
+
+                    <Link
+                      href={`/veterinario/historial?paciente=${cita.petId}`}
+                      className="mt-3 inline-flex text-[13px] font-semibold text-[#2563EB]"
+                    >
+                      Consultar historial clínico
+                    </Link>
                   </div>
-
-                  <span className="text-[12px] text-[#94A3B8]">
-                    {paciente.hora}
-                  </span>
-                </div>
-
-                <div className="mt-3 rounded-xl bg-[#F8FAFC] px-3 py-3 text-[13px] dark:bg-[#0F172A]">
-                  <p className="text-[#475569] dark:text-[#CBD5E1]">
-                    <span className="font-semibold">Diagnóstico:</span>{" "}
-                    {paciente.diagnostico}
-                  </p>
-
-                  <p className="mt-1 text-[#475569] dark:text-[#CBD5E1]">
-                    <span className="font-semibold">Tratamiento:</span>{" "}
-                    {paciente.tratamiento}
-                  </p>
-                </div>
-
-                <Link
-                  href="/veterinario/historial"
-                  className="mt-3 inline-flex text-[13px] font-semibold text-[#2563EB]"
-                >
-                  Consultar historial clínico
-                </Link>
-              </div>
-            ))}
+                );
+              })
+            )}
           </div>
         </article>
       </section>

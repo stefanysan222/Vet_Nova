@@ -5,8 +5,18 @@ import {
   ChangeEvent,
   FormEvent,
   ReactNode,
+  useEffect,
+  useMemo,
   useState,
 } from "react";
+import { fetchCitas, createCita } from "../../../lib/api/citas";
+import { fetchMascotas } from "../../../lib/api/mascotas";
+import { fetchVeterinarios } from "../../../lib/api/usuarios";
+import type { UsuarioAPI } from "../../../lib/api/usuarios";
+import type { Appointment } from "../../../lib/recepcionista/types";
+import type { PetRecord } from "../../../lib/recepcionista/types";
+import { getCurrentUser } from "../../../lib/auth";
+import { getClinicSlots, isClinicOpen, getScheduleLabel } from "../../../lib/utils/clinic-schedule";
 
 type EstadoCita =
   | "Pendiente de confirmación"
@@ -15,135 +25,144 @@ type EstadoCita =
   | "Atendida";
 
 interface Cita {
-  id: number;
-  pacienteId?: string;
+  id: string;
+  petId: string;
   fecha: string;
   hora: string;
   mascota: string;
   especie: string;
   raza: string;
   cliente: string;
-  telefono: string;
   servicio: string;
   observaciones: string;
   estado: EstadoCita;
+  veterinario?: string;
 }
 
 interface FormularioCita {
   fecha: string;
   hora: string;
-  mascota: string;
-  especie: string;
-  raza: string;
-  cliente: string;
-  telefono: string;
+  mascotaId: string;
   servicio: string;
   observaciones: string;
+  veterinarioNombre: string;
 }
 
-const citasIniciales: Cita[] = [
-  {
-    id: 1,
-    pacienteId: "max",
-    fecha: "Hoy",
-    hora: "09:00",
-    mascota: "Max",
-    especie: "Canino",
-    raza: "Labrador Retriever",
-    cliente: "Juan Pérez",
-    telefono: "300 555 1010",
-    servicio: "Consulta General",
-    observaciones: "Paciente programado para valoración general.",
-    estado: "Confirmada",
-  },
-  {
-    id: 2,
-    fecha: "Hoy",
-    hora: "10:30",
-    mascota: "Luna",
-    especie: "Felino",
-    raza: "Persa",
-    cliente: "María García",
-    telefono: "301 420 1200",
-    servicio: "Vacunación",
-    observaciones: "Solicitud registrada pendiente de revisión administrativa.",
-    estado: "Pendiente de confirmación",
-  },
-  {
-    id: 3,
-    pacienteId: "rocky",
-    fecha: "Hoy",
-    hora: "11:00",
-    mascota: "Rocky",
-    especie: "Canino",
-    raza: "Bulldog Francés",
-    cliente: "Carlos López",
-    telefono: "315 780 2211",
-    servicio: "Cirugía Menor",
-    observaciones: "Control y revisión posterior al procedimiento.",
-    estado: "Confirmada",
-  },
-  {
-    id: 4,
-    pacienteId: "bella",
-    fecha: "Hoy",
-    hora: "14:00",
-    mascota: "Bella",
-    especie: "Canino",
-    raza: "Golden Retriever",
-    cliente: "Ana Martínez",
-    telefono: "312 420 8800",
-    servicio: "Control Post-Op",
-    observaciones: "Paciente en seguimiento clínico postoperatorio.",
-    estado: "En proceso",
-  },
-];
+function mapApiStatusToEstado(status: string): EstadoCita {
+  switch (status) {
+    case "Confirmada":
+      return "Confirmada";
+    case "En espera":
+    case "En atención":
+      return "En proceso";
+    case "Finalizada":
+    case "No asistió":
+      return "Atendida";
+    default:
+      return "Pendiente de confirmación";
+  }
+}
 
-function formularioVacio(): FormularioCita {
+function mapAppointmentToCita(a: Appointment): Cita {
+  return {
+    id: a.id,
+    petId: a.petId,
+    fecha: a.date,
+    hora: a.time,
+    mascota: a.petName,
+    especie: a.petEspecie ?? "",
+    raza: a.petRaza ?? "",
+    cliente: a.ownerName,
+    servicio: a.service,
+    observaciones: a.notes ?? "",
+    estado: mapApiStatusToEstado(a.status),
+    veterinario: a.veterinarian,
+  };
+}
+
+function formularioVacio(vetName = ""): FormularioCita {
   return {
     fecha: "",
     hora: "",
-    mascota: "",
-    especie: "",
-    raza: "",
-    cliente: "",
-    telefono: "",
+    mascotaId: "",
     servicio: "",
     observaciones: "",
+    veterinarioNombre: vetName,
   };
 }
 
 export default function VeterinarioCitasPage() {
-  const [citas, setCitas] = useState<Cita[]>(citasIniciales);
+  const [citas, setCitas] = useState<Cita[]>([]);
+  const [mascotas, setMascotas] = useState<PetRecord[]>([]);
+  const [vets, setVets] = useState<UsuarioAPI[]>([]);
+  const [currentVetName, setCurrentVetName] = useState("");
+  const [loading, setLoading] = useState(true);
+  const [guardando, setGuardando] = useState(false);
+  const [error, setError] = useState<string | null>(null);
   const [mostrarFormulario, setMostrarFormulario] = useState(false);
   const [mostrarMensaje, setMostrarMensaje] = useState(false);
   const [citaDetalle, setCitaDetalle] = useState<Cita | null>(null);
-  const [formulario, setFormulario] =
-    useState<FormularioCita>(formularioVacio());
+  const [formulario, setFormulario] = useState<FormularioCita>(formularioVacio());
 
-  const pendientes = citas.filter(
-    (cita) => cita.estado === "Pendiente de confirmación"
-  ).length;
+  useEffect(() => {
+    const user = getCurrentUser();
+    const vetName = user?.name ?? "";
+    setCurrentVetName(vetName);
+    setFormulario(formularioVacio(vetName));
 
-  const confirmadas = citas.filter(
-    (cita) => cita.estado === "Confirmada"
-  ).length;
+    Promise.all([fetchCitas(), fetchMascotas(), fetchVeterinarios().catch(() => [] as UsuarioAPI[])])
+      .then(([appts, pets, vetList]) => {
+        setCitas(appts.map(mapAppointmentToCita));
+        setMascotas(pets);
+        setVets(vetList);
+      })
+      .catch(() => setError("No se pudo cargar la agenda. Verifica la conexión con el servidor."))
+      .finally(() => setLoading(false));
+  }, []);
+
+  // Slots de la clínica para la fecha seleccionada
+  const clinicSlots = useMemo(() => getClinicSlots(formulario.fecha), [formulario.fecha]);
+  const clinicaCerrada = !!formulario.fecha && !isClinicOpen(formulario.fecha);
+
+  // Slots ya ocupados para el veterinario seleccionado en la fecha escogida
+  const slotsBloqueados = useMemo(() => {
+    const vetName = formulario.veterinarioNombre || currentVetName;
+    if (!formulario.fecha || !vetName) return new Set<string>();
+    return new Set(
+      citas
+        .filter((c) => c.fecha === formulario.fecha && c.veterinario === vetName && c.estado !== "Atendida")
+        .map((c) => c.hora)
+    );
+  }, [citas, formulario.fecha, formulario.veterinarioNombre, currentVetName]);
+
+  // Vets ocupados en la fecha+hora seleccionada
+  const busyVetNames = useMemo(() => {
+    if (!formulario.fecha || !formulario.hora) return new Set<string>();
+    return new Set(
+      citas
+        .filter((c) => c.fecha === formulario.fecha && c.hora === formulario.hora && c.estado !== "Atendida")
+        .map((c) => c.veterinario)
+        .filter(Boolean) as string[]
+    );
+  }, [citas, formulario.fecha, formulario.hora]);
+
+  const vetsDisponibles = vets.filter((v) => !busyVetNames.has(v.nombre ?? ""));
+  const vetsOcupados = vets.filter((v) => busyVetNames.has(v.nombre ?? ""));
+
+  const pendientes = citas.filter((c) => c.estado === "Pendiente de confirmación").length;
+  const confirmadas = citas.filter((c) => c.estado === "Confirmada").length;
+
+  const mascotaSeleccionada = mascotas.find((m) => m.id === formulario.mascotaId) ?? null;
 
   function handleChange(
-    event: ChangeEvent<
-      HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement
-    >
+    event: ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>
   ) {
     const { name, value } = event.target;
-
-    setFormulario((actual) => ({
-      ...actual,
-      [name]: value,
-    }));
+    setFormulario((actual) => ({ ...actual, [name]: value }));
   }
 
   function abrirFormulario() {
-    setFormulario(formularioVacio());
+    setFormulario(formularioVacio(currentVetName));
     setMostrarMensaje(false);
     setMostrarFormulario(true);
   }
@@ -153,27 +172,44 @@ export default function VeterinarioCitasPage() {
     setFormulario(formularioVacio());
   }
 
-  function handleSubmit(event: FormEvent<HTMLFormElement>) {
+  async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
+    if (!mascotaSeleccionada) return;
 
-    const nuevaCita: Cita = {
-      id: Date.now(),
-      fecha: formulario.fecha,
-      hora: formulario.hora,
-      mascota: formulario.mascota,
-      especie: formulario.especie,
-      raza: formulario.raza,
-      cliente: formulario.cliente,
-      telefono: formulario.telefono,
-      servicio: formulario.servicio,
-      observaciones: formulario.observaciones,
-      estado: "Pendiente de confirmación",
-    };
+    setGuardando(true);
+    setError(null);
+    try {
+      const nueva = await createCita({
+        date: formulario.fecha,
+        time: formulario.hora,
+        petId: mascotaSeleccionada.id,
+        ownerId: mascotaSeleccionada.propietarioId,
+        petName: mascotaSeleccionada.nombre,
+        ownerName: mascotaSeleccionada.propietarioNombre,
+        petEspecie: mascotaSeleccionada.especie,
+        petRaza: mascotaSeleccionada.raza,
+        service: formulario.servicio,
+        status: "Pendiente",
+        veterinarian: formulario.veterinarioNombre || undefined,
+        notes: formulario.observaciones || undefined,
+      });
+      setCitas((actuales) => [mapAppointmentToCita(nueva), ...actuales]);
+      setMostrarFormulario(false);
+      setMostrarMensaje(true);
+      setFormulario(formularioVacio());
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Error al guardar la cita.");
+    } finally {
+      setGuardando(false);
+    }
+  }
 
-    setCitas((actuales) => [nuevaCita, ...actuales]);
-    setMostrarFormulario(false);
-    setMostrarMensaje(true);
-    setFormulario(formularioVacio());
+  if (loading) {
+    return (
+      <div className="flex min-h-[400px] items-center justify-center">
+        <p className="text-[14px] text-[#64748B] dark:text-[#94A3B8]">Cargando agenda...</p>
+      </div>
+    );
   }
 
   return (
@@ -209,6 +245,14 @@ export default function VeterinarioCitasPage() {
           </button>
         </div>
       </header>
+
+      {/* ERROR */}
+      {error && (
+        <div className="flex items-start justify-between gap-4 rounded-[16px] border border-[#FECACA] bg-[#FEF2F2] px-5 py-4 dark:border-[#7F1D1D] dark:bg-[#450A0A]">
+          <p className="text-[14px] text-[#B91C1C] dark:text-[#FECACA]">{error}</p>
+          <button type="button" onClick={() => setError(null)} className="text-[18px] font-semibold text-[#B91C1C]">×</button>
+        </div>
+      )}
 
       {/* MENSAJE DE REGISTRO */}
       {mostrarMensaje && (
@@ -248,8 +292,7 @@ export default function VeterinarioCitasPage() {
           </p>
 
           <p className="mt-3 text-sm text-[#64748B] dark:text-[#94A3B8]">
-            Solicitudes registradas que deben ser confirmadas por
-            administración.
+            Solicitudes registradas que deben ser confirmadas por administración.
           </p>
         </article>
 
@@ -286,44 +329,48 @@ export default function VeterinarioCitasPage() {
           </span>
         </div>
 
-        <div className="space-y-3">
-          {citas.map((cita) => (
-            <article
-              key={cita.id}
-              className="group rounded-[20px] border border-[#E5EAF2] bg-[#F8FAFC] p-5 transition-all duration-300 hover:-translate-y-0.5 hover:border-[#D6E3FF] hover:shadow-[0_12px_26px_rgba(15,23,42,0.06)] dark:border-[#334155] dark:bg-[#0F172A]"
-            >
-              <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-                <div>
-                  <p className="text-[15px] font-semibold text-[#10213A] transition group-hover:text-[#2563EB] dark:text-white">
-                    {formatearFecha(cita.fecha)} · {cita.hora} • {cita.mascota}
-                  </p>
+        {citas.length === 0 ? (
+          <p className="py-10 text-center text-[14px] text-[#64748B] dark:text-[#94A3B8]">
+            No hay citas registradas.
+          </p>
+        ) : (
+          <div className="space-y-3">
+            {citas.map((cita) => (
+              <article
+                key={cita.id}
+                className="group rounded-[20px] border border-[#E5EAF2] bg-[#F8FAFC] p-5 transition-all duration-300 hover:-translate-y-0.5 hover:border-[#D6E3FF] hover:shadow-[0_12px_26px_rgba(15,23,42,0.06)] dark:border-[#334155] dark:bg-[#0F172A]"
+              >
+                <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+                  <div>
+                    <p className="text-[15px] font-semibold text-[#10213A] transition group-hover:text-[#2563EB] dark:text-white">
+                      {formatearFecha(cita.fecha)} · {cita.hora} • {cita.mascota}
+                    </p>
 
-                  <p className="mt-1 text-sm text-[#64748B] dark:text-[#94A3B8]">
-                    {cita.cliente} · {cita.servicio}
-                  </p>
+                    <p className="mt-1 text-sm text-[#64748B] dark:text-[#94A3B8]">
+                      {cita.cliente} · {cita.servicio}
+                    </p>
+                  </div>
+
+                  <div className="flex flex-wrap items-center gap-3">
+                    <button
+                      type="button"
+                      onClick={() => setCitaDetalle(cita)}
+                      className="flex h-[40px] items-center justify-center rounded-xl border border-[#D6E3FF] bg-white px-4 text-[13px] font-semibold text-[#2563EB] transition hover:-translate-y-0.5 hover:bg-[#EFF6FF] dark:border-[#334155] dark:bg-[#111827] dark:text-[#93C5FD] dark:hover:bg-[#1E293B]"
+                    >
+                      Ver detalles
+                    </button>
+
+                    <span
+                      className={`rounded-full px-3 py-2 text-[13px] font-semibold ${estiloEstado(cita.estado)}`}
+                    >
+                      {cita.estado}
+                    </span>
+                  </div>
                 </div>
-
-                <div className="flex flex-wrap items-center gap-3">
-                  <button
-                    type="button"
-                    onClick={() => setCitaDetalle(cita)}
-                    className="flex h-[40px] items-center justify-center rounded-xl border border-[#D6E3FF] bg-white px-4 text-[13px] font-semibold text-[#2563EB] transition hover:-translate-y-0.5 hover:bg-[#EFF6FF] dark:border-[#334155] dark:bg-[#111827] dark:text-[#93C5FD] dark:hover:bg-[#1E293B]"
-                  >
-                    Ver detalles
-                  </button>
-
-                  <span
-                    className={`rounded-full px-3 py-2 text-[13px] font-semibold ${estiloEstado(
-                      cita.estado
-                    )}`}
-                  >
-                    {cita.estado}
-                  </span>
-                </div>
-              </div>
-            </article>
-          ))}
-        </div>
+              </article>
+            ))}
+          </div>
+        )}
       </section>
 
       {/* MODAL DETALLE DE LA CITA */}
@@ -353,16 +400,15 @@ export default function VeterinarioCitasPage() {
                     </h2>
 
                     <span
-                      className={`rounded-full px-3 py-1.5 text-[12px] font-semibold ${estiloEstado(
-                        citaDetalle.estado
-                      )}`}
+                      className={`rounded-full px-3 py-1.5 text-[12px] font-semibold ${estiloEstado(citaDetalle.estado)}`}
                     >
                       {citaDetalle.estado}
                     </span>
                   </div>
 
                   <p className="mt-2 text-[14px] text-[#64748B] dark:text-[#94A3B8]">
-                    {citaDetalle.especie} · {citaDetalle.raza}
+                    {citaDetalle.especie}
+                    {citaDetalle.raza ? ` · ${citaDetalle.raza}` : ""}
                   </p>
                 </div>
 
@@ -393,17 +439,10 @@ export default function VeterinarioCitasPage() {
                 <div className="mt-5 grid gap-4 sm:grid-cols-2">
                   <DatoDetalle titulo="Paciente" valor={citaDetalle.mascota} />
                   <DatoDetalle
-                    titulo="Especie y raza"
-                    valor={`${citaDetalle.especie} · ${citaDetalle.raza}`}
+                    titulo="Especie"
+                    valor={citaDetalle.especie || "—"}
                   />
-                  <DatoDetalle
-                    titulo="Propietario"
-                    valor={citaDetalle.cliente}
-                  />
-                  <DatoDetalle
-                    titulo="Teléfono"
-                    valor={citaDetalle.telefono}
-                  />
+                  <DatoDetalle titulo="Propietario" valor={citaDetalle.cliente || "—"} />
                 </div>
               </section>
 
@@ -427,8 +466,7 @@ export default function VeterinarioCitasPage() {
                 </div>
               )}
 
-              {(citaDetalle.estado === "Confirmada" ||
-                citaDetalle.estado === "En proceso") && (
+              {(citaDetalle.estado === "Confirmada" || citaDetalle.estado === "En proceso") && (
                 <div className="rounded-[16px] border border-[#DBEAFE] bg-[#EFF6FF] px-4 py-3 dark:border-[#1E3A8A] dark:bg-[#172554]">
                   <p className="text-[13px] leading-6 text-[#1D4ED8] dark:text-[#BFDBFE]">
                     Esta cita está habilitada para atención. Puedes iniciar o
@@ -446,16 +484,14 @@ export default function VeterinarioCitasPage() {
                   Cerrar
                 </button>
 
-                {citaDetalle.pacienteId &&
-                  (citaDetalle.estado === "Confirmada" ||
-                    citaDetalle.estado === "En proceso") && (
-                    <Link
-                      href={`/veterinario/consulta?paciente=${citaDetalle.pacienteId}`}
-                      className="flex h-[46px] items-center justify-center rounded-xl bg-[#2F6BFF] px-6 text-[14px] font-semibold text-white transition hover:bg-[#2459DF]"
-                    >
-                      Registrar consulta
-                    </Link>
-                  )}
+                {(citaDetalle.estado === "Confirmada" || citaDetalle.estado === "En proceso") && (
+                  <Link
+                    href={`/veterinario/consulta?cita=${citaDetalle.id}`}
+                    className="flex h-[46px] items-center justify-center rounded-xl bg-[#2F6BFF] px-6 text-[14px] font-semibold text-white transition hover:bg-[#2459DF]"
+                  >
+                    Registrar consulta
+                  </Link>
+                )}
               </div>
             </div>
           </section>
@@ -485,8 +521,7 @@ export default function VeterinarioCitasPage() {
                 </h2>
 
                 <p className="mt-2 text-[14px] text-[#64748B] dark:text-[#94A3B8]">
-                  Completa los datos. La cita quedará pendiente de
-                  confirmación administrativa.
+                  Completa los datos. La cita quedará pendiente de confirmación administrativa.
                 </p>
               </div>
 
@@ -502,112 +537,178 @@ export default function VeterinarioCitasPage() {
 
             <form onSubmit={handleSubmit} className="space-y-5 p-6">
               <div className="grid gap-5 md:grid-cols-2">
+                {/* Fecha */}
                 <CampoFormulario label="Fecha de la cita">
                   <input
                     type="date"
                     name="fecha"
                     value={formulario.fecha}
-                    onChange={handleChange}
+                    onChange={(e) => {
+                      handleChange(e);
+                      setFormulario((f) => ({ ...f, hora: "", veterinarioNombre: currentVetName }));
+                    }}
                     required
                     className={campoClases}
                   />
+                  {formulario.fecha && (
+                    <p className={`mt-1 text-xs font-medium ${isClinicOpen(formulario.fecha) ? "text-emerald-600" : "text-rose-600"}`}>
+                      {isClinicOpen(formulario.fecha) ? `Horario: ${getScheduleLabel(formulario.fecha)}` : "La clínica está cerrada este día"}
+                    </p>
+                  )}
                 </CampoFormulario>
 
-                <CampoFormulario label="Hora">
-                  <input
-                    type="time"
-                    name="hora"
-                    value={formulario.hora}
-                    onChange={handleChange}
-                    required
-                    className={campoClases}
-                  />
-                </CampoFormulario>
+                {/* Hora — slots dinámicos */}
+                <div>
+                  <span className="mb-2 block text-[13px] font-semibold text-[#334155] dark:text-[#CBD5E1]">
+                    Hora disponible
+                  </span>
+                  {!formulario.fecha ? (
+                    <p className="text-xs text-[#94A3B8]">Selecciona una fecha primero.</p>
+                  ) : clinicaCerrada ? (
+                    <div className="rounded-xl border border-[#FECACA] bg-[#FEF2F2] px-4 py-3 text-xs text-[#B91C1C] dark:border-[#7F1D1D] dark:bg-[#450A0A] dark:text-[#FECACA]">
+                      No hay turnos disponibles. La clínica está cerrada ese día.
+                    </div>
+                  ) : (
+                    <div className="grid grid-cols-3 gap-2 max-h-[180px] overflow-y-auto pr-1">
+                      {clinicSlots.map((slot) => {
+                        const bloqueado = slotsBloqueados.has(slot);
+                        return (
+                          <button
+                            key={slot}
+                            type="button"
+                            disabled={bloqueado}
+                            onClick={() => setFormulario((f) => ({ ...f, hora: slot }))}
+                            title={bloqueado ? "Ya tienes una cita a esta hora" : undefined}
+                            className={`rounded-xl border py-2 text-xs font-semibold transition ${
+                              formulario.hora === slot
+                                ? "border-[#2F6BFF] bg-[#2F6BFF] text-white"
+                                : bloqueado
+                                  ? "cursor-not-allowed border-[#E5EAF2] bg-[#F8FAFC] text-[#94A3B8] line-through dark:border-[#334155] dark:bg-[#0F172A]"
+                                  : "border-[#CBD5E1] bg-white text-[#475569] hover:border-[#2F6BFF] dark:border-[#334155] dark:bg-[#0F172A] dark:text-[#CBD5E1]"
+                            }`}
+                          >
+                            {slot}
+                          </button>
+                        );
+                      })}
+                    </div>
+                  )}
+                </div>
 
-                <CampoFormulario label="Mascota">
-                  <input
-                    type="text"
-                    name="mascota"
-                    value={formulario.mascota}
-                    onChange={handleChange}
-                    placeholder="Nombre de la mascota"
-                    required
-                    className={campoClases}
-                  />
-                </CampoFormulario>
+                {/* Mascota */}
+                <div className="md:col-span-2">
+                  <CampoFormulario label="Mascota">
+                    <select
+                      name="mascotaId"
+                      value={formulario.mascotaId}
+                      onChange={handleChange}
+                      required
+                      className={campoClases}
+                    >
+                      <option value="" disabled>
+                        Selecciona la mascota
+                      </option>
+                      {mascotas.map((m) => (
+                        <option key={m.id} value={m.id}>
+                          {m.nombre} ({m.especie}) — Propietario: {m.propietarioNombre}
+                        </option>
+                      ))}
+                    </select>
+                  </CampoFormulario>
+                </div>
 
-                <CampoFormulario label="Especie">
-                  <select
-                    name="especie"
-                    value={formulario.especie}
-                    onChange={handleChange}
-                    required
-                    className={campoClases}
-                  >
-                    <option value="" disabled>
-                      Selecciona la especie
-                    </option>
-                    <option value="Canino">Canino</option>
-                    <option value="Felino">Felino</option>
-                    <option value="Otro">Otro</option>
-                  </select>
-                </CampoFormulario>
+                {mascotaSeleccionada && (
+                  <>
+                    <CampoFormulario label="Especie">
+                      <input
+                        type="text"
+                        value={mascotaSeleccionada.especie}
+                        readOnly
+                        className={`${campoClases} cursor-not-allowed bg-[#F8FAFC] text-[#64748B] dark:bg-[#0F172A]`}
+                      />
+                    </CampoFormulario>
 
-                <CampoFormulario label="Raza">
-                  <input
-                    type="text"
-                    name="raza"
-                    value={formulario.raza}
-                    onChange={handleChange}
-                    placeholder="Raza de la mascota"
-                    required
-                    className={campoClases}
-                  />
-                </CampoFormulario>
+                    <CampoFormulario label="Propietario">
+                      <input
+                        type="text"
+                        value={mascotaSeleccionada.propietarioNombre}
+                        readOnly
+                        className={`${campoClases} cursor-not-allowed bg-[#F8FAFC] text-[#64748B] dark:bg-[#0F172A]`}
+                      />
+                    </CampoFormulario>
+                  </>
+                )}
 
-                <CampoFormulario label="Propietario">
-                  <input
-                    type="text"
-                    name="cliente"
-                    value={formulario.cliente}
-                    onChange={handleChange}
-                    placeholder="Nombre del propietario"
-                    required
-                    className={campoClases}
-                  />
-                </CampoFormulario>
+                {/* Servicio */}
+                <div className="md:col-span-2">
+                  <CampoFormulario label="Servicio solicitado">
+                    <select
+                      name="servicio"
+                      value={formulario.servicio}
+                      onChange={handleChange}
+                      required
+                      className={campoClases}
+                    >
+                      <option value="" disabled>
+                        Selecciona el servicio
+                      </option>
+                      <option value="Consulta General">Consulta General</option>
+                      <option value="Vacunación">Vacunación</option>
+                      <option value="Control Post-Op">Control Post-Op</option>
+                      <option value="Desparasitación">Desparasitación</option>
+                      <option value="Urgencia">Urgencia</option>
+                      <option value="Cirugía Menor">Cirugía Menor</option>
+                    </select>
+                  </CampoFormulario>
+                </div>
 
-                <CampoFormulario label="Teléfono de contacto">
-                  <input
-                    type="tel"
-                    name="telefono"
-                    value={formulario.telefono}
-                    onChange={handleChange}
-                    placeholder="Número de contacto"
-                    required
-                    className={campoClases}
-                  />
-                </CampoFormulario>
+                {/* Veterinario — disponibilidad basada en fecha+hora */}
+                {formulario.fecha && formulario.hora && !clinicaCerrada && (
+                  <div className="md:col-span-2">
+                    <span className="mb-2 block text-[13px] font-semibold text-[#334155] dark:text-[#CBD5E1]">
+                      Veterinario asignado
+                      <span className="ml-2 text-xs font-normal text-[#94A3B8]">
+                        {vetsDisponibles.length} disponible{vetsDisponibles.length !== 1 ? "s" : ""} a las {formulario.hora}
+                      </span>
+                    </span>
+                    <div className="space-y-2">
+                      {vetsDisponibles.map((v) => (
+                        <button
+                          key={v.id}
+                          type="button"
+                          onClick={() => setFormulario((f) => ({ ...f, veterinarioNombre: f.veterinarioNombre === (v.nombre ?? "") ? "" : (v.nombre ?? "") }))}
+                          className={`flex w-full items-center gap-3 rounded-xl border px-4 py-2.5 text-left text-[13px] transition ${
+                            formulario.veterinarioNombre === v.nombre
+                              ? "border-[#2F6BFF] bg-[#EFF6FF] text-[#1D4ED8] dark:border-[#2563EB] dark:bg-[#172554] dark:text-[#BFDBFE]"
+                              : "border-[#E2E8F0] bg-white text-[#475569] hover:border-[#BFDBFE] hover:bg-[#F0F9FF] dark:border-[#334155] dark:bg-[#0F172A] dark:text-[#CBD5E1]"
+                          }`}
+                        >
+                          <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg bg-emerald-100 text-xs font-bold text-emerald-700 dark:bg-emerald-900/40 dark:text-emerald-300">
+                            {(v.nombre ?? "?")[0].toUpperCase()}
+                          </span>
+                          <span className="flex-1 font-medium">{v.nombre}</span>
+                          {formulario.veterinarioNombre === v.nombre && (
+                            <span className="text-xs font-semibold text-[#2563EB] dark:text-[#93C5FD]">Seleccionado</span>
+                          )}
+                          <span className="text-xs text-emerald-600 dark:text-emerald-400">Disponible</span>
+                        </button>
+                      ))}
 
-                <CampoFormulario label="Servicio solicitado">
-                  <select
-                    name="servicio"
-                    value={formulario.servicio}
-                    onChange={handleChange}
-                    required
-                    className={campoClases}
-                  >
-                    <option value="" disabled>
-                      Selecciona el servicio
-                    </option>
-                    <option value="Consulta General">Consulta General</option>
-                    <option value="Vacunación">Vacunación</option>
-                    <option value="Control Post-Op">Control Post-Op</option>
-                    <option value="Desparasitación">Desparasitación</option>
-                    <option value="Urgencia">Urgencia</option>
-                    <option value="Cirugía Menor">Cirugía Menor</option>
-                  </select>
-                </CampoFormulario>
+                      {vetsOcupados.map((v) => (
+                        <div
+                          key={v.id}
+                          className="flex w-full items-center gap-3 rounded-xl border border-[#E5EAF2] bg-[#F8FAFC] px-4 py-2.5 text-[13px] opacity-50 dark:border-[#334155] dark:bg-[#0F172A]"
+                        >
+                          <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg bg-slate-200 text-xs font-bold text-slate-500 dark:bg-slate-700">
+                            {(v.nombre ?? "?")[0].toUpperCase()}
+                          </span>
+                          <span className="flex-1 font-medium text-[#64748B]">{v.nombre}</span>
+                          <span className="text-xs text-rose-500">Ocupado</span>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
               </div>
 
               <CampoFormulario label="Observaciones">
@@ -623,9 +724,8 @@ export default function VeterinarioCitasPage() {
 
               <div className="rounded-[14px] border border-[#FDE68A] bg-[#FFFBEB] px-4 py-3 dark:border-[#78350F] dark:bg-[#451A03]">
                 <p className="text-[13px] leading-6 text-[#92400E] dark:text-[#FDE68A]">
-                  <strong>Importante:</strong> el veterinario puede registrar
-                  la solicitud, pero no confirmarla. El estado inicial será{" "}
-                  <strong>Pendiente de confirmación</strong>.
+                  <strong>Importante:</strong> el veterinario puede registrar la solicitud, pero no
+                  confirmarla. El estado inicial será <strong>Pendiente de confirmación</strong>.
                 </p>
               </div>
 
@@ -640,9 +740,10 @@ export default function VeterinarioCitasPage() {
 
                 <button
                   type="submit"
-                  className="flex h-[46px] items-center justify-center rounded-xl bg-[#2F6BFF] px-7 text-[14px] font-semibold text-white transition hover:bg-[#2459DF]"
+                  disabled={guardando || clinicaCerrada}
+                  className="flex h-[46px] items-center justify-center rounded-xl bg-[#2F6BFF] px-7 text-[14px] font-semibold text-white transition hover:bg-[#2459DF] disabled:opacity-60"
                 >
-                  Guardar solicitud
+                  {guardando ? "Guardando..." : "Guardar solicitud"}
                 </button>
               </div>
             </form>
@@ -653,37 +754,23 @@ export default function VeterinarioCitasPage() {
   );
 }
 
-function CampoFormulario({
-  label,
-  children,
-}: {
-  label: string;
-  children: ReactNode;
-}) {
+function CampoFormulario({ label, children }: { label: string; children: ReactNode }) {
   return (
     <label className="block">
       <span className="mb-2 block text-[13px] font-semibold text-[#334155] dark:text-[#CBD5E1]">
         {label}
       </span>
-
       {children}
     </label>
   );
 }
 
-function DatoDetalle({
-  titulo,
-  valor,
-}: {
-  titulo: string;
-  valor: string;
-}) {
+function DatoDetalle({ titulo, valor }: { titulo: string; valor: string }) {
   return (
     <div className="rounded-[14px] bg-[#F8FAFC] px-4 py-3 dark:bg-[#0F172A]">
       <p className="text-[11px] font-semibold uppercase tracking-wide text-[#64748B] dark:text-[#94A3B8]">
         {titulo}
       </p>
-
       <p className="mt-2 text-[14px] font-medium text-[#10213A] dark:text-white">
         {valor}
       </p>
@@ -695,25 +782,18 @@ function estiloEstado(estado: EstadoCita) {
   switch (estado) {
     case "Pendiente de confirmación":
       return "bg-[#FEF3C7] text-[#B45309] dark:bg-[#78350F] dark:text-[#FDE68A]";
-
     case "Confirmada":
       return "bg-[#DCFCE7] text-[#15803D] dark:bg-[#14532D] dark:text-[#BBF7D0]";
-
     case "En proceso":
       return "bg-[#DBEAFE] text-[#2563EB] dark:bg-[#1E3A8A] dark:text-[#BFDBFE]";
-
     case "Atendida":
       return "bg-[#E0E7FF] text-[#4338CA] dark:bg-[#312E81] dark:text-[#C7D2FE]";
   }
 }
 
 function formatearFecha(fecha: string) {
-  if (fecha === "Hoy") {
-    return "Hoy";
-  }
-
+  if (!fecha || fecha === "Hoy") return fecha;
   const fechaLocal = new Date(`${fecha}T00:00:00`);
-
   return fechaLocal.toLocaleDateString("es-CO", {
     day: "2-digit",
     month: "short",
