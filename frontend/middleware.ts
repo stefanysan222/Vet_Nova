@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
+import { API_URL } from "./lib/config";
 
 type UserRole = "Administrador" | "Veterinario" | "Cliente";
 
@@ -29,13 +30,12 @@ function decodeToken(token: string): { sub: number; role: UserRole; exp: number 
 }
 
 function buildCsp(nonce: string): string {
-  const apiUrl = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:3000";
   return [
     "default-src 'self'",
     `script-src 'self' 'nonce-${nonce}' 'strict-dynamic' https://accounts.google.com`,
     "style-src 'self' 'unsafe-inline'",
     "img-src 'self' data: blob: https://res.cloudinary.com https://lh3.googleusercontent.com",
-    `connect-src 'self' ${apiUrl} https://api.emailjs.com https://accounts.google.com https://api.cloudinary.com`,
+    `connect-src 'self' ${API_URL} https://api.emailjs.com https://accounts.google.com https://api.cloudinary.com`,
     "font-src 'self'",
     "frame-src https://accounts.google.com",
     "object-src 'none'",

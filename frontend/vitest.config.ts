@@ -9,6 +9,16 @@ export default defineConfig({
     globals: true,
     setupFiles: ["./vitest.setup.ts"],
     exclude: ["**/node_modules/**", "**/e2e/**"],
+    coverage: {
+      provider: "v8",
+      include: ["lib/auth.ts", "lib/config.ts"],
+      thresholds: {
+        statements: 50,
+        branches: 38,
+        functions: 65,
+        lines: 50,
+      },
+    },
   },
   resolve: {
     alias: {
