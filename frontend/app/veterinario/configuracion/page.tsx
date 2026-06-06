@@ -1,6 +1,11 @@
 "use client";
 
 import { FormEvent, useState, type ReactNode } from "react";
+import { getCurrentUser } from "../../../lib/auth";
+import { updateUsuario } from "../../../lib/api/usuarios";
+import { useToast } from "../../components/ui/Toast";
+
+const VET_PERFIL_KEY = "vetnova_vet_perfil";
 
 interface PerfilVeterinario {
   nombre: string;
@@ -18,15 +23,15 @@ interface FormularioSeguridad {
   confirmarContrasena: string;
 }
 
-const perfilInicial: PerfilVeterinario = {
-  nombre: "Dr. Rodríguez",
-  cargo: "Veterinario",
-  especialidad: "Medicina general veterinaria",
-  registroProfesional: "VET-2026-001",
-  email: "dr.rodriguez@vetnova.com",
-  telefono: "+57 300 123 4567",
-  horarioAtencion: "Lunes a viernes · 8:00 AM - 5:00 PM",
-};
+function leerPerfilGuardado(): Partial<PerfilVeterinario> {
+  if (typeof window === "undefined") return {};
+  try {
+    const stored = localStorage.getItem(VET_PERFIL_KEY);
+    return stored ? JSON.parse(stored) : {};
+  } catch {
+    return {};
+  }
+}
 
 const seguridadInicial: FormularioSeguridad = {
   contrasenaActual: "",
@@ -35,18 +40,29 @@ const seguridadInicial: FormularioSeguridad = {
 };
 
 export default function ConfiguracionVeterinarioPage() {
-  const [perfil, setPerfil] = useState<PerfilVeterinario>(perfilInicial);
-  const [seguridad, setSeguridad] =
-    useState<FormularioSeguridad>(seguridadInicial);
+  const user = getCurrentUser();
+  const { success, error: toastError } = useToast();
 
+  const [perfil, setPerfil] = useState<PerfilVeterinario>(() => {
+    const guardado = leerPerfilGuardado();
+    return {
+      nombre: user?.name ?? "",
+      cargo: "Veterinario",
+      especialidad: guardado.especialidad ?? "",
+      registroProfesional: guardado.registroProfesional ?? "",
+      email: user?.email ?? "",
+      telefono: guardado.telefono ?? "",
+      horarioAtencion: guardado.horarioAtencion ?? "",
+    };
+  });
+  const [guardando, setGuardando] = useState(false);
+  const [seguridad, setSeguridad] = useState<FormularioSeguridad>(seguridadInicial);
+  const [guardandoPassword, setGuardandoPassword] = useState(false);
   const [mensajePerfil, setMensajePerfil] = useState("");
   const [mensajeSeguridad, setMensajeSeguridad] = useState("");
   const [errorSeguridad, setErrorSeguridad] = useState("");
 
-  function actualizarPerfil(
-    campo: keyof PerfilVeterinario,
-    valor: string
-  ) {
+  function actualizarPerfil(campo: keyof PerfilVeterinario, valor: string) {
     setPerfil((actual) => ({
       ...actual,
       [campo]: valor,
@@ -55,21 +71,46 @@ export default function ConfiguracionVeterinarioPage() {
     setMensajePerfil("");
   }
 
-  function guardarPerfil(event: FormEvent<HTMLFormElement>) {
+  async function guardarPerfil(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
-
-    setMensajePerfil("La información personal fue actualizada correctamente.");
+    if (!user) return;
+    setGuardando(true);
+    try {
+      await updateUsuario(user.id, { nombre: perfil.nombre.trim(), email: perfil.email.trim() });
+      const extras = {
+        especialidad: perfil.especialidad,
+        telefono: perfil.telefono,
+        horarioAtencion: perfil.horarioAtencion,
+        registroProfesional: perfil.registroProfesional,
+      };
+      localStorage.setItem(VET_PERFIL_KEY, JSON.stringify(extras));
+      success("Perfil actualizado", "Los cambios se aplicarán en la próxima sesión.");
+      setMensajePerfil("La información personal fue actualizada correctamente.");
+    } catch (err) {
+      toastError(
+        "Error al guardar",
+        err instanceof Error ? err.message : "No se pudo actualizar el perfil.",
+      );
+    } finally {
+      setGuardando(false);
+    }
   }
 
   function cancelarCambiosPerfil() {
-    setPerfil(perfilInicial);
+    const guardado = leerPerfilGuardado();
+    setPerfil({
+      nombre: user?.name ?? "",
+      cargo: "Veterinario",
+      especialidad: guardado.especialidad ?? "",
+      registroProfesional: guardado.registroProfesional ?? "",
+      email: user?.email ?? "",
+      telefono: guardado.telefono ?? "",
+      horarioAtencion: guardado.horarioAtencion ?? "",
+    });
     setMensajePerfil("");
   }
 
-  function actualizarSeguridad(
-    campo: keyof FormularioSeguridad,
-    valor: string
-  ) {
+  function actualizarSeguridad(campo: keyof FormularioSeguridad, valor: string) {
     setSeguridad((actual) => ({
       ...actual,
       [campo]: valor,
@@ -79,9 +120,8 @@ export default function ConfiguracionVeterinarioPage() {
     setErrorSeguridad("");
   }
 
-  function actualizarContrasena(event: FormEvent<HTMLFormElement>) {
+  async function actualizarContrasena(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
-
     if (
       !seguridad.contrasenaActual ||
       !seguridad.nuevaContrasena ||
@@ -90,22 +130,28 @@ export default function ConfiguracionVeterinarioPage() {
       setErrorSeguridad("Debes completar todos los campos de contraseña.");
       return;
     }
-
     if (seguridad.nuevaContrasena.length < 8) {
-      setErrorSeguridad(
-        "La nueva contraseña debe contener mínimo 8 caracteres."
-      );
+      setErrorSeguridad("La nueva contraseña debe contener mínimo 8 caracteres.");
       return;
     }
-
     if (seguridad.nuevaContrasena !== seguridad.confirmarContrasena) {
       setErrorSeguridad("Las nuevas contraseñas no coinciden.");
       return;
     }
-
+    if (!user) return;
+    setGuardandoPassword(true);
     setErrorSeguridad("");
-    setMensajeSeguridad("La contraseña fue actualizada correctamente.");
-    setSeguridad(seguridadInicial);
+    try {
+      await updateUsuario(user.id, { password: seguridad.nuevaContrasena });
+      setMensajeSeguridad("La contraseña fue actualizada correctamente.");
+      setSeguridad(seguridadInicial);
+    } catch (err) {
+      setErrorSeguridad(
+        err instanceof Error ? err.message : "No se pudo actualizar la contraseña.",
+      );
+    } finally {
+      setGuardandoPassword(false);
+    }
   }
 
   function cancelarCambioContrasena() {
@@ -131,14 +177,13 @@ export default function ConfiguracionVeterinarioPage() {
             </h1>
 
             <p className="mt-3 max-w-2xl text-[15px] leading-7 text-[#64748B] dark:text-[#94A3B8]">
-              Consulta y actualiza tus datos profesionales y administra la
-              seguridad de tu cuenta.
+              Consulta y actualiza tus datos profesionales y administra la seguridad de tu cuenta.
             </p>
           </div>
 
           <div className="flex items-center gap-4 rounded-[18px] border border-white bg-white/80 px-5 py-4 shadow-[0_10px_26px_rgba(37,99,235,0.08)] dark:border-[#334155] dark:bg-[#0F172A]/80">
             <div className="flex h-14 w-14 items-center justify-center rounded-full bg-[#2F6BFF] text-[19px] font-bold text-white">
-              D
+              {perfil.nombre.trim()[0]?.toUpperCase() ?? "V"}
             </div>
 
             <div>
@@ -146,9 +191,7 @@ export default function ConfiguracionVeterinarioPage() {
                 {perfil.nombre}
               </p>
 
-              <p className="mt-1 text-[13px] text-[#64748B] dark:text-[#94A3B8]">
-                {perfil.cargo}
-              </p>
+              <p className="mt-1 text-[13px] text-[#64748B] dark:text-[#94A3B8]">{perfil.cargo}</p>
             </div>
           </div>
         </div>
@@ -170,17 +213,13 @@ export default function ConfiguracionVeterinarioPage() {
             </h2>
 
             <p className="mt-1 text-[13px] text-[#64748B] dark:text-[#94A3B8]">
-              Actualiza tus datos de contacto y consulta tu información
-              profesional.
+              Actualiza tus datos de contacto y consulta tu información profesional.
             </p>
           </div>
         </div>
 
         {mensajePerfil && (
-          <MensajeExito
-            mensaje={mensajePerfil}
-            onClose={() => setMensajePerfil("")}
-          />
+          <MensajeExito mensaje={mensajePerfil} onClose={() => setMensajePerfil("")} />
         )}
 
         <div className="grid gap-5 md:grid-cols-2">
@@ -188,9 +227,7 @@ export default function ConfiguracionVeterinarioPage() {
             <input
               type="text"
               value={perfil.nombre}
-              onChange={(event) =>
-                actualizarPerfil("nombre", event.target.value)
-              }
+              onChange={(event) => actualizarPerfil("nombre", event.target.value)}
               required
               className={campoClases}
             />
@@ -209,9 +246,7 @@ export default function ConfiguracionVeterinarioPage() {
             <input
               type="text"
               value={perfil.especialidad}
-              onChange={(event) =>
-                actualizarPerfil("especialidad", event.target.value)
-              }
+              onChange={(event) => actualizarPerfil("especialidad", event.target.value)}
               required
               className={campoClases}
             />
@@ -230,9 +265,7 @@ export default function ConfiguracionVeterinarioPage() {
             <input
               type="email"
               value={perfil.email}
-              onChange={(event) =>
-                actualizarPerfil("email", event.target.value)
-              }
+              onChange={(event) => actualizarPerfil("email", event.target.value)}
               required
               className={campoClases}
             />
@@ -242,9 +275,7 @@ export default function ConfiguracionVeterinarioPage() {
             <input
               type="tel"
               value={perfil.telefono}
-              onChange={(event) =>
-                actualizarPerfil("telefono", event.target.value)
-              }
+              onChange={(event) => actualizarPerfil("telefono", event.target.value)}
               required
               className={campoClases}
             />
@@ -255,9 +286,7 @@ export default function ConfiguracionVeterinarioPage() {
               <input
                 type="text"
                 value={perfil.horarioAtencion}
-                onChange={(event) =>
-                  actualizarPerfil("horarioAtencion", event.target.value)
-                }
+                onChange={(event) => actualizarPerfil("horarioAtencion", event.target.value)}
                 required
                 className={campoClases}
               />
@@ -276,10 +305,11 @@ export default function ConfiguracionVeterinarioPage() {
 
           <button
             type="submit"
-            className="profile-button-primary flex h-[46px] items-center justify-center gap-2 rounded-xl bg-[#2F6BFF] px-7 text-[14px] font-semibold text-white"
+            disabled={guardando}
+            className="profile-button-primary flex h-[46px] items-center justify-center gap-2 rounded-xl bg-[#2F6BFF] px-7 text-[14px] font-semibold text-white disabled:opacity-60"
           >
             <ProfileIcon name="save" className="h-[17px] w-[17px]" />
-            Guardar cambios
+            {guardando ? "Guardando..." : "Guardar cambios"}
           </button>
         </div>
       </form>
@@ -300,17 +330,13 @@ export default function ConfiguracionVeterinarioPage() {
             </h2>
 
             <p className="mt-1 text-[13px] text-[#64748B] dark:text-[#94A3B8]">
-              Cambia tu contraseña para mantener protegido el acceso a tu
-              perfil veterinario.
+              Cambia tu contraseña para mantener protegido el acceso a tu perfil veterinario.
             </p>
           </div>
         </div>
 
         {mensajeSeguridad && (
-          <MensajeExito
-            mensaje={mensajeSeguridad}
-            onClose={() => setMensajeSeguridad("")}
-          />
+          <MensajeExito mensaje={mensajeSeguridad} onClose={() => setMensajeSeguridad("")} />
         )}
 
         {errorSeguridad && (
@@ -343,9 +369,7 @@ export default function ConfiguracionVeterinarioPage() {
               <input
                 type="password"
                 value={seguridad.contrasenaActual}
-                onChange={(event) =>
-                  actualizarSeguridad("contrasenaActual", event.target.value)
-                }
+                onChange={(event) => actualizarSeguridad("contrasenaActual", event.target.value)}
                 placeholder="Ingresa tu contraseña actual"
                 autoComplete="current-password"
                 className={campoClases}
@@ -357,9 +381,7 @@ export default function ConfiguracionVeterinarioPage() {
             <input
               type="password"
               value={seguridad.nuevaContrasena}
-              onChange={(event) =>
-                actualizarSeguridad("nuevaContrasena", event.target.value)
-              }
+              onChange={(event) => actualizarSeguridad("nuevaContrasena", event.target.value)}
               placeholder="Mínimo 8 caracteres"
               autoComplete="new-password"
               className={campoClases}
@@ -370,12 +392,7 @@ export default function ConfiguracionVeterinarioPage() {
             <input
               type="password"
               value={seguridad.confirmarContrasena}
-              onChange={(event) =>
-                actualizarSeguridad(
-                  "confirmarContrasena",
-                  event.target.value
-                )
-              }
+              onChange={(event) => actualizarSeguridad("confirmarContrasena", event.target.value)}
               placeholder="Repite la nueva contraseña"
               autoComplete="new-password"
               className={campoClases}
@@ -390,8 +407,8 @@ export default function ConfiguracionVeterinarioPage() {
           />
 
           <p className="text-[13px] leading-6 text-[#1D4ED8] dark:text-[#BFDBFE]">
-            Utiliza una contraseña de mínimo 8 caracteres y evita compartir
-            tus credenciales de acceso.
+            Utiliza una contraseña de mínimo 8 caracteres y evita compartir tus credenciales de
+            acceso.
           </p>
         </div>
 
@@ -406,10 +423,11 @@ export default function ConfiguracionVeterinarioPage() {
 
           <button
             type="submit"
-            className="profile-button-primary flex h-[46px] items-center justify-center gap-2 rounded-xl bg-[#2F6BFF] px-7 text-[14px] font-semibold text-white"
+            disabled={guardandoPassword}
+            className="profile-button-primary flex h-[46px] items-center justify-center gap-2 rounded-xl bg-[#2F6BFF] px-7 text-[14px] font-semibold text-white disabled:opacity-60"
           >
             <ProfileIcon name="shield" className="h-[17px] w-[17px]" />
-            Actualizar contraseña
+            {guardandoPassword ? "Actualizando..." : "Actualizar contraseña"}
           </button>
         </div>
       </form>
@@ -511,13 +529,7 @@ export default function ConfiguracionVeterinarioPage() {
   );
 }
 
-function Campo({
-  label,
-  children,
-}: {
-  label: string;
-  children: ReactNode;
-}) {
+function Campo({ label, children }: { label: string; children: ReactNode }) {
   return (
     <label className="block">
       <span className="mb-2 block text-[13px] font-semibold text-[#334155] dark:text-[#CBD5E1]">
@@ -529,24 +541,13 @@ function Campo({
   );
 }
 
-function MensajeExito({
-  mensaje,
-  onClose,
-}: {
-  mensaje: string;
-  onClose: () => void;
-}) {
+function MensajeExito({ mensaje, onClose }: { mensaje: string; onClose: () => void }) {
   return (
     <div className="mb-6 flex items-start justify-between gap-4 rounded-[15px] border border-[#BBF7D0] bg-[#F0FDF4] px-4 py-3 dark:border-[#14532D] dark:bg-[#052E16]">
       <div className="flex items-start gap-3">
-        <ProfileIcon
-          name="check"
-          className="mt-0.5 h-[18px] w-[18px] shrink-0 text-[#16A34A]"
-        />
+        <ProfileIcon name="check" className="mt-0.5 h-[18px] w-[18px] shrink-0 text-[#16A34A]" />
 
-        <p className="text-[13px] leading-6 text-[#15803D] dark:text-[#BBF7D0]">
-          {mensaje}
-        </p>
+        <p className="text-[13px] leading-6 text-[#15803D] dark:text-[#BBF7D0]">{mensaje}</p>
       </div>
 
       <button
@@ -561,22 +562,9 @@ function MensajeExito({
   );
 }
 
-type IconName =
-  | "user"
-  | "lock"
-  | "save"
-  | "shield"
-  | "check"
-  | "alert"
-  | "info";
+type IconName = "user" | "lock" | "save" | "shield" | "check" | "alert" | "info";
 
-function ProfileIcon({
-  name,
-  className = "h-5 w-5",
-}: {
-  name: IconName;
-  className?: string;
-}) {
+function ProfileIcon({ name, className = "h-5 w-5" }: { name: IconName; className?: string }) {
   const svgProps = {
     className,
     viewBox: "0 0 24 24",
