@@ -77,7 +77,9 @@ export async function createCita(
   id_usuario?: number,
 ): Promise<Appointment> {
   const data = await api.post<CitaAPI>("/citas", {
-    fecha: appointment.date,
+    fecha: appointment.date
+      ? new Date(appointment.date + "T00:00:00.000Z").toISOString()
+      : undefined,
     hora: appointment.time,
     estado: STATUS_REVERSE_MAP[appointment.status] ?? "pendiente",
     servicio: appointment.service || undefined,
@@ -101,7 +103,9 @@ export async function updateCitaEstado(
 
 export async function updateCita(appointment: Appointment): Promise<Appointment> {
   const data = await api.put<CitaAPI>(`/citas/${appointment.id}`, {
-    fecha: appointment.date,
+    fecha: appointment.date
+      ? new Date(appointment.date + "T00:00:00.000Z").toISOString()
+      : undefined,
     hora: appointment.time,
     estado: STATUS_REVERSE_MAP[appointment.status] ?? "pendiente",
     servicio: appointment.service || undefined,
