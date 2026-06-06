@@ -165,19 +165,19 @@ describe("loginUser", () => {
 describe("loginOrRegisterGoogle", () => {
   it("returns token on success", async () => {
     mockFetch(200, { token: "google.tok.abc" });
-    const result = await loginOrRegisterGoogle({ name: "Ana", email: "ana@gmail.com" });
+    const result = await loginOrRegisterGoogle({ credential: "fake.jwt.token" });
     expect(result.token).toBe("google.tok.abc");
   });
 
   it("returns error on server failure", async () => {
     mockFetch(500, { message: "Error interno" }, false);
-    const result = await loginOrRegisterGoogle({ name: "Ana", email: "ana@gmail.com" });
+    const result = await loginOrRegisterGoogle({ credential: "fake.jwt.token" });
     expect(result.error).toBe("Error interno");
   });
 
   it("returns network error when fetch throws", async () => {
     vi.stubGlobal("fetch", vi.fn().mockRejectedValue(new Error("offline")));
-    const result = await loginOrRegisterGoogle({ name: "X", email: "x@x.com" });
+    const result = await loginOrRegisterGoogle({ credential: "fake.jwt.token" });
     expect(result.error).toBe("No se pudo conectar con el servidor.");
   });
 });
