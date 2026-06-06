@@ -3,7 +3,20 @@
 import { useState, useEffect, useRef, useCallback } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { Bell, Search, Moon, Sun, LayoutDashboard, Users2, CalendarDays, PawPrint, BarChart3, Bell as BellIcon, Settings, X } from "lucide-react";
+import {
+  Bell,
+  Search,
+  Moon,
+  Sun,
+  LayoutDashboard,
+  Users2,
+  CalendarDays,
+  PawPrint,
+  BarChart3,
+  Bell as BellIcon,
+  Settings,
+  X,
+} from "lucide-react";
 import { AnimatePresence, motion } from "framer-motion";
 import { getCurrentUser } from "../../../lib/auth";
 import { fetchUsuarios } from "../../../lib/api/usuarios";
@@ -19,35 +32,95 @@ type SearchResult = {
 };
 
 const NAV_PAGES: SearchResult[] = [
-  { id: "p-dashboard",      label: "Dashboard",        sublabel: "Panel principal",            category: "Páginas", href: "/admin" },
-  { id: "p-usuarios",       label: "Usuarios",         sublabel: "Gestión de usuarios",        category: "Páginas", href: "/admin/usuarios" },
-  { id: "p-citas",          label: "Citas",            sublabel: "Agenda de atención",         category: "Páginas", href: "/admin/citas" },
-  { id: "p-mascotas",       label: "Mascotas",         sublabel: "Registro de mascotas",       category: "Páginas", href: "/admin/mascotas" },
-  { id: "p-reportes",       label: "Reportes",         sublabel: "Resumen del sistema",        category: "Páginas", href: "/admin/reportes" },
-  { id: "p-notificaciones", label: "Notificaciones",   sublabel: "Alertas del sistema",        category: "Páginas", href: "/admin/notificaciones" },
-  { id: "p-configuracion",  label: "Configuración",    sublabel: "Perfil y cuenta",            category: "Páginas", href: "/admin/configuracion" },
+  {
+    id: "p-dashboard",
+    label: "Dashboard",
+    sublabel: "Panel principal",
+    category: "Páginas",
+    href: "/admin",
+  },
+  {
+    id: "p-usuarios",
+    label: "Usuarios",
+    sublabel: "Gestión de usuarios",
+    category: "Páginas",
+    href: "/admin/usuarios",
+  },
+  {
+    id: "p-citas",
+    label: "Citas",
+    sublabel: "Agenda de atención",
+    category: "Páginas",
+    href: "/admin/citas",
+  },
+  {
+    id: "p-mascotas",
+    label: "Mascotas",
+    sublabel: "Registro de mascotas",
+    category: "Páginas",
+    href: "/admin/mascotas",
+  },
+  {
+    id: "p-reportes",
+    label: "Reportes",
+    sublabel: "Resumen del sistema",
+    category: "Páginas",
+    href: "/admin/reportes",
+  },
+  {
+    id: "p-notificaciones",
+    label: "Notificaciones",
+    sublabel: "Alertas del sistema",
+    category: "Páginas",
+    href: "/admin/notificaciones",
+  },
+  {
+    id: "p-configuracion",
+    label: "Configuración",
+    sublabel: "Perfil y cuenta",
+    category: "Páginas",
+    href: "/admin/configuracion",
+  },
 ];
 
 const CATEGORY_ORDER: SearchResult["category"][] = ["Páginas", "Usuarios", "Mascotas", "Citas"];
 
 const CATEGORY_ICON: Record<SearchResult["category"], React.ReactNode> = {
-  "Páginas":   <LayoutDashboard className="h-3.5 w-3.5" />,
-  "Usuarios":  <Users2 className="h-3.5 w-3.5" />,
-  "Mascotas":  <PawPrint className="h-3.5 w-3.5" />,
-  "Citas":     <CalendarDays className="h-3.5 w-3.5" />,
+  Páginas: <LayoutDashboard className="h-3.5 w-3.5" />,
+  Usuarios: <Users2 className="h-3.5 w-3.5" />,
+  Mascotas: <PawPrint className="h-3.5 w-3.5" />,
+  Citas: <CalendarDays className="h-3.5 w-3.5" />,
 };
 
 type NavNotif = { id: string; title: string; desc: string; urgente: boolean };
 
-function buildNavNotifs(citas: import("../../../lib/recepcionista/types").Appointment[]): NavNotif[] {
+function buildNavNotifs(
+  citas: import("../../../lib/recepcionista/types").Appointment[],
+): NavNotif[] {
   const items: NavNotif[] = [];
   const hoy = new Date().toISOString().slice(0, 10);
   const pendientes = citas.filter((c) => c.status === "Pendiente");
   if (pendientes.length > 0)
-    items.push({ id: "p", title: `${pendientes.length} cita${pendientes.length > 1 ? "s" : ""} pendiente${pendientes.length > 1 ? "s" : ""}`, desc: pendientes.slice(0, 2).map((c) => c.petName).join(", "), urgente: pendientes.length >= 3 });
+    items.push({
+      id: "p",
+      title: `${pendientes.length} cita${pendientes.length > 1 ? "s" : ""} pendiente${pendientes.length > 1 ? "s" : ""}`,
+      desc: pendientes
+        .slice(0, 2)
+        .map((c) => c.petName)
+        .join(", "),
+      urgente: pendientes.length >= 3,
+    });
   const hoyList = citas.filter((c) => c.date === hoy && c.status !== "Cancelada");
   if (hoyList.length > 0)
-    items.push({ id: "h", title: `${hoyList.length} cita${hoyList.length > 1 ? "s" : ""} hoy`, desc: hoyList.slice(0, 2).map((c) => `${c.petName}${c.time ? ` ${c.time}` : ""}`).join(", "), urgente: false });
+    items.push({
+      id: "h",
+      title: `${hoyList.length} cita${hoyList.length > 1 ? "s" : ""} hoy`,
+      desc: hoyList
+        .slice(0, 2)
+        .map((c) => `${c.petName}${c.time ? ` ${c.time}` : ""}`)
+        .join(", "),
+      urgente: false,
+    });
   return items;
 }
 
@@ -55,7 +128,11 @@ export default function Navbar() {
   const router = useRouter();
   const [notifOpen, setNotifOpen] = useState(false);
   const [notifs, setNotifs] = useState<NavNotif[]>([]);
-  const [darkMode, setDarkMode] = useState(false);
+  const [darkMode, setDarkMode] = useState(() => {
+    if (typeof window === "undefined") return false;
+    const saved = localStorage.getItem("vetnova-theme");
+    return saved ? saved === "dark" : window.matchMedia("(prefers-color-scheme: dark)").matches;
+  });
   const [query, setQuery] = useState("");
   const [results, setResults] = useState<SearchResult[]>([]);
   const [searching, setSearching] = useState(false);
@@ -72,17 +149,11 @@ export default function Navbar() {
       .catch(() => setNotifs([]));
   }, []);
 
-  // Tema
+  // Tema — sincronizar DOM y escuchar cambios de sistema
   useEffect(() => {
+    document.documentElement.classList.toggle("dark", darkMode);
     const saved = localStorage.getItem("vetnova-theme");
-    if (saved) {
-      const isDark = saved === "dark";
-      setDarkMode(isDark);
-      document.documentElement.classList.toggle("dark", isDark);
-    } else {
-      const prefersDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
-      setDarkMode(prefersDark);
-      document.documentElement.classList.toggle("dark", prefersDark);
+    if (!saved) {
       const listener = (e: MediaQueryListEvent) => {
         if (!localStorage.getItem("vetnova-theme")) {
           setDarkMode(e.matches);
@@ -90,9 +161,10 @@ export default function Navbar() {
         }
       };
       window.matchMedia("(prefers-color-scheme: dark)").addEventListener("change", listener);
-      return () => window.matchMedia("(prefers-color-scheme: dark)").removeEventListener("change", listener);
+      return () =>
+        window.matchMedia("(prefers-color-scheme: dark)").removeEventListener("change", listener);
     }
-  }, []);
+  }, [darkMode]);
 
   const toggleDark = () => {
     const next = !darkMode;
@@ -118,7 +190,8 @@ export default function Navbar() {
 
     // Páginas (siempre local)
     const pageResults = NAV_PAGES.filter(
-      (p) => p.label.toLowerCase().includes(term) || (p.sublabel ?? "").toLowerCase().includes(term)
+      (p) =>
+        p.label.toLowerCase().includes(term) || (p.sublabel ?? "").toLowerCase().includes(term),
     );
 
     if (term.length < 2) {
@@ -136,7 +209,10 @@ export default function Navbar() {
       ]);
 
       const userResults: SearchResult[] = usuarios
-        .filter((u) => (u.nombre ?? "").toLowerCase().includes(term) || u.email.toLowerCase().includes(term))
+        .filter(
+          (u) =>
+            (u.nombre ?? "").toLowerCase().includes(term) || u.email.toLowerCase().includes(term),
+        )
         .slice(0, 4)
         .map((u) => ({
           id: `u-${u.id}`,
@@ -147,7 +223,12 @@ export default function Navbar() {
         }));
 
       const petResults: SearchResult[] = mascotas
-        .filter((p) => p.nombre.toLowerCase().includes(term) || (p.propietarioNombre ?? "").toLowerCase().includes(term) || (p.raza ?? "").toLowerCase().includes(term))
+        .filter(
+          (p) =>
+            p.nombre.toLowerCase().includes(term) ||
+            (p.propietarioNombre ?? "").toLowerCase().includes(term) ||
+            (p.raza ?? "").toLowerCase().includes(term),
+        )
         .slice(0, 4)
         .map((p) => ({
           id: `m-${p.id}`,
@@ -158,11 +239,12 @@ export default function Navbar() {
         }));
 
       const citaResults: SearchResult[] = citas
-        .filter((c) =>
-          c.petName.toLowerCase().includes(term) ||
-          (c.service ?? "").toLowerCase().includes(term) ||
-          (c.veterinarian ?? "").toLowerCase().includes(term) ||
-          c.date.includes(term)
+        .filter(
+          (c) =>
+            c.petName.toLowerCase().includes(term) ||
+            (c.service ?? "").toLowerCase().includes(term) ||
+            (c.veterinarian ?? "").toLowerCase().includes(term) ||
+            c.date.includes(term),
         )
         .slice(0, 4)
         .map((c) => ({
@@ -180,8 +262,13 @@ export default function Navbar() {
   }, []);
 
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setActiveIdx(0);
-    if (!query) { setResults([]); setOpen(false); return; }
+    if (!query) {
+      setResults([]);
+      setOpen(false);
+      return;
+    }
     setOpen(true);
     const timer = setTimeout(() => doSearch(query), 300);
     return () => clearTimeout(timer);
@@ -197,23 +284,37 @@ export default function Navbar() {
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
     if (!open) return;
-    if (e.key === "ArrowDown") { e.preventDefault(); setActiveIdx((i) => Math.min(i + 1, flatResults.length - 1)); }
-    if (e.key === "ArrowUp")   { e.preventDefault(); setActiveIdx((i) => Math.max(i - 1, 0)); }
+    if (e.key === "ArrowDown") {
+      e.preventDefault();
+      setActiveIdx((i) => Math.min(i + 1, flatResults.length - 1));
+    }
+    if (e.key === "ArrowUp") {
+      e.preventDefault();
+      setActiveIdx((i) => Math.max(i - 1, 0));
+    }
     if (e.key === "Enter" && flatResults[activeIdx]) {
       router.push(flatResults[activeIdx].href);
-      setQuery(""); setOpen(false);
+      setQuery("");
+      setOpen(false);
     }
-    if (e.key === "Escape") { setOpen(false); inputRef.current?.blur(); }
+    if (e.key === "Escape") {
+      setOpen(false);
+      inputRef.current?.blur();
+    }
   };
 
   const initials = user?.name
-    ? user.name.split(" ").map((p) => p[0]).slice(0, 2).join("").toUpperCase()
+    ? user.name
+        .split(" ")
+        .map((p) => p[0])
+        .slice(0, 2)
+        .join("")
+        .toUpperCase()
     : "A";
 
   return (
     <header className="sticky top-0 z-40 border-b border-slate-200/70 bg-white/95 backdrop-blur-xl dark:border-slate-800 dark:bg-slate-950/95">
       <div className="mx-auto flex max-w-7xl items-center justify-between gap-4 px-5 py-3 sm:px-6 lg:px-8">
-
         {/* Buscador */}
         <div ref={searchRef} className="relative hidden w-full max-w-sm sm:block">
           <Search className="pointer-events-none absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
@@ -222,14 +323,19 @@ export default function Navbar() {
             type="search"
             value={query}
             onChange={(e) => setQuery(e.target.value)}
-            onFocus={() => { if (query) setOpen(true); }}
+            onFocus={() => {
+              if (query) setOpen(true);
+            }}
             onKeyDown={handleKeyDown}
             placeholder="Buscar citas, usuarios o mascotas..."
             className="w-full rounded-xl border border-slate-200 bg-slate-50 py-2.5 pl-10 pr-8 text-sm text-slate-900 outline-none transition focus:border-brand-500 focus:ring-2 focus:ring-brand-100 dark:border-slate-700 dark:bg-slate-900 dark:text-white dark:placeholder-slate-500"
           />
           {query && (
             <button
-              onClick={() => { setQuery(""); setOpen(false); }}
+              onClick={() => {
+                setQuery("");
+                setOpen(false);
+              }}
               className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200"
             >
               <X className="h-3.5 w-3.5" />
@@ -244,12 +350,14 @@ export default function Navbar() {
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, y: -6 }}
                 transition={{ duration: 0.15 }}
-                className="absolute left-0 top-full mt-2 w-full min-w-[320px] overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-card-lg dark:border-slate-700 dark:bg-slate-900"
+                className="shadow-card-lg absolute left-0 top-full mt-2 w-full min-w-[320px] overflow-hidden rounded-2xl border border-slate-200 bg-white dark:border-slate-700 dark:bg-slate-900"
               >
                 {searching && results.length === 0 ? (
                   <p className="px-4 py-3 text-sm text-slate-400">Buscando...</p>
                 ) : results.length === 0 ? (
-                  <p className="px-4 py-3 text-sm text-slate-400">Sin resultados para "{query}"</p>
+                  <p className="px-4 py-3 text-sm text-slate-400">
+                    Sin resultados para &quot;{query}&quot;
+                  </p>
                 ) : (
                   <div className="max-h-80 overflow-y-auto py-2">
                     {Object.entries(grouped).map(([cat, items]) => {
@@ -266,16 +374,23 @@ export default function Navbar() {
                               <Link
                                 key={r.id}
                                 href={r.href}
-                                onClick={() => { setQuery(""); setOpen(false); }}
+                                onClick={() => {
+                                  setQuery("");
+                                  setOpen(false);
+                                }}
                                 className={`flex flex-col px-4 py-2.5 transition ${
                                   idx === activeIdx
                                     ? "bg-brand-50 dark:bg-brand-950/30"
                                     : "hover:bg-slate-50 dark:hover:bg-slate-800"
                                 }`}
                               >
-                                <span className="text-sm font-medium text-slate-900 dark:text-white">{r.label}</span>
+                                <span className="text-sm font-medium text-slate-900 dark:text-white">
+                                  {r.label}
+                                </span>
                                 {r.sublabel && (
-                                  <span className="text-xs text-slate-400 dark:text-slate-500">{r.sublabel}</span>
+                                  <span className="text-xs text-slate-400 dark:text-slate-500">
+                                    {r.sublabel}
+                                  </span>
                                 )}
                               </Link>
                             );
@@ -290,8 +405,7 @@ export default function Navbar() {
           </AnimatePresence>
         </div>
 
-        <div className="flex items-center gap-2 ml-auto">
-
+        <div className="ml-auto flex items-center gap-2">
           {/* Toggle dark mode */}
           <button
             onClick={toggleDark}
@@ -329,7 +443,9 @@ export default function Navbar() {
                   >
                     {/* Header */}
                     <div className="flex items-center justify-between border-b border-slate-100 px-4 py-3 dark:border-slate-800">
-                      <p className="text-sm font-semibold text-slate-900 dark:text-white">Notificaciones</p>
+                      <p className="text-sm font-semibold text-slate-900 dark:text-white">
+                        Notificaciones
+                      </p>
                       {notifs.length > 0 && (
                         <span className="rounded-full bg-red-50 px-2 py-0.5 text-xs font-semibold text-red-600 dark:bg-red-950/50 dark:text-red-400">
                           {notifs.length} activa{notifs.length > 1 ? "s" : ""}
@@ -345,9 +461,16 @@ export default function Navbar() {
                         </p>
                       ) : (
                         notifs.map((n) => (
-                          <div key={n.id} className={`px-4 py-3 ${n.urgente ? "bg-red-50/60 dark:bg-red-950/20" : ""}`}>
-                            <p className="text-sm font-medium text-slate-900 dark:text-white">{n.title}</p>
-                            <p className="mt-0.5 text-xs text-slate-500 dark:text-slate-400 line-clamp-1">{n.desc}</p>
+                          <div
+                            key={n.id}
+                            className={`px-4 py-3 ${n.urgente ? "bg-red-50/60 dark:bg-red-950/20" : ""}`}
+                          >
+                            <p className="text-sm font-medium text-slate-900 dark:text-white">
+                              {n.title}
+                            </p>
+                            <p className="mt-0.5 line-clamp-1 text-xs text-slate-500 dark:text-slate-400">
+                              {n.desc}
+                            </p>
                           </div>
                         ))
                       )}
@@ -374,7 +497,7 @@ export default function Navbar() {
             <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-brand-600 text-xs font-bold text-white">
               {initials}
             </div>
-            <span className="hidden max-w-[120px] truncate text-sm font-medium text-slate-700 sm:block dark:text-slate-200">
+            <span className="hidden max-w-[120px] truncate text-sm font-medium text-slate-700 dark:text-slate-200 sm:block">
               {user?.name ?? "Admin"}
             </span>
           </div>

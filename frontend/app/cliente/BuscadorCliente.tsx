@@ -2,14 +2,7 @@
 
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
-import {
-  KeyboardEvent,
-  useCallback,
-  useEffect,
-  useMemo,
-  useRef,
-  useState,
-} from "react";
+import { KeyboardEvent, useCallback, useEffect, useMemo, useRef, useState } from "react";
 
 const PETS_STORAGE_KEY = "vetnova_mascotas_cliente";
 const APPOINTMENTS_STORAGE_KEY = "vetnova_citas_cliente";
@@ -96,25 +89,14 @@ export default function BuscadorCliente() {
   const [citas, setCitas] = useState<Cita[]>([]);
 
   const cargarDatos = useCallback(() => {
-    const mascotasGuardadas = leerLocalStorage<Mascota[]>(
-      PETS_STORAGE_KEY,
-      []
-    );
+    const mascotasGuardadas = leerLocalStorage<Mascota[]>(PETS_STORAGE_KEY, []);
 
-    const citasGuardadas = leerLocalStorage<Cita[]>(
-      APPOINTMENTS_STORAGE_KEY,
-      []
-    );
+    const citasGuardadas = leerLocalStorage<Cita[]>(APPOINTMENTS_STORAGE_KEY, []);
 
-    const mascotasCombinadas = [
-      ...mascotasGuardadas,
-      ...mascotasIniciales,
-    ];
+    const mascotasCombinadas = [...mascotasGuardadas, ...mascotasIniciales];
 
     const mascotasSinDuplicados = Array.from(
-      new Map(
-        mascotasCombinadas.map((mascota) => [mascota.id, mascota])
-      ).values()
+      new Map(mascotasCombinadas.map((mascota) => [mascota.id, mascota])).values(),
     );
 
     setMascotas(mascotasSinDuplicados);
@@ -122,6 +104,7 @@ export default function BuscadorCliente() {
   }, []);
 
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     cargarDatos();
 
     window.addEventListener("storage", cargarDatos);
@@ -136,16 +119,14 @@ export default function BuscadorCliente() {
   }, [cargarDatos]);
 
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setTermino("");
     setAbierto(false);
   }, [pathname]);
 
   useEffect(() => {
     const cerrarAlHacerClickFuera = (event: MouseEvent) => {
-      if (
-        contenedorRef.current &&
-        !contenedorRef.current.contains(event.target as Node)
-      ) {
+      if (contenedorRef.current && !contenedorRef.current.contains(event.target as Node)) {
         setAbierto(false);
       }
     };
@@ -165,9 +146,7 @@ export default function BuscadorCliente() {
     const resultadosMascotas: ResultadoBusqueda[] = mascotas
       .filter((mascota) => {
         const contenido = normalizarTexto(
-          `${mascota.nombre} ${mascota.especie} ${mascota.raza} ${
-            mascota.dueño ?? ""
-          }`
+          `${mascota.nombre} ${mascota.especie} ${mascota.raza} ${mascota.dueño ?? ""}`,
         );
 
         return contenido.includes(textoBuscado);
@@ -185,7 +164,7 @@ export default function BuscadorCliente() {
         const contenido = normalizarTexto(
           `${cita.mascota} ${cita.servicio} ${cita.fecha ?? ""} ${
             cita.hora ?? ""
-          } ${cita.veterinario ?? ""} ${cita.estado ?? ""}`
+          } ${cita.veterinario ?? ""} ${cita.estado ?? ""}`,
         );
 
         return contenido.includes(textoBuscado);
@@ -229,10 +208,7 @@ export default function BuscadorCliente() {
   };
 
   return (
-    <div
-      ref={contenedorRef}
-      className="relative w-full max-w-[505px]"
-    >
+    <div ref={contenedorRef} className="relative w-full max-w-[505px]">
       <div className="flex h-[42px] items-center gap-3 rounded-lg border border-[#CBD5E1] bg-white px-4 transition-all focus-within:border-[#2F6BFF] focus-within:ring-2 focus-within:ring-[#2F6BFF]/10 dark:border-[#334155] dark:bg-[#0F172A] dark:focus-within:border-[#2F6BFF]">
         <SearchIcon />
 
@@ -270,9 +246,7 @@ export default function BuscadorCliente() {
             <p className="text-[13px] font-medium text-[#64748B] dark:text-[#94A3B8]">
               {resultados.length > 0
                 ? `${resultados.length} ${
-                    resultados.length === 1
-                      ? "resultado encontrado"
-                      : "resultados encontrados"
+                    resultados.length === 1 ? "resultado encontrado" : "resultados encontrados"
                   }`
                 : "Resultados de búsqueda"}
             </p>
@@ -294,11 +268,7 @@ export default function BuscadorCliente() {
                         : "bg-[#E8F7EE] text-[#16A34A] dark:bg-[#123B22] dark:text-[#86EFAC]"
                     }`}
                   >
-                    {resultado.tipo === "Mascota" ? (
-                      <PetIcon />
-                    ) : (
-                      <CalendarIcon />
-                    )}
+                    {resultado.tipo === "Mascota" ? <PetIcon /> : <CalendarIcon />}
                   </div>
 
                   <div className="min-w-0 flex-1">
@@ -371,12 +341,7 @@ function SearchIcon() {
       className="shrink-0 text-[#64748B] dark:text-[#94A3B8]"
     >
       <circle cx="11" cy="11" r="7" stroke="currentColor" strokeWidth="2" />
-      <path
-        d="m20 20-3.5-3.5"
-        stroke="currentColor"
-        strokeWidth="2"
-        strokeLinecap="round"
-      />
+      <path d="m20 20-3.5-3.5" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
     </svg>
   );
 }
@@ -385,12 +350,7 @@ function SearchLargeIcon() {
   return (
     <svg width="25" height="25" viewBox="0 0 24 24" fill="none">
       <circle cx="11" cy="11" r="7" stroke="currentColor" strokeWidth="2" />
-      <path
-        d="m20 20-3.5-3.5"
-        stroke="currentColor"
-        strokeWidth="2"
-        strokeLinecap="round"
-      />
+      <path d="m20 20-3.5-3.5" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
     </svg>
   );
 }
@@ -398,12 +358,7 @@ function SearchLargeIcon() {
 function CloseIcon() {
   return (
     <svg width="17" height="17" viewBox="0 0 24 24" fill="none">
-      <path
-        d="M18 6 6 18M6 6l12 12"
-        stroke="currentColor"
-        strokeWidth="2"
-        strokeLinecap="round"
-      />
+      <path d="M18 6 6 18M6 6l12 12" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
     </svg>
   );
 }
@@ -440,13 +395,7 @@ function CalendarIcon() {
 
 function ArrowIcon() {
   return (
-    <svg
-      width="16"
-      height="16"
-      viewBox="0 0 24 24"
-      fill="none"
-      className="shrink-0 text-[#94A3B8]"
-    >
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" className="shrink-0 text-[#94A3B8]">
       <path
         d="m9 18 6-6-6-6"
         stroke="currentColor"

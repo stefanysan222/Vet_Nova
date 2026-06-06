@@ -34,7 +34,9 @@ function RescheduleModal({
   const today = new Date().toISOString().slice(0, 10);
 
   useEffect(() => {
-    fetchVeterinarios().then(setVets).catch(() => setVets([]));
+    fetchVeterinarios()
+      .then(setVets)
+      .catch(() => setVets([]));
   }, []);
 
   const slots = getClinicSlots(date);
@@ -43,9 +45,12 @@ function RescheduleModal({
   // Vets ocupados en la fecha+hora seleccionada (excluyendo la cita actual)
   const busyVetNames = new Set(
     allAppointments
-      .filter((a) => a.id !== appointment.id && a.date === date && a.time === time && a.status !== "Cancelada")
+      .filter(
+        (a) =>
+          a.id !== appointment.id && a.date === date && a.time === time && a.status !== "Cancelada",
+      )
       .map((a) => a.veterinarian)
-      .filter(Boolean)
+      .filter(Boolean),
   );
 
   const availableVets = vets.filter((v) => !busyVetNames.has(v.nombre ?? ""));
@@ -109,12 +114,20 @@ function RescheduleModal({
                 type="date"
                 min={today}
                 value={date}
-                onChange={(e) => { setDate(e.target.value); setTime(""); setSelectedVet(""); }}
+                onChange={(e) => {
+                  setDate(e.target.value);
+                  setTime("");
+                  setSelectedVet("");
+                }}
                 className="w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-2.5 text-sm text-slate-900 outline-none transition focus:border-brand-500 focus:ring-2 focus:ring-brand-100 dark:border-slate-700 dark:bg-slate-800 dark:text-white"
               />
               {date && (
-                <p className={`mt-1 text-xs font-medium ${isClinicOpen(date) ? "text-emerald-600 dark:text-emerald-400" : "text-rose-600 dark:text-rose-400"}`}>
-                  {isClinicOpen(date) ? `Horario: ${getScheduleLabel(date)}` : "La clínica está cerrada este día"}
+                <p
+                  className={`mt-1 text-xs font-medium ${isClinicOpen(date) ? "text-emerald-600 dark:text-emerald-400" : "text-rose-600 dark:text-rose-400"}`}
+                >
+                  {isClinicOpen(date)
+                    ? `Horario: ${getScheduleLabel(date)}`
+                    : "La clínica está cerrada este día"}
                 </p>
               )}
             </div>
@@ -137,7 +150,10 @@ function RescheduleModal({
                     <button
                       key={slot}
                       type="button"
-                      onClick={() => { setTime(slot); setSelectedVet(""); }}
+                      onClick={() => {
+                        setTime(slot);
+                        setSelectedVet("");
+                      }}
                       className={`rounded-xl py-2 text-xs font-medium transition ${
                         time === slot
                           ? "bg-brand-600 text-white shadow-sm"
@@ -182,7 +198,9 @@ function RescheduleModal({
                         {(v.nombre ?? "?")[0].toUpperCase()}
                       </span>
                       <span className="flex-1 font-medium">{v.nombre}</span>
-                      <span className="text-xs text-emerald-600 dark:text-emerald-400">Disponible</span>
+                      <span className="text-xs text-emerald-600 dark:text-emerald-400">
+                        Disponible
+                      </span>
                     </button>
                   ))}
 
@@ -194,7 +212,9 @@ function RescheduleModal({
                       <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg bg-slate-200 text-xs font-bold text-slate-500 dark:bg-slate-700">
                         {(v.nombre ?? "?")[0].toUpperCase()}
                       </span>
-                      <span className="flex-1 font-medium text-slate-500 dark:text-slate-400">{v.nombre}</span>
+                      <span className="flex-1 font-medium text-slate-500 dark:text-slate-400">
+                        {v.nombre}
+                      </span>
                       <span className="text-xs text-rose-500">Ocupado</span>
                     </div>
                   ))}
@@ -245,19 +265,28 @@ export default function CitasPage() {
       .finally(() => setLoading(false));
   };
 
-  useEffect(() => { cargar(); }, []);
+  // eslint-disable-next-line react-hooks/set-state-in-effect
+  useEffect(() => {
+    cargar();
+  }, []);
 
   const cambiarEstado = async (id: string, status: AppointmentStatus, silent = false) => {
     setUpdatingId(id);
     try {
       await updateCitaEstado(id, status);
       setAppointments((prev) => prev.map((a) => (a.id === id ? { ...a, status } : a)));
-      if (!silent) success(
-        status === "Confirmada" ? "Cita confirmada" : "Cita actualizada",
-        status === "Confirmada" ? "La cita fue confirmada exitosamente." : `Estado cambiado a ${status}.`
-      );
+      if (!silent)
+        success(
+          status === "Confirmada" ? "Cita confirmada" : "Cita actualizada",
+          status === "Confirmada"
+            ? "La cita fue confirmada exitosamente."
+            : `Estado cambiado a ${status}.`,
+        );
     } catch (err) {
-      error("Error al actualizar", err instanceof Error ? err.message : "No se pudo actualizar la cita.");
+      error(
+        "Error al actualizar",
+        err instanceof Error ? err.message : "No se pudo actualizar la cita.",
+      );
     } finally {
       setUpdatingId(null);
     }
@@ -276,12 +305,24 @@ export default function CitasPage() {
     const cita = rescheduleTarget;
     setSavingReschedule(true);
     try {
-      const updated = await updateCita({ ...cita, date, time, status: "Pendiente", veterinarian: veterinarian || cita.veterinarian });
+      const updated = await updateCita({
+        ...cita,
+        date,
+        time,
+        status: "Pendiente",
+        veterinarian: veterinarian || cita.veterinarian,
+      });
       setAppointments((prev) => prev.map((a) => (a.id === cita.id ? updated : a)));
       setRescheduleTarget(null);
-      success("Cita reprogramada", `La cita de ${cita.petName} fue reprogramada para el ${date} a las ${time}.`);
+      success(
+        "Cita reprogramada",
+        `La cita de ${cita.petName} fue reprogramada para el ${date} a las ${time}.`,
+      );
     } catch (err) {
-      error("Error al reprogramar", err instanceof Error ? err.message : "No se pudo reprogramar la cita.");
+      error(
+        "Error al reprogramar",
+        err instanceof Error ? err.message : "No se pudo reprogramar la cita.",
+      );
     } finally {
       setSavingReschedule(false);
     }
@@ -302,9 +343,10 @@ export default function CitasPage() {
         <section className="admin-card-padded">
           <div>
             <p className="text-eyebrow">Citas</p>
-            <h1 className="mt-2 text-page-title">Agenda de atención</h1>
-            <p className="mt-1 text-subtitle max-w-2xl">
-              Gestiona las citas del sistema. Confirma, reprograma o cancela las solicitudes pendientes.
+            <h1 className="text-page-title mt-2">Agenda de atención</h1>
+            <p className="text-subtitle mt-1 max-w-2xl">
+              Gestiona las citas del sistema. Confirma, reprograma o cancela las solicitudes
+              pendientes.
             </p>
           </div>
 
@@ -313,17 +355,23 @@ export default function CitasPage() {
             <article className="relative overflow-hidden rounded-2xl border border-slate-200/70 bg-white p-5 shadow-xs dark:border-slate-700 dark:bg-slate-800/50">
               <div className="absolute inset-y-0 left-0 w-1 rounded-l-2xl bg-slate-400" />
               <p className="text-label pl-1">Total citas</p>
-              <p className="mt-1 text-stat pl-1 text-slate-900 dark:text-white">{loading ? "—" : appointments.length}</p>
+              <p className="text-stat mt-1 pl-1 text-slate-900 dark:text-white">
+                {loading ? "—" : appointments.length}
+              </p>
             </article>
             <article className="relative overflow-hidden rounded-2xl border border-amber-200/70 bg-amber-50 p-5 shadow-xs dark:border-amber-900 dark:bg-amber-950/30">
               <div className="absolute inset-y-0 left-0 w-1 rounded-l-2xl bg-amber-500" />
               <p className="text-label pl-1 text-amber-600 dark:text-amber-400">Pendientes</p>
-              <p className="mt-1 text-stat pl-1 text-amber-800 dark:text-amber-300">{loading ? "—" : pendientes}</p>
+              <p className="text-stat mt-1 pl-1 text-amber-800 dark:text-amber-300">
+                {loading ? "—" : pendientes}
+              </p>
             </article>
             <article className="relative overflow-hidden rounded-2xl border border-emerald-200/70 bg-emerald-50 p-5 shadow-xs dark:border-emerald-900 dark:bg-emerald-950/30">
               <div className="absolute inset-y-0 left-0 w-1 rounded-l-2xl bg-emerald-500" />
               <p className="text-label pl-1 text-emerald-600 dark:text-emerald-400">Confirmadas</p>
-              <p className="mt-1 text-stat pl-1 text-emerald-800 dark:text-emerald-300">{loading ? "—" : confirmadas}</p>
+              <p className="text-stat mt-1 pl-1 text-emerald-800 dark:text-emerald-300">
+                {loading ? "—" : confirmadas}
+              </p>
             </article>
           </div>
 
@@ -350,21 +398,31 @@ export default function CitasPage() {
               <p className="text-sm text-slate-500">Cargando citas...</p>
             ) : citasFiltradas.length === 0 ? (
               <div className="rounded-2xl border border-slate-200/70 bg-slate-50 p-8 text-center dark:border-slate-700 dark:bg-slate-900">
-                <p className="text-slate-600 dark:text-slate-400">No hay citas que coincidan con el filtro.</p>
+                <p className="text-slate-600 dark:text-slate-400">
+                  No hay citas que coincidan con el filtro.
+                </p>
               </div>
             ) : (
               citasFiltradas.map((appointment) => (
-                <article key={appointment.id} className="rounded-2xl border border-slate-200/70 bg-white p-5 shadow-xs transition-shadow duration-200 hover:shadow-card-hover dark:border-slate-700 dark:bg-slate-900">
+                <article
+                  key={appointment.id}
+                  className="rounded-2xl border border-slate-200/70 bg-white p-5 shadow-xs transition-shadow duration-200 hover:shadow-card-hover dark:border-slate-700 dark:bg-slate-900"
+                >
                   <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
                     <div className="min-w-0 flex-1">
                       <p className="text-sm text-slate-500 dark:text-slate-400">
                         {appointment.date} · {appointment.time}
                       </p>
-                      <h2 className="mt-1 text-xl font-semibold text-slate-900 dark:text-white">{appointment.petName}</h2>
+                      <h2 className="mt-1 text-xl font-semibold text-slate-900 dark:text-white">
+                        {appointment.petName}
+                      </h2>
                       <p className="mt-1 text-sm text-slate-600 dark:text-slate-400">
-                        {appointment.service || "—"} · {appointment.veterinarian || "Sin veterinario asignado"}
+                        {appointment.service || "—"} ·{" "}
+                        {appointment.veterinarian || "Sin veterinario asignado"}
                       </p>
-                      <p className="mt-1 text-xs text-slate-500">Propietario: {appointment.ownerName || "—"}</p>
+                      <p className="mt-1 text-xs text-slate-500">
+                        Propietario: {appointment.ownerName || "—"}
+                      </p>
                     </div>
 
                     <div className="flex flex-wrap items-center gap-3">
@@ -389,7 +447,8 @@ export default function CitasPage() {
                         </button>
                       )}
 
-                      {(appointment.status === "Pendiente" || appointment.status === "Confirmada") && (
+                      {(appointment.status === "Pendiente" ||
+                        appointment.status === "Confirmada") && (
                         <button
                           onClick={() => setConfirmCancel(appointment)}
                           disabled={updatingId === appointment.id}

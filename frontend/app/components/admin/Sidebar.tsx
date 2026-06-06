@@ -20,13 +20,13 @@ import { motion, AnimatePresence } from "framer-motion";
 import { clearCurrentUser, getCurrentUser } from "../../../lib/auth";
 
 const menuItems = [
-  { label: "Dashboard",      icon: Home,        href: "/admin" },
-  { label: "Usuarios",       icon: Users2,      href: "/admin/usuarios" },
-  { label: "Citas",          icon: CalendarDays, href: "/admin/citas" },
-  { label: "Mascotas",       icon: Box,         href: "/admin/mascotas" },
-  { label: "Reportes",       icon: BarChart3,   href: "/admin/reportes" },
-  { label: "Notificaciones", icon: Bell,        href: "/admin/notificaciones" },
-  { label: "Configuración",  icon: Settings,    href: "/admin/configuracion" },
+  { label: "Dashboard", icon: Home, href: "/admin" },
+  { label: "Usuarios", icon: Users2, href: "/admin/usuarios" },
+  { label: "Citas", icon: CalendarDays, href: "/admin/citas" },
+  { label: "Mascotas", icon: Box, href: "/admin/mascotas" },
+  { label: "Reportes", icon: BarChart3, href: "/admin/reportes" },
+  { label: "Notificaciones", icon: Bell, href: "/admin/notificaciones" },
+  { label: "Configuración", icon: Settings, href: "/admin/configuracion" },
 ];
 
 function ThemeLogo({ size = 28 }: { size?: number }) {
@@ -50,18 +50,8 @@ function ThemeLogo({ size = 28 }: { size?: number }) {
   );
 }
 
-export default function Sidebar() {
-  const [mobileOpen, setMobileOpen] = useState(false);
-  const pathname = usePathname();
-  const router = useRouter();
-  const user = getCurrentUser();
-
-  const handleLogout = () => {
-    clearCurrentUser();
-    router.push("/login");
-  };
-
-  const NavLinks = ({ onItemClick }: { onItemClick?: () => void }) => (
+function NavLinks({ onItemClick, pathname }: { onItemClick?: () => void; pathname: string }) {
+  return (
     <nav className="space-y-1">
       {menuItems.map((item) => {
         const Icon = item.icon;
@@ -84,18 +74,34 @@ export default function Sidebar() {
       })}
     </nav>
   );
+}
+
+export default function Sidebar() {
+  const [mobileOpen, setMobileOpen] = useState(false);
+  const pathname = usePathname();
+  const router = useRouter();
+  const user = getCurrentUser();
+
+  const handleLogout = () => {
+    clearCurrentUser();
+    router.push("/login");
+  };
 
   return (
     <>
       {/* Sidebar desktop */}
       <aside className="hidden lg:flex lg:h-screen lg:w-[260px] lg:flex-col lg:border-r lg:border-slate-200/70 lg:bg-white lg:px-4 lg:py-6 dark:lg:border-slate-800 dark:lg:bg-slate-950">
-
         {/* Perfil del usuario */}
         <div className="mb-6 rounded-xl border border-slate-200/80 bg-slate-50 px-3 py-3 dark:border-slate-700 dark:bg-slate-900">
           <div className="flex items-center gap-3">
             <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-brand-600 text-xs font-bold text-white">
               {user?.name
-                ? user.name.split(" ").map((p) => p[0]).slice(0, 2).join("").toUpperCase()
+                ? user.name
+                    .split(" ")
+                    .map((p) => p[0])
+                    .slice(0, 2)
+                    .join("")
+                    .toUpperCase()
                 : "A"}
             </div>
             <div className="min-w-0">
@@ -109,7 +115,7 @@ export default function Sidebar() {
 
         {/* Navegación */}
         <div className="flex-1 overflow-y-auto">
-          <NavLinks />
+          <NavLinks pathname={pathname} />
         </div>
 
         {/* Footer del sidebar */}
@@ -176,21 +182,31 @@ export default function Sidebar() {
                 <div className="flex items-center gap-3">
                   <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-brand-600 text-xs font-bold text-white">
                     {user?.name
-                      ? user.name.split(" ").map((p) => p[0]).slice(0, 2).join("").toUpperCase()
+                      ? user.name
+                          .split(" ")
+                          .map((p) => p[0])
+                          .slice(0, 2)
+                          .join("")
+                          .toUpperCase()
                       : "A"}
                   </div>
                   <div>
-                    <p className="text-sm font-semibold text-slate-900 dark:text-white">{user?.name ?? "Administrador"}</p>
+                    <p className="text-sm font-semibold text-slate-900 dark:text-white">
+                      {user?.name ?? "Administrador"}
+                    </p>
                     <p className="text-xs text-slate-500">Administrador</p>
                   </div>
                 </div>
               </div>
 
-              <NavLinks onItemClick={() => setMobileOpen(false)} />
+              <NavLinks pathname={pathname} onItemClick={() => setMobileOpen(false)} />
 
               <div className="mt-6 border-t border-slate-200 pt-4 dark:border-slate-800">
                 <button
-                  onClick={() => { handleLogout(); setMobileOpen(false); }}
+                  onClick={() => {
+                    handleLogout();
+                    setMobileOpen(false);
+                  }}
                   className="flex w-full items-center gap-2 rounded-xl px-3 py-2.5 text-sm font-medium text-slate-600 transition hover:bg-slate-100 dark:text-slate-400 dark:hover:bg-slate-800"
                 >
                   <LogOut className="h-4 w-4" />

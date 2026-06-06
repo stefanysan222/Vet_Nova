@@ -1,3 +1,4 @@
+/// <reference types="vitest/globals" />
 import { describe, it, expect, beforeEach, vi } from "vitest";
 import { getToken, setToken, clearCurrentUser, getCurrentUser } from "../auth";
 

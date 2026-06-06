@@ -10,7 +10,11 @@ import ConfirmDialog from "../ui/ConfirmDialog";
 
 function getInitials(name: string | null) {
   if (!name) return "?";
-  return name.split(" ").map((p) => p.charAt(0)).slice(0, 2).join("");
+  return name
+    .split(" ")
+    .map((p) => p.charAt(0))
+    .slice(0, 2)
+    .join("");
 }
 
 function roleStyle(role: string): { bg: string; dot: string } {
@@ -38,7 +42,10 @@ export default function UsersTable({ refreshTrigger = 0 }: { refreshTrigger?: nu
       .finally(() => setLoading(false));
   };
 
-  useEffect(() => { cargar(); }, [refreshTrigger]);
+  // eslint-disable-next-line react-hooks/set-state-in-effect
+  useEffect(() => {
+    cargar();
+  }, [refreshTrigger]);
 
   const handleDeleteConfirm = async () => {
     // Capturar el usuario antes de limpiar el estado para evitar problemas de closure
@@ -49,9 +56,15 @@ export default function UsersTable({ refreshTrigger = 0 }: { refreshTrigger?: nu
     try {
       await deleteUsuario(usuario.id);
       setUsers((prev) => prev.filter((u) => u.id !== usuario.id));
-      success("Usuario eliminado", `${usuario.nombre ?? usuario.email} fue eliminado correctamente.`);
+      success(
+        "Usuario eliminado",
+        `${usuario.nombre ?? usuario.email} fue eliminado correctamente.`,
+      );
     } catch (err) {
-      error("Error al eliminar", err instanceof Error ? err.message : "No se pudo eliminar el usuario.");
+      error(
+        "Error al eliminar",
+        err instanceof Error ? err.message : "No se pudo eliminar el usuario.",
+      );
     } finally {
       setDeletingId(null);
     }
@@ -60,7 +73,9 @@ export default function UsersTable({ refreshTrigger = 0 }: { refreshTrigger?: nu
   return (
     <section className="rounded-[2rem] border border-slate-200/70 bg-white p-6 shadow-sm shadow-slate-200/40 dark:border-slate-700 dark:bg-slate-950 dark:shadow-slate-900/40">
       <div className="mb-2">
-        <h2 className="text-2xl font-semibold tracking-tight text-slate-900 dark:text-white">Usuarios activos</h2>
+        <h2 className="text-2xl font-semibold tracking-tight text-slate-900 dark:text-white">
+          Usuarios activos
+        </h2>
         <p className="mt-2 max-w-2xl text-sm text-slate-500">
           Revisa y administra el acceso de cada miembro del equipo.
         </p>
@@ -91,12 +106,17 @@ export default function UsersTable({ refreshTrigger = 0 }: { refreshTrigger?: nu
                       {user.nombre ?? "Sin nombre"}
                     </p>
                     <div className="mt-2">
-                      {(() => { const rs = roleStyle(user.rol); return (
-                        <span className={`inline-flex items-center gap-1.5 rounded-full px-2.5 py-0.5 text-xs font-semibold ${rs.bg}`}>
-                          <span className={`h-1.5 w-1.5 shrink-0 rounded-full ${rs.dot}`} />
-                          {user.rol}
-                        </span>
-                      ); })()}
+                      {(() => {
+                        const rs = roleStyle(user.rol);
+                        return (
+                          <span
+                            className={`inline-flex items-center gap-1.5 rounded-full px-2.5 py-0.5 text-xs font-semibold ${rs.bg}`}
+                          >
+                            <span className={`h-1.5 w-1.5 shrink-0 rounded-full ${rs.dot}`} />
+                            {user.rol}
+                          </span>
+                        );
+                      })()}
                     </div>
                     <p className="mt-3 text-sm text-slate-600 dark:text-slate-300">{user.email}</p>
                   </div>
@@ -104,7 +124,10 @@ export default function UsersTable({ refreshTrigger = 0 }: { refreshTrigger?: nu
 
                 <div className="flex flex-wrap items-center gap-3">
                   <button
-                    onClick={() => { setSelectedUser(user); setShowEdit(true); }}
+                    onClick={() => {
+                      setSelectedUser(user);
+                      setShowEdit(true);
+                    }}
                     className="btn-secondary"
                   >
                     <Pencil className="h-4 w-4" />
@@ -129,7 +152,16 @@ export default function UsersTable({ refreshTrigger = 0 }: { refreshTrigger?: nu
         isOpen={showEdit}
         onClose={() => setShowEdit(false)}
         onUpdated={cargar}
-        user={selectedUser ? { id: selectedUser.id, name: selectedUser.nombre ?? "", email: selectedUser.email, role: selectedUser.rol } : null}
+        user={
+          selectedUser
+            ? {
+                id: selectedUser.id,
+                name: selectedUser.nombre ?? "",
+                email: selectedUser.email,
+                role: selectedUser.rol,
+              }
+            : null
+        }
       />
 
       <ConfirmDialog

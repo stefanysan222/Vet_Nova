@@ -2,14 +2,7 @@
 
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
-import {
-  useEffect,
-  useMemo,
-  useRef,
-  useState,
-  type KeyboardEvent,
-  type ReactNode,
-} from "react";
+import { useEffect, useMemo, useRef, useState, type KeyboardEvent, type ReactNode } from "react";
 import { getCurrentUser, clearCurrentUser } from "../../lib/auth";
 
 type IconName =
@@ -25,11 +18,7 @@ type IconName =
   | "moon"
   | "sun";
 
-type CategoriaResultado =
-  | "Paciente"
-  | "Historial clínico"
-  | "Consulta"
-  | "Módulo";
+type CategoriaResultado = "Paciente" | "Historial clínico" | "Consulta" | "Módulo";
 
 interface ResultadoBusqueda {
   id: string;
@@ -73,7 +62,8 @@ const navigation: {
   },
 ];
 
-const notificationPreview: { title: string; description: string; time: string; unread: boolean }[] = [];
+const notificationPreview: { title: string; description: string; time: string; unread: boolean }[] =
+  [];
 
 const elementosBusqueda: ResultadoBusqueda[] = [
   {
@@ -132,20 +122,28 @@ const elementosBusqueda: ResultadoBusqueda[] = [
   },
 ];
 
-export default function VeterinarioLayoutShell({
-  children,
-}: {
-  children: ReactNode;
-}) {
+export default function VeterinarioLayoutShell({ children }: { children: ReactNode }) {
   const pathname = usePathname();
   const router = useRouter();
   const buscadorRef = useRef<HTMLDivElement>(null);
-  const [userName, setUserName] = useState("Veterinario");
-  const [userInitials, setUserInitials] = useState("V");
+  const [userName, setUserName] = useState(() => getCurrentUser()?.name ?? "Veterinario");
+  const [userInitials, setUserInitials] = useState(() => {
+    const name = getCurrentUser()?.name;
+    return name
+      ? name
+          .split(" ")
+          .map((p: string) => p[0])
+          .slice(0, 2)
+          .join("")
+          .toUpperCase()
+      : "V";
+  });
 
   const [showNotifications, setShowNotifications] = useState(false);
   const [showUserMenu, setShowUserMenu] = useState(false);
-  const [darkMode, setDarkMode] = useState(false);
+  const [darkMode, setDarkMode] = useState(
+    () => typeof window !== "undefined" && localStorage.getItem("vetnova-theme") === "dark",
+  );
   const [mobileOpen, setMobileOpen] = useState(false);
 
   const [busquedaGlobal, setBusquedaGlobal] = useState("");
@@ -161,7 +159,7 @@ export default function VeterinarioLayoutShell({
     return elementosBusqueda
       .filter((resultado) => {
         const contenido = normalizarTexto(
-          `${resultado.titulo} ${resultado.descripcion} ${resultado.palabrasClave}`
+          `${resultado.titulo} ${resultado.descripcion} ${resultado.palabrasClave}`,
         );
 
         return contenido.includes(termino);
@@ -183,20 +181,14 @@ export default function VeterinarioLayoutShell({
       router.replace(routes[user.role] ?? "/login");
       return;
     }
-    // Actualizar nombre e iniciales una vez confirmada la sesión
-    const name = user.name ?? "Veterinario";
-    setUserName(name);
-    setUserInitials(name.split(" ").map((p: string) => p[0]).slice(0, 2).join("").toUpperCase());
   }, [router]);
 
   useEffect(() => {
-    const savedTheme = localStorage.getItem("vetnova-theme") === "dark";
-
-    setDarkMode(savedTheme);
-    document.documentElement.classList.toggle("dark", savedTheme);
-  }, []);
+    document.documentElement.classList.toggle("dark", darkMode);
+  }, [darkMode]);
 
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setShowNotifications(false);
     setShowUserMenu(false);
     setMostrarResultados(false);
@@ -207,10 +199,7 @@ export default function VeterinarioLayoutShell({
     function cerrarElementosAbiertos(event: MouseEvent) {
       const target = event.target as Node;
 
-      if (
-        buscadorRef.current &&
-        !buscadorRef.current.contains(target)
-      ) {
+      if (buscadorRef.current && !buscadorRef.current.contains(target)) {
         setMostrarResultados(false);
       }
     }
@@ -267,11 +256,7 @@ export default function VeterinarioLayoutShell({
         <aside className="hidden h-screen w-[215px] shrink-0 border-r border-[#E5EAF2] bg-white dark:border-[#1E293B] dark:bg-[#111827] lg:flex lg:flex-col">
           <div className="flex h-[78px] items-center gap-3 border-b border-[#E5EAF2] px-4 dark:border-[#1E293B]">
             <img
-              src={
-                darkMode
-                  ? "/logos/vetnova-logo-dark.png"
-                  : "/logos/vetnova-logo-light.png"
-              }
+              src={darkMode ? "/logos/vetnova-logo-dark.png" : "/logos/vetnova-logo-light.png"}
               alt="VetNova"
               className="h-10 w-10 rounded-xl object-contain"
             />
@@ -302,7 +287,10 @@ export default function VeterinarioLayoutShell({
           <div className="border-t border-[#E5EAF2] px-3 py-5 dark:border-[#1E293B]">
             <button
               type="button"
-              onClick={() => { clearCurrentUser(); router.push("/login"); }}
+              onClick={() => {
+                clearCurrentUser();
+                router.push("/login");
+              }}
               className="flex w-full items-center gap-3 rounded-xl px-4 py-3 text-[14px] font-semibold text-[#10213A] transition hover:bg-[#F1F5F9] dark:text-white dark:hover:bg-[#1E293B]"
             >
               <AppIcon name="logout" />
@@ -318,10 +306,18 @@ export default function VeterinarioLayoutShell({
             <button
               type="button"
               onClick={() => setMobileOpen(true)}
-              className="mr-3 flex h-9 w-9 shrink-0 items-center justify-center rounded-xl border border-[#E5EAF2] bg-white lg:hidden dark:border-[#1E293B] dark:bg-[#111827]"
+              className="mr-3 flex h-9 w-9 shrink-0 items-center justify-center rounded-xl border border-[#E5EAF2] bg-white dark:border-[#1E293B] dark:bg-[#111827] lg:hidden"
               aria-label="Abrir menú"
             >
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
+              <svg
+                width="20"
+                height="20"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+              >
                 <path d="M4 6h16M4 12h16M4 18h16" />
               </svg>
             </button>
@@ -334,10 +330,7 @@ export default function VeterinarioLayoutShell({
                     : "border-[#CBD5E1] dark:border-[#334155]"
                 }`}
               >
-                <AppIcon
-                  name="search"
-                  className="h-[18px] w-[18px] text-[#64748B]"
-                />
+                <AppIcon name="search" className="h-[18px] w-[18px] text-[#64748B]" />
 
                 <input
                   type="text"
@@ -392,10 +385,7 @@ export default function VeterinarioLayoutShell({
                           className="group flex w-full items-center gap-3 px-4 py-3 text-left transition hover:bg-[#F5F9FF] dark:hover:bg-[#1E293B]"
                         >
                           <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-[#EEF4FF] text-[#2563EB] transition group-hover:bg-[#DBEAFE] dark:bg-[#172554] dark:text-[#93C5FD]">
-                            <AppIcon
-                              name={resultado.icon}
-                              className="h-[19px] w-[19px]"
-                            />
+                            <AppIcon name={resultado.icon} className="h-[19px] w-[19px]" />
                           </div>
 
                           <div className="min-w-0 flex-1">
@@ -494,9 +484,7 @@ export default function VeterinarioLayoutShell({
                               {notification.description}
                             </p>
 
-                            <p className="mt-2 text-[12px] text-[#94A3B8]">
-                              {notification.time}
-                            </p>
+                            <p className="mt-2 text-[12px] text-[#94A3B8]">{notification.time}</p>
                           </div>
                         </div>
                       ))}
@@ -606,7 +594,11 @@ export default function VeterinarioLayoutShell({
                     <div className="border-t border-[#E2E8F0] py-2 dark:border-[#334155]">
                       <button
                         type="button"
-                        onClick={() => { setShowUserMenu(false); clearCurrentUser(); router.push("/login"); }}
+                        onClick={() => {
+                          setShowUserMenu(false);
+                          clearCurrentUser();
+                          router.push("/login");
+                        }}
                         className="flex w-full items-center gap-3 px-5 py-3 text-[14px] font-semibold text-[#EF4444] transition hover:bg-[#FEF2F2] dark:hover:bg-[#3F1D1D]"
                       >
                         <AppIcon name="logout" />
@@ -636,23 +628,58 @@ export default function VeterinarioLayoutShell({
           >
             <div className="flex h-[78px] items-center justify-between border-b border-[#E5EAF2] px-4 dark:border-[#1E293B]">
               <div className="flex items-center gap-3">
-                <img src={darkMode ? "/logos/vetnova-logo-dark.png" : "/logos/vetnova-logo-light.png"} alt="VetNova" className="h-10 w-10 rounded-xl object-contain" />
+                <img
+                  src={darkMode ? "/logos/vetnova-logo-dark.png" : "/logos/vetnova-logo-light.png"}
+                  alt="VetNova"
+                  className="h-10 w-10 rounded-xl object-contain"
+                />
                 <div>
-                  <h1 className="text-[20px] font-bold leading-none text-[#10213A] dark:text-white">VetNova</h1>
-                  <p className="mt-1.5 text-[11px] text-[#64748B] dark:text-[#94A3B8]">Sistema Veterinario</p>
+                  <h1 className="text-[20px] font-bold leading-none text-[#10213A] dark:text-white">
+                    VetNova
+                  </h1>
+                  <p className="mt-1.5 text-[11px] text-[#64748B] dark:text-[#94A3B8]">
+                    Sistema Veterinario
+                  </p>
                 </div>
               </div>
-              <button onClick={() => setMobileOpen(false)} className="flex h-8 w-8 items-center justify-center rounded-lg text-[#64748B] hover:bg-[#F1F5F9] dark:hover:bg-[#1E293B]">
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><path d="M18 6 6 18M6 6l12 12" /></svg>
+              <button
+                onClick={() => setMobileOpen(false)}
+                className="flex h-8 w-8 items-center justify-center rounded-lg text-[#64748B] hover:bg-[#F1F5F9] dark:hover:bg-[#1E293B]"
+              >
+                <svg
+                  width="18"
+                  height="18"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                >
+                  <path d="M18 6 6 18M6 6l12 12" />
+                </svg>
               </button>
             </div>
             <nav className="px-3 py-5">
               {navigation.map((item) => (
-                <SidebarItem key={item.href} href={item.href} label={item.label} icon={item.icon} active={isActive(item.href)} onClick={() => setMobileOpen(false)} />
+                <SidebarItem
+                  key={item.href}
+                  href={item.href}
+                  label={item.label}
+                  icon={item.icon}
+                  active={isActive(item.href)}
+                  onClick={() => setMobileOpen(false)}
+                />
               ))}
             </nav>
             <div className="border-t border-[#E5EAF2] px-3 py-5 dark:border-[#1E293B]">
-              <button type="button" onClick={() => { clearCurrentUser(); router.push("/login"); }} className="flex w-full items-center gap-3 rounded-xl px-4 py-3 text-[14px] font-semibold text-[#10213A] transition hover:bg-[#F1F5F9] dark:text-white dark:hover:bg-[#1E293B]">
+              <button
+                type="button"
+                onClick={() => {
+                  clearCurrentUser();
+                  router.push("/login");
+                }}
+                className="flex w-full items-center gap-3 rounded-xl px-4 py-3 text-[14px] font-semibold text-[#10213A] transition hover:bg-[#F1F5F9] dark:text-white dark:hover:bg-[#1E293B]"
+              >
                 <AppIcon name="logout" />
                 Cerrar Sesión
               </button>
@@ -693,15 +720,7 @@ function SidebarItem({
   );
 }
 
-function DropdownLink({
-  href,
-  icon,
-  label,
-}: {
-  href: string;
-  icon: IconName;
-  label: string;
-}) {
+function DropdownLink({ href, icon, label }: { href: string; icon: IconName; label: string }) {
   return (
     <Link
       href={href}
@@ -713,13 +732,7 @@ function DropdownLink({
   );
 }
 
-function AppIcon({
-  name,
-  className = "h-5 w-5",
-}: {
-  name: IconName;
-  className?: string;
-}) {
+function AppIcon({ name, className = "h-5 w-5" }: { name: IconName; className?: string }) {
   const svgProps = {
     className,
     viewBox: "0 0 24 24",

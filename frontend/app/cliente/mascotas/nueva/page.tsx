@@ -68,17 +68,14 @@ const formularioInicial: FormularioMascota = {
 const inputClassName =
   "mt-2 h-[48px] w-full rounded-xl border border-[#CBD5E1] bg-white px-4 text-[15px] text-[#10213A] outline-none transition-all placeholder:text-[#94A3B8] focus:border-[#2F6BFF] focus:ring-2 focus:ring-[#2F6BFF]/10 dark:border-[#334155] dark:bg-[#0F172A] dark:text-white dark:placeholder:text-[#64748B] dark:focus:border-[#2F6BFF]";
 
-const labelClassName =
-  "text-[14px] font-semibold text-[#10213A] dark:text-white";
+const labelClassName = "text-[14px] font-semibold text-[#10213A] dark:text-white";
 
 export default function NuevaMascotaPage() {
   const router = useRouter();
 
-  const [propietario, setPropietario] =
-    useState<PropietarioActual>(propietarioInicial);
+  const [propietario, setPropietario] = useState<PropietarioActual>(propietarioInicial);
 
-  const [formulario, setFormulario] =
-    useState<FormularioMascota>(formularioInicial);
+  const [formulario, setFormulario] = useState<FormularioMascota>(formularioInicial);
 
   const [foto, setFoto] = useState<string | null>(null);
   const [subiendoFoto, setSubiendoFoto] = useState(false);
@@ -99,18 +96,13 @@ export default function NuevaMascotaPage() {
     window.addEventListener("storage", cargarPropietario);
 
     return () => {
-      window.removeEventListener(
-        "vetnova-profile-updated",
-        cargarPropietario
-      );
+      window.removeEventListener("vetnova-profile-updated", cargarPropietario);
       window.removeEventListener("storage", cargarPropietario);
     };
   }, []);
 
   const actualizarCampo = (
-    event: ChangeEvent<
-      HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement
-    >
+    event: ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>,
   ) => {
     const { name, value } = event.target;
 
@@ -119,7 +111,7 @@ export default function NuevaMascotaPage() {
         ({
           ...actual,
           [name]: value,
-        }) as FormularioMascota
+        }) as FormularioMascota,
     );
 
     setErrorFormulario("");
@@ -147,7 +139,6 @@ export default function NuevaMascotaPage() {
       setFoto(json.url);
     } catch (error) {
       setErrorFoto("No se pudo subir la imagen. Intenta de nuevo.");
-      console.error(error);
     } finally {
       setSubiendoFoto(false);
     }
@@ -182,9 +173,7 @@ export default function NuevaMascotaPage() {
     setErrorFoto("");
   };
 
-  const seleccionarDocumentosClinicos = (
-    event: ChangeEvent<HTMLInputElement>
-  ) => {
+  const seleccionarDocumentosClinicos = (event: ChangeEvent<HTMLInputElement>) => {
     const archivosSeleccionados = Array.from(event.target.files ?? []);
 
     setErrorDocumentos("");
@@ -195,7 +184,7 @@ export default function NuevaMascotaPage() {
     }
 
     const archivoNoPermitido = archivosSeleccionados.find(
-      (archivo) => !DOCUMENT_TYPES.includes(archivo.type)
+      (archivo) => !DOCUMENT_TYPES.includes(archivo.type),
     );
 
     if (archivoNoPermitido) {
@@ -204,7 +193,7 @@ export default function NuevaMascotaPage() {
     }
 
     const archivoMuyGrande = archivosSeleccionados.find(
-      (archivo) => archivo.size > MAX_DOCUMENT_SIZE
+      (archivo) => archivo.size > MAX_DOCUMENT_SIZE,
     );
 
     if (archivoMuyGrande) {
@@ -217,14 +206,10 @@ export default function NuevaMascotaPage() {
     const archivosParaLeer = archivosSeleccionados.filter((archivo) => {
       const estaRepetido =
         documentosClinicos.some(
-          (documento) =>
-            documento.nombre === archivo.name &&
-            documento.tamano === archivo.size
+          (documento) => documento.nombre === archivo.name && documento.tamano === archivo.size,
         ) ||
         nuevosDocumentos.some(
-          (documento) =>
-            documento.nombre === archivo.name &&
-            documento.tamano === archivo.size
+          (documento) => documento.nombre === archivo.name && documento.tamano === archivo.size,
         );
 
       return !estaRepetido;
@@ -260,7 +245,7 @@ export default function NuevaMascotaPage() {
           fechaCarga: new Date().toISOString(),
           dataUrl,
         } as DocumentoClinicoAdjunto;
-      })
+      }),
     )
       .then((leidos) => {
         setDocumentosClinicos((actuales) => [...actuales, ...leidos]);
@@ -271,9 +256,7 @@ export default function NuevaMascotaPage() {
   };
 
   const quitarDocumentoClinico = (id: string) => {
-    setDocumentosClinicos((actuales) =>
-      actuales.filter((documento) => documento.id !== id)
-    );
+    setDocumentosClinicos((actuales) => actuales.filter((documento) => documento.id !== id));
     setErrorDocumentos("");
   };
 
@@ -310,15 +293,15 @@ export default function NuevaMascotaPage() {
         formulario.sexo === "macho"
           ? "Macho"
           : formulario.sexo === "hembra"
-          ? "Hembra"
-          : "No especificado";
+            ? "Hembra"
+            : "No especificado";
 
       const especieMapeada =
         formulario.especie === "perro"
           ? "Perro"
           : formulario.especie === "gato"
-          ? "Gato"
-          : formulario.especieOtra.trim();
+            ? "Gato"
+            : formulario.especieOtra.trim();
 
       await createMascota({
         nombre: formulario.nombre.trim(),
@@ -335,7 +318,7 @@ export default function NuevaMascotaPage() {
       router.push("/cliente/mascotas");
     } catch (err) {
       setErrorFormulario(
-        err instanceof Error ? err.message : "No se pudo guardar la mascota. Intenta de nuevo."
+        err instanceof Error ? err.message : "No se pudo guardar la mascota. Intenta de nuevo.",
       );
     } finally {
       setGuardando(false);
@@ -386,7 +369,7 @@ export default function NuevaMascotaPage() {
           </div>
 
           {/* Foto de la mascota */}
-          <div className="mb-8 flex flex-col gap-5 rounded-xl border border-[#E2E8F0] bg-[#F8FAFD] p-5 sm:flex-row sm:items-center dark:border-[#334155] dark:bg-[#0F172A]">
+          <div className="mb-8 flex flex-col gap-5 rounded-xl border border-[#E2E8F0] bg-[#F8FAFD] p-5 dark:border-[#334155] dark:bg-[#0F172A] sm:flex-row sm:items-center">
             <div className="relative flex h-[104px] w-[104px] shrink-0 items-center justify-center overflow-hidden rounded-xl bg-[#DBEAFE] text-[#2563EB] dark:bg-[#1E3A8A] dark:text-[#93C5FD]">
               {foto ? (
                 <Image
@@ -438,9 +421,7 @@ export default function NuevaMascotaPage() {
               />
 
               {errorFoto && (
-                <p className="mt-3 text-[13px] font-medium text-[#DC3545]">
-                  {errorFoto}
-                </p>
+                <p className="mt-3 text-[13px] font-medium text-[#DC3545]">{errorFoto}</p>
               )}
             </div>
           </div>
@@ -585,9 +566,7 @@ export default function NuevaMascotaPage() {
                   {propietario.nombreCompleto}
                 </p>
 
-                <p className="mt-1 text-[13px] text-[#64748B] dark:text-[#94A3B8]">
-                  Cliente
-                </p>
+                <p className="mt-1 text-[13px] text-[#64748B] dark:text-[#94A3B8]">Cliente</p>
               </div>
             </div>
 
@@ -600,7 +579,7 @@ export default function NuevaMascotaPage() {
             <button
               type="submit"
               disabled={guardando || subiendoFoto}
-              className="inline-flex h-[48px] w-full items-center justify-center gap-2 rounded-xl bg-[#2F6BFF] px-6 text-[15px] font-semibold text-white shadow-sm transition-all hover:-translate-y-0.5 hover:bg-[#2457D6] hover:shadow-[0_10px_20px_rgba(47,107,255,0.28)] disabled:opacity-60 disabled:cursor-not-allowed disabled:hover:translate-y-0"
+              className="inline-flex h-[48px] w-full items-center justify-center gap-2 rounded-xl bg-[#2F6BFF] px-6 text-[15px] font-semibold text-white shadow-sm transition-all hover:-translate-y-0.5 hover:bg-[#2457D6] hover:shadow-[0_10px_20px_rgba(47,107,255,0.28)] disabled:cursor-not-allowed disabled:opacity-60 disabled:hover:translate-y-0"
             >
               {guardando ? "Guardando..." : "Guardar Mascota"}
             </button>
@@ -645,11 +624,7 @@ function leerPropietarioActual(): PropietarioActual {
   }
 }
 
-function AvatarPropietario({
-  propietario,
-}: {
-  propietario: PropietarioActual;
-}) {
+function AvatarPropietario({ propietario }: { propietario: PropietarioActual }) {
   const iniciales = propietario.nombreCompleto
     .split(" ")
     .filter(Boolean)
@@ -690,9 +665,7 @@ function InputField({
   placeholder?: string;
   required?: boolean;
   onChange: (
-    event: ChangeEvent<
-      HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement
-    >
+    event: ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>,
   ) => void;
 }) {
   return (
@@ -733,9 +706,7 @@ function SelectField({
   options: { value: string; label: string }[];
   required?: boolean;
   onChange: (
-    event: ChangeEvent<
-      HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement
-    >
+    event: ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>,
   ) => void;
 }) {
   return (
@@ -848,7 +819,8 @@ function AntecedentesClinicosCard({
       </div>
 
       <p className="mt-2 text-[14px] leading-6 text-[#64748B] dark:text-[#94A3B8]">
-        Adjunta historias clínicas anteriores, carné de vacunación o resultados de exámenes para que el veterinario conozca sus antecedentes.
+        Adjunta historias clínicas anteriores, carné de vacunación o resultados de exámenes para que
+        el veterinario conozca sus antecedentes.
       </p>
 
       <label
@@ -949,7 +921,8 @@ function AntecedentesClinicosCard({
         <InfoIcon />
 
         <p className="text-[12px] leading-5 text-[#64748B] dark:text-[#94A3B8]">
-          Los documentos serán visibles únicamente para el propietario y el personal veterinario autorizado.
+          Los documentos serán visibles únicamente para el propietario y el personal veterinario
+          autorizado.
         </p>
       </div>
     </section>
@@ -1018,13 +991,7 @@ function InfoIcon() {
       viewBox="0 0 24 24"
       fill="none"
     >
-      <circle
-        cx="12"
-        cy="12"
-        r="9"
-        stroke="currentColor"
-        strokeWidth="1.8"
-      />
+      <circle cx="12" cy="12" r="9" stroke="currentColor" strokeWidth="1.8" />
       <path
         d="M12 10.5v6M12 7.5h.01"
         stroke="currentColor"

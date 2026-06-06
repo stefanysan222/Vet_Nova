@@ -3,6 +3,7 @@
 import { type FormEvent, useState } from "react";
 import { Mail } from "lucide-react";
 import { motion } from "framer-motion";
+import { API_URL } from "../../../lib/config";
 
 export default function ForgotPasswordForm() {
   const [email, setEmail] = useState("");
@@ -27,8 +28,12 @@ export default function ForgotPasswordForm() {
     setLoading(true);
     setError("");
     try {
-      // TODO: conectar a POST /auth/forgot-password cuando el backend lo implemente
-      await new Promise((r) => setTimeout(r, 800));
+      await fetch(`${API_URL}/auth/forgot-password`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email }),
+      });
+      // Siempre mostrar éxito — nunca revelar si el email existe o no
       setSent(true);
     } catch {
       setError("No se pudo enviar el correo. Intenta de nuevo.");

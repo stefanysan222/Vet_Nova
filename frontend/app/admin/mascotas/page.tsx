@@ -19,7 +19,9 @@ function parseNotas(notas?: string): Record<string, string> | null {
   try {
     const parsed = JSON.parse(notas);
     if (typeof parsed === "object" && parsed !== null) return parsed;
-  } catch { /* not JSON */ }
+  } catch {
+    /* not JSON */
+  }
   return null;
 }
 
@@ -28,14 +30,18 @@ function PetAvatar({ pet, size = "md" }: { pet: PetRecord; size?: "sm" | "md" | 
   const colors: Record<string, string> = {
     Canino: "bg-amber-100 text-amber-700 dark:bg-amber-900/40 dark:text-amber-300",
     Felino: "bg-violet-100 text-violet-700 dark:bg-violet-900/40 dark:text-violet-300",
-    Otro:   "bg-teal-100 text-teal-700 dark:bg-teal-900/40 dark:text-teal-300",
+    Otro: "bg-teal-100 text-teal-700 dark:bg-teal-900/40 dark:text-teal-300",
   };
   const color = colors[pet.especie] ?? colors["Otro"];
   return (
-    <div className={`${sizeMap[size]} ${color} flex shrink-0 items-center justify-center rounded-2xl font-bold`}>
-      {pet.foto
-        ? <img src={pet.foto} alt={pet.nombre} className="h-full w-full rounded-2xl object-cover" />
-        : pet.nombre[0]?.toUpperCase() ?? "?"}
+    <div
+      className={`${sizeMap[size]} ${color} flex shrink-0 items-center justify-center rounded-2xl font-bold`}
+    >
+      {pet.foto ? (
+        <img src={pet.foto} alt={pet.nombre} className="h-full w-full rounded-2xl object-cover" />
+      ) : (
+        (pet.nombre[0]?.toUpperCase() ?? "?")
+      )}
     </div>
   );
 }
@@ -52,7 +58,9 @@ function DetailModal({
   onClose: () => void;
 }) {
   const [tab, setTab] = useState<Tab>("info");
-  const historial = citas.filter((c) => c.petId === pet.id).sort((a, b) => b.date.localeCompare(a.date));
+  const historial = citas
+    .filter((c) => c.petId === pet.id)
+    .sort((a, b) => b.date.localeCompare(a.date));
 
   return (
     <motion.div
@@ -77,7 +85,9 @@ function DetailModal({
             <p className="text-xs font-semibold uppercase tracking-widest text-brand-600 dark:text-brand-400">
               {pet.especie}
             </p>
-            <h2 className="mt-0.5 text-2xl font-bold text-slate-900 dark:text-white">{pet.nombre}</h2>
+            <h2 className="mt-0.5 text-2xl font-bold text-slate-900 dark:text-white">
+              {pet.nombre}
+            </h2>
             <p className="mt-0.5 text-sm text-slate-500 dark:text-slate-400">
               {pet.raza || "Raza no especificada"} · Propietario: {pet.propietarioNombre || "—"}
             </p>
@@ -92,10 +102,12 @@ function DetailModal({
 
         {/* Tabs */}
         <div className="flex border-b border-slate-100 px-6 dark:border-slate-800">
-          {([
-            { id: "info" as Tab, label: "Información", icon: Info },
-            { id: "historial" as Tab, label: "Historial clínico", icon: FileText },
-          ] as const).map(({ id, label, icon: Icon }) => (
+          {(
+            [
+              { id: "info" as Tab, label: "Información", icon: Info },
+              { id: "historial" as Tab, label: "Historial clínico", icon: FileText },
+            ] as const
+          ).map(({ id, label, icon: Icon }) => (
             <button
               key={id}
               onClick={() => setTab(id)}
@@ -129,7 +141,10 @@ function DetailModal({
                   { label: "Raza", value: pet.raza || "—" },
                   { label: "Fecha de nac.", value: pet.fechaNacimiento || "—" },
                 ].map(({ label, value }) => (
-                  <div key={label} className="rounded-2xl border border-slate-100 bg-slate-50 p-4 dark:border-slate-800 dark:bg-slate-800/50">
+                  <div
+                    key={label}
+                    className="rounded-2xl border border-slate-100 bg-slate-50 p-4 dark:border-slate-800 dark:bg-slate-800/50"
+                  >
                     <p className="text-xs text-slate-500 dark:text-slate-400">{label}</p>
                     <p className="mt-1 font-semibold text-slate-900 dark:text-white">{value}</p>
                   </div>
@@ -137,7 +152,9 @@ function DetailModal({
               </div>
               <div className="rounded-2xl border border-slate-100 bg-slate-50 p-4 dark:border-slate-800 dark:bg-slate-800/50">
                 <p className="text-xs text-slate-500 dark:text-slate-400">Propietario</p>
-                <p className="mt-1 font-semibold text-slate-900 dark:text-white">{pet.propietarioNombre || "No registrado"}</p>
+                <p className="mt-1 font-semibold text-slate-900 dark:text-white">
+                  {pet.propietarioNombre || "No registrado"}
+                </p>
               </div>
             </div>
           )}
@@ -147,28 +164,40 @@ function DetailModal({
               {loadingCitas ? (
                 <div className="space-y-3">
                   {[1, 2, 3].map((i) => (
-                    <div key={i} className="h-20 animate-pulse rounded-2xl bg-slate-100 dark:bg-slate-800" />
+                    <div
+                      key={i}
+                      className="h-20 animate-pulse rounded-2xl bg-slate-100 dark:bg-slate-800"
+                    />
                   ))}
                 </div>
               ) : historial.length === 0 ? (
                 <div className="flex flex-col items-center justify-center gap-3 py-12 text-center">
                   <FileText className="h-10 w-10 text-slate-300 dark:text-slate-600" />
-                  <p className="text-sm text-slate-500 dark:text-slate-400">No hay historial clínico registrado para esta mascota.</p>
+                  <p className="text-sm text-slate-500 dark:text-slate-400">
+                    No hay historial clínico registrado para esta mascota.
+                  </p>
                 </div>
               ) : (
                 <div className="space-y-3">
                   {historial.map((cita) => {
                     const notas = parseNotas(cita.notes);
                     return (
-                      <div key={cita.id} className="rounded-2xl border border-slate-100 bg-slate-50 p-4 dark:border-slate-800 dark:bg-slate-800/50">
+                      <div
+                        key={cita.id}
+                        className="rounded-2xl border border-slate-100 bg-slate-50 p-4 dark:border-slate-800 dark:bg-slate-800/50"
+                      >
                         <div className="flex flex-wrap items-start justify-between gap-2">
                           <div>
-                            <p className="text-xs text-slate-400">{cita.date} · {cita.time || "—"}</p>
+                            <p className="text-xs text-slate-400">
+                              {cita.date} · {cita.time || "—"}
+                            </p>
                             <p className="mt-0.5 font-semibold text-slate-900 dark:text-white">
                               {cita.service || "Consulta general"}
                             </p>
                             {cita.veterinarian && (
-                              <p className="text-xs text-slate-500 dark:text-slate-400">Dr. {cita.veterinarian}</p>
+                              <p className="text-xs text-slate-500 dark:text-slate-400">
+                                Dr. {cita.veterinarian}
+                              </p>
                             )}
                           </div>
                           <StatusBadge status={cita.status} />
@@ -177,14 +206,16 @@ function DetailModal({
                         {/* Notas clínicas */}
                         {notas ? (
                           <div className="mt-3 space-y-1.5 border-t border-slate-200/70 pt-3 dark:border-slate-700">
-                            {Object.entries(notas).map(([k, v]) => v ? (
-                              <div key={k} className="flex gap-2 text-sm">
-                                <span className="w-28 shrink-0 font-medium capitalize text-slate-500 dark:text-slate-400">
-                                  {k.replace(/_/g, " ")}:
-                                </span>
-                                <span className="text-slate-700 dark:text-slate-300">{v}</span>
-                              </div>
-                            ) : null)}
+                            {Object.entries(notas).map(([k, v]) =>
+                              v ? (
+                                <div key={k} className="flex gap-2 text-sm">
+                                  <span className="w-28 shrink-0 font-medium capitalize text-slate-500 dark:text-slate-400">
+                                    {k.replace(/_/g, " ")}:
+                                  </span>
+                                  <span className="text-slate-700 dark:text-slate-300">{v}</span>
+                                </div>
+                              ) : null,
+                            )}
                           </div>
                         ) : cita.notes ? (
                           <p className="mt-3 border-t border-slate-200/70 pt-3 text-sm text-slate-600 dark:border-slate-700 dark:text-slate-300">
@@ -213,23 +244,36 @@ export default function MascotasPage() {
   const [selectedPet, setSelectedPet] = useState<PetRecord | null>(null);
   const [showForm, setShowForm] = useState(false);
   const [search, setSearch] = useState("");
-  const [filtroEspecie, setFiltroEspecie] = useState<"todas" | "Canino" | "Felino" | "Otro">("todas");
+  const [filtroEspecie, setFiltroEspecie] = useState<"todas" | "Canino" | "Felino" | "Otro">(
+    "todas",
+  );
   const [saving, setSaving] = useState(false);
   const [formError, setFormError] = useState("");
   const [form, setForm] = useState({
-    nombre: "", especie: "Canino", raza: "", edad: "", peso: "",
-    sexo: "No especificado", propietarioId: "",
+    nombre: "",
+    especie: "Canino",
+    raza: "",
+    edad: "",
+    peso: "",
+    sexo: "No especificado",
+    propietarioId: "",
   });
 
   const cargar = () => {
     setLoading(true);
     Promise.all([fetchMascotas(), fetchPropietarios()])
-      .then(([p, prop]) => { setPets(p); setPropietarios(prop); })
+      .then(([p, prop]) => {
+        setPets(p);
+        setPropietarios(prop);
+      })
       .catch(() => {})
       .finally(() => setLoading(false));
   };
 
-  useEffect(() => { cargar(); }, []);
+  // eslint-disable-next-line react-hooks/set-state-in-effect
+  useEffect(() => {
+    cargar();
+  }, []);
 
   useEffect(() => {
     fetchCitas()
@@ -257,8 +301,14 @@ export default function MascotasPage() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!form.nombre.trim()) { setFormError("El nombre es obligatorio."); return; }
-    if (!form.propietarioId) { setFormError("Selecciona un propietario."); return; }
+    if (!form.nombre.trim()) {
+      setFormError("El nombre es obligatorio.");
+      return;
+    }
+    if (!form.propietarioId) {
+      setFormError("Selecciona un propietario.");
+      return;
+    }
     setSaving(true);
     setFormError("");
     try {
@@ -273,7 +323,15 @@ export default function MascotasPage() {
         propietarioId: form.propietarioId,
       });
       setShowForm(false);
-      setForm({ nombre: "", especie: "Canino", raza: "", edad: "", peso: "", sexo: "No especificado", propietarioId: "" });
+      setForm({
+        nombre: "",
+        especie: "Canino",
+        raza: "",
+        edad: "",
+        peso: "",
+        sexo: "No especificado",
+        propietarioId: "",
+      });
       cargar();
     } catch (err) {
       setFormError(err instanceof Error ? err.message : "Error al registrar la mascota.");
@@ -282,30 +340,29 @@ export default function MascotasPage() {
     }
   };
 
-  const especieCounts = useMemo(() => ({
-    Canino: pets.filter((p) => p.especie === "Canino").length,
-    Felino: pets.filter((p) => p.especie === "Felino").length,
-    Otro:   pets.filter((p) => p.especie !== "Canino" && p.especie !== "Felino").length,
-  }), [pets]);
+  const especieCounts = useMemo(
+    () => ({
+      Canino: pets.filter((p) => p.especie === "Canino").length,
+      Felino: pets.filter((p) => p.especie === "Felino").length,
+      Otro: pets.filter((p) => p.especie !== "Canino" && p.especie !== "Felino").length,
+    }),
+    [pets],
+  );
 
   return (
     <>
       <div className="admin-page">
         <section className="admin-card-padded">
-
           {/* Header */}
           <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
             <div>
               <p className="text-eyebrow">Mascotas</p>
-              <h1 className="mt-2 text-page-title">Gestión de mascotas</h1>
-              <p className="mt-1 text-subtitle">
+              <h1 className="text-page-title mt-2">Gestión de mascotas</h1>
+              <p className="text-subtitle mt-1">
                 Consulta información y historial clínico de cada paciente.
               </p>
             </div>
-            <button
-              onClick={() => setShowForm(true)}
-              className="btn-primary shrink-0"
-            >
+            <button onClick={() => setShowForm(true)} className="btn-primary shrink-0">
               <Plus className="h-4 w-4" />
               Nueva mascota
             </button>
@@ -315,19 +372,27 @@ export default function MascotasPage() {
           <div className="mt-6 grid grid-cols-2 gap-4 sm:grid-cols-4">
             <article className="rounded-2xl border border-slate-200/70 bg-slate-50 p-4 dark:border-slate-700 dark:bg-slate-800/50">
               <p className="text-xs font-medium text-slate-500 dark:text-slate-400">Total</p>
-              <p className="mt-1 text-2xl font-bold text-slate-900 dark:text-white">{loading ? "—" : pets.length}</p>
+              <p className="mt-1 text-2xl font-bold text-slate-900 dark:text-white">
+                {loading ? "—" : pets.length}
+              </p>
             </article>
             <article className="rounded-2xl border border-amber-200/70 bg-amber-50 p-4 dark:border-amber-900/50 dark:bg-amber-950/20">
               <p className="text-xs font-medium text-amber-600 dark:text-amber-400">Caninos</p>
-              <p className="mt-1 text-2xl font-bold text-amber-800 dark:text-amber-300">{loading ? "—" : especieCounts.Canino}</p>
+              <p className="mt-1 text-2xl font-bold text-amber-800 dark:text-amber-300">
+                {loading ? "—" : especieCounts.Canino}
+              </p>
             </article>
             <article className="rounded-2xl border border-violet-200/70 bg-violet-50 p-4 dark:border-violet-900/50 dark:bg-violet-950/20">
               <p className="text-xs font-medium text-violet-600 dark:text-violet-400">Felinos</p>
-              <p className="mt-1 text-2xl font-bold text-violet-800 dark:text-violet-300">{loading ? "—" : especieCounts.Felino}</p>
+              <p className="mt-1 text-2xl font-bold text-violet-800 dark:text-violet-300">
+                {loading ? "—" : especieCounts.Felino}
+              </p>
             </article>
             <article className="rounded-2xl border border-teal-200/70 bg-teal-50 p-4 dark:border-teal-900/50 dark:bg-teal-950/20">
               <p className="text-xs font-medium text-teal-600 dark:text-teal-400">Otros</p>
-              <p className="mt-1 text-2xl font-bold text-teal-800 dark:text-teal-300">{loading ? "—" : especieCounts.Otro}</p>
+              <p className="mt-1 text-2xl font-bold text-teal-800 dark:text-teal-300">
+                {loading ? "—" : especieCounts.Otro}
+              </p>
             </article>
           </div>
 
@@ -365,14 +430,19 @@ export default function MascotasPage() {
             {loading ? (
               <div className="space-y-3">
                 {[1, 2, 3].map((i) => (
-                  <div key={i} className="h-20 animate-pulse rounded-2xl bg-slate-100 dark:bg-slate-800" />
+                  <div
+                    key={i}
+                    className="h-20 animate-pulse rounded-2xl bg-slate-100 dark:bg-slate-800"
+                  />
                 ))}
               </div>
             ) : petsFiltradas.length === 0 ? (
               <div className="flex flex-col items-center gap-3 rounded-2xl border border-slate-200/70 bg-slate-50 py-14 text-center dark:border-slate-700 dark:bg-slate-800/40">
                 <PawPrint className="h-10 w-10 text-slate-300 dark:text-slate-600" />
                 <p className="text-sm text-slate-500 dark:text-slate-400">
-                  {search || filtroEspecie !== "todas" ? "No hay mascotas que coincidan con el filtro." : "No hay mascotas registradas."}
+                  {search || filtroEspecie !== "todas"
+                    ? "No hay mascotas que coincidan con el filtro."
+                    : "No hay mascotas registradas."}
                 </p>
               </div>
             ) : (
@@ -388,7 +458,9 @@ export default function MascotasPage() {
                       <PetAvatar pet={pet} size="md" />
                       <div className="min-w-0 flex-1">
                         <div className="flex items-center gap-2">
-                          <p className="font-semibold text-slate-900 dark:text-white">{pet.nombre}</p>
+                          <p className="font-semibold text-slate-900 dark:text-white">
+                            {pet.nombre}
+                          </p>
                           <span className="rounded-full bg-slate-100 px-2 py-0.5 text-xs text-slate-500 dark:bg-slate-700 dark:text-slate-400">
                             {pet.especie}
                           </span>
@@ -405,7 +477,19 @@ export default function MascotasPage() {
                           </span>
                         )}
                       </div>
-                      <svg className="h-4 w-4 shrink-0 text-slate-300 dark:text-slate-600" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" /></svg>
+                      <svg
+                        className="h-4 w-4 shrink-0 text-slate-300 dark:text-slate-600"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                        stroke="currentColor"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth={2}
+                          d="M9 5l7 7-7 7"
+                        />
+                      </svg>
                     </button>
                   );
                 })}
@@ -454,7 +538,10 @@ export default function MascotasPage() {
             >
               <div className="flex items-center justify-between border-b border-slate-100 px-6 py-4 dark:border-slate-800">
                 <h2 className="text-lg font-bold text-slate-900 dark:text-white">Nueva mascota</h2>
-                <button onClick={() => setShowForm(false)} className="flex h-8 w-8 items-center justify-center rounded-xl text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800">
+                <button
+                  onClick={() => setShowForm(false)}
+                  className="flex h-8 w-8 items-center justify-center rounded-xl text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800"
+                >
                   <X className="h-4 w-4" />
                 </button>
               </div>
@@ -462,43 +549,100 @@ export default function MascotasPage() {
                 <form id="form-mascota" onSubmit={handleSubmit} className="space-y-5">
                   <div className="grid gap-5 sm:grid-cols-2">
                     <div>
-                      <label className="mb-1 block text-sm font-semibold text-slate-700 dark:text-slate-300">Nombre *</label>
-                      <input name="nombre" value={form.nombre} onChange={handleChange} placeholder="Nombre de la mascota" className={inputClass} required />
+                      <label className="mb-1 block text-sm font-semibold text-slate-700 dark:text-slate-300">
+                        Nombre *
+                      </label>
+                      <input
+                        name="nombre"
+                        value={form.nombre}
+                        onChange={handleChange}
+                        placeholder="Nombre de la mascota"
+                        className={inputClass}
+                        required
+                      />
                     </div>
                     <div>
-                      <label className="mb-1 block text-sm font-semibold text-slate-700 dark:text-slate-300">Especie</label>
-                      <select name="especie" value={form.especie} onChange={handleChange} className={inputClass}>
+                      <label className="mb-1 block text-sm font-semibold text-slate-700 dark:text-slate-300">
+                        Especie
+                      </label>
+                      <select
+                        name="especie"
+                        value={form.especie}
+                        onChange={handleChange}
+                        className={inputClass}
+                      >
                         <option value="Canino">Canino</option>
                         <option value="Felino">Felino</option>
                         <option value="Otro">Otro</option>
                       </select>
                     </div>
                     <div>
-                      <label className="mb-1 block text-sm font-semibold text-slate-700 dark:text-slate-300">Raza</label>
-                      <input name="raza" value={form.raza} onChange={handleChange} placeholder="Raza" className={inputClass} />
+                      <label className="mb-1 block text-sm font-semibold text-slate-700 dark:text-slate-300">
+                        Raza
+                      </label>
+                      <input
+                        name="raza"
+                        value={form.raza}
+                        onChange={handleChange}
+                        placeholder="Raza"
+                        className={inputClass}
+                      />
                     </div>
                     <div>
-                      <label className="mb-1 block text-sm font-semibold text-slate-700 dark:text-slate-300">Sexo</label>
-                      <select name="sexo" value={form.sexo} onChange={handleChange} className={inputClass}>
+                      <label className="mb-1 block text-sm font-semibold text-slate-700 dark:text-slate-300">
+                        Sexo
+                      </label>
+                      <select
+                        name="sexo"
+                        value={form.sexo}
+                        onChange={handleChange}
+                        className={inputClass}
+                      >
                         <option value="Macho">Macho</option>
                         <option value="Hembra">Hembra</option>
                         <option value="No especificado">No especificado</option>
                       </select>
                     </div>
                     <div>
-                      <label className="mb-1 block text-sm font-semibold text-slate-700 dark:text-slate-300">Edad (años)</label>
-                      <input name="edad" value={form.edad} onChange={handleChange} placeholder="Ej: 3 años" className={inputClass} />
+                      <label className="mb-1 block text-sm font-semibold text-slate-700 dark:text-slate-300">
+                        Edad (años)
+                      </label>
+                      <input
+                        name="edad"
+                        value={form.edad}
+                        onChange={handleChange}
+                        placeholder="Ej: 3 años"
+                        className={inputClass}
+                      />
                     </div>
                     <div>
-                      <label className="mb-1 block text-sm font-semibold text-slate-700 dark:text-slate-300">Peso (kg)</label>
-                      <input name="peso" value={form.peso} onChange={handleChange} placeholder="Ej: 4.5 kg" className={inputClass} />
+                      <label className="mb-1 block text-sm font-semibold text-slate-700 dark:text-slate-300">
+                        Peso (kg)
+                      </label>
+                      <input
+                        name="peso"
+                        value={form.peso}
+                        onChange={handleChange}
+                        placeholder="Ej: 4.5 kg"
+                        className={inputClass}
+                      />
                     </div>
                     <div className="sm:col-span-2">
-                      <label className="mb-1 block text-sm font-semibold text-slate-700 dark:text-slate-300">Propietario *</label>
-                      <select name="propietarioId" value={form.propietarioId} onChange={handleChange} className={inputClass} required>
+                      <label className="mb-1 block text-sm font-semibold text-slate-700 dark:text-slate-300">
+                        Propietario *
+                      </label>
+                      <select
+                        name="propietarioId"
+                        value={form.propietarioId}
+                        onChange={handleChange}
+                        className={inputClass}
+                        required
+                      >
                         <option value="">Seleccionar propietario</option>
                         {propietarios.map((p) => (
-                          <option key={p.id} value={p.id}>{p.name} — {p.email}</option>
+                          <option key={p.id} value={p.id}>
+                            {p.name} — {p.email}
+                          </option>
                         ))}
                       </select>
                     </div>
@@ -511,10 +655,19 @@ export default function MascotasPage() {
                 </form>
               </div>
               <div className="flex justify-end gap-3 border-t border-slate-100 px-6 py-4 dark:border-slate-800">
-                <button type="button" onClick={() => setShowForm(false)} className="rounded-xl border border-slate-200 px-5 py-2.5 text-sm font-semibold text-slate-700 transition hover:bg-slate-50 dark:border-slate-700 dark:text-slate-300">
+                <button
+                  type="button"
+                  onClick={() => setShowForm(false)}
+                  className="rounded-xl border border-slate-200 px-5 py-2.5 text-sm font-semibold text-slate-700 transition hover:bg-slate-50 dark:border-slate-700 dark:text-slate-300"
+                >
                   Cancelar
                 </button>
-                <button form="form-mascota" type="submit" disabled={saving} className="rounded-xl bg-brand-600 px-6 py-2.5 text-sm font-semibold text-white transition hover:bg-brand-700 disabled:opacity-60">
+                <button
+                  form="form-mascota"
+                  type="submit"
+                  disabled={saving}
+                  className="rounded-xl bg-brand-600 px-6 py-2.5 text-sm font-semibold text-white transition hover:bg-brand-700 disabled:opacity-60"
+                >
                   {saving ? "Guardando..." : "Registrar mascota"}
                 </button>
               </div>

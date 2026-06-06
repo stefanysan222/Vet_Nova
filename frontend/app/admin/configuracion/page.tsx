@@ -13,8 +13,8 @@ export default function ConfiguracionPage() {
   const user = getCurrentUser();
   const { success, error } = useToast();
 
-  const [nombre, setNombre] = useState("");
-  const [email, setEmail] = useState("");
+  const [nombre, setNombre] = useState(() => user?.name ?? "");
+  const [email, setEmail] = useState(() => user?.email ?? "");
   const [currentPassword, setCurrentPassword] = useState("");
   const [newPassword, setNewPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
@@ -25,13 +25,6 @@ export default function ConfiguracionPage() {
   const [savingEmail, setSavingEmail] = useState(false);
   const [savingPassword, setSavingPassword] = useState(false);
 
-  useEffect(() => {
-    if (user) {
-      setNombre(user.name);
-      setEmail(user.email);
-    }
-  }, []);
-
   const handleSaveNombre = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!nombre.trim()) return;
@@ -39,9 +32,15 @@ export default function ConfiguracionPage() {
     setSavingNombre(true);
     try {
       await updateUsuario(user.id, { nombre: nombre.trim() });
-      success("Nombre actualizado", "El nombre de usuario se actualizó correctamente. Vuelve a iniciar sesión para ver los cambios reflejados.");
+      success(
+        "Nombre actualizado",
+        "El nombre de usuario se actualizó correctamente. Vuelve a iniciar sesión para ver los cambios reflejados.",
+      );
     } catch (err) {
-      error("Error al actualizar", err instanceof Error ? err.message : "No se pudo actualizar el nombre.");
+      error(
+        "Error al actualizar",
+        err instanceof Error ? err.message : "No se pudo actualizar el nombre.",
+      );
     } finally {
       setSavingNombre(false);
     }
@@ -54,9 +53,15 @@ export default function ConfiguracionPage() {
     setSavingEmail(true);
     try {
       await updateUsuario(user.id, { email: email.trim() });
-      success("Correo actualizado", "El correo electrónico se actualizó correctamente. Vuelve a iniciar sesión para aplicar el cambio.");
+      success(
+        "Correo actualizado",
+        "El correo electrónico se actualizó correctamente. Vuelve a iniciar sesión para aplicar el cambio.",
+      );
     } catch (err) {
-      error("Error al actualizar", err instanceof Error ? err.message : "No se pudo actualizar el correo.");
+      error(
+        "Error al actualizar",
+        err instanceof Error ? err.message : "No se pudo actualizar el correo.",
+      );
     } finally {
       setSavingEmail(false);
     }
@@ -74,19 +79,28 @@ export default function ConfiguracionPage() {
       return;
     }
     if (newPassword !== confirmPassword) {
-      error("Las contraseñas no coinciden", "Verifica que la nueva contraseña y la confirmación sean iguales.");
+      error(
+        "Las contraseñas no coinciden",
+        "Verifica que la nueva contraseña y la confirmación sean iguales.",
+      );
       return;
     }
     if (!user) return;
     setSavingPassword(true);
     try {
       await updateUsuario(user.id, { password: newPassword });
-      success("Contraseña actualizada", "La contraseña se cambió correctamente. Usa la nueva contraseña en tu próximo inicio de sesión.");
+      success(
+        "Contraseña actualizada",
+        "La contraseña se cambió correctamente. Usa la nueva contraseña en tu próximo inicio de sesión.",
+      );
       setCurrentPassword("");
       setNewPassword("");
       setConfirmPassword("");
     } catch (err) {
-      error("Error al actualizar", err instanceof Error ? err.message : "No se pudo actualizar la contraseña.");
+      error(
+        "Error al actualizar",
+        err instanceof Error ? err.message : "No se pudo actualizar la contraseña.",
+      );
     } finally {
       setSavingPassword(false);
     }
@@ -95,23 +109,26 @@ export default function ConfiguracionPage() {
   return (
     <div className="admin-page">
       <section className="admin-card-padded">
-
         {/* Header */}
         <div>
           <p className="text-eyebrow">Configuración</p>
-          <h1 className="mt-2 text-page-title">Perfil de cuenta</h1>
-          <p className="mt-1 text-subtitle">
+          <h1 className="text-page-title mt-2">Perfil de cuenta</h1>
+          <p className="text-subtitle mt-1">
             Actualiza tu nombre de usuario, correo electrónico y contraseña.
           </p>
         </div>
 
         <div className="mt-8 max-w-lg space-y-6">
-
           {/* Nombre de usuario */}
-          <form onSubmit={handleSaveNombre} className="rounded-2xl border border-slate-200/70 bg-white p-5 shadow-xs dark:border-slate-700 dark:bg-slate-800/50">
+          <form
+            onSubmit={handleSaveNombre}
+            className="rounded-2xl border border-slate-200/70 bg-white p-5 shadow-xs dark:border-slate-700 dark:bg-slate-800/50"
+          >
             <div className="mb-4 flex items-center gap-2">
               <User className="h-4 w-4 text-brand-600 dark:text-brand-400" />
-              <h2 className="text-sm font-semibold text-slate-900 dark:text-white">Nombre de usuario</h2>
+              <h2 className="text-sm font-semibold text-slate-900 dark:text-white">
+                Nombre de usuario
+              </h2>
             </div>
             <input
               type="text"
@@ -133,10 +150,15 @@ export default function ConfiguracionPage() {
           </form>
 
           {/* Correo electrónico */}
-          <form onSubmit={handleSaveEmail} className="rounded-2xl border border-slate-200/70 bg-white p-5 shadow-xs dark:border-slate-700 dark:bg-slate-800/50">
+          <form
+            onSubmit={handleSaveEmail}
+            className="rounded-2xl border border-slate-200/70 bg-white p-5 shadow-xs dark:border-slate-700 dark:bg-slate-800/50"
+          >
             <div className="mb-4 flex items-center gap-2">
               <Mail className="h-4 w-4 text-brand-600 dark:text-brand-400" />
-              <h2 className="text-sm font-semibold text-slate-900 dark:text-white">Correo electrónico</h2>
+              <h2 className="text-sm font-semibold text-slate-900 dark:text-white">
+                Correo electrónico
+              </h2>
             </div>
             <input
               type="email"
@@ -158,14 +180,19 @@ export default function ConfiguracionPage() {
           </form>
 
           {/* Contraseña */}
-          <form onSubmit={handleSavePassword} className="rounded-2xl border border-slate-200/70 bg-white p-5 shadow-xs dark:border-slate-700 dark:bg-slate-800/50">
+          <form
+            onSubmit={handleSavePassword}
+            className="rounded-2xl border border-slate-200/70 bg-white p-5 shadow-xs dark:border-slate-700 dark:bg-slate-800/50"
+          >
             <div className="mb-4 flex items-center gap-2">
               <Lock className="h-4 w-4 text-brand-600 dark:text-brand-400" />
               <h2 className="text-sm font-semibold text-slate-900 dark:text-white">Contraseña</h2>
             </div>
             <div className="space-y-3">
               <div>
-                <label className="mb-1 block text-xs font-medium text-slate-500 dark:text-slate-400">Contraseña actual</label>
+                <label className="mb-1 block text-xs font-medium text-slate-500 dark:text-slate-400">
+                  Contraseña actual
+                </label>
                 <input
                   type="password"
                   value={currentPassword}
@@ -176,7 +203,9 @@ export default function ConfiguracionPage() {
                 />
               </div>
               <div>
-                <label className="mb-1 block text-xs font-medium text-slate-500 dark:text-slate-400">Nueva contraseña</label>
+                <label className="mb-1 block text-xs font-medium text-slate-500 dark:text-slate-400">
+                  Nueva contraseña
+                </label>
                 <div className="relative">
                   <input
                     type={showNew ? "text" : "password"}
@@ -195,7 +224,9 @@ export default function ConfiguracionPage() {
                 </div>
               </div>
               <div>
-                <label className="mb-1 block text-xs font-medium text-slate-500 dark:text-slate-400">Confirmar contraseña</label>
+                <label className="mb-1 block text-xs font-medium text-slate-500 dark:text-slate-400">
+                  Confirmar contraseña
+                </label>
                 <div className="relative">
                   <input
                     type={showConfirm ? "text" : "password"}
@@ -216,8 +247,12 @@ export default function ConfiguracionPage() {
 
               {/* Indicador de coincidencia */}
               {newPassword && confirmPassword && (
-                <p className={`text-xs font-medium ${newPassword === confirmPassword ? "text-emerald-600 dark:text-emerald-400" : "text-rose-600 dark:text-rose-400"}`}>
-                  {newPassword === confirmPassword ? "✓ Las contraseñas coinciden" : "✗ Las contraseñas no coinciden"}
+                <p
+                  className={`text-xs font-medium ${newPassword === confirmPassword ? "text-emerald-600 dark:text-emerald-400" : "text-rose-600 dark:text-rose-400"}`}
+                >
+                  {newPassword === confirmPassword
+                    ? "✓ Las contraseñas coinciden"
+                    : "✗ Las contraseñas no coinciden"}
                 </p>
               )}
             </div>

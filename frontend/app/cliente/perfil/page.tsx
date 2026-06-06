@@ -20,17 +20,17 @@ export default function PerfilPage() {
   const [stats, setStats] = useState<Stats>({ mascotas: 0, citas: 0 });
   const [ultimaCita, setUltimaCita] = useState<Appointment | null>(null);
   const [ultimaMascota, setUltimaMascota] = useState<PetRecord | null>(null);
-  const [perfilTelefono, setPerfilTelefono] = useState("");
+  const [perfilTelefono, setPerfilTelefono] = useState(() => {
+    if (typeof window === "undefined") return "";
+    try {
+      const stored = localStorage.getItem("vetnova_cliente_perfil");
+      return stored ? (JSON.parse(stored).telefono ?? "") : "";
+    } catch {
+      return "";
+    }
+  });
 
   useEffect(() => {
-    const stored = localStorage.getItem("vetnova_cliente_perfil");
-    if (stored) {
-      try {
-        const parsed = JSON.parse(stored);
-        setPerfilTelefono(parsed.telefono ?? "");
-      } catch {}
-    }
-
     const uid = user?.id ? Number(user.id) : undefined;
 
     Promise.all([
@@ -38,7 +38,7 @@ export default function PerfilPage() {
       fetchCitas(uid).catch(() => [] as Appointment[]),
     ]).then(([mascotas, citas]) => {
       const citasActivas = citas.filter(
-        (c) => c.status !== "Cancelada" && c.status !== "Finalizada" && c.status !== "No asistió"
+        (c) => c.status !== "Cancelada" && c.status !== "Finalizada" && c.status !== "No asistió",
       );
       setStats({ mascotas: mascotas.length, citas: citasActivas.length });
 
@@ -50,7 +50,7 @@ export default function PerfilPage() {
       setUltimaCita(sorted[0] ?? null);
 
       const sortedMascotas = [...mascotas].sort((a, b) =>
-        (b.id ?? "").toString().localeCompare((a.id ?? "").toString())
+        (b.id ?? "").toString().localeCompare((a.id ?? "").toString()),
       );
       setUltimaMascota(sortedMascotas[0] ?? null);
     });
@@ -78,9 +78,7 @@ export default function PerfilPage() {
               {nombre} {apellido}
             </h2>
 
-            <p className="mt-2 text-[15px] text-[#64748B] dark:text-[#94A3B8]">
-              Cliente
-            </p>
+            <p className="mt-2 text-[15px] text-[#64748B] dark:text-[#94A3B8]">Cliente</p>
 
             <span className="mt-4 rounded-full bg-[#DDF5DE] px-4 py-1.5 text-[13px] font-semibold text-[#2F9E44]">
               Cuenta activa
@@ -94,7 +92,7 @@ export default function PerfilPage() {
 
           <Link
             href="/cliente/configuracion"
-            className="mt-8 flex h-[45px] w-full items-center justify-center rounded-xl bg-brand-600 text-[15px] font-semibold text-white shadow-sm hover:bg-brand-700 transition-colors"
+            className="mt-8 flex h-[45px] w-full items-center justify-center rounded-xl bg-brand-600 text-[15px] font-semibold text-white shadow-sm transition-colors hover:bg-brand-700"
           >
             Configuración del perfil
           </Link>
@@ -118,10 +116,7 @@ export default function PerfilPage() {
                   description={`${ultimaCita.petName ?? "Mascota"} · ${ultimaCita.date} ${ultimaCita.time}`}
                 />
               ) : (
-                <ActivityItem
-                  title="Citas"
-                  description="Sin citas registradas aún"
-                />
+                <ActivityItem title="Citas" description="Sin citas registradas aún" />
               )}
 
               {ultimaMascota ? (
@@ -130,10 +125,7 @@ export default function PerfilPage() {
                   description={`${ultimaMascota.nombre} · ${ultimaMascota.especie}`}
                 />
               ) : (
-                <ActivityItem
-                  title="Mascotas"
-                  description="Sin mascotas registradas aún"
-                />
+                <ActivityItem title="Mascotas" description="Sin mascotas registradas aún" />
               )}
             </div>
           </div>
@@ -146,12 +138,8 @@ export default function PerfilPage() {
             <div className="mt-6 grid grid-cols-1 gap-4 md:grid-cols-2">
               <QuickLink href="/cliente/mascotas">Ver mis mascotas</QuickLink>
               <QuickLink href="/cliente/agendar">Ver mis citas</QuickLink>
-              <QuickLink href="/cliente/notificaciones">
-                Ver notificaciones
-              </QuickLink>
-              <QuickLink href="/cliente/configuracion">
-                Editar configuración
-              </QuickLink>
+              <QuickLink href="/cliente/notificaciones">Ver notificaciones</QuickLink>
+              <QuickLink href="/cliente/configuracion">Editar configuración</QuickLink>
             </div>
           </div>
         </section>
@@ -163,9 +151,7 @@ export default function PerfilPage() {
 function InfoRow({ label, value }: { label: string; value: string }) {
   return (
     <div className="flex items-center justify-between gap-4">
-      <span className="text-[14px] text-[#64748B] dark:text-[#94A3B8]">
-        {label}
-      </span>
+      <span className="text-[14px] text-[#64748B] dark:text-[#94A3B8]">{label}</span>
       <span className="text-right text-[14px] font-semibold text-[#10213A] dark:text-white">
         {value}
       </span>
@@ -176,42 +162,22 @@ function InfoRow({ label, value }: { label: string; value: string }) {
 function ProfileStat({ title, value }: { title: string; value: string }) {
   return (
     <article className="rounded-xl border border-[#CBD5E1] bg-white p-5 shadow-sm dark:border-[#334155] dark:bg-[#111827]">
-      <p className="text-[14px] text-[#64748B] dark:text-[#94A3B8]">
-        {title}
-      </p>
-      <h3 className="mt-3 text-[26px] font-semibold text-[#10213A] dark:text-white">
-        {value}
-      </h3>
+      <p className="text-[14px] text-[#64748B] dark:text-[#94A3B8]">{title}</p>
+      <h3 className="mt-3 text-[26px] font-semibold text-[#10213A] dark:text-white">{value}</h3>
     </article>
   );
 }
 
-function ActivityItem({
-  title,
-  description,
-}: {
-  title: string;
-  description: string;
-}) {
+function ActivityItem({ title, description }: { title: string; description: string }) {
   return (
     <div className="border-b border-[#E2E8F0] pb-4 last:border-b-0 last:pb-0 dark:border-[#334155]">
-      <h4 className="text-[15px] font-semibold text-[#10213A] dark:text-white">
-        {title}
-      </h4>
-      <p className="mt-2 text-[14px] text-[#64748B] dark:text-[#94A3B8]">
-        {description}
-      </p>
+      <h4 className="text-[15px] font-semibold text-[#10213A] dark:text-white">{title}</h4>
+      <p className="mt-2 text-[14px] text-[#64748B] dark:text-[#94A3B8]">{description}</p>
     </div>
   );
 }
 
-function QuickLink({
-  href,
-  children,
-}: {
-  href: string;
-  children: React.ReactNode;
-}) {
+function QuickLink({ href, children }: { href: string; children: React.ReactNode }) {
   return (
     <Link
       href={href}

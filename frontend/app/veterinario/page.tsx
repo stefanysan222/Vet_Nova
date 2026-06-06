@@ -23,40 +23,43 @@ function parseNotas(raw: string | undefined): { diagnostico?: string; tratamient
 export default function VeterinarioPage() {
   const [citas, setCitas] = useState<Appointment[]>([]);
   const [loading, setLoading] = useState(true);
-  const [userName, setUserName] = useState("Veterinario");
-
-  useEffect(() => {
-    const u = getCurrentUser();
-    if (u?.name) setUserName(u.name);
-  }, []);
+  const [userName] = useState(() => getCurrentUser()?.name ?? "Veterinario");
 
   useEffect(() => {
     fetchCitas()
       .then(setCitas)
-      .catch(console.error)
+      .catch(() => {})
       .finally(() => setLoading(false));
   }, []);
 
   const hoy = fechaHoy();
   const citasHoy = citas.filter((c) => c.date === hoy);
   const atendidas = citasHoy.filter((c) => c.status === "Finalizada");
-  const pendientes = citasHoy.filter(
-    (c) => c.status !== "Finalizada" && c.status !== "Cancelada"
-  );
+  const pendientes = citasHoy.filter((c) => c.status !== "Finalizada" && c.status !== "Cancelada");
   const conNotas = citas.filter((c) => c.notes);
 
   const stats = [
     { title: "Citas de hoy", value: String(citasHoy.length), description: "Agenda programada" },
-    { title: "Pacientes atendidos", value: String(atendidas.length), description: "Consultas completadas hoy" },
-    { title: "Consultas pendientes", value: String(pendientes.length), description: "Pacientes por valorar" },
-    { title: "Tratamientos registrados", value: String(conNotas.length), description: "Con registro clínico" },
+    {
+      title: "Pacientes atendidos",
+      value: String(atendidas.length),
+      description: "Consultas completadas hoy",
+    },
+    {
+      title: "Consultas pendientes",
+      value: String(pendientes.length),
+      description: "Pacientes por valorar",
+    },
+    {
+      title: "Tratamientos registrados",
+      value: String(conNotas.length),
+      description: "Con registro clínico",
+    },
   ];
 
   const agendaDiaria = citasHoy.slice(0, 5);
 
-  const pacientesAtendidos = citas
-    .filter((c) => c.status === "Finalizada")
-    .slice(0, 3);
+  const pacientesAtendidos = citas.filter((c) => c.status === "Finalizada").slice(0, 3);
 
   if (loading) {
     return (
@@ -76,13 +79,11 @@ export default function VeterinarioPage() {
               Módulo veterinario
             </p>
 
-            <h1 className="text-[28px] font-bold leading-tight">
-              Hola, {userName} 👋
-            </h1>
+            <h1 className="text-[28px] font-bold leading-tight">Hola, {userName} 👋</h1>
 
             <p className="mt-3 max-w-2xl text-sm leading-6 text-brand-100">
-              Consulta tu agenda diaria, registra valoraciones y tratamientos,
-              y revisa la historia clínica de tus pacientes.
+              Consulta tu agenda diaria, registra valoraciones y tratamientos, y revisa la historia
+              clínica de tus pacientes.
             </p>
           </div>
 
@@ -171,7 +172,9 @@ export default function VeterinarioPage() {
                   </div>
 
                   <div className="flex items-center gap-3">
-                    <span className={`inline-flex items-center rounded-full px-3 py-1.5 text-[12px] font-semibold ${getStatusStyle(cita.status).badge}`}>
+                    <span
+                      className={`inline-flex items-center rounded-full px-3 py-1.5 text-[12px] font-semibold ${getStatusStyle(cita.status).badge}`}
+                    >
                       {cita.status}
                     </span>
 
@@ -203,10 +206,7 @@ export default function VeterinarioPage() {
               </p>
             </div>
 
-            <Link
-              href="/veterinario/mascotas"
-              className="text-[14px] font-semibold text-[#2563EB]"
-            >
+            <Link href="/veterinario/mascotas" className="text-[14px] font-semibold text-[#2563EB]">
               Ver todos
             </Link>
           </div>
@@ -235,9 +235,7 @@ export default function VeterinarioPage() {
                         </p>
                       </div>
 
-                      <span className="text-[12px] text-[#94A3B8]">
-                        {cita.date}
-                      </span>
+                      <span className="text-[12px] text-[#94A3B8]">{cita.date}</span>
                     </div>
 
                     <div className="mt-3 rounded-xl bg-[#F8FAFC] px-3 py-3 text-[13px] dark:bg-[#0F172A]">
@@ -248,8 +246,7 @@ export default function VeterinarioPage() {
 
                       {notas.tratamiento && (
                         <p className="mt-1 text-[#475569] dark:text-[#CBD5E1]">
-                          <span className="font-semibold">Tratamiento:</span>{" "}
-                          {notas.tratamiento}
+                          <span className="font-semibold">Tratamiento:</span> {notas.tratamiento}
                         </p>
                       )}
                     </div>

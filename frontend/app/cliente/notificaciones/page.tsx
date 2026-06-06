@@ -33,12 +33,12 @@ export default function NotificacionesPage() {
   };
 
   return (
-    <div className="h-full overflow-y-auto admin-page">
+    <div className="admin-page h-full overflow-y-auto">
       {/* Header */}
       <div className="mb-8 flex items-start justify-between gap-4">
         <div>
           <h1 className="text-page-title">Notificaciones</h1>
-          <p className="mt-2 text-subtitle">Centro de alertas y recordatorios</p>
+          <p className="text-subtitle mt-2">Centro de alertas y recordatorios</p>
         </div>
 
         <button type="button" onClick={handleViewAll} className="btn-primary whitespace-nowrap">
@@ -55,23 +55,11 @@ export default function NotificacionesPage() {
           icon={<BellCardIcon />}
         />
 
-        <SummaryCard
-          title="No leídas"
-          value={unreadCount.toString()}
-          icon={<UnreadIcon />}
-        />
+        <SummaryCard title="No leídas" value={unreadCount.toString()} icon={<UnreadIcon />} />
 
-        <SummaryCard
-          title="Citas"
-          value="2"
-          icon={<CalendarCardIcon />}
-        />
+        <SummaryCard title="Citas" value="2" icon={<CalendarCardIcon />} />
 
-        <SummaryCard
-          title="Recordatorios"
-          value="1"
-          icon={<ReminderIcon />}
-        />
+        <SummaryCard title="Recordatorios" value="1" icon={<ReminderIcon />} />
       </div>
 
       {/* Main content */}
@@ -81,7 +69,9 @@ export default function NotificacionesPage() {
           <div className="mb-6 flex items-center justify-between gap-4">
             <div>
               <h2 className="text-section-title">Notificaciones recientes</h2>
-              <p className="mt-1 text-subtitle">Revisa las novedades relacionadas con tus mascotas y citas.</p>
+              <p className="text-subtitle mt-1">
+                Revisa las novedades relacionadas con tus mascotas y citas.
+              </p>
             </div>
 
             <div className="hidden items-center gap-2 md:flex">
@@ -105,8 +95,12 @@ export default function NotificacionesPage() {
           {filteredNotifications.length === 0 ? (
             <div className="rounded-2xl border border-dashed border-slate-300 bg-slate-50 p-10 text-center dark:border-slate-700 dark:bg-slate-800/50">
               <p className="text-section-title">No hay notificaciones con este filtro.</p>
-              <p className="mt-2 text-subtitle">Presiona "Ver todas" para regresar al listado completo.</p>
-              <button type="button" onClick={handleViewAll} className="mt-5 btn-primary">Ver todas</button>
+              <p className="text-subtitle mt-2">
+                Presiona &quot;Ver todas&quot; para regresar al listado completo.
+              </p>
+              <button type="button" onClick={handleViewAll} className="btn-primary mt-5">
+                Ver todas
+              </button>
             </div>
           ) : (
             <div className="divide-y divide-slate-200 dark:divide-slate-700">
@@ -116,7 +110,9 @@ export default function NotificacionesPage() {
                   className="flex items-start justify-between gap-5 py-5 first:pt-0 last:pb-0"
                 >
                   <div className="flex min-w-0 gap-4">
-                    <div className={`flex h-12 w-12 shrink-0 items-center justify-center rounded-xl ${item.color}`}>
+                    <div
+                      className={`flex h-12 w-12 shrink-0 items-center justify-center rounded-xl ${item.color}`}
+                    >
                       {item.icon === "calendar" && <CalendarIcon />}
                       {item.icon === "vaccine" && <VaccineIcon />}
                       {item.icon === "payment" && <PaymentIcon />}
@@ -125,10 +121,14 @@ export default function NotificacionesPage() {
 
                     <div className="min-w-0">
                       <div className="flex items-center gap-2">
-                        <h3 className="text-sm font-semibold text-slate-900 dark:text-white">{item.title}</h3>
+                        <h3 className="text-sm font-semibold text-slate-900 dark:text-white">
+                          {item.title}
+                        </h3>
                         {item.unread && <span className="h-2 w-2 rounded-full bg-red-500" />}
                       </div>
-                      <p className="mt-1 max-w-[720px] text-sm leading-6 text-slate-500 dark:text-slate-400">{item.description}</p>
+                      <p className="mt-1 max-w-[720px] text-sm leading-6 text-slate-500 dark:text-slate-400">
+                        {item.description}
+                      </p>
                       <div className="mt-2 flex items-center gap-3">
                         <span className="rounded-full bg-slate-100 px-2.5 py-0.5 text-xs font-semibold text-slate-600 dark:bg-slate-800 dark:text-slate-300">
                           {item.category}
@@ -160,38 +160,52 @@ export default function NotificacionesPage() {
                 <div className="mb-4 flex items-center justify-between gap-4">
                   <div>
                     <p className="text-eyebrow">Detalle</p>
-                    <h2 className="mt-1 text-section-title">{selected.title}</h2>
+                    <h2 className="text-section-title mt-1">{selected.title}</h2>
                   </div>
-                  <span className={`rounded-full px-2.5 py-1 text-xs font-semibold ${selected.unread ? "bg-amber-50 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400" : "bg-slate-100 text-slate-600 dark:bg-slate-800 dark:text-slate-300"}`}>
+                  <span
+                    className={`rounded-full px-2.5 py-1 text-xs font-semibold ${selected.unread ? "bg-amber-50 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400" : "bg-slate-100 text-slate-600 dark:bg-slate-800 dark:text-slate-300"}`}
+                  >
                     {selected.unread ? "No leída" : "Leída"}
                   </span>
                 </div>
 
                 <div className="rounded-xl border border-slate-200 bg-slate-50 p-4 dark:border-slate-700 dark:bg-slate-800/50">
                   <p className="text-label">Categoría</p>
-                  <p className="mt-1 text-sm font-semibold text-slate-900 dark:text-white">{selected.category}</p>
+                  <p className="mt-1 text-sm font-semibold text-slate-900 dark:text-white">
+                    {selected.category}
+                  </p>
                 </div>
 
                 <div className="mt-4 space-y-3">
                   <div>
                     <p className="text-label">Descripción</p>
-                    <p className="mt-1 text-sm leading-6 text-slate-600 dark:text-slate-300">{selected.description}</p>
+                    <p className="mt-1 text-sm leading-6 text-slate-600 dark:text-slate-300">
+                      {selected.description}
+                    </p>
                   </div>
                   <div>
                     <p className="text-label">Fecha</p>
-                    <p className="mt-1 text-sm text-slate-600 dark:text-slate-300">{selected.time}</p>
+                    <p className="mt-1 text-sm text-slate-600 dark:text-slate-300">
+                      {selected.time}
+                    </p>
                   </div>
                 </div>
 
-                <button type="button" onClick={handleViewAll} className="mt-5 btn-primary w-full justify-center">
+                <button
+                  type="button"
+                  onClick={handleViewAll}
+                  className="btn-primary mt-5 w-full justify-center"
+                >
                   Ver todas las notificaciones
                 </button>
               </div>
             ) : (
               <div className="flex h-full min-h-[200px] flex-col items-center justify-center rounded-xl border border-dashed border-slate-300 bg-slate-50 p-8 text-center dark:border-slate-700 dark:bg-slate-800/50">
                 <p className="text-section-title">Selecciona una notificación</p>
-                <p className="mt-2 text-subtitle">Haz clic en "Ver" para ver el detalle.</p>
-                <button type="button" onClick={handleViewAll} className="mt-4 btn-secondary">
+                <p className="text-subtitle mt-2">
+                  Haz clic en &quot;Ver&quot; para ver el detalle.
+                </p>
+                <button type="button" onClick={handleViewAll} className="btn-secondary mt-4">
                   Volver a todas
                 </button>
               </div>
@@ -294,12 +308,7 @@ function BellCardIcon() {
         strokeWidth="2"
         strokeLinejoin="round"
       />
-      <path
-        d="M10 19.2a2.2 2.2 0 0 0 4 0"
-        stroke="#2563EB"
-        strokeWidth="2"
-        strokeLinecap="round"
-      />
+      <path d="M10 19.2a2.2 2.2 0 0 0 4 0" stroke="#2563EB" strokeWidth="2" strokeLinecap="round" />
     </svg>
   );
 }
@@ -316,15 +325,7 @@ function UnreadIcon() {
 function CalendarCardIcon() {
   return (
     <svg width="23" height="23" viewBox="0 0 24 24" fill="none">
-      <rect
-        x="3.5"
-        y="5.5"
-        width="17"
-        height="15"
-        rx="2.5"
-        stroke="#2563EB"
-        strokeWidth="2"
-      />
+      <rect x="3.5" y="5.5" width="17" height="15" rx="2.5" stroke="#2563EB" strokeWidth="2" />
       <path
         d="M7 3.8v3.4M17 3.8v3.4M3.5 9.5h17"
         stroke="#2563EB"

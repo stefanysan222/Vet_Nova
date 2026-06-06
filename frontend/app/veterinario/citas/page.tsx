@@ -1,14 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import {
-  ChangeEvent,
-  FormEvent,
-  ReactNode,
-  useEffect,
-  useMemo,
-  useState,
-} from "react";
+import { ChangeEvent, FormEvent, ReactNode, useEffect, useMemo, useState } from "react";
 import { fetchCitas, createCita } from "../../../lib/api/citas";
 import { fetchMascotas } from "../../../lib/api/mascotas";
 import { fetchVeterinarios } from "../../../lib/api/usuarios";
@@ -18,11 +11,7 @@ import type { PetRecord } from "../../../lib/recepcionista/types";
 import { getCurrentUser } from "../../../lib/auth";
 import { getClinicSlots, isClinicOpen, getScheduleLabel } from "../../../lib/utils/clinic-schedule";
 
-type EstadoCita =
-  | "Pendiente de confirmación"
-  | "Confirmada"
-  | "En proceso"
-  | "Atendida";
+type EstadoCita = "Pendiente de confirmación" | "Confirmada" | "En proceso" | "Atendida";
 
 interface Cita {
   id: string;
@@ -95,22 +84,23 @@ export default function VeterinarioCitasPage() {
   const [citas, setCitas] = useState<Cita[]>([]);
   const [mascotas, setMascotas] = useState<PetRecord[]>([]);
   const [vets, setVets] = useState<UsuarioAPI[]>([]);
-  const [currentVetName, setCurrentVetName] = useState("");
+  const [currentVetName, setCurrentVetName] = useState(() => getCurrentUser()?.name ?? "");
   const [loading, setLoading] = useState(true);
   const [guardando, setGuardando] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [mostrarFormulario, setMostrarFormulario] = useState(false);
   const [mostrarMensaje, setMostrarMensaje] = useState(false);
   const [citaDetalle, setCitaDetalle] = useState<Cita | null>(null);
-  const [formulario, setFormulario] = useState<FormularioCita>(formularioVacio());
+  const [formulario, setFormulario] = useState<FormularioCita>(() =>
+    formularioVacio(getCurrentUser()?.name ?? ""),
+  );
 
   useEffect(() => {
-    const user = getCurrentUser();
-    const vetName = user?.name ?? "";
-    setCurrentVetName(vetName);
-    setFormulario(formularioVacio(vetName));
-
-    Promise.all([fetchCitas(), fetchMascotas(), fetchVeterinarios().catch(() => [] as UsuarioAPI[])])
+    Promise.all([
+      fetchCitas(),
+      fetchMascotas(),
+      fetchVeterinarios().catch(() => [] as UsuarioAPI[]),
+    ])
       .then(([appts, pets, vetList]) => {
         setCitas(appts.map(mapAppointmentToCita));
         setMascotas(pets);
@@ -130,8 +120,11 @@ export default function VeterinarioCitasPage() {
     if (!formulario.fecha || !vetName) return new Set<string>();
     return new Set(
       citas
-        .filter((c) => c.fecha === formulario.fecha && c.veterinario === vetName && c.estado !== "Atendida")
-        .map((c) => c.hora)
+        .filter(
+          (c) =>
+            c.fecha === formulario.fecha && c.veterinario === vetName && c.estado !== "Atendida",
+        )
+        .map((c) => c.hora),
     );
   }, [citas, formulario.fecha, formulario.veterinarioNombre, currentVetName]);
 
@@ -140,9 +133,12 @@ export default function VeterinarioCitasPage() {
     if (!formulario.fecha || !formulario.hora) return new Set<string>();
     return new Set(
       citas
-        .filter((c) => c.fecha === formulario.fecha && c.hora === formulario.hora && c.estado !== "Atendida")
+        .filter(
+          (c) =>
+            c.fecha === formulario.fecha && c.hora === formulario.hora && c.estado !== "Atendida",
+        )
         .map((c) => c.veterinario)
-        .filter(Boolean) as string[]
+        .filter(Boolean) as string[],
     );
   }, [citas, formulario.fecha, formulario.hora]);
 
@@ -155,7 +151,7 @@ export default function VeterinarioCitasPage() {
   const mascotaSeleccionada = mascotas.find((m) => m.id === formulario.mascotaId) ?? null;
 
   function handleChange(
-    event: ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>
+    event: ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>,
   ) {
     const { name, value } = event.target;
     setFormulario((actual) => ({ ...actual, [name]: value }));
@@ -229,9 +225,8 @@ export default function VeterinarioCitasPage() {
             </h1>
 
             <p className="mt-3 max-w-3xl text-base leading-7 text-[#64748B] dark:text-[#94A3B8]">
-              Consulta las citas programadas y registra nuevas solicitudes de
-              atención. Las citas creadas por el veterinario quedan pendientes
-              de confirmación administrativa.
+              Consulta las citas programadas y registra nuevas solicitudes de atención. Las citas
+              creadas por el veterinario quedan pendientes de confirmación administrativa.
             </p>
           </div>
 
@@ -250,7 +245,13 @@ export default function VeterinarioCitasPage() {
       {error && (
         <div className="flex items-start justify-between gap-4 rounded-[16px] border border-[#FECACA] bg-[#FEF2F2] px-5 py-4 dark:border-[#7F1D1D] dark:bg-[#450A0A]">
           <p className="text-[14px] text-[#B91C1C] dark:text-[#FECACA]">{error}</p>
-          <button type="button" onClick={() => setError(null)} className="text-[18px] font-semibold text-[#B91C1C]">×</button>
+          <button
+            type="button"
+            onClick={() => setError(null)}
+            className="text-[18px] font-semibold text-[#B91C1C]"
+          >
+            ×
+          </button>
         </div>
       )}
 
@@ -263,9 +264,8 @@ export default function VeterinarioCitasPage() {
             </p>
 
             <p className="mt-1 text-[13px] leading-6 text-[#166534] dark:text-[#BBF7D0]">
-              La solicitud fue creada con estado{" "}
-              <strong>Pendiente de confirmación</strong>. El administrador
-              deberá revisarla y confirmarla.
+              La solicitud fue creada con estado <strong>Pendiente de confirmación</strong>. El
+              administrador deberá revisarla y confirmarla.
             </p>
           </div>
 
@@ -287,9 +287,7 @@ export default function VeterinarioCitasPage() {
             Pendientes de confirmación
           </p>
 
-          <p className="mt-4 text-4xl font-semibold text-[#10213A] dark:text-white">
-            {pendientes}
-          </p>
+          <p className="mt-4 text-4xl font-semibold text-[#10213A] dark:text-white">{pendientes}</p>
 
           <p className="mt-3 text-sm text-[#64748B] dark:text-[#94A3B8]">
             Solicitudes registradas que deben ser confirmadas por administración.
@@ -438,10 +436,7 @@ export default function VeterinarioCitasPage() {
 
                 <div className="mt-5 grid gap-4 sm:grid-cols-2">
                   <DatoDetalle titulo="Paciente" valor={citaDetalle.mascota} />
-                  <DatoDetalle
-                    titulo="Especie"
-                    valor={citaDetalle.especie || "—"}
-                  />
+                  <DatoDetalle titulo="Especie" valor={citaDetalle.especie || "—"} />
                   <DatoDetalle titulo="Propietario" valor={citaDetalle.cliente || "—"} />
                 </div>
               </section>
@@ -459,9 +454,8 @@ export default function VeterinarioCitasPage() {
               {citaDetalle.estado === "Pendiente de confirmación" && (
                 <div className="rounded-[16px] border border-[#FDE68A] bg-[#FFFBEB] px-4 py-3 dark:border-[#78350F] dark:bg-[#451A03]">
                   <p className="text-[13px] leading-6 text-[#92400E] dark:text-[#FDE68A]">
-                    <strong>Pendiente de confirmación:</strong> esta solicitud
-                    debe ser revisada por administración antes de iniciar la
-                    atención clínica.
+                    <strong>Pendiente de confirmación:</strong> esta solicitud debe ser revisada por
+                    administración antes de iniciar la atención clínica.
                   </p>
                 </div>
               )}
@@ -469,8 +463,8 @@ export default function VeterinarioCitasPage() {
               {(citaDetalle.estado === "Confirmada" || citaDetalle.estado === "En proceso") && (
                 <div className="rounded-[16px] border border-[#DBEAFE] bg-[#EFF6FF] px-4 py-3 dark:border-[#1E3A8A] dark:bg-[#172554]">
                   <p className="text-[13px] leading-6 text-[#1D4ED8] dark:text-[#BFDBFE]">
-                    Esta cita está habilitada para atención. Puedes iniciar o
-                    continuar el registro clínico del paciente.
+                    Esta cita está habilitada para atención. Puedes iniciar o continuar el registro
+                    clínico del paciente.
                   </p>
                 </div>
               )}
@@ -551,8 +545,12 @@ export default function VeterinarioCitasPage() {
                     className={campoClases}
                   />
                   {formulario.fecha && (
-                    <p className={`mt-1 text-xs font-medium ${isClinicOpen(formulario.fecha) ? "text-emerald-600" : "text-rose-600"}`}>
-                      {isClinicOpen(formulario.fecha) ? `Horario: ${getScheduleLabel(formulario.fecha)}` : "La clínica está cerrada este día"}
+                    <p
+                      className={`mt-1 text-xs font-medium ${isClinicOpen(formulario.fecha) ? "text-emerald-600" : "text-rose-600"}`}
+                    >
+                      {isClinicOpen(formulario.fecha)
+                        ? `Horario: ${getScheduleLabel(formulario.fecha)}`
+                        : "La clínica está cerrada este día"}
                     </p>
                   )}
                 </CampoFormulario>
@@ -569,7 +567,7 @@ export default function VeterinarioCitasPage() {
                       No hay turnos disponibles. La clínica está cerrada ese día.
                     </div>
                   ) : (
-                    <div className="grid grid-cols-3 gap-2 max-h-[180px] overflow-y-auto pr-1">
+                    <div className="grid max-h-[180px] grid-cols-3 gap-2 overflow-y-auto pr-1">
                       {clinicSlots.map((slot) => {
                         const bloqueado = slotsBloqueados.has(slot);
                         return (
@@ -668,7 +666,8 @@ export default function VeterinarioCitasPage() {
                     <span className="mb-2 block text-[13px] font-semibold text-[#334155] dark:text-[#CBD5E1]">
                       Veterinario asignado
                       <span className="ml-2 text-xs font-normal text-[#94A3B8]">
-                        {vetsDisponibles.length} disponible{vetsDisponibles.length !== 1 ? "s" : ""} a las {formulario.hora}
+                        {vetsDisponibles.length} disponible{vetsDisponibles.length !== 1 ? "s" : ""}{" "}
+                        a las {formulario.hora}
                       </span>
                     </span>
                     <div className="space-y-2">
@@ -676,7 +675,13 @@ export default function VeterinarioCitasPage() {
                         <button
                           key={v.id}
                           type="button"
-                          onClick={() => setFormulario((f) => ({ ...f, veterinarioNombre: f.veterinarioNombre === (v.nombre ?? "") ? "" : (v.nombre ?? "") }))}
+                          onClick={() =>
+                            setFormulario((f) => ({
+                              ...f,
+                              veterinarioNombre:
+                                f.veterinarioNombre === (v.nombre ?? "") ? "" : (v.nombre ?? ""),
+                            }))
+                          }
                           className={`flex w-full items-center gap-3 rounded-xl border px-4 py-2.5 text-left text-[13px] transition ${
                             formulario.veterinarioNombre === v.nombre
                               ? "border-[#2F6BFF] bg-[#EFF6FF] text-[#1D4ED8] dark:border-[#2563EB] dark:bg-[#172554] dark:text-[#BFDBFE]"
@@ -688,9 +693,13 @@ export default function VeterinarioCitasPage() {
                           </span>
                           <span className="flex-1 font-medium">{v.nombre}</span>
                           {formulario.veterinarioNombre === v.nombre && (
-                            <span className="text-xs font-semibold text-[#2563EB] dark:text-[#93C5FD]">Seleccionado</span>
+                            <span className="text-xs font-semibold text-[#2563EB] dark:text-[#93C5FD]">
+                              Seleccionado
+                            </span>
                           )}
-                          <span className="text-xs text-emerald-600 dark:text-emerald-400">Disponible</span>
+                          <span className="text-xs text-emerald-600 dark:text-emerald-400">
+                            Disponible
+                          </span>
                         </button>
                       ))}
 
@@ -771,9 +780,7 @@ function DatoDetalle({ titulo, valor }: { titulo: string; valor: string }) {
       <p className="text-[11px] font-semibold uppercase tracking-wide text-[#64748B] dark:text-[#94A3B8]">
         {titulo}
       </p>
-      <p className="mt-2 text-[14px] font-medium text-[#10213A] dark:text-white">
-        {valor}
-      </p>
+      <p className="mt-2 text-[14px] font-medium text-[#10213A] dark:text-white">{valor}</p>
     </div>
   );
 }

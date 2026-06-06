@@ -10,26 +10,46 @@ import { createCita, fetchCitas } from "../../../../lib/api/citas";
 import { fetchVeterinarios } from "../../../../lib/api/usuarios";
 import type { UsuarioAPI } from "../../../../lib/api/usuarios";
 import type { Appointment, PetRecord } from "../../../../lib/recepcionista/types";
-import { getClinicSlots, isClinicOpen, formatSlot, getScheduleLabel } from "../../../../lib/utils/clinic-schedule";
+import {
+  getClinicSlots,
+  isClinicOpen,
+  formatSlot,
+  getScheduleLabel,
+} from "../../../../lib/utils/clinic-schedule";
 import { ArrowLeft, ArrowRight, CalendarDays, CheckCircle, Clock, User } from "lucide-react";
 
 const SERVICIOS = [
-  { id: "Consulta general",  label: "Consulta general",  desc: "Revisión médica completa", emoji: "🩺" },
-  { id: "Vacunación",        label: "Vacunación",         desc: "Aplicación de vacunas",    emoji: "💉" },
-  { id: "Desparasitación",   label: "Desparasitación",    desc: "Control de parásitos",     emoji: "🪱" },
-  { id: "Control médico",    label: "Control médico",     desc: "Seguimiento de tratamiento", emoji: "📋" },
-  { id: "Urgencia",          label: "Urgencia",           desc: "Atención prioritaria",     emoji: "🚨" },
+  {
+    id: "Consulta general",
+    label: "Consulta general",
+    desc: "Revisión médica completa",
+    emoji: "🩺",
+  },
+  { id: "Vacunación", label: "Vacunación", desc: "Aplicación de vacunas", emoji: "💉" },
+  { id: "Desparasitación", label: "Desparasitación", desc: "Control de parásitos", emoji: "🪱" },
+  {
+    id: "Control médico",
+    label: "Control médico",
+    desc: "Seguimiento de tratamiento",
+    emoji: "📋",
+  },
+  { id: "Urgencia", label: "Urgencia", desc: "Atención prioritaria", emoji: "🚨" },
 ] as const;
 
 function fechaMin() {
   const hoy = new Date();
-  return `${hoy.getFullYear()}-${String(hoy.getMonth() + 1).padStart(2,"0")}-${String(hoy.getDate()).padStart(2,"0")}`;
+  return `${hoy.getFullYear()}-${String(hoy.getMonth() + 1).padStart(2, "0")}-${String(hoy.getDate()).padStart(2, "0")}`;
 }
 
 function formatearFecha(iso: string) {
   if (!iso) return "Sin seleccionar";
   const d = new Date(iso + "T00:00:00");
-  return d.toLocaleDateString("es-CO", { weekday: "long", day: "numeric", month: "long", year: "numeric" });
+  return d.toLocaleDateString("es-CO", {
+    weekday: "long",
+    day: "numeric",
+    month: "long",
+    year: "numeric",
+  });
 }
 
 export default function NuevaCitaPage() {
@@ -48,12 +68,11 @@ export default function NuevaCitaPage() {
   const [error, setError] = useState("");
   const [guardando, setGuardando] = useState(false);
   const [propietarioId, setPropietarioId] = useState("");
-  const [propietarioNombre, setPropietarioNombre] = useState("");
+  const [propietarioNombre, setPropietarioNombre] = useState(() => getCurrentUser()?.name ?? "");
 
   useEffect(() => {
     const user = getCurrentUser();
     if (!user) return;
-    setPropietarioNombre(user.name);
 
     const cargar = async () => {
       try {
@@ -69,7 +88,9 @@ export default function NuevaCitaPage() {
         setCitasExistentes(allCitas);
         setVets(vetList);
         if (pets.length === 1) setMascotaId(pets[0].id);
-      } catch { /* */ } finally {
+      } catch {
+        /* */
+      } finally {
         setVetsLoaded(true);
       }
     };
@@ -97,7 +118,7 @@ export default function NuevaCitaPage() {
       citasExistentes
         .filter((a) => a.date === fecha && a.time === hora && a.status !== "Cancelada")
         .map((a) => a.veterinarian)
-        .filter(Boolean) as string[]
+        .filter(Boolean) as string[],
     );
   }, [citasExistentes, fecha, hora]);
 
@@ -107,8 +128,14 @@ export default function NuevaCitaPage() {
   const mascotaSeleccionada = mascotas.find((m) => m.id === mascotaId);
 
   const avanzar = () => {
-    if (paso === 1 && !mascotaId) { setError("Selecciona una mascota."); return; }
-    if (paso === 2 && !servicio)  { setError("Selecciona un servicio.");  return; }
+    if (paso === 1 && !mascotaId) {
+      setError("Selecciona una mascota.");
+      return;
+    }
+    if (paso === 2 && !servicio) {
+      setError("Selecciona un servicio.");
+      return;
+    }
     setError("");
     setPaso((p) => Math.min(p + 1, 3) as 1 | 2 | 3);
   };
@@ -119,11 +146,21 @@ export default function NuevaCitaPage() {
   };
 
   const handleSubmit = async () => {
-    if (!fecha) { setError("Selecciona una fecha."); return; }
-    if (!isClinicOpen(fecha)) { setError("La clínica no atiende ese día. Selecciona otro."); return; }
-    if (!hora)  { setError("Selecciona una hora.");  return; }
+    if (!fecha) {
+      setError("Selecciona una fecha.");
+      return;
+    }
+    if (!isClinicOpen(fecha)) {
+      setError("La clínica no atiende ese día. Selecciona otro.");
+      return;
+    }
+    if (!hora) {
+      setError("Selecciona una hora.");
+      return;
+    }
     if (new Date(fecha + "T00:00:00") < new Date(fechaMin() + "T00:00:00")) {
-      setError("La fecha no puede ser anterior a hoy."); return;
+      setError("La fecha no puede ser anterior a hoy.");
+      return;
     }
     if (!mascotaSeleccionada) return;
 
@@ -147,14 +184,16 @@ export default function NuevaCitaPage() {
       router.push("/cliente/agendar?solicitud=enviada");
     } catch (err) {
       setGuardando(false);
-      setError(err instanceof Error ? err.message : "No se pudo guardar la cita. Verifica tu conexión.");
+      setError(
+        err instanceof Error ? err.message : "No se pudo guardar la cita. Verifica tu conexión.",
+      );
     }
   };
 
   const PASOS = ["Mascota", "Servicio", "Fecha y hora"];
 
   return (
-    <div className="h-full overflow-y-auto admin-page">
+    <div className="admin-page h-full overflow-y-auto">
       {/* Encabezado */}
       <div className="mb-6">
         <Link
@@ -164,7 +203,7 @@ export default function NuevaCitaPage() {
           <ArrowLeft className="h-4 w-4" />
           Volver a citas
         </Link>
-        <h1 className="mt-3 text-page-title">Nueva solicitud de cita</h1>
+        <h1 className="text-page-title mt-3">Nueva solicitud de cita</h1>
       </div>
 
       {/* Barra de progreso */}
@@ -177,17 +216,27 @@ export default function NuevaCitaPage() {
             return (
               <div key={nombre} className="flex flex-1 items-center">
                 <div className="flex flex-col items-center">
-                  <div className={`flex h-8 w-8 items-center justify-center rounded-full text-sm font-bold transition ${
-                    completo ? "bg-brand-600 text-white" : activo ? "bg-brand-600 text-white ring-4 ring-brand-200 dark:ring-brand-900" : "bg-slate-200 text-slate-400 dark:bg-slate-700"
-                  }`}>
+                  <div
+                    className={`flex h-8 w-8 items-center justify-center rounded-full text-sm font-bold transition ${
+                      completo
+                        ? "bg-brand-600 text-white"
+                        : activo
+                          ? "bg-brand-600 text-white ring-4 ring-brand-200 dark:ring-brand-900"
+                          : "bg-slate-200 text-slate-400 dark:bg-slate-700"
+                    }`}
+                  >
                     {completo ? <CheckCircle className="h-4 w-4" /> : num}
                   </div>
-                  <p className={`mt-1.5 text-[11px] font-semibold ${activo || completo ? "text-brand-600 dark:text-brand-400" : "text-slate-400"}`}>
+                  <p
+                    className={`mt-1.5 text-[11px] font-semibold ${activo || completo ? "text-brand-600 dark:text-brand-400" : "text-slate-400"}`}
+                  >
                     {nombre}
                   </p>
                 </div>
                 {i < PASOS.length - 1 && (
-                  <div className={`mb-5 h-0.5 flex-1 transition ${completo ? "bg-brand-600" : "bg-slate-200 dark:bg-slate-700"}`} />
+                  <div
+                    className={`mb-5 h-0.5 flex-1 transition ${completo ? "bg-brand-600" : "bg-slate-200 dark:bg-slate-700"}`}
+                  />
                 )}
               </div>
             );
@@ -197,17 +246,20 @@ export default function NuevaCitaPage() {
 
       {/* Contenido del paso */}
       <div className="admin-card p-6">
-
         {/* Paso 1: Mascota */}
         {paso === 1 && (
           <div>
             <h2 className="text-section-title">¿Para qué mascota es la cita?</h2>
-            <p className="mt-1 text-subtitle">Selecciona la mascota que necesita atención.</p>
+            <p className="text-subtitle mt-1">Selecciona la mascota que necesita atención.</p>
 
             {mascotas.length === 0 ? (
               <div className="mt-6 rounded-xl border border-dashed border-slate-300 bg-slate-50 p-8 text-center dark:border-slate-700 dark:bg-slate-800/50">
-                <p className="text-sm text-slate-500 dark:text-slate-400">No tienes mascotas registradas.</p>
-                <p className="mt-1 text-xs text-slate-400">Registra una mascota para poder agendar citas.</p>
+                <p className="text-sm text-slate-500 dark:text-slate-400">
+                  No tienes mascotas registradas.
+                </p>
+                <p className="mt-1 text-xs text-slate-400">
+                  Registra una mascota para poder agendar citas.
+                </p>
               </div>
             ) : (
               <div className="mt-5 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
@@ -215,21 +267,33 @@ export default function NuevaCitaPage() {
                   <button
                     key={m.id}
                     type="button"
-                    onClick={() => { setMascotaId(m.id); setError(""); }}
+                    onClick={() => {
+                      setMascotaId(m.id);
+                      setError("");
+                    }}
                     className={`flex items-center gap-4 rounded-xl border p-4 text-left transition ${
                       mascotaId === m.id
                         ? "border-brand-500 bg-brand-50 dark:border-brand-500 dark:bg-brand-900/20"
                         : "border-slate-200 bg-white hover:border-brand-300 dark:border-slate-700 dark:bg-slate-900 dark:hover:border-slate-600"
                     }`}
                   >
-                    <div className={`flex h-12 w-12 shrink-0 items-center justify-center rounded-xl text-xl font-bold ${
-                      mascotaId === m.id ? "bg-brand-600 text-white" : "bg-brand-50 text-brand-600 dark:bg-brand-900/30 dark:text-brand-400"
-                    }`}>
+                    <div
+                      className={`flex h-12 w-12 shrink-0 items-center justify-center rounded-xl text-xl font-bold ${
+                        mascotaId === m.id
+                          ? "bg-brand-600 text-white"
+                          : "bg-brand-50 text-brand-600 dark:bg-brand-900/30 dark:text-brand-400"
+                      }`}
+                    >
                       {m.nombre.charAt(0)}
                     </div>
                     <div className="min-w-0">
-                      <p className="truncate text-sm font-semibold text-slate-900 dark:text-white">{m.nombre}</p>
-                      <p className="text-xs text-slate-500 dark:text-slate-400">{m.especie}{m.raza ? ` · ${m.raza}` : ""}</p>
+                      <p className="truncate text-sm font-semibold text-slate-900 dark:text-white">
+                        {m.nombre}
+                      </p>
+                      <p className="text-xs text-slate-500 dark:text-slate-400">
+                        {m.especie}
+                        {m.raza ? ` · ${m.raza}` : ""}
+                      </p>
                       {m.edad && <p className="text-xs text-slate-400">{m.edad}</p>}
                     </div>
                     {mascotaId === m.id && (
@@ -245,17 +309,18 @@ export default function NuevaCitaPage() {
         {/* Paso 2: Servicio */}
         {paso === 2 && (
           <div>
-            <h2 className="text-section-title">
-              ¿Qué necesita {mascotaSeleccionada?.nombre}?
-            </h2>
-            <p className="mt-1 text-subtitle">Selecciona el tipo de atención requerida.</p>
+            <h2 className="text-section-title">¿Qué necesita {mascotaSeleccionada?.nombre}?</h2>
+            <p className="text-subtitle mt-1">Selecciona el tipo de atención requerida.</p>
 
             <div className="mt-5 grid gap-3 sm:grid-cols-2">
               {SERVICIOS.map((s) => (
                 <button
                   key={s.id}
                   type="button"
-                  onClick={() => { setServicio(s.id); setError(""); }}
+                  onClick={() => {
+                    setServicio(s.id);
+                    setError("");
+                  }}
                   className={`flex items-center gap-4 rounded-xl border p-4 text-left transition ${
                     servicio === s.id
                       ? "border-brand-500 bg-brand-50 dark:border-brand-500 dark:bg-brand-900/20"
@@ -264,7 +329,9 @@ export default function NuevaCitaPage() {
                 >
                   <span className="text-2xl">{s.emoji}</span>
                   <div className="min-w-0">
-                    <p className="text-sm font-semibold text-slate-900 dark:text-white">{s.label}</p>
+                    <p className="text-sm font-semibold text-slate-900 dark:text-white">
+                      {s.label}
+                    </p>
                     <p className="text-xs text-slate-500 dark:text-slate-400">{s.desc}</p>
                   </div>
                   {servicio === s.id && (
@@ -280,7 +347,7 @@ export default function NuevaCitaPage() {
         {paso === 3 && (
           <div>
             <h2 className="text-section-title">Elige fecha, hora y veterinario</h2>
-            <p className="mt-1 text-subtitle">
+            <p className="text-subtitle mt-1">
               Selecciona cuándo quieres que {mascotaSeleccionada?.nombre} sea atendida.
             </p>
 
@@ -295,12 +362,21 @@ export default function NuevaCitaPage() {
                   type="date"
                   min={fechaMin()}
                   value={fecha}
-                  onChange={(e) => { setFecha(e.target.value); setHora(""); setVetNombre(""); setError(""); }}
+                  onChange={(e) => {
+                    setFecha(e.target.value);
+                    setHora("");
+                    setVetNombre("");
+                    setError("");
+                  }}
                   className="w-full rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-900 outline-none transition focus:border-brand-400 focus:ring-2 focus:ring-brand-400/10 dark:border-slate-700 dark:bg-slate-900 dark:text-white"
                 />
                 {fecha && (
-                  <p className={`mt-1.5 text-xs font-medium ${isClinicOpen(fecha) ? "text-emerald-600" : "text-rose-600"}`}>
-                    {isClinicOpen(fecha) ? `Horario: ${getScheduleLabel(fecha)}` : "La clínica está cerrada este día (domingos no hay atención)"}
+                  <p
+                    className={`mt-1.5 text-xs font-medium ${isClinicOpen(fecha) ? "text-emerald-600" : "text-rose-600"}`}
+                  >
+                    {isClinicOpen(fecha)
+                      ? `Horario: ${getScheduleLabel(fecha)}`
+                      : "La clínica está cerrada este día (domingos no hay atención)"}
                   </p>
                 )}
               </div>
@@ -327,7 +403,11 @@ export default function NuevaCitaPage() {
                       <button
                         key={s}
                         type="button"
-                        onClick={() => { setHora(s); setVetNombre(""); setError(""); }}
+                        onClick={() => {
+                          setHora(s);
+                          setVetNombre("");
+                          setError("");
+                        }}
                         className={`rounded-lg border py-2 text-xs font-semibold transition ${
                           hora === s
                             ? "border-brand-600 bg-brand-600 text-white"
@@ -368,7 +448,9 @@ export default function NuevaCitaPage() {
                       <button
                         key={v.id}
                         type="button"
-                        onClick={() => setVetNombre(vetNombre === (v.nombre ?? "") ? "" : (v.nombre ?? ""))}
+                        onClick={() =>
+                          setVetNombre(vetNombre === (v.nombre ?? "") ? "" : (v.nombre ?? ""))
+                        }
                         className={`flex w-full items-center gap-3 rounded-xl border px-4 py-2.5 text-left text-sm transition ${
                           vetNombre === v.nombre
                             ? "border-brand-400 bg-brand-50 text-brand-800 dark:border-brand-600 dark:bg-brand-950/40 dark:text-brand-200"
@@ -379,8 +461,12 @@ export default function NuevaCitaPage() {
                           {(v.nombre ?? "?")[0].toUpperCase()}
                         </span>
                         <span className="flex-1 font-medium">{v.nombre}</span>
-                        <span className="text-xs text-emerald-600 dark:text-emerald-400">Disponible</span>
-                        {vetNombre === v.nombre && <CheckCircle className="h-4 w-4 text-brand-600" />}
+                        <span className="text-xs text-emerald-600 dark:text-emerald-400">
+                          Disponible
+                        </span>
+                        {vetNombre === v.nombre && (
+                          <CheckCircle className="h-4 w-4 text-brand-600" />
+                        )}
                       </button>
                     ))}
 
@@ -392,14 +478,17 @@ export default function NuevaCitaPage() {
                         <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg bg-slate-200 text-xs font-bold text-slate-500 dark:bg-slate-700">
                           {(v.nombre ?? "?")[0].toUpperCase()}
                         </span>
-                        <span className="flex-1 font-medium text-slate-500 dark:text-slate-400">{v.nombre}</span>
+                        <span className="flex-1 font-medium text-slate-500 dark:text-slate-400">
+                          {v.nombre}
+                        </span>
                         <span className="text-xs text-rose-500">Ocupado a esta hora</span>
                       </div>
                     ))}
 
                     {vets.length > 0 && vetsDisponibles.length === 0 && (
                       <p className="text-xs text-amber-600 dark:text-amber-400">
-                        Todos los veterinarios tienen cita a esta hora. La clínica asignará uno al confirmar.
+                        Todos los veterinarios tienen cita a esta hora. La clínica asignará uno al
+                        confirmar.
                       </p>
                     )}
                   </div>
@@ -427,7 +516,9 @@ export default function NuevaCitaPage() {
               <div className="mt-3 grid grid-cols-2 gap-2 text-sm">
                 <div>
                   <p className="text-label">Mascota</p>
-                  <p className="mt-0.5 font-semibold text-slate-900 dark:text-white">{mascotaSeleccionada?.nombre}</p>
+                  <p className="mt-0.5 font-semibold text-slate-900 dark:text-white">
+                    {mascotaSeleccionada?.nombre}
+                  </p>
                 </div>
                 <div>
                   <p className="text-label">Servicio</p>
@@ -435,19 +526,29 @@ export default function NuevaCitaPage() {
                 </div>
                 <div>
                   <p className="text-label">Fecha</p>
-                  <p className="mt-0.5 font-semibold text-slate-900 dark:text-white">{fecha ? formatearFecha(fecha) : "—"}</p>
+                  <p className="mt-0.5 font-semibold text-slate-900 dark:text-white">
+                    {fecha ? formatearFecha(fecha) : "—"}
+                  </p>
                 </div>
                 <div>
                   <p className="text-label">Hora</p>
-                  <p className="mt-0.5 font-semibold text-slate-900 dark:text-white">{hora ? formatSlot(hora) : "—"}</p>
+                  <p className="mt-0.5 font-semibold text-slate-900 dark:text-white">
+                    {hora ? formatSlot(hora) : "—"}
+                  </p>
                 </div>
                 <div className="col-span-2">
                   <p className="text-label">Veterinario</p>
-                  <p className="mt-0.5 font-semibold text-slate-900 dark:text-white">{vetNombre || "Sin preferencia (la clínica asignará)"}</p>
+                  <p className="mt-0.5 font-semibold text-slate-900 dark:text-white">
+                    {vetNombre || "Sin preferencia (la clínica asignará)"}
+                  </p>
                 </div>
               </div>
               <p className="mt-3 text-xs text-slate-500 dark:text-slate-400">
-                La cita quedará en estado <strong className="text-slate-700 dark:text-slate-200">Pendiente de confirmación</strong>. La clínica revisará y confirmará el horario.
+                La cita quedará en estado{" "}
+                <strong className="text-slate-700 dark:text-slate-200">
+                  Pendiente de confirmación
+                </strong>
+                . La clínica revisará y confirmará el horario.
               </p>
             </div>
           </div>

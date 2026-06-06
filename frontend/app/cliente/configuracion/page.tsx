@@ -1,6 +1,6 @@
 "use client";
 
-import { ChangeEvent, FormEvent, useEffect, useState } from "react";
+import { ChangeEvent, FormEvent, useState } from "react";
 import { getCurrentUser } from "@/lib/auth";
 
 const PROFILE_STORAGE_KEY = "vetnova_cliente_perfil";
@@ -14,48 +14,40 @@ type PerfilCliente = {
 
 const EMPTY_PERFIL: PerfilCliente = { nombre: "", apellido: "", email: "", telefono: "" };
 
+function cargarPerfilInicial(): PerfilCliente {
+  if (typeof window === "undefined") return EMPTY_PERFIL;
+  const user = getCurrentUser();
+  const partes = (user?.name ?? "").trim().split(" ");
+  const nombreJWT = partes[0] ?? "";
+  const apellidoJWT = partes.slice(1).join(" ");
+  const emailJWT = user?.email ?? "";
+
+  const informacionGuardada = localStorage.getItem(PROFILE_STORAGE_KEY);
+
+  if (!informacionGuardada) {
+    return { nombre: nombreJWT, apellido: apellidoJWT, email: emailJWT, telefono: "" };
+  }
+
+  try {
+    const datosGuardados = JSON.parse(informacionGuardada) as Partial<PerfilCliente>;
+    const datosLimpios: PerfilCliente = {
+      nombre: datosGuardados.nombre || nombreJWT,
+      apellido: datosGuardados.apellido || apellidoJWT,
+      email: datosGuardados.email || emailJWT,
+      telefono: datosGuardados.telefono ?? "",
+    };
+    localStorage.setItem(PROFILE_STORAGE_KEY, JSON.stringify(datosLimpios));
+    return datosLimpios;
+  } catch {
+    localStorage.removeItem(PROFILE_STORAGE_KEY);
+    return { nombre: nombreJWT, apellido: apellidoJWT, email: emailJWT, telefono: "" };
+  }
+}
+
 export default function ConfiguracionPage() {
-  const [perfil, setPerfil] = useState<PerfilCliente>(EMPTY_PERFIL);
-  const [perfilGuardado, setPerfilGuardado] = useState<PerfilCliente>(EMPTY_PERFIL);
+  const [perfil, setPerfil] = useState<PerfilCliente>(cargarPerfilInicial);
+  const [perfilGuardado, setPerfilGuardado] = useState<PerfilCliente>(cargarPerfilInicial);
   const [mensaje, setMensaje] = useState("");
-
-  useEffect(() => {
-    const user = getCurrentUser();
-    const partes = (user?.name ?? "").trim().split(" ");
-    const nombreJWT = partes[0] ?? "";
-    const apellidoJWT = partes.slice(1).join(" ");
-    const emailJWT = user?.email ?? "";
-
-    const informacionGuardada = localStorage.getItem(PROFILE_STORAGE_KEY);
-
-    if (!informacionGuardada) {
-      const fromJWT: PerfilCliente = { nombre: nombreJWT, apellido: apellidoJWT, email: emailJWT, telefono: "" };
-      setPerfil(fromJWT);
-      setPerfilGuardado(fromJWT);
-      return;
-    }
-
-    try {
-      const datosGuardados = JSON.parse(informacionGuardada) as Partial<PerfilCliente>;
-
-      const datosLimpios: PerfilCliente = {
-        nombre: datosGuardados.nombre || nombreJWT,
-        apellido: datosGuardados.apellido || apellidoJWT,
-        email: datosGuardados.email || emailJWT,
-        telefono: datosGuardados.telefono ?? "",
-      };
-
-      localStorage.setItem(PROFILE_STORAGE_KEY, JSON.stringify(datosLimpios));
-      setPerfil(datosLimpios);
-      setPerfilGuardado(datosLimpios);
-      window.dispatchEvent(new Event("vetnova-profile-updated"));
-    } catch {
-      localStorage.removeItem(PROFILE_STORAGE_KEY);
-      const fromJWT: PerfilCliente = { nombre: nombreJWT, apellido: apellidoJWT, email: emailJWT, telefono: "" };
-      setPerfil(fromJWT);
-      setPerfilGuardado(fromJWT);
-    }
-  }, []);
 
   const actualizarCampo = (event: ChangeEvent<HTMLInputElement>) => {
     const { name, value } = event.target;
@@ -84,10 +76,10 @@ export default function ConfiguracionPage() {
   };
 
   return (
-    <div className="h-full overflow-y-auto admin-page">
+    <div className="admin-page h-full overflow-y-auto">
       <div className="mb-8">
         <h1 className="text-page-title">Configuración</h1>
-        <p className="mt-2 text-subtitle">Administra tu información personal y seguridad</p>
+        <p className="text-subtitle mt-2">Administra tu información personal y seguridad</p>
       </div>
 
       <div className="max-w-[1100px] space-y-7">
@@ -105,15 +97,32 @@ export default function ConfiguracionPage() {
 
           <div className="grid grid-cols-1 gap-5 md:grid-cols-2">
             <Field label="Nombre" name="nombre" value={perfil.nombre} onChange={actualizarCampo} />
-            <Field label="Apellido" name="apellido" value={perfil.apellido} onChange={actualizarCampo} />
+            <Field
+              label="Apellido"
+              name="apellido"
+              value={perfil.apellido}
+              onChange={actualizarCampo}
+            />
           </div>
 
           <div className="mt-5">
-            <Field label="Email" name="email" type="email" value={perfil.email} onChange={actualizarCampo} />
+            <Field
+              label="Email"
+              name="email"
+              type="email"
+              value={perfil.email}
+              onChange={actualizarCampo}
+            />
           </div>
 
           <div className="mt-5">
-            <Field label="Teléfono" name="telefono" type="tel" value={perfil.telefono} onChange={actualizarCampo} />
+            <Field
+              label="Teléfono"
+              name="telefono"
+              type="tel"
+              value={perfil.telefono}
+              onChange={actualizarCampo}
+            />
           </div>
 
           <div className="mt-7 flex justify-end gap-3">
@@ -143,8 +152,12 @@ export default function ConfiguracionPage() {
           </div>
 
           <div className="mt-7 flex justify-end gap-3">
-            <button type="button" className="btn-secondary">Cancelar</button>
-            <button type="button" className="btn-primary">Actualizar Contraseña</button>
+            <button type="button" className="btn-secondary">
+              Cancelar
+            </button>
+            <button type="button" className="btn-primary">
+              Actualizar Contraseña
+            </button>
           </div>
         </section>
       </div>
@@ -167,7 +180,9 @@ function Field({
 }) {
   return (
     <label className="block">
-      <span className="mb-2 block text-sm font-semibold text-slate-800 dark:text-white">{label}</span>
+      <span className="mb-2 block text-sm font-semibold text-slate-800 dark:text-white">
+        {label}
+      </span>
       <input
         required
         name={name}
@@ -183,7 +198,9 @@ function Field({
 function PasswordField({ label }: { label: string }) {
   return (
     <label className="block">
-      <span className="mb-2 block text-sm font-semibold text-slate-800 dark:text-white">{label}</span>
+      <span className="mb-2 block text-sm font-semibold text-slate-800 dark:text-white">
+        {label}
+      </span>
       <input
         type="password"
         placeholder="••••••••"
@@ -202,11 +219,7 @@ function UserIcon() {
       fill="none"
       className="text-slate-800 dark:text-white"
     >
-      <path
-        d="M12 12a4 4 0 1 0 0-8 4 4 0 0 0 0 8Z"
-        stroke="currentColor"
-        strokeWidth="2"
-      />
+      <path d="M12 12a4 4 0 1 0 0-8 4 4 0 0 0 0 8Z" stroke="currentColor" strokeWidth="2" />
 
       <path
         d="M5 20c0-3.5 2.9-6 7-6s7 2.5 7 6"
@@ -227,15 +240,7 @@ function LockIcon() {
       fill="none"
       className="text-slate-800 dark:text-white"
     >
-      <rect
-        x="4"
-        y="10"
-        width="16"
-        height="10"
-        rx="2"
-        stroke="currentColor"
-        strokeWidth="2"
-      />
+      <rect x="4" y="10" width="16" height="10" rx="2" stroke="currentColor" strokeWidth="2" />
 
       <path
         d="M8 10V7a4 4 0 0 1 8 0v3"

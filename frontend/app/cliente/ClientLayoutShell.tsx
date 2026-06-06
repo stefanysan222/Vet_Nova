@@ -15,20 +15,25 @@ type PerfilCliente = {
   apellido: string;
 };
 
-const notificationPreview: { title: string; description: string; time: string; unread: boolean }[] = [];
+const notificationPreview: { title: string; description: string; time: string; unread: boolean }[] =
+  [];
 
-export default function ClientLayoutShell({
-  children,
-}: {
-  children: ReactNode;
-}) {
+export default function ClientLayoutShell({ children }: { children: ReactNode }) {
   const pathname = usePathname();
   const router = useRouter();
 
   const [showNotifications, setShowNotifications] = useState(false);
   const [showUserMenu, setShowUserMenu] = useState(false);
-  const [darkMode, setDarkMode] = useState(false);
-  const [perfil, setPerfil] = useState<PerfilCliente>({ nombre: "", apellido: "" });
+  const [darkMode, setDarkMode] = useState(() => {
+    if (typeof window === "undefined") return false;
+    return localStorage.getItem("vetnova-theme") === "dark";
+  });
+  const [perfil, setPerfil] = useState<PerfilCliente>(() => {
+    const user = getCurrentUser();
+    if (!user) return { nombre: "", apellido: "" };
+    const partes = user.name.trim().split(" ");
+    return { nombre: partes[0] ?? user.name, apellido: partes.slice(1).join(" ") || "" };
+  });
   const [mobileOpen, setMobileOpen] = useState(false);
 
   useEffect(() => {
@@ -43,26 +48,12 @@ export default function ClientLayoutShell({
         Veterinario: "/veterinario",
       };
       router.replace(routes[user.role] ?? "/login");
-      return;
     }
-    const partes = user.name.trim().split(" ");
-    setPerfil({
-      nombre: partes[0] ?? user.name,
-      apellido: partes.slice(1).join(" ") || "",
-    });
   }, [router]);
 
   useEffect(() => {
-    const savedTheme = localStorage.getItem("vetnova-theme");
-
-    if (savedTheme === "dark") {
-      setDarkMode(true);
-      document.documentElement.classList.add("dark");
-    } else {
-      setDarkMode(false);
-      document.documentElement.classList.remove("dark");
-    }
-  }, []);
+    document.documentElement.classList.toggle("dark", darkMode);
+  }, [darkMode]);
 
   useEffect(() => {
     const cargarPerfil = () => {
@@ -89,6 +80,8 @@ export default function ClientLayoutShell({
   }, []);
 
   useEffect(() => {
+    // Close menus on route change — setState allowed here (no cascade risk, boolean flip)
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setShowNotifications(false);
     setShowUserMenu(false);
   }, [pathname]);
@@ -110,11 +103,7 @@ export default function ClientLayoutShell({
         <aside className="hidden h-screen w-[260px] shrink-0 border-r border-[#E5EAF2] bg-white dark:border-[#1E293B] dark:bg-[#111827] lg:flex lg:flex-col">
           <div className="flex h-[78px] items-center gap-3 border-b border-[#E5EAF2] px-5 dark:border-[#1E293B]">
             <img
-              src={
-                darkMode
-                  ? "/logos/vetnova-logo-dark.png"
-                  : "/logos/vetnova-logo-light.png"
-              }
+              src={darkMode ? "/logos/vetnova-logo-dark.png" : "/logos/vetnova-logo-light.png"}
               alt="VetNova Logo"
               className="h-10 w-10 rounded-xl object-contain"
             />
@@ -131,11 +120,7 @@ export default function ClientLayoutShell({
           </div>
 
           <nav className="flex-1 px-4 py-4">
-            <SidebarItem
-              href="/cliente"
-              active={pathname === "/cliente"}
-              icon={<HomeIcon />}
-            >
+            <SidebarItem href="/cliente" active={pathname === "/cliente"} icon={<HomeIcon />}>
               Dashboard
             </SidebarItem>
 
@@ -167,7 +152,10 @@ export default function ClientLayoutShell({
           <div className="border-t border-[#E5EAF2] px-5 py-5 dark:border-[#1E293B]">
             <button
               type="button"
-              onClick={() => { clearCurrentUser(); router.push("/login"); }}
+              onClick={() => {
+                clearCurrentUser();
+                router.push("/login");
+              }}
               className="flex items-center gap-3 text-[15px] font-semibold text-[#10213A] transition-colors hover:text-[#2F6BFF] dark:text-white dark:hover:text-[#60A5FA]"
             >
               <LogoutIcon />
@@ -183,10 +171,18 @@ export default function ClientLayoutShell({
             <button
               type="button"
               onClick={() => setMobileOpen(true)}
-              className="mr-3 flex h-9 w-9 shrink-0 items-center justify-center rounded-xl border border-[#E5EAF2] bg-white lg:hidden dark:border-[#1E293B] dark:bg-[#111827]"
+              className="mr-3 flex h-9 w-9 shrink-0 items-center justify-center rounded-xl border border-[#E5EAF2] bg-white dark:border-[#1E293B] dark:bg-[#111827] lg:hidden"
               aria-label="Abrir menú"
             >
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
+              <svg
+                width="20"
+                height="20"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+              >
                 <path d="M4 6h16M4 12h16M4 18h16" />
               </svg>
             </button>
@@ -236,18 +232,14 @@ export default function ClientLayoutShell({
                               {item.title}
                             </h4>
 
-                            {item.unread && (
-                              <span className="h-2 w-2 rounded-full bg-[#EF4444]" />
-                            )}
+                            {item.unread && <span className="h-2 w-2 rounded-full bg-[#EF4444]" />}
                           </div>
 
                           <p className="mt-1 text-[13px] leading-5 text-[#64748B] dark:text-[#94A3B8]">
                             {item.description}
                           </p>
 
-                          <p className="mt-2 text-[12px] text-[#94A3B8]">
-                            {item.time}
-                          </p>
+                          <p className="mt-2 text-[12px] text-[#94A3B8]">{item.time}</p>
                         </div>
                       </div>
                     ))}
@@ -283,9 +275,7 @@ export default function ClientLayoutShell({
                       {nombreCompleto}
                     </p>
 
-                    <p className="mt-1.5 text-[12px] text-[#64748B] dark:text-[#94A3B8]">
-                      Cliente
-                    </p>
+                    <p className="mt-1.5 text-[12px] text-[#64748B] dark:text-[#94A3B8]">Cliente</p>
                   </div>
 
                   <AvatarCliente size="small" />
@@ -357,9 +347,7 @@ export default function ClientLayoutShell({
                         >
                           <span
                             className={`inline-block h-5 w-5 rounded-full bg-white transition-transform ${
-                              darkMode
-                                ? "translate-x-[22px]"
-                                : "translate-x-[2px]"
+                              darkMode ? "translate-x-[22px]" : "translate-x-[2px]"
                             }`}
                           />
                         </span>
@@ -369,7 +357,11 @@ export default function ClientLayoutShell({
                     <div className="border-t border-[#E2E8F0] py-2 dark:border-[#334155]">
                       <button
                         type="button"
-                        onClick={() => { setShowUserMenu(false); clearCurrentUser(); router.push("/login"); }}
+                        onClick={() => {
+                          setShowUserMenu(false);
+                          clearCurrentUser();
+                          router.push("/login");
+                        }}
                         className="flex w-full items-center gap-3 px-5 py-3 text-[14px] font-semibold text-[#EF4444] transition-colors hover:bg-[#FEF2F2] dark:hover:bg-[#28171B]"
                       >
                         <LogoutIcon />
@@ -410,21 +402,75 @@ export default function ClientLayoutShell({
           >
             <div className="flex h-[64px] items-center justify-between border-b border-[#E5EAF2] px-5 dark:border-[#1E293B]">
               <div className="flex items-center gap-3">
-                <img src={darkMode ? "/logos/vetnova-logo-dark.png" : "/logos/vetnova-logo-light.png"} alt="VetNova" className="h-8 w-8 rounded-xl object-contain" />
-                <span className="text-[18px] font-semibold text-[#10213A] dark:text-white">VetNova</span>
+                <img
+                  src={darkMode ? "/logos/vetnova-logo-dark.png" : "/logos/vetnova-logo-light.png"}
+                  alt="VetNova"
+                  className="h-8 w-8 rounded-xl object-contain"
+                />
+                <span className="text-[18px] font-semibold text-[#10213A] dark:text-white">
+                  VetNova
+                </span>
               </div>
-              <button onClick={() => setMobileOpen(false)} className="flex h-8 w-8 items-center justify-center rounded-lg text-[#64748B] hover:bg-[#F1F5F9] dark:hover:bg-[#1E293B]">
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><path d="M18 6 6 18M6 6l12 12" /></svg>
+              <button
+                onClick={() => setMobileOpen(false)}
+                className="flex h-8 w-8 items-center justify-center rounded-lg text-[#64748B] hover:bg-[#F1F5F9] dark:hover:bg-[#1E293B]"
+              >
+                <svg
+                  width="18"
+                  height="18"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                >
+                  <path d="M18 6 6 18M6 6l12 12" />
+                </svg>
               </button>
             </div>
             <nav className="flex-1 px-4 py-4">
-              <SidebarItem href="/cliente" active={pathname === "/cliente"} icon={<HomeIcon />} onClick={() => setMobileOpen(false)}>Dashboard</SidebarItem>
-              <SidebarItem href="/cliente/agendar" active={pathname.startsWith("/cliente/agendar")} icon={<CalendarMenuIcon />} onClick={() => setMobileOpen(false)}>Citas</SidebarItem>
-              <SidebarItem href="/cliente/mascotas" active={pathname.startsWith("/cliente/mascotas")} icon={<PawMenuIcon />} onClick={() => setMobileOpen(false)}>Mascotas</SidebarItem>
-              <SidebarItem href="/cliente/configuracion" active={pathname.startsWith("/cliente/configuracion")} icon={<SettingsIcon />} onClick={() => setMobileOpen(false)}>Configuración</SidebarItem>
+              <SidebarItem
+                href="/cliente"
+                active={pathname === "/cliente"}
+                icon={<HomeIcon />}
+                onClick={() => setMobileOpen(false)}
+              >
+                Dashboard
+              </SidebarItem>
+              <SidebarItem
+                href="/cliente/agendar"
+                active={pathname.startsWith("/cliente/agendar")}
+                icon={<CalendarMenuIcon />}
+                onClick={() => setMobileOpen(false)}
+              >
+                Citas
+              </SidebarItem>
+              <SidebarItem
+                href="/cliente/mascotas"
+                active={pathname.startsWith("/cliente/mascotas")}
+                icon={<PawMenuIcon />}
+                onClick={() => setMobileOpen(false)}
+              >
+                Mascotas
+              </SidebarItem>
+              <SidebarItem
+                href="/cliente/configuracion"
+                active={pathname.startsWith("/cliente/configuracion")}
+                icon={<SettingsIcon />}
+                onClick={() => setMobileOpen(false)}
+              >
+                Configuración
+              </SidebarItem>
             </nav>
             <div className="border-t border-[#E5EAF2] px-5 py-5 dark:border-[#1E293B]">
-              <button type="button" onClick={() => { clearCurrentUser(); router.push("/login"); }} className="flex items-center gap-3 text-[15px] font-semibold text-[#10213A] transition-colors hover:text-[#2F6BFF] dark:text-white">
+              <button
+                type="button"
+                onClick={() => {
+                  clearCurrentUser();
+                  router.push("/login");
+                }}
+                className="flex items-center gap-3 text-[15px] font-semibold text-[#10213A] transition-colors hover:text-[#2F6BFF] dark:text-white"
+              >
                 <LogoutIcon />
                 Cerrar Sesión
               </button>
@@ -579,12 +625,7 @@ function SearchIcon() {
       className="text-[#64748B] dark:text-[#94A3B8]"
     >
       <circle cx="11" cy="11" r="7" stroke="currentColor" strokeWidth="2" />
-      <path
-        d="m20 20-3.5-3.5"
-        stroke="currentColor"
-        strokeWidth="2"
-        strokeLinecap="round"
-      />
+      <path d="m20 20-3.5-3.5" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
     </svg>
   );
 }

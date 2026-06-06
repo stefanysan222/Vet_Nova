@@ -21,6 +21,7 @@ export default function EditUserModal({ isOpen, onClose, onUpdated, user }: Edit
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     if (user) setForm({ nombre: user.name, email: user.email, rol: user.role });
   }, [user]);
 
@@ -78,21 +79,42 @@ export default function EditUserModal({ isOpen, onClose, onUpdated, user }: Edit
             <div className="flex items-center justify-between">
               <div>
                 <h3 className="text-lg font-semibold text-slate-900">Editar usuario</h3>
-                <p className="text-sm text-slate-500">Los cambios se guardarán en la base de datos.</p>
+                <p className="text-sm text-slate-500">
+                  Los cambios se guardarán en la base de datos.
+                </p>
               </div>
-              <button type="button" onClick={handleClose} className="rounded-full p-2 transition hover:bg-slate-100">
+              <button
+                type="button"
+                onClick={handleClose}
+                className="rounded-full p-2 transition hover:bg-slate-100"
+              >
                 <X className="h-5 w-5 text-slate-600" />
               </button>
             </div>
 
             <div className="grid gap-4 sm:grid-cols-2">
               <div>
-                <label className="mb-1 block text-sm font-medium text-slate-700">Nombre completo</label>
-                <input name="nombre" value={form.nombre} onChange={handleChange} className={inputClass} required />
+                <label className="mb-1 block text-sm font-medium text-slate-700">
+                  Nombre completo
+                </label>
+                <input
+                  name="nombre"
+                  value={form.nombre}
+                  onChange={handleChange}
+                  className={inputClass}
+                  required
+                />
               </div>
               <div>
                 <label className="mb-1 block text-sm font-medium text-slate-700">Correo</label>
-                <input name="email" type="email" value={form.email} onChange={handleChange} className={inputClass} required />
+                <input
+                  name="email"
+                  type="email"
+                  value={form.email}
+                  onChange={handleChange}
+                  className={inputClass}
+                  required
+                />
               </div>
             </div>
 

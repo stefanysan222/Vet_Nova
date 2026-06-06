@@ -35,7 +35,7 @@ export default function LoginForm() {
     else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email))
       e.email = "Ingresa un correo válido.";
     if (!formData.password) e.password = "La contraseña es obligatoria.";
-    else if (formData.password.length < 6) e.password = "Mínimo 6 caracteres.";
+    else if (formData.password.length < 8) e.password = "Mínimo 8 caracteres.";
     return e;
   };
 
@@ -59,7 +59,7 @@ export default function LoginForm() {
       return;
     }
     if (result.token && result.user) {
-      setToken(result.token);
+      setToken(result.token, true);
       router.push(getDashboardRoute(result.user.role));
     }
   };
@@ -81,7 +81,7 @@ export default function LoginForm() {
     }
     setErrors({});
     if (result.token && result.user) {
-      setToken(result.token);
+      setToken(result.token, formData.remember);
       router.push(getDashboardRoute(result.user.role));
     }
   };

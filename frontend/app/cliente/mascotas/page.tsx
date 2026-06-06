@@ -49,17 +49,23 @@ export default function MascotasPage() {
   const [mascotas, setMascotas] = useState<Pet[]>([]);
   const [loading, setLoading] = useState(true);
   const [busqueda, setBusqueda] = useState("");
-  const [especieSeleccionada, setEspecieSeleccionada] =
-    useState<SpeciesFilter>("todas");
+  const [especieSeleccionada, setEspecieSeleccionada] = useState<SpeciesFilter>("todas");
 
   useEffect(() => {
     const user = getCurrentUser();
-    if (!user) { setLoading(false); return; }
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    if (!user) {
+      setLoading(false);
+      return;
+    }
 
     const cargarMascotas = async () => {
       try {
         const propietario = await fetchPropietarioByUsuario(user.id);
-        if (!propietario) { setMascotas([]); return; }
+        if (!propietario) {
+          setMascotas([]);
+          return;
+        }
 
         const apiMascotas = await fetchMascotas(parseInt(propietario.id, 10));
         const mapped: Pet[] = apiMascotas.map((m) => ({
@@ -100,8 +106,7 @@ export default function MascotasPage() {
         normalizarTexto(mascota.raza).includes(termino);
 
       const coincideEspecie =
-        especieSeleccionada === "todas" ||
-        mascota.tipo === especieSeleccionada;
+        especieSeleccionada === "todas" || mascota.tipo === especieSeleccionada;
 
       return coincideBusqueda && coincideEspecie;
     });
@@ -113,11 +118,11 @@ export default function MascotasPage() {
   };
 
   return (
-    <div className="h-full overflow-y-auto admin-page">
+    <div className="admin-page h-full overflow-y-auto">
       <div className="mb-8 flex items-start justify-between gap-4">
         <div>
           <h1 className="text-page-title">Mis mascotas</h1>
-          <p className="mt-2 text-subtitle">
+          <p className="text-subtitle mt-2">
             {mascotasFiltradas.length}{" "}
             {mascotasFiltradas.length === 1 ? "mascota registrada" : "mascotas registradas"}
           </p>
@@ -157,9 +162,7 @@ export default function MascotasPage() {
           <div className="relative w-full sm:w-[205px]">
             <select
               value={especieSeleccionada}
-              onChange={(event) =>
-                setEspecieSeleccionada(event.target.value as SpeciesFilter)
-              }
+              onChange={(event) => setEspecieSeleccionada(event.target.value as SpeciesFilter)}
               className="h-[46px] w-full cursor-pointer appearance-none rounded-xl border border-slate-200 bg-white px-5 pr-11 text-sm text-slate-900 outline-none transition-all hover:border-brand-400 focus:border-brand-400 dark:border-slate-700 dark:bg-slate-900 dark:text-white"
             >
               <option value="todas">Todas las especies</option>
@@ -183,7 +186,7 @@ export default function MascotasPage() {
               initial={{ opacity: 0, y: 16 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.35, delay: i * 0.05 }}
-              className="group relative flex min-h-[220px] flex-col admin-card p-5 transition-all duration-200 hover:-translate-y-1 hover:shadow-card-hover"
+              className="admin-card group relative flex min-h-[220px] flex-col p-5 transition-all duration-200 hover:-translate-y-1 hover:shadow-card-hover"
             >
               <StatusBadge estado={mascota.estado} />
 
@@ -215,9 +218,7 @@ export default function MascotasPage() {
                     {mascota.especie} · {mascota.raza}
                   </p>
 
-                  <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">
-                    {mascota.edad}
-                  </p>
+                  <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">{mascota.edad}</p>
                 </div>
               </div>
 
@@ -256,7 +257,7 @@ export default function MascotasPage() {
           <p className="mt-2 text-sm text-slate-500 dark:text-slate-400">
             Intenta buscar con otro nombre, dueño, raza o especie.
           </p>
-          <button type="button" onClick={limpiarFiltros} className="mt-5 btn-secondary">
+          <button type="button" onClick={limpiarFiltros} className="btn-secondary mt-5">
             Limpiar filtros
           </button>
         </div>
@@ -275,11 +276,19 @@ function normalizarTexto(texto: string) {
 function StatusBadge({ estado }: { estado: Pet["estado"] }) {
   const { badge, dot } =
     estado === "Activo"
-      ? { badge: "bg-emerald-50 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400", dot: "bg-emerald-500" }
-      : { badge: "bg-amber-50 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400", dot: "bg-amber-500" };
+      ? {
+          badge: "bg-emerald-50 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400",
+          dot: "bg-emerald-500",
+        }
+      : {
+          badge: "bg-amber-50 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400",
+          dot: "bg-amber-500",
+        };
 
   return (
-    <span className={`absolute right-4 top-4 inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-xs font-semibold ${badge}`}>
+    <span
+      className={`absolute right-4 top-4 inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-xs font-semibold ${badge}`}
+    >
       <span className={`h-1.5 w-1.5 rounded-full ${dot}`} />
       {estado}
     </span>
@@ -289,12 +298,7 @@ function StatusBadge({ estado }: { estado: Pet["estado"] }) {
 function PlusIcon() {
   return (
     <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
-      <path
-        d="M12 5v14M5 12h14"
-        stroke="currentColor"
-        strokeWidth="2"
-        strokeLinecap="round"
-      />
+      <path d="M12 5v14M5 12h14" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
     </svg>
   );
 }
@@ -315,12 +319,7 @@ function SearchIcon() {
 function CloseIcon() {
   return (
     <svg width="17" height="17" viewBox="0 0 24 24" fill="none">
-      <path
-        d="M18 6 6 18M6 6l12 12"
-        stroke="currentColor"
-        strokeWidth="2"
-        strokeLinecap="round"
-      />
+      <path d="M18 6 6 18M6 6l12 12" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
     </svg>
   );
 }

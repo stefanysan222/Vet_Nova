@@ -52,15 +52,15 @@ function PetPattern() {
 }
 
 export default function AuthLayout({ title, description, children }: AuthLayoutProps) {
-  const [dark, setDark] = useState(false);
+  const [dark, setDark] = useState(() => {
+    if (typeof window === "undefined") return false;
+    const saved = localStorage.getItem("vetnova-theme");
+    return saved ? saved === "dark" : window.matchMedia("(prefers-color-scheme: dark)").matches;
+  });
 
   useEffect(() => {
-    const saved = localStorage.getItem("vetnova-theme");
-    const prefersDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
-    const isDark = saved ? saved === "dark" : prefersDark;
-    setDark(isDark);
-    document.documentElement.classList.toggle("dark", isDark);
-  }, []);
+    document.documentElement.classList.toggle("dark", dark);
+  }, [dark]);
 
   const toggleDark = () => {
     const next = !dark;
@@ -74,7 +74,6 @@ export default function AuthLayout({ title, description, children }: AuthLayoutP
       <PetPattern />
 
       <div className="relative mx-auto flex w-full max-w-md flex-col items-center gap-5 px-4 sm:px-6">
-
         {/* Top bar */}
         <motion.div
           initial={{ opacity: 0, y: -10 }}

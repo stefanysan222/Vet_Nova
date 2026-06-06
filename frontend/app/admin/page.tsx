@@ -8,13 +8,7 @@ import { motion } from "framer-motion";
 import { getCurrentUser } from "../../lib/auth";
 import { fetchCitas } from "../../lib/api/citas";
 import type { Appointment } from "../../lib/recepcionista/types";
-import {
-  Chart as ChartJS,
-  CategoryScale,
-  LinearScale,
-  BarElement,
-  Tooltip,
-} from "chart.js";
+import { Chart as ChartJS, CategoryScale, LinearScale, BarElement, Tooltip } from "chart.js";
 import { Bar } from "react-chartjs-2";
 
 ChartJS.register(CategoryScale, LinearScale, BarElement, Tooltip);
@@ -43,21 +37,20 @@ const valueLabelsPlugin = {
 const AdminDashboardPage: React.FC = () => {
   const [isRegisterModalOpen, setIsRegisterModalOpen] = useState(false);
   const [citas, setCitas] = useState<Appointment[]>([]);
-  const [userName, setUserName] = useState("Administrador");
+  const [userName] = useState(() => getCurrentUser()?.name ?? "Administrador");
 
   useEffect(() => {
-    const u = getCurrentUser();
-    if (u?.name) setUserName(u.name);
-  }, []);
-
-  useEffect(() => {
-    fetchCitas().then(setCitas).catch(() => setCitas([]));
+    fetchCitas()
+      .then(setCitas)
+      .catch(() => setCitas([]));
   }, []);
 
   const chartData = useMemo(() => {
     const hoy = new Date();
-    const desde = new Date(hoy); desde.setDate(hoy.getDate() - 29);
-    const hasta = new Date(hoy); hasta.setDate(hoy.getDate() + 14);
+    const desde = new Date(hoy);
+    desde.setDate(hoy.getDate() - 29);
+    const hasta = new Date(hoy);
+    hasta.setDate(hoy.getDate() + 14);
 
     const fechas: string[] = [];
     const cur = new Date(desde);
@@ -70,21 +63,28 @@ const AdminDashboardPage: React.FC = () => {
     const conteo: Record<string, number> = {};
     citas
       .filter((c) => c.status !== "Cancelada")
-      .forEach((c) => { if (c.date) conteo[c.date] = (conteo[c.date] ?? 0) + 1; });
+      .forEach((c) => {
+        if (c.date) conteo[c.date] = (conteo[c.date] ?? 0) + 1;
+      });
 
     const fechasConDatos = fechas.filter((f) => conteo[f] || f === todayStr);
 
     return {
-      labels: fechasConDatos.map((f) => { const [, m, d] = f.split("-"); return `${d}/${m}`; }),
-      datasets: [{
-        label: "Citas",
-        data: fechasConDatos.map((f) => conteo[f] ?? 0),
-        backgroundColor: fechasConDatos.map((f) =>
-          f === todayStr ? "#4a87c3" : f < todayStr ? "#90c1ed" : "#bcdaf4"
-        ),
-        borderRadius: 6,
-        borderSkipped: false,
-      }],
+      labels: fechasConDatos.map((f) => {
+        const [, m, d] = f.split("-");
+        return `${d}/${m}`;
+      }),
+      datasets: [
+        {
+          label: "Citas",
+          data: fechasConDatos.map((f) => conteo[f] ?? 0),
+          backgroundColor: fechasConDatos.map((f) =>
+            f === todayStr ? "#4a87c3" : f < todayStr ? "#90c1ed" : "#bcdaf4",
+          ),
+          borderRadius: 6,
+          borderSkipped: false,
+        },
+      ],
     };
   }, [citas]);
 
@@ -92,7 +92,7 @@ const AdminDashboardPage: React.FC = () => {
     <div className="admin-page">
       {/* Banner de bienvenida */}
       <motion.div
-        className="mb-8 admin-header-banner"
+        className="admin-header-banner mb-8"
         initial={{ opacity: 0, y: 16 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.4 }}
@@ -102,11 +102,10 @@ const AdminDashboardPage: React.FC = () => {
             <p className="text-xs font-semibold uppercase tracking-[0.3em] text-brand-200">
               Panel administrativo
             </p>
-            <h1 className="text-3xl font-bold tracking-tight">
-              Hola, {userName}
-            </h1>
+            <h1 className="text-3xl font-bold tracking-tight">Hola, {userName}</h1>
             <p className="max-w-xl text-sm leading-6 text-brand-100">
-              Desde aquí puedes gestionar usuarios, revisar citas pendientes, consultar el registro de mascotas y monitorear la actividad del sistema.
+              Desde aquí puedes gestionar usuarios, revisar citas pendientes, consultar el registro
+              de mascotas y monitorear la actividad del sistema.
             </p>
           </div>
           <button
@@ -138,9 +137,7 @@ const AdminDashboardPage: React.FC = () => {
         {/* Gráfica de barras */}
         <div className="admin-card p-6">
           <div className="mb-1">
-            <h2 className="text-section-title">
-              Citas programadas por día
-            </h2>
+            <h2 className="text-section-title">Citas programadas por día</h2>
             <p className="mt-0.5 text-xs text-slate-400">
               Últimos 30 días y próximos 14 ·{" "}
               <span className="inline-flex items-center gap-1">
@@ -174,8 +171,7 @@ const AdminDashboardPage: React.FC = () => {
                         const idx = items[0]?.dataIndex ?? 0;
                         return `Fecha: ${chartData.labels[idx] ?? ""}`;
                       },
-                      label: (item) =>
-                        `  ${item.raw} cita${Number(item.raw) !== 1 ? "s" : ""}`,
+                      label: (item) => `  ${item.raw} cita${Number(item.raw) !== 1 ? "s" : ""}`,
                     },
                   },
                 },

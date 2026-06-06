@@ -9,7 +9,6 @@ import { fetchCitas, updateCitaEstado } from "../../../lib/api/citas";
 import type { Appointment } from "../../../lib/recepcionista/types";
 import { getStatusStyle } from "../../../lib/utils/status";
 
-
 type EstadoCita = "Confirmada" | "Pendiente" | "Completada" | "Cancelada";
 type FiltroCita = "todas" | "proximas" | "confirmadas" | "canceladas";
 
@@ -27,7 +26,7 @@ type Cita = {
   estado: EstadoCita;
 };
 
-const MONTHS = ["ENE","FEB","MAR","ABR","MAY","JUN","JUL","AGO","SEP","OCT","NOV","DIC"];
+const MONTHS = ["ENE", "FEB", "MAR", "ABR", "MAY", "JUN", "JUL", "AGO", "SEP", "OCT", "NOV", "DIC"];
 
 function appointmentToCita(a: Appointment): Cita {
   const d = a.date ? new Date(a.date + "T00:00:00") : new Date();
@@ -55,11 +54,13 @@ function appointmentToCita(a: Appointment): Cita {
 
 export default function AgendarPage() {
   return (
-    <Suspense fallback={
-      <div className="flex h-full items-center justify-center bg-slate-50 dark:bg-slate-950">
-        <p className="text-sm text-slate-500 dark:text-slate-400">Cargando citas...</p>
-      </div>
-    }>
+    <Suspense
+      fallback={
+        <div className="flex h-full items-center justify-center bg-slate-50 dark:bg-slate-950">
+          <p className="text-sm text-slate-500 dark:text-slate-400">Cargando citas...</p>
+        </div>
+      }
+    >
       <AgendarContent />
     </Suspense>
   );
@@ -78,7 +79,10 @@ function AgendarContent() {
 
   const cargarCitas = async () => {
     const user = getCurrentUser();
-    if (!user) { setCargado(true); return; }
+    if (!user) {
+      setCargado(true);
+      return;
+    }
     try {
       const apiCitas = await fetchCitas();
       setCitas(apiCitas.map(appointmentToCita));
@@ -90,6 +94,7 @@ function AgendarContent() {
   };
 
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     cargarCitas();
   }, []);
 
@@ -107,8 +112,7 @@ function AgendarContent() {
 
       const coincideFiltro =
         filtro === "todas" ||
-        (filtro === "proximas" &&
-          (cita.estado === "Pendiente" || cita.estado === "Confirmada")) ||
+        (filtro === "proximas" && (cita.estado === "Pendiente" || cita.estado === "Confirmada")) ||
         (filtro === "confirmadas" && cita.estado === "Confirmada") ||
         (filtro === "canceladas" && cita.estado === "Cancelada");
 
@@ -117,16 +121,12 @@ function AgendarContent() {
   }, [busqueda, citas, filtro]);
 
   const totalProximas = citas.filter(
-    (cita) => cita.estado === "Pendiente" || cita.estado === "Confirmada"
+    (cita) => cita.estado === "Pendiente" || cita.estado === "Confirmada",
   ).length;
 
-  const totalConfirmadas = citas.filter(
-    (cita) => cita.estado === "Confirmada"
-  ).length;
+  const totalConfirmadas = citas.filter((cita) => cita.estado === "Confirmada").length;
 
-  const totalPendientes = citas.filter(
-    (cita) => cita.estado === "Pendiente"
-  ).length;
+  const totalPendientes = citas.filter((cita) => cita.estado === "Pendiente").length;
 
   const cancelarCita = async (id: string) => {
     try {
@@ -134,13 +134,13 @@ function AgendarContent() {
       await cargarCitas();
     } catch {
       // update local state optimistically if API fails
-      setCitas((prev) => prev.map((c) => c.id === id ? { ...c, estado: "Cancelada" as EstadoCita } : c));
+      setCitas((prev) =>
+        prev.map((c) => (c.id === id ? { ...c, estado: "Cancelada" as EstadoCita } : c)),
+      );
     }
 
     setCitaSeleccionada((actual) =>
-      actual?.id === id
-        ? { ...actual, estado: "Cancelada" as EstadoCita }
-        : actual
+      actual?.id === id ? { ...actual, estado: "Cancelada" as EstadoCita } : actual,
     );
   };
 
@@ -158,21 +158,30 @@ function AgendarContent() {
   }
 
   return (
-    <div className="h-full overflow-y-auto admin-page">
-
+    <div className="admin-page h-full overflow-y-auto">
       {/* Banner de solicitud enviada */}
       {bannerVisible && (
         <div className="mb-6 flex items-start justify-between gap-4 rounded-xl border border-emerald-200 bg-emerald-50 px-5 py-4 dark:border-emerald-800 dark:bg-emerald-950/30">
           <div className="flex items-start gap-3">
-            <svg className="mt-0.5 h-5 w-5 shrink-0 text-[#15803D]" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-              <circle cx="12" cy="12" r="9" /><path d="m8 12 2.5 2.5L16 9" />
+            <svg
+              className="mt-0.5 h-5 w-5 shrink-0 text-[#15803D]"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            >
+              <circle cx="12" cy="12" r="9" />
+              <path d="m8 12 2.5 2.5L16 9" />
             </svg>
             <div>
               <p className="text-sm font-semibold text-emerald-700 dark:text-emerald-300">
                 Solicitud enviada correctamente
               </p>
               <p className="mt-1 text-sm leading-6 text-emerald-700 dark:text-emerald-300">
-                Tu cita quedó registrada como <strong>Pendiente</strong>. La clínica la revisará y te notificará cuando sea confirmada.
+                Tu cita quedó registrada como <strong>Pendiente</strong>. La clínica la revisará y
+                te notificará cuando sea confirmada.
               </p>
             </div>
           </div>
@@ -191,7 +200,9 @@ function AgendarContent() {
       <div className="mb-8 flex flex-col justify-between gap-5 sm:flex-row sm:items-start">
         <div>
           <h1 className="text-page-title">Mis citas</h1>
-          <p className="mt-2 text-subtitle">Consulta y administra las citas programadas para tus mascotas</p>
+          <p className="text-subtitle mt-2">
+            Consulta y administra las citas programadas para tus mascotas
+          </p>
         </div>
         <Link href="/cliente/agendar/nueva" className="btn-primary whitespace-nowrap">
           <PlusIcon />
@@ -202,9 +213,27 @@ function AgendarContent() {
       {/* Tarjetas de resumen */}
       <div className="mb-6 grid grid-cols-1 gap-4 md:grid-cols-3">
         {[
-          { title: "Próximas citas", value: totalProximas, desc: "Citas por atender", icon: <CalendarIcon />, accent: "bg-brand-500" },
-          { title: "Confirmadas", value: totalConfirmadas, desc: "Horario confirmado", icon: <CalendarCheckIcon />, accent: "bg-emerald-500" },
-          { title: "Pendientes", value: totalPendientes, desc: "En espera de confirmación", icon: <ClockIcon />, accent: "bg-amber-500" },
+          {
+            title: "Próximas citas",
+            value: totalProximas,
+            desc: "Citas por atender",
+            icon: <CalendarIcon />,
+            accent: "bg-brand-500",
+          },
+          {
+            title: "Confirmadas",
+            value: totalConfirmadas,
+            desc: "Horario confirmado",
+            icon: <CalendarCheckIcon />,
+            accent: "bg-emerald-500",
+          },
+          {
+            title: "Pendientes",
+            value: totalPendientes,
+            desc: "En espera de confirmación",
+            icon: <ClockIcon />,
+            accent: "bg-amber-500",
+          },
         ].map((s, i) => (
           <motion.div
             key={s.title}
@@ -212,7 +241,13 @@ function AgendarContent() {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.35, delay: i * 0.07 }}
           >
-            <SummaryCard title={s.title} value={s.value} description={s.desc} icon={s.icon} accent={s.accent} />
+            <SummaryCard
+              title={s.title}
+              value={s.value}
+              description={s.desc}
+              icon={s.icon}
+              accent={s.accent}
+            />
           </motion.div>
         ))}
       </div>
@@ -244,17 +279,11 @@ function AgendarContent() {
           </div>
 
           <div className="flex flex-wrap gap-2">
-            <FilterButton
-              active={filtro === "todas"}
-              onClick={() => setFiltro("todas")}
-            >
+            <FilterButton active={filtro === "todas"} onClick={() => setFiltro("todas")}>
               Todas
             </FilterButton>
 
-            <FilterButton
-              active={filtro === "proximas"}
-              onClick={() => setFiltro("proximas")}
-            >
+            <FilterButton active={filtro === "proximas"} onClick={() => setFiltro("proximas")}>
               Próximas
             </FilterButton>
 
@@ -265,10 +294,7 @@ function AgendarContent() {
               Confirmadas
             </FilterButton>
 
-            <FilterButton
-              active={filtro === "canceladas"}
-              onClick={() => setFiltro("canceladas")}
-            >
+            <FilterButton active={filtro === "canceladas"} onClick={() => setFiltro("canceladas")}>
               Canceladas
             </FilterButton>
           </div>
@@ -294,13 +320,9 @@ function AgendarContent() {
                 <div className="flex flex-col gap-5 xl:flex-row xl:items-center xl:justify-between">
                   <div className="flex flex-col gap-5 sm:flex-row sm:items-center">
                     <div className="flex h-[92px] w-[92px] shrink-0 flex-col items-center justify-center rounded-xl bg-brand-50 text-brand-600 dark:bg-brand-900/30 dark:text-brand-400">
-                      <span className="text-[28px] font-bold leading-none">
-                        {cita.fechaCorta}
-                      </span>
+                      <span className="text-[28px] font-bold leading-none">{cita.fechaCorta}</span>
 
-                      <span className="mt-2 text-[12px] font-semibold">
-                        {cita.dia}
-                      </span>
+                      <span className="mt-2 text-[12px] font-semibold">{cita.dia}</span>
                     </div>
 
                     <div>
@@ -317,25 +339,16 @@ function AgendarContent() {
                       </p>
 
                       <div className="mt-4 flex flex-wrap gap-x-6 gap-y-2 text-sm text-slate-500 dark:text-slate-400">
-                        <DetailItem
-                          icon={<MedicalIcon />}
-                          text={cita.servicio}
-                        />
+                        <DetailItem icon={<MedicalIcon />} text={cita.servicio} />
 
-                        <DetailItem
-                          icon={<ClockSmallIcon />}
-                          text={cita.hora}
-                        />
+                        <DetailItem icon={<ClockSmallIcon />} text={cita.hora} />
 
-                        <DetailItem
-                          icon={<UserIcon />}
-                          text={cita.veterinario}
-                        />
+                        <DetailItem icon={<UserIcon />} text={cita.veterinario} />
                       </div>
                     </div>
                   </div>
 
-                  <div className="flex flex-col gap-3 border-t border-slate-200 pt-5 sm:flex-row xl:border-l xl:border-t-0 xl:pl-8 xl:pt-0 dark:border-slate-700">
+                  <div className="flex flex-col gap-3 border-t border-slate-200 pt-5 dark:border-slate-700 sm:flex-row xl:border-l xl:border-t-0 xl:pl-8 xl:pt-0">
                     <button
                       type="button"
                       onClick={() => setCitaSeleccionada(cita)}
@@ -344,16 +357,15 @@ function AgendarContent() {
                       Ver detalle
                     </button>
 
-                    {cita.estado !== "Cancelada" &&
-                      cita.estado !== "Completada" && (
-                        <button
-                          type="button"
-                          onClick={() => cancelarCita(cita.id)}
-                          className="btn-danger"
-                        >
-                          Cancelar cita
-                        </button>
-                      )}
+                    {cita.estado !== "Cancelada" && cita.estado !== "Completada" && (
+                      <button
+                        type="button"
+                        onClick={() => cancelarCita(cita.id)}
+                        className="btn-danger"
+                      >
+                        Cancelar cita
+                      </button>
+                    )}
                   </div>
                 </div>
 
@@ -427,16 +439,11 @@ function DetalleCitaModal({
             </div>
 
             <div>
-              <h2
-                id="titulo-detalle-cita"
-                className="text-section-title text-xl"
-              >
+              <h2 id="titulo-detalle-cita" className="text-section-title text-xl">
                 Detalle de la cita
               </h2>
 
-              <p className="mt-1 text-subtitle">
-                Información completa de la atención programada
-              </p>
+              <p className="text-subtitle mt-1">Información completa de la atención programada</p>
             </div>
           </div>
 
@@ -451,10 +458,12 @@ function DetalleCitaModal({
         </div>
 
         <div className="px-7 py-6">
-          <div className="flex flex-col justify-between gap-4 rounded-xl bg-slate-50 p-5 sm:flex-row sm:items-center dark:bg-slate-800/50">
+          <div className="flex flex-col justify-between gap-4 rounded-xl bg-slate-50 p-5 dark:bg-slate-800/50 sm:flex-row sm:items-center">
             <div>
               <p className="text-label">Mascota</p>
-              <h3 className="mt-2 text-xl font-semibold text-slate-900 dark:text-white">{cita.mascota}</h3>
+              <h3 className="mt-2 text-xl font-semibold text-slate-900 dark:text-white">
+                {cita.mascota}
+              </h3>
               <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">{cita.especie}</p>
             </div>
 
@@ -462,10 +471,10 @@ function DetalleCitaModal({
           </div>
 
           <div className="mt-5 grid grid-cols-1 gap-3 sm:grid-cols-2">
-            <ModalInfoItem label="Fecha"          value={cita.fecha}      icon={<CalendarSmallIcon />} />
-            <ModalInfoItem label="Hora"           value={cita.hora}       icon={<ClockSmallIcon />} />
+            <ModalInfoItem label="Fecha" value={cita.fecha} icon={<CalendarSmallIcon />} />
+            <ModalInfoItem label="Hora" value={cita.hora} icon={<ClockSmallIcon />} />
             <ModalInfoItem label="Tipo de atención" value={cita.servicio} icon={<MedicalIcon />} />
-            <ModalInfoItem label="Veterinario"    value={cita.veterinario} icon={<UserIcon />} />
+            <ModalInfoItem label="Veterinario" value={cita.veterinario} icon={<UserIcon />} />
           </div>
 
           <div className="mt-5 rounded-xl border border-slate-200 bg-slate-50 p-4 dark:border-slate-700 dark:bg-slate-800/50">
@@ -477,19 +486,37 @@ function DetalleCitaModal({
 
           {cita.estado === "Pendiente" && (
             <div className="mt-4 flex items-start gap-3 rounded-xl border border-amber-200 bg-amber-50 px-4 py-4 dark:border-amber-800 dark:bg-amber-950/30">
-              <svg className="mt-0.5 h-5 w-5 shrink-0 text-amber-600" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round">
-                <circle cx="12" cy="12" r="9" /><path d="M12 8v4M12 16h.01" />
+              <svg
+                className="mt-0.5 h-5 w-5 shrink-0 text-amber-600"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="1.8"
+                strokeLinecap="round"
+              >
+                <circle cx="12" cy="12" r="9" />
+                <path d="M12 8v4M12 16h.01" />
               </svg>
               <p className="text-sm leading-6 text-amber-700 dark:text-amber-300">
-                <strong>En revisión:</strong> tu solicitud fue recibida. La clínica la revisará y te confirmará el horario a la brevedad.
+                <strong>En revisión:</strong> tu solicitud fue recibida. La clínica la revisará y te
+                confirmará el horario a la brevedad.
               </p>
             </div>
           )}
 
           {cita.estado === "Confirmada" && (
             <div className="mt-4 flex items-start gap-3 rounded-xl border border-emerald-200 bg-emerald-50 px-4 py-4 dark:border-emerald-800 dark:bg-emerald-950/30">
-              <svg className="mt-0.5 h-5 w-5 shrink-0 text-emerald-600" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                <circle cx="12" cy="12" r="9" /><path d="m8 12 2.5 2.5L16 9" />
+              <svg
+                className="mt-0.5 h-5 w-5 shrink-0 text-emerald-600"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              >
+                <circle cx="12" cy="12" r="9" />
+                <path d="m8 12 2.5 2.5L16 9" />
               </svg>
               <p className="text-sm leading-6 text-emerald-700 dark:text-emerald-300">
                 <strong>Cita confirmada.</strong> Recuerda asistir a tiempo con tu mascota.
@@ -498,13 +525,12 @@ function DetalleCitaModal({
           )}
         </div>
 
-        <div className="flex flex-col-reverse justify-end gap-3 border-t border-slate-200 px-7 py-5 sm:flex-row dark:border-slate-700">
-          {cita.estado !== "Cancelada" &&
-            cita.estado !== "Completada" && (
-              <button type="button" onClick={onCancel} className="btn-danger">
-                Cancelar cita
-              </button>
-            )}
+        <div className="flex flex-col-reverse justify-end gap-3 border-t border-slate-200 px-7 py-5 dark:border-slate-700 sm:flex-row">
+          {cita.estado !== "Cancelada" && cita.estado !== "Completada" && (
+            <button type="button" onClick={onCancel} className="btn-danger">
+              Cancelar cita
+            </button>
+          )}
 
           <button type="button" onClick={onClose} className="btn-primary">
             Cerrar
@@ -529,12 +555,12 @@ function SummaryCard({
   accent?: string;
 }) {
   return (
-    <article className="relative overflow-hidden admin-card p-5">
+    <article className="admin-card relative overflow-hidden p-5">
       <div className={`absolute inset-y-0 left-0 w-1 rounded-l-2xl ${accent}`} />
       <div className="flex items-center justify-between">
         <div>
           <p className="text-label">{title}</p>
-          <p className="mt-2 text-stat text-slate-900 dark:text-white">{value}</p>
+          <p className="text-stat mt-2 text-slate-900 dark:text-white">{value}</p>
           <p className="mt-2 text-xs text-slate-500 dark:text-slate-400">{description}</p>
         </div>
         <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-brand-50 text-brand-600 dark:bg-brand-900/30 dark:text-brand-400">
@@ -573,20 +599,16 @@ function StatusBadge({ estado }: { estado: EstadoCita }) {
   const label = estado === "Pendiente" ? "Pendiente" : estado;
   const style = getStatusStyle(estado);
   return (
-    <span className={`inline-flex items-center gap-1.5 rounded-full px-2.5 py-0.5 text-xs font-semibold ${style.badge}`}>
+    <span
+      className={`inline-flex items-center gap-1.5 rounded-full px-2.5 py-0.5 text-xs font-semibold ${style.badge}`}
+    >
       <span className={`h-1.5 w-1.5 shrink-0 rounded-full ${style.dot}`} />
       {label}
     </span>
   );
 }
 
-function DetailItem({
-  icon,
-  text,
-}: {
-  icon: ReactNode;
-  text: string;
-}) {
+function DetailItem({ icon, text }: { icon: ReactNode; text: string }) {
   return (
     <div className="flex items-center gap-2">
       <span className="text-[#52698A] dark:text-[#94A3B8]">{icon}</span>
@@ -619,7 +641,7 @@ function EmptyState({ onReset }: { onReset: () => void }) {
       <p className="mt-2 max-w-sm text-sm text-slate-500 dark:text-slate-400">
         No hay citas que coincidan con la búsqueda o filtro seleccionado.
       </p>
-      <button type="button" onClick={onReset} className="mt-5 btn-secondary">
+      <button type="button" onClick={onReset} className="btn-secondary mt-5">
         Limpiar filtros
       </button>
     </div>
@@ -636,12 +658,7 @@ function normalizarTexto(texto: string) {
 function PlusIcon() {
   return (
     <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
-      <path
-        d="M12 5v14M5 12h14"
-        stroke="currentColor"
-        strokeWidth="2.2"
-        strokeLinecap="round"
-      />
+      <path d="M12 5v14M5 12h14" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" />
     </svg>
   );
 }
@@ -650,12 +667,7 @@ function SearchIcon() {
   return (
     <svg width="19" height="19" viewBox="0 0 24 24" fill="none">
       <circle cx="11" cy="11" r="7" stroke="currentColor" strokeWidth="2" />
-      <path
-        d="m20 20-3.5-3.5"
-        stroke="currentColor"
-        strokeWidth="2"
-        strokeLinecap="round"
-      />
+      <path d="m20 20-3.5-3.5" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
     </svg>
   );
 }
@@ -663,12 +675,7 @@ function SearchIcon() {
 function CloseIcon() {
   return (
     <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
-      <path
-        d="M18 6 6 18M6 6l12 12"
-        stroke="currentColor"
-        strokeWidth="2"
-        strokeLinecap="round"
-      />
+      <path d="M18 6 6 18M6 6l12 12" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
     </svg>
   );
 }
@@ -734,12 +741,7 @@ function CalendarEmptyIcon() {
         strokeWidth="1.8"
         strokeLinecap="round"
       />
-      <path
-        d="M9 14.5h6"
-        stroke="currentColor"
-        strokeWidth="1.8"
-        strokeLinecap="round"
-      />
+      <path d="M9 14.5h6" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" />
     </svg>
   );
 }
@@ -748,12 +750,7 @@ function ClockIcon() {
   return (
     <svg width="25" height="25" viewBox="0 0 24 24" fill="none">
       <circle cx="12" cy="12" r="8.5" stroke="currentColor" strokeWidth="1.8" />
-      <path
-        d="M12 7v5l3.5 2"
-        stroke="currentColor"
-        strokeWidth="1.8"
-        strokeLinecap="round"
-      />
+      <path d="M12 7v5l3.5 2" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" />
     </svg>
   );
 }
@@ -762,12 +759,7 @@ function ClockSmallIcon() {
   return (
     <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
       <circle cx="12" cy="12" r="8.5" stroke="currentColor" strokeWidth="1.8" />
-      <path
-        d="M12 7v5l3.5 2"
-        stroke="currentColor"
-        strokeWidth="1.8"
-        strokeLinecap="round"
-      />
+      <path d="M12 7v5l3.5 2" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" />
     </svg>
   );
 }

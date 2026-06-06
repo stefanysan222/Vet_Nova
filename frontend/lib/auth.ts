@@ -15,25 +15,32 @@ function isBrowser() {
 
 export function getToken(): string | null {
   if (!isBrowser()) return null;
-  return localStorage.getItem(TOKEN_KEY);
+  return localStorage.getItem(TOKEN_KEY) ?? sessionStorage.getItem(TOKEN_KEY);
 }
 
-export function setToken(token: string) {
+export function setToken(token: string, remember = true) {
   if (!isBrowser()) return;
-  localStorage.setItem(TOKEN_KEY, token);
-  // Cookie para que middleware.ts pueda leer el token server-side.
-  // En Semana 2 se migra a httpOnly cookie via API Route.
-  document.cookie = `vetnova-token=${token}; path=/; SameSite=Strict`;
+  if (remember) {
+    localStorage.setItem(TOKEN_KEY, token);
+  } else {
+    sessionStorage.setItem(TOKEN_KEY, token);
+  }
+  const secure = location.protocol === "https:" ? "; Secure" : "";
+  document.cookie = `vetnova-token=${token}; path=/; SameSite=Strict${secure}`;
 }
 
 export function clearCurrentUser() {
   if (!isBrowser()) return;
   localStorage.removeItem(TOKEN_KEY);
+  sessionStorage.removeItem(TOKEN_KEY);
   localStorage.removeItem("vetnova_cliente_perfil");
-  document.cookie = "vetnova-token=; path=/; max-age=0; SameSite=Strict";
+  const secure = location.protocol === "https:" ? "; Secure" : "";
+  document.cookie = `vetnova-token=; path=/; max-age=0; SameSite=Strict${secure}`;
 }
 
-function decodeToken(token: string): { sub: number; name: string; email: string; role: UserRole; exp: number } | null {
+function decodeToken(
+  token: string,
+): { sub: number; name: string; email: string; role: UserRole; exp: number } | null {
   try {
     const payload = token.split(".")[1];
     const base64 = payload.replace(/-/g, "+").replace(/_/g, "/");
@@ -42,8 +49,8 @@ function decodeToken(token: string): { sub: number; name: string; email: string;
         atob(base64)
           .split("")
           .map((c) => `%${`00${c.charCodeAt(0).toString(16)}`.slice(-2)}`)
-          .join("")
-      )
+          .join(""),
+      ),
     );
   } catch {
     return null;
@@ -94,7 +101,7 @@ export async function registerUser(data: {
 
 export async function loginUser(
   email: string,
-  password: string
+  password: string,
 ): Promise<{ token?: string; user?: AuthUser; error?: string }> {
   try {
     const res = await fetch(`${API_URL}/auth/login`, {
