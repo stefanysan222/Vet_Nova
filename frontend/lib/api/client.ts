@@ -27,6 +27,9 @@ export async function apiFetch<T>(path: string, options?: RequestInit): Promise<
     if (res.status === 403) {
       throw new Error("No tienes permiso para realizar esta acción.");
     }
+    if (res.status === 429) {
+      throw new Error("Demasiados intentos. Intenta de nuevo en unos minutos.");
+    }
     const text = await res.text().catch(() => "");
     let message = `Error ${res.status}`;
     try {

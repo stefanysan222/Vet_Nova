@@ -88,6 +88,8 @@ export async function registerUser(data: {
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(data),
     });
+    if (res.status === 429)
+      return { error: "Demasiados intentos. Intenta de nuevo en unos minutos." };
     const json = await res.json();
     if (!res.ok) {
       const msg = Array.isArray(json.message) ? json.message[0] : json.message;
@@ -109,6 +111,8 @@ export async function loginUser(
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ email, password }),
     });
+    if (res.status === 429)
+      return { error: "Demasiados intentos. Intenta de nuevo en unos minutos." };
     const json = await res.json();
     if (!res.ok) {
       const msg = Array.isArray(json.message) ? json.message[0] : json.message;

@@ -28,11 +28,15 @@ export default function ForgotPasswordForm() {
     setLoading(true);
     setError("");
     try {
-      await fetch(`${API_URL}/auth/forgot-password`, {
+      const res = await fetch(`${API_URL}/auth/forgot-password`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email }),
       });
+      if (res.status === 429) {
+        setError("Demasiados intentos. Intenta de nuevo en unos minutos.");
+        return;
+      }
       // Siempre mostrar éxito — nunca revelar si el email existe o no
       setSent(true);
     } catch {
