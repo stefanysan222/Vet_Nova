@@ -11,12 +11,18 @@ export default defineConfig({
     exclude: ["**/node_modules/**", "**/e2e/**"],
     coverage: {
       provider: "v8",
-      include: ["lib/auth.ts", "lib/config.ts"],
+      include: [
+        "lib/auth.ts",
+        "lib/config.ts",
+        "lib/api/client.ts",
+        "lib/utils/status.ts",
+        "lib/utils/clinic-schedule.ts",
+      ],
       thresholds: {
-        statements: 50,
-        branches: 38,
-        functions: 65,
-        lines: 50,
+        statements: 70,
+        branches: 60,
+        functions: 75,
+        lines: 70,
       },
     },
   },

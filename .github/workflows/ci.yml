@@ -34,5 +34,5 @@ jobs:
       - name: Typecheck
         run: npx tsc --noEmit --skipLibCheck
 
-      - name: Unit tests
-        run: npm test
+      - name: Unit tests with coverage
+        run: npm run test:coverage
