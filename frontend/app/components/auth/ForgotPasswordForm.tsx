@@ -37,7 +37,11 @@ export default function ForgotPasswordForm() {
         setError("Demasiados intentos. Intenta de nuevo en unos minutos.");
         return;
       }
-      // Siempre mostrar éxito — nunca revelar si el email existe o no
+      if (res.status >= 500) {
+        setError("No se pudo enviar el correo. Intenta de nuevo más tarde.");
+        return;
+      }
+      // Siempre mostrar éxito para 2xx/4xx — nunca revelar si el email existe o no
       setSent(true);
     } catch {
       setError("No se pudo enviar el correo. Intenta de nuevo.");
