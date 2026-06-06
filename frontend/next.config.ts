@@ -1,7 +1,6 @@
 import type { NextConfig } from "next";
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:3000";
-
+// Content-Security-Policy se genera por request con nonce en middleware.ts
 const securityHeaders = [
   {
     key: "X-DNS-Prefetch-Control",
@@ -26,21 +25,6 @@ const securityHeaders = [
   {
     key: "Permissions-Policy",
     value: "camera=(), microphone=(), geolocation=()",
-  },
-  {
-    key: "Content-Security-Policy",
-    value: [
-      "default-src 'self'",
-      "script-src 'self' 'unsafe-inline' https://accounts.google.com",
-      "style-src 'self' 'unsafe-inline'",
-      "img-src 'self' data: blob: https://res.cloudinary.com https://lh3.googleusercontent.com",
-      `connect-src 'self' ${API_URL} https://api.emailjs.com https://accounts.google.com https://api.cloudinary.com`,
-      "font-src 'self'",
-      "frame-src https://accounts.google.com",
-      "object-src 'none'",
-      "base-uri 'self'",
-      "form-action 'self'",
-    ].join("; "),
   },
 ];
 

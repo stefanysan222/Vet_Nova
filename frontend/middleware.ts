@@ -15,6 +15,8 @@ const ROLE_HOME: Record<UserRole, string> = {
   Cliente: "/cliente",
 };
 
+const PROTECTED_PREFIXES = Object.keys(ROLE_REQUIRED);
+
 function decodeToken(token: string): { sub: number; role: UserRole; exp: number } | null {
   try {
     const raw = token.split(".")[1];
@@ -26,43 +28,74 @@ function decodeToken(token: string): { sub: number; role: UserRole; exp: number 
   }
 }
 
+function buildCsp(nonce: string): string {
+  const apiUrl = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:3000";
+  return [
+    "default-src 'self'",
+    `script-src 'self' 'nonce-${nonce}' 'strict-dynamic' https://accounts.google.com`,
+    "style-src 'self' 'unsafe-inline'",
+    "img-src 'self' data: blob: https://res.cloudinary.com https://lh3.googleusercontent.com",
+    `connect-src 'self' ${apiUrl} https://api.emailjs.com https://accounts.google.com https://api.cloudinary.com`,
+    "font-src 'self'",
+    "frame-src https://accounts.google.com",
+    "object-src 'none'",
+    "base-uri 'self'",
+    "form-action 'self'",
+  ].join("; ");
+}
+
 export function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
-  // El token puede venir de cookie (futuro) o del header Authorization
-  const token =
-    request.cookies.get("vetnova-token")?.value ??
-    request.headers.get("x-vetnova-token") ??
-    null;
+  const nonce = Buffer.from(crypto.randomUUID()).toString("base64");
+  const csp = buildCsp(nonce);
 
-  if (!token) {
-    return NextResponse.redirect(new URL("/login", request.url));
+  const requestHeaders = new Headers(request.headers);
+  requestHeaders.set("x-nonce", nonce);
+  requestHeaders.set("Content-Security-Policy", csp);
+
+  const isProtected = PROTECTED_PREFIXES.some((prefix) => pathname.startsWith(prefix));
+
+  if (isProtected) {
+    const token =
+      request.cookies.get("vetnova-token")?.value ?? request.headers.get("x-vetnova-token") ?? null;
+
+    if (!token) {
+      return NextResponse.redirect(new URL("/login", request.url));
+    }
+
+    const payload = decodeToken(token);
+
+    if (!payload) {
+      return NextResponse.redirect(new URL("/login", request.url));
+    }
+
+    if (payload.exp * 1000 < Date.now()) {
+      const response = NextResponse.redirect(new URL("/login", request.url));
+      response.cookies.delete("vetnova-token");
+      return response;
+    }
+
+    const requiredRole = Object.entries(ROLE_REQUIRED).find(([route]) =>
+      pathname.startsWith(route),
+    )?.[1];
+
+    if (requiredRole && payload.role !== requiredRole) {
+      const home = ROLE_HOME[payload.role] ?? "/login";
+      return NextResponse.redirect(new URL(home, request.url));
+    }
   }
 
-  const payload = decodeToken(token);
+  const response = NextResponse.next({
+    request: { headers: requestHeaders },
+  });
+  response.headers.set("Content-Security-Policy", csp);
 
-  if (!payload) {
-    return NextResponse.redirect(new URL("/login", request.url));
-  }
-
-  if (payload.exp * 1000 < Date.now()) {
-    const response = NextResponse.redirect(new URL("/login", request.url));
-    response.cookies.delete("vetnova-token");
-    return response;
-  }
-
-  const requiredRole = Object.entries(ROLE_REQUIRED).find(([route]) =>
-    pathname.startsWith(route)
-  )?.[1];
-
-  if (requiredRole && payload.role !== requiredRole) {
-    const home = ROLE_HOME[payload.role] ?? "/login";
-    return NextResponse.redirect(new URL(home, request.url));
-  }
-
-  return NextResponse.next();
+  return response;
 }
 
 export const config = {
-  matcher: ["/admin/:path*", "/veterinario/:path*", "/cliente/:path*"],
+  matcher: [
+    "/((?!_next/static|_next/image|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp|ico)$).*)",
+  ],
 };
