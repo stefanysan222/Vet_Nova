@@ -1,7 +1,8 @@
 "use client";
 
 import Link from "next/link";
-import { FormEvent, ReactNode, useEffect, useState } from "react";
+import { useSearchParams } from "next/navigation";
+import { FormEvent, ReactNode, Suspense, useEffect, useState } from "react";
 import { fetchMascotas } from "../../../lib/api/mascotas";
 import { fetchCitas, createCita } from "../../../lib/api/citas";
 import type { PetRecord, Appointment } from "../../../lib/recepcionista/types";
@@ -153,6 +154,21 @@ function buildPacienteClinico(pet: PetRecord, citas: Appointment[]): PacienteCli
 }
 
 export default function HistorialPage() {
+  return (
+    <Suspense
+      fallback={
+        <div className="flex h-full items-center justify-center">
+          <p className="text-sm text-slate-500">Cargando historial...</p>
+        </div>
+      }
+    >
+      <HistorialContent />
+    </Suspense>
+  );
+}
+
+function HistorialContent() {
+  const searchParams = useSearchParams();
   const [pacientes, setPacientes] = useState<PacienteClinico[]>([]);
   const [, setTodasLasCitas] = useState<Appointment[]>([]);
   const [pacienteSeleccionado, setPacienteSeleccionado] = useState<string>("");
@@ -172,9 +188,8 @@ export default function HistorialPage() {
         const built = pets.map((p) => buildPacienteClinico(p, citas));
         setPacientes(built);
 
-        const parametros = new URLSearchParams(window.location.search);
-        const pacienteUrl = parametros.get("paciente");
-        const accion = parametros.get("accion");
+        const pacienteUrl = searchParams.get("paciente");
+        const accion = searchParams.get("accion");
 
         const inicial = built.find((p) => p.id === pacienteUrl) ?? built[0];
         if (inicial) setPacienteSeleccionado(inicial.id);
@@ -184,7 +199,7 @@ export default function HistorialPage() {
         setError("No se pudo cargar los expedientes. Verifica la conexión con el servidor."),
       )
       .finally(() => setLoading(false));
-  }, []);
+  }, [searchParams]);
 
   const paciente = pacientes.find((p) => p.id === pacienteSeleccionado) ?? null;
 

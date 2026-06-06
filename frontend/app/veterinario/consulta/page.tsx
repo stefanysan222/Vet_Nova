@@ -1,14 +1,8 @@
 "use client";
 
 import Link from "next/link";
-import {
-  ChangeEvent,
-  FormEvent,
-  ReactNode,
-  useEffect,
-  useMemo,
-  useState,
-} from "react";
+import { useSearchParams } from "next/navigation";
+import { ChangeEvent, FormEvent, ReactNode, Suspense, useEffect, useMemo, useState } from "react";
 import { fetchCitas, updateCita } from "../../../lib/api/citas";
 import type { Appointment } from "../../../lib/recepcionista/types";
 import { getCurrentUser } from "../../../lib/auth";
@@ -74,6 +68,21 @@ function mapAppointmentToCitaHabilitada(a: Appointment): CitaHabilitada {
 }
 
 export default function RegistrarConsultaPage() {
+  return (
+    <Suspense
+      fallback={
+        <div className="flex h-full items-center justify-center">
+          <p className="text-sm text-slate-500">Cargando consulta...</p>
+        </div>
+      }
+    >
+      <RegistrarConsultaContent />
+    </Suspense>
+  );
+}
+
+function RegistrarConsultaContent() {
+  const searchParams = useSearchParams();
   const [citasHabilitadas, setCitasHabilitadas] = useState<CitaHabilitada[]>([]);
   const [todasLasCitas, setTodasLasCitas] = useState<Appointment[]>([]);
   const [loading, setLoading] = useState(true);
@@ -93,9 +102,8 @@ export default function RegistrarConsultaPage() {
           .map(mapAppointmentToCitaHabilitada);
         setCitasHabilitadas(confirmadas);
 
-        const parametros = new URLSearchParams(window.location.search);
-        const citaUrl = parametros.get("cita");
-        const pacienteUrl = parametros.get("paciente");
+        const citaUrl = searchParams.get("cita");
+        const pacienteUrl = searchParams.get("paciente");
 
         if (citaUrl) {
           const found = confirmadas.find((c) => c.id === citaUrl);
@@ -111,11 +119,11 @@ export default function RegistrarConsultaPage() {
       })
       .catch(() => setError("No se pudo cargar las citas. Verifica la conexión con el servidor."))
       .finally(() => setLoading(false));
-  }, []);
+  }, [searchParams]);
 
   const citaSeleccionada = useMemo(
     () => citasHabilitadas.find((cita) => cita.id === formulario.citaId) ?? null,
-    [formulario.citaId, citasHabilitadas]
+    [formulario.citaId, citasHabilitadas],
   );
 
   function seleccionarCita(event: ChangeEvent<HTMLSelectElement>) {
@@ -126,7 +134,7 @@ export default function RegistrarConsultaPage() {
   }
 
   function actualizarCampo(
-    event: ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>
+    event: ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>,
   ) {
     const campo = event.target.name as keyof FormularioConsulta;
     const valor = event.target.value;
@@ -182,7 +190,9 @@ export default function RegistrarConsultaPage() {
   if (loading) {
     return (
       <div className="flex min-h-[400px] items-center justify-center">
-        <p className="text-[14px] text-[#64748B] dark:text-[#94A3B8]">Cargando citas confirmadas...</p>
+        <p className="text-[14px] text-[#64748B] dark:text-[#94A3B8]">
+          Cargando citas confirmadas...
+        </p>
       </div>
     );
   }
@@ -204,8 +214,8 @@ export default function RegistrarConsultaPage() {
             </h1>
 
             <p className="mt-3 max-w-3xl text-[14px] leading-7 text-[#64748B] dark:text-[#94A3B8]">
-              Documenta la valoración médica de un paciente asignado y actualiza su historial clínico
-              con diagnóstico, tratamiento y seguimiento.
+              Documenta la valoración médica de un paciente asignado y actualiza su historial
+              clínico con diagnóstico, tratamiento y seguimiento.
             </p>
           </div>
 
@@ -222,7 +232,13 @@ export default function RegistrarConsultaPage() {
       {error && (
         <div className="flex items-start justify-between gap-4 rounded-[16px] border border-[#FECACA] bg-[#FEF2F2] px-5 py-4 dark:border-[#7F1D1D] dark:bg-[#450A0A]">
           <p className="text-[14px] text-[#B91C1C] dark:text-[#FECACA]">{error}</p>
-          <button type="button" onClick={() => setError(null)} className="text-[18px] font-semibold text-[#B91C1C]">×</button>
+          <button
+            type="button"
+            onClick={() => setError(null)}
+            className="text-[18px] font-semibold text-[#B91C1C]"
+          >
+            ×
+          </button>
         </div>
       )}
 
@@ -256,10 +272,7 @@ export default function RegistrarConsultaPage() {
         </div>
       )}
 
-      <form
-        onSubmit={handleSubmit}
-        className="grid gap-5 xl:grid-cols-[0.92fr_1.18fr]"
-      >
+      <form onSubmit={handleSubmit} className="grid gap-5 xl:grid-cols-[0.92fr_1.18fr]">
         {/* DATOS DE LA ATENCIÓN */}
         <section className="consulta-card rounded-[22px] border border-[#D9E2EF] bg-white p-6 shadow-[0_8px_24px_rgba(15,23,42,0.05)] dark:border-[#334155] dark:bg-[#111827]">
           <div className="mb-6">
@@ -280,10 +293,13 @@ export default function RegistrarConsultaPage() {
           </div>
 
           <div className="mb-6 flex items-start gap-3 rounded-[14px] border border-[#DBEAFE] bg-[#EFF6FF] px-4 py-3 dark:border-[#1E3A8A] dark:bg-[#172554]">
-            <ConsultaIcon name="lock" className="mt-0.5 h-[17px] w-[17px] shrink-0 text-[#2563EB] dark:text-[#93C5FD]" />
+            <ConsultaIcon
+              name="lock"
+              className="mt-0.5 h-[17px] w-[17px] shrink-0 text-[#2563EB] dark:text-[#93C5FD]"
+            />
             <p className="text-[13px] leading-6 text-[#1D4ED8] dark:text-[#BFDBFE]">
-              Solo se muestran citas confirmadas para atención. Los datos generales no pueden editarse
-              desde este módulo.
+              Solo se muestran citas confirmadas para atención. Los datos generales no pueden
+              editarse desde este módulo.
             </p>
           </div>
 
@@ -548,35 +564,128 @@ export default function RegistrarConsultaPage() {
 
       <style jsx global>{`
         @keyframes consulta-fade-up {
-          from { opacity: 0; transform: translateY(14px); }
-          to { opacity: 1; transform: translateY(0); }
+          from {
+            opacity: 0;
+            transform: translateY(14px);
+          }
+          to {
+            opacity: 1;
+            transform: translateY(0);
+          }
         }
         @keyframes consulta-orb {
-          0%, 100% { transform: translate(0, 0); }
-          50% { transform: translate(-12px, 10px); }
+          0%,
+          100% {
+            transform: translate(0, 0);
+          }
+          50% {
+            transform: translate(-12px, 10px);
+          }
         }
-        .consulta-enter { animation: consulta-fade-up 0.45s ease-out both; }
-        .consulta-orb { animation: consulta-orb 7s ease-in-out infinite; }
-        .consulta-alert-enter { animation: consulta-fade-up 0.3s ease-out both; }
-        .consulta-card { animation: consulta-fade-up 0.45s ease-out 0.12s both; transition: border-color 0.25s ease, box-shadow 0.25s ease; }
-        .consulta-card-delay { animation-delay: 0.2s; }
-        .consulta-card:hover { border-color: #bfdbfe; box-shadow: 0 16px 32px rgba(15, 23, 42, 0.07); }
-        .consulta-patient-summary { animation: consulta-fade-up 0.25s ease-out both; }
-        .input-style { width: 100%; height: 48px; border: 1px solid #cbd5e1; border-radius: 12px; background: #ffffff; padding: 0 14px; font-size: 14px; color: #10213a; outline: none; transition: border-color 0.2s ease, box-shadow 0.2s ease, background 0.2s ease; }
-        .input-style:focus { border-color: #2563eb; box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.1); }
-        .input-style::placeholder { color: #94a3b8; }
-        .textarea-style { height: auto; min-height: 94px; padding: 12px 14px; resize: none; }
-        .campo-bloqueado { cursor: not-allowed; background: #f8fafc; color: #64748b; }
-        .consulta-button-primary { transition: transform 0.2s ease, background 0.2s ease, box-shadow 0.2s ease; }
-        .consulta-button-primary:hover:not(:disabled) { transform: translateY(-2px); background: #2459df; box-shadow: 0 10px 18px rgba(47, 107, 255, 0.22); }
-        .consulta-button-secondary { transition: transform 0.2s ease, border-color 0.2s ease, background 0.2s ease; }
-        .consulta-button-secondary:hover { transform: translateY(-2px); border-color: #bfdbfe; background: #f8fbff; }
-        .dark .input-style { border-color: #334155; background: #0f172a; color: #ffffff; }
-        .dark .campo-bloqueado { background: #0f172a; color: #94a3b8; }
-        .dark .consulta-button-secondary:hover { background: #1e293b; }
+        .consulta-enter {
+          animation: consulta-fade-up 0.45s ease-out both;
+        }
+        .consulta-orb {
+          animation: consulta-orb 7s ease-in-out infinite;
+        }
+        .consulta-alert-enter {
+          animation: consulta-fade-up 0.3s ease-out both;
+        }
+        .consulta-card {
+          animation: consulta-fade-up 0.45s ease-out 0.12s both;
+          transition:
+            border-color 0.25s ease,
+            box-shadow 0.25s ease;
+        }
+        .consulta-card-delay {
+          animation-delay: 0.2s;
+        }
+        .consulta-card:hover {
+          border-color: #bfdbfe;
+          box-shadow: 0 16px 32px rgba(15, 23, 42, 0.07);
+        }
+        .consulta-patient-summary {
+          animation: consulta-fade-up 0.25s ease-out both;
+        }
+        .input-style {
+          width: 100%;
+          height: 48px;
+          border: 1px solid #cbd5e1;
+          border-radius: 12px;
+          background: #ffffff;
+          padding: 0 14px;
+          font-size: 14px;
+          color: #10213a;
+          outline: none;
+          transition:
+            border-color 0.2s ease,
+            box-shadow 0.2s ease,
+            background 0.2s ease;
+        }
+        .input-style:focus {
+          border-color: #2563eb;
+          box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.1);
+        }
+        .input-style::placeholder {
+          color: #94a3b8;
+        }
+        .textarea-style {
+          height: auto;
+          min-height: 94px;
+          padding: 12px 14px;
+          resize: none;
+        }
+        .campo-bloqueado {
+          cursor: not-allowed;
+          background: #f8fafc;
+          color: #64748b;
+        }
+        .consulta-button-primary {
+          transition:
+            transform 0.2s ease,
+            background 0.2s ease,
+            box-shadow 0.2s ease;
+        }
+        .consulta-button-primary:hover:not(:disabled) {
+          transform: translateY(-2px);
+          background: #2459df;
+          box-shadow: 0 10px 18px rgba(47, 107, 255, 0.22);
+        }
+        .consulta-button-secondary {
+          transition:
+            transform 0.2s ease,
+            border-color 0.2s ease,
+            background 0.2s ease;
+        }
+        .consulta-button-secondary:hover {
+          transform: translateY(-2px);
+          border-color: #bfdbfe;
+          background: #f8fbff;
+        }
+        .dark .input-style {
+          border-color: #334155;
+          background: #0f172a;
+          color: #ffffff;
+        }
+        .dark .campo-bloqueado {
+          background: #0f172a;
+          color: #94a3b8;
+        }
+        .dark .consulta-button-secondary:hover {
+          background: #1e293b;
+        }
         @media (prefers-reduced-motion: reduce) {
-          .consulta-enter, .consulta-orb, .consulta-alert-enter, .consulta-card, .consulta-patient-summary { animation: none !important; }
-          .consulta-button-primary:hover, .consulta-button-secondary:hover { transform: none !important; }
+          .consulta-enter,
+          .consulta-orb,
+          .consulta-alert-enter,
+          .consulta-card,
+          .consulta-patient-summary {
+            animation: none !important;
+          }
+          .consulta-button-primary:hover,
+          .consulta-button-secondary:hover {
+            transform: none !important;
+          }
         }
       `}</style>
     </div>
@@ -597,13 +706,58 @@ function Campo({ label, children }: { label: string; children: ReactNode }) {
 type IconName = "patient" | "clipboard" | "lock" | "history" | "save";
 
 function ConsultaIcon({ name, className = "h-5 w-5" }: { name: IconName; className?: string }) {
-  const svgProps = { className, viewBox: "0 0 24 24", fill: "none", stroke: "currentColor", strokeWidth: 1.8, strokeLinecap: "round" as const, strokeLinejoin: "round" as const };
+  const svgProps = {
+    className,
+    viewBox: "0 0 24 24",
+    fill: "none",
+    stroke: "currentColor",
+    strokeWidth: 1.8,
+    strokeLinecap: "round" as const,
+    strokeLinejoin: "round" as const,
+  };
   switch (name) {
-    case "patient": return <svg {...svgProps}><ellipse cx="8" cy="7" rx="2" ry="2.6" /><ellipse cx="16" cy="7" rx="2" ry="2.6" /><ellipse cx="6.5" cy="13" rx="2" ry="2.6" /><ellipse cx="17.5" cy="13" rx="2" ry="2.6" /><path d="M12 18.6c2.2 0 3.8-1.3 3.8-3 0-1.8-1.6-2.9-3.3-2.9-.8 0-1.5.2-2.1.7-.5.3-1 .4-1.5.4-1.5 0-2.7 1-2.7 2.4 0 1.4 1.2 2.4 2.8 2.4H12Z" /></svg>;
-    case "clipboard": return <svg {...svgProps}><path d="M9 4h6" /><path d="M9 3.5h6A1.5 1.5 0 0 1 16.5 5v1h-9V5A1.5 1.5 0 0 1 9 3.5Z" /><rect x="5" y="6" width="14" height="15" rx="2" /><path d="M9 11h6M9 15h6M9 18h4" /></svg>;
-    case "lock": return <svg {...svgProps}><rect x="5" y="10" width="14" height="10" rx="2" /><path d="M8 10V7a4 4 0 0 1 8 0v3" /></svg>;
-    case "history": return <svg {...svgProps}><path d="M12 7v5l3.5 2" /><path d="M20.5 12a8.5 8.5 0 1 1-2.7-6.2" /><path d="M20.5 4.5v5h-5" /></svg>;
-    case "save": return <svg {...svgProps}><path d="M5 4h11l3 3v13H5Z" /><path d="M8 4v6h8V4" /><path d="M8 20v-6h8v6" /></svg>;
+    case "patient":
+      return (
+        <svg {...svgProps}>
+          <ellipse cx="8" cy="7" rx="2" ry="2.6" />
+          <ellipse cx="16" cy="7" rx="2" ry="2.6" />
+          <ellipse cx="6.5" cy="13" rx="2" ry="2.6" />
+          <ellipse cx="17.5" cy="13" rx="2" ry="2.6" />
+          <path d="M12 18.6c2.2 0 3.8-1.3 3.8-3 0-1.8-1.6-2.9-3.3-2.9-.8 0-1.5.2-2.1.7-.5.3-1 .4-1.5.4-1.5 0-2.7 1-2.7 2.4 0 1.4 1.2 2.4 2.8 2.4H12Z" />
+        </svg>
+      );
+    case "clipboard":
+      return (
+        <svg {...svgProps}>
+          <path d="M9 4h6" />
+          <path d="M9 3.5h6A1.5 1.5 0 0 1 16.5 5v1h-9V5A1.5 1.5 0 0 1 9 3.5Z" />
+          <rect x="5" y="6" width="14" height="15" rx="2" />
+          <path d="M9 11h6M9 15h6M9 18h4" />
+        </svg>
+      );
+    case "lock":
+      return (
+        <svg {...svgProps}>
+          <rect x="5" y="10" width="14" height="10" rx="2" />
+          <path d="M8 10V7a4 4 0 0 1 8 0v3" />
+        </svg>
+      );
+    case "history":
+      return (
+        <svg {...svgProps}>
+          <path d="M12 7v5l3.5 2" />
+          <path d="M20.5 12a8.5 8.5 0 1 1-2.7-6.2" />
+          <path d="M20.5 4.5v5h-5" />
+        </svg>
+      );
+    case "save":
+      return (
+        <svg {...svgProps}>
+          <path d="M5 4h11l3 3v13H5Z" />
+          <path d="M8 4v6h8V4" />
+          <path d="M8 20v-6h8v6" />
+        </svg>
+      );
   }
 }
 

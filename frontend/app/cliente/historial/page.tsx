@@ -21,27 +21,16 @@ const MONTHS = [
 ];
 
 function agruparPorMes(citas: Appointment[]): { etiqueta: string; items: Appointment[] }[] {
-  const map = new Map<string, Appointment[]>();
+  const map = new Map<string, { etiqueta: string; items: Appointment[] }>();
   for (const c of citas) {
     if (!c.date) continue;
     const d = new Date(c.date + "T00:00:00");
     const key = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}`;
-    const label = `${MONTHS[d.getMonth()]} ${d.getFullYear()}`;
-    if (!map.has(key)) map.set(key, []);
-    map.get(key)!.push(c);
-    if (!map.has(key + "__label"))
-      map.set(key + "__label", [{ id: label } as unknown as Appointment]);
+    const etiqueta = `${MONTHS[d.getMonth()]} ${d.getFullYear()}`;
+    if (!map.has(key)) map.set(key, { etiqueta, items: [] });
+    map.get(key)!.items.push(c);
   }
-  const entries: { etiqueta: string; items: Appointment[] }[] = [];
-  const keys = [...map.keys()]
-    .filter((k) => !k.endsWith("__label"))
-    .sort((a, b) => b.localeCompare(a));
-  for (const key of keys) {
-    const labelArr = map.get(key + "__label");
-    const etiqueta = labelArr ? String((labelArr[0] as unknown as { id: string }).id) : key;
-    entries.push({ etiqueta, items: map.get(key) ?? [] });
-  }
-  return entries;
+  return [...map.entries()].sort(([a], [b]) => b.localeCompare(a)).map(([, value]) => value);
 }
 
 function estadoBadge(status: string) {

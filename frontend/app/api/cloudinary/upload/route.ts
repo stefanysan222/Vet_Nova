@@ -7,7 +7,7 @@ export async function POST(req: Request) {
   const ip =
     (req as Request & { headers: Headers }).headers.get("x-forwarded-for")?.split(",")[0].trim() ??
     "unknown";
-  if (!rateLimit(`upload:${ip}`, 10, 60_000)) {
+  if (!(await rateLimit(`upload:${ip}`, 10, 60_000))) {
     return NextResponse.json(
       { error: "Demasiadas subidas. Intenta en un minuto." },
       { status: 429 },
