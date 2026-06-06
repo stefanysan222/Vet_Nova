@@ -98,7 +98,7 @@ export default function LoginForm() {
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.1 }}
       >
-        <GoogleAuthButton label="Continuar con Google" onSuccess={handleGoogleSuccess} />
+        <GoogleAuthButton onSuccess={handleGoogleSuccess} />
       </motion.div>
 
       <motion.div
