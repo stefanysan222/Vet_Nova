@@ -33,7 +33,7 @@ function buildCsp(nonce: string): string {
   return [
     "default-src 'self'",
     `script-src 'self' 'nonce-${nonce}' 'strict-dynamic' https://accounts.google.com`,
-    "style-src 'self' 'unsafe-inline'",
+    "style-src 'self' 'unsafe-inline' https://accounts.google.com",
     "img-src 'self' data: blob: https://res.cloudinary.com https://lh3.googleusercontent.com",
     `connect-src 'self' ${API_URL} https://api.emailjs.com https://accounts.google.com https://api.cloudinary.com`,
     "font-src 'self'",
@@ -44,7 +44,7 @@ function buildCsp(nonce: string): string {
   ].join("; ");
 }
 
-export function middleware(request: NextRequest) {
+export function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
   const nonce = Buffer.from(crypto.randomUUID()).toString("base64");
