@@ -32,7 +32,8 @@ export default function LoginForm() {
   const validate = () => {
     const e: Record<string, string> = {};
     if (!formData.email.trim()) e.email = "El correo es obligatorio.";
-    else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) e.email = "Ingresa un correo válido.";
+    else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email))
+      e.email = "Ingresa un correo válido.";
     if (!formData.password) e.password = "La contraseña es obligatoria.";
     else if (formData.password.length < 6) e.password = "Mínimo 6 caracteres.";
     return e;
@@ -44,26 +45,45 @@ export default function LoginForm() {
     return "/cliente";
   };
 
-  const handleGoogleSuccess = async (profile: { name: string; email: string; picture?: string }) => {
+  const handleGoogleSuccess = async (profile: {
+    name: string;
+    email: string;
+    picture?: string;
+  }) => {
     setLoading(true);
     setSubmitError(null);
     const result = await loginOrRegisterGoogle(profile);
     setLoading(false);
-    if (result.error) { setSubmitError(result.error); return; }
-    if (result.token && result.user) { setToken(result.token); router.push(getDashboardRoute(result.user.role)); }
+    if (result.error) {
+      setSubmitError(result.error);
+      return;
+    }
+    if (result.token && result.user) {
+      setToken(result.token);
+      router.push(getDashboardRoute(result.user.role));
+    }
   };
 
   const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     const nextErrors = validate();
-    if (Object.keys(nextErrors).length > 0) { setErrors(nextErrors); return; }
+    if (Object.keys(nextErrors).length > 0) {
+      setErrors(nextErrors);
+      return;
+    }
     setLoading(true);
     setSubmitError(null);
     const result = await loginUser(formData.email, formData.password);
     setLoading(false);
-    if (result.error) { setSubmitError(result.error); return; }
+    if (result.error) {
+      setSubmitError(result.error);
+      return;
+    }
     setErrors({});
-    if (result.token && result.user) { setToken(result.token); router.push(getDashboardRoute(result.user.role)); }
+    if (result.token && result.user) {
+      setToken(result.token);
+      router.push(getDashboardRoute(result.user.role));
+    }
   };
 
   const inputBase = (field: string) =>
@@ -71,13 +91,17 @@ export default function LoginForm() {
       errors[field]
         ? "border-red-400 bg-red-50 dark:border-red-500 dark:bg-red-950/30"
         : focused === field
-        ? "border-blue-400 bg-blue-50/50 ring-2 ring-blue-100 dark:border-blue-500 dark:bg-blue-950/20 dark:ring-blue-900/40"
-        : "border-slate-200 bg-white dark:border-slate-700 dark:bg-slate-800/60"
+          ? "border-blue-400 bg-blue-50/50 ring-2 ring-blue-100 dark:border-blue-500 dark:bg-blue-950/20 dark:ring-blue-900/40"
+          : "border-slate-200 bg-white dark:border-slate-700 dark:bg-slate-800/60"
     }`;
 
   return (
     <form onSubmit={handleSubmit} className="space-y-5" noValidate>
-      <motion.div initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }}>
+      <motion.div
+        initial={{ opacity: 0, y: 8 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.1 }}
+      >
         <GoogleAuthButton label="Continuar con Google" onSuccess={handleGoogleSuccess} />
       </motion.div>
 
@@ -109,11 +133,20 @@ export default function LoginForm() {
         transition={{ delay: 0.2 }}
         className="space-y-1.5"
       >
-        <label className="block text-sm font-medium text-slate-700 dark:text-slate-300" htmlFor="email">
+        <label
+          className="block text-sm font-medium text-slate-700 dark:text-slate-300"
+          htmlFor="email"
+        >
           Correo electrónico
         </label>
-        <motion.div variants={inputVariants} animate={focused === "email" ? "focus" : "rest"} className="relative">
-          <Mail className={`pointer-events-none absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 transition-colors ${focused === "email" ? "text-blue-500" : "text-slate-400"}`} />
+        <motion.div
+          variants={inputVariants}
+          animate={focused === "email" ? "focus" : "rest"}
+          className="relative"
+        >
+          <Mail
+            className={`pointer-events-none absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 transition-colors ${focused === "email" ? "text-blue-500" : "text-slate-400"}`}
+          />
           <input
             id="email"
             type="email"
@@ -126,7 +159,11 @@ export default function LoginForm() {
           />
         </motion.div>
         {errors.email && (
-          <motion.p initial={{ opacity: 0, x: -4 }} animate={{ opacity: 1, x: 0 }} className="text-xs text-red-600 dark:text-red-400">
+          <motion.p
+            initial={{ opacity: 0, x: -4 }}
+            animate={{ opacity: 1, x: 0 }}
+            className="text-xs text-red-600 dark:text-red-400"
+          >
             {errors.email}
           </motion.p>
         )}
@@ -139,11 +176,20 @@ export default function LoginForm() {
         transition={{ delay: 0.25 }}
         className="space-y-1.5"
       >
-        <label className="block text-sm font-medium text-slate-700 dark:text-slate-300" htmlFor="password">
+        <label
+          className="block text-sm font-medium text-slate-700 dark:text-slate-300"
+          htmlFor="password"
+        >
           Contraseña
         </label>
-        <motion.div variants={inputVariants} animate={focused === "password" ? "focus" : "rest"} className="relative">
-          <Lock className={`pointer-events-none absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 transition-colors ${focused === "password" ? "text-blue-500" : "text-slate-400"}`} />
+        <motion.div
+          variants={inputVariants}
+          animate={focused === "password" ? "focus" : "rest"}
+          className="relative"
+        >
+          <Lock
+            className={`pointer-events-none absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 transition-colors ${focused === "password" ? "text-blue-500" : "text-slate-400"}`}
+          />
           <input
             id="password"
             type={showPassword ? "text" : "password"}
@@ -164,7 +210,11 @@ export default function LoginForm() {
           </motion.button>
         </motion.div>
         {errors.password && (
-          <motion.p initial={{ opacity: 0, x: -4 }} animate={{ opacity: 1, x: 0 }} className="text-xs text-red-600 dark:text-red-400">
+          <motion.p
+            initial={{ opacity: 0, x: -4 }}
+            animate={{ opacity: 1, x: 0 }}
+            className="text-xs text-red-600 dark:text-red-400"
+          >
             {errors.password}
           </motion.p>
         )}
@@ -185,9 +235,12 @@ export default function LoginForm() {
           />
           Recordarme
         </label>
-        <span className="text-sm text-slate-400 dark:text-slate-500">
-          ¿Olvidaste tu contraseña? Contacta al administrador
-        </span>
+        <a
+          href="/forgot-password"
+          className="text-sm font-semibold text-blue-600 transition hover:text-blue-700 dark:text-blue-400 dark:hover:text-blue-300"
+        >
+          ¿Olvidaste tu contraseña?
+        </a>
       </motion.div>
 
       <motion.div
@@ -224,7 +277,10 @@ export default function LoginForm() {
         className="text-center text-sm text-slate-500 dark:text-slate-400"
       >
         ¿Aún no tienes cuenta?{" "}
-        <a href="/register" className="font-semibold text-blue-600 transition hover:text-blue-700 dark:text-blue-400 dark:hover:text-blue-300">
+        <a
+          href="/register"
+          className="font-semibold text-blue-600 transition hover:text-blue-700 dark:text-blue-400 dark:hover:text-blue-300"
+        >
           Crear cuenta
         </a>
       </motion.p>
