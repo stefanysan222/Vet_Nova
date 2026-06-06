@@ -1,22 +1,15 @@
 "use client";
 
 import Link from "next/link";
-import { useMemo, useState, type CSSProperties } from "react";
+import { useEffect, useMemo, useState, type CSSProperties } from "react";
+import { getCurrentUser } from "../../../lib/auth";
+import { fetchCitas } from "../../../lib/api/citas";
+import type { Appointment } from "../../../lib/recepcionista/types";
 
 type CategoriaNotificacion = "Citas" | "Seguimiento" | "Historial";
-type FiltroNotificacion =
-  | "Todas"
-  | "No leídas"
-  | CategoriaNotificacion;
+type FiltroNotificacion = "Todas" | "No leídas" | CategoriaNotificacion;
 
-type IconName =
-  | "bell"
-  | "calendar"
-  | "history"
-  | "activity"
-  | "check"
-  | "document"
-  | "empty";
+type IconName = "bell" | "calendar" | "history" | "activity" | "check" | "document" | "empty";
 
 interface AccionNotificacion {
   label: string;
@@ -31,124 +24,114 @@ interface Notificacion {
   paciente: string;
   descripcion: string;
   tiempo: string;
-  grupo: "Hoy" | "Ayer";
+  grupo: string;
   leida: boolean;
   requiereAccion: boolean;
   icono: IconName;
   acciones: AccionNotificacion[];
 }
 
-const notificacionesIniciales: Notificacion[] = [
-  {
-    id: 1,
-    categoria: "Citas",
-    titulo: "Cita habilitada para atención",
-    paciente: "Max · Consulta general · 09:00 AM",
-    descripcion:
-      "Administración confirmó la cita y el paciente ya puede ser atendido.",
-    tiempo: "Hace 5 min",
-    grupo: "Hoy",
-    leida: false,
-    requiereAccion: true,
-    icono: "calendar",
-    acciones: [
-      {
-        label: "Ver cita",
-        href: "/veterinario/citas",
-      },
-      {
-        label: "Registrar consulta",
-        href: "/veterinario/consulta?paciente=max",
-        principal: true,
-      },
-    ],
-  },
-  {
-    id: 2,
-    categoria: "Seguimiento",
-    titulo: "Control clínico próximo",
-    paciente: "Bella · Control postoperatorio · 02:00 PM",
-    descripcion:
-      "Paciente en seguimiento con control programado para hoy. Revisa su evolución clínica.",
-    tiempo: "Hace 30 min",
-    grupo: "Hoy",
-    leida: false,
-    requiereAccion: true,
-    icono: "activity",
-    acciones: [
-      {
-        label: "Ver historial",
-        href: "/veterinario/historial?paciente=bella",
-      },
-      {
-        label: "Agregar evolución",
-        href: "/veterinario/historial?paciente=bella&accion=evolucion",
-        principal: true,
-      },
-    ],
-  },
-  {
-    id: 3,
-    categoria: "Citas",
-    titulo: "Solicitud pendiente de confirmación",
-    paciente: "Luna · Vacunación · 10:30 AM",
-    descripcion:
-      "La solicitud de cita fue registrada y está pendiente de confirmación por administración.",
-    tiempo: "Hace 1 hora",
-    grupo: "Hoy",
-    leida: false,
-    requiereAccion: false,
-    icono: "calendar",
-    acciones: [
-      {
-        label: "Ver agenda",
-        href: "/veterinario/citas",
-      },
-    ],
-  },
-  {
-    id: 4,
-    categoria: "Historial",
-    titulo: "Documento clínico disponible",
-    paciente: "Rocky · Bulldog Francés",
-    descripcion:
-      "Se agregó un documento PDF al expediente clínico del paciente.",
-    tiempo: "Ayer",
-    grupo: "Ayer",
-    leida: true,
-    requiereAccion: false,
-    icono: "document",
-    acciones: [
-      {
-        label: "Ver historial",
-        href: "/veterinario/historial?paciente=rocky",
-      },
-    ],
-  },
-];
+function citaHaciaNotificacion(a: Appointment, idx: number): Notificacion {
+  const hoy = new Date().toISOString().slice(0, 10);
+  const ayer = new Date(Date.now() - 86400000).toISOString().slice(0, 10);
 
-const filtros: FiltroNotificacion[] = [
-  "Todas",
-  "No leídas",
-  "Citas",
-  "Seguimiento",
-  "Historial",
-];
+  let grupo: string;
+  if (a.date === hoy) grupo = "Hoy";
+  else if (a.date === ayer) grupo = "Ayer";
+  else {
+    const d = new Date(a.date + "T00:00:00");
+    grupo = d.toLocaleDateString("es-CO", { day: "numeric", month: "long" });
+  }
 
-const grupos: Array<Notificacion["grupo"]> = ["Hoy", "Ayer"];
+  const categoriaMap: Record<string, CategoriaNotificacion> = {
+    Finalizada: "Historial",
+    "En atención": "Seguimiento",
+    "En espera": "Seguimiento",
+  };
+  const categoria = categoriaMap[a.status] ?? "Citas";
+
+  const iconoMap: Record<string, IconName> = {
+    Finalizada: "check",
+    "En atención": "activity",
+    "En espera": "activity",
+    Reprogramada: "history",
+  };
+  const icono = iconoMap[a.status] ?? "calendar";
+
+  const requiereAccion = ["Confirmada", "En atención", "En espera"].includes(a.status);
+  const leida = ["Finalizada", "Cancelada", "No asistió"].includes(a.status);
+
+  const titulos: Record<string, string> = {
+    Confirmada: "Cita confirmada para atención",
+    Pendiente: "Solicitud pendiente de confirmación",
+    "En atención": "Paciente en atención",
+    "En espera": "Paciente en espera",
+    Finalizada: "Consulta finalizada",
+    Cancelada: "Cita cancelada",
+    "No asistió": "Paciente no asistió",
+    Reprogramada: "Cita reprogramada",
+  };
+  const titulo = titulos[a.status] ?? "Notificación clínica";
+
+  const descripciones: Record<string, string> = {
+    Confirmada: "La cita fue confirmada y el paciente puede ser atendido.",
+    Pendiente: "La solicitud fue registrada y está pendiente de confirmación por administración.",
+    "En atención": "El paciente está siendo atendido en este momento.",
+    "En espera": "El paciente se encuentra en sala de espera.",
+    Finalizada: "La consulta fue finalizada y el expediente está disponible.",
+    Cancelada: "La cita fue cancelada.",
+    "No asistió": "El paciente no se presentó a la cita programada.",
+    Reprogramada: "La cita fue reprogramada a una nueva fecha.",
+  };
+  const descripcion = descripciones[a.status] ?? "";
+
+  const acciones: AccionNotificacion[] = [{ label: "Ver agenda", href: "/veterinario/citas" }];
+  if (requiereAccion) {
+    acciones.push({ label: "Ir a la cita", href: "/veterinario/citas", principal: true });
+  }
+  if (categoria === "Historial") {
+    acciones[0] = { label: "Ver historial", href: "/veterinario/historial" };
+  }
+
+  return {
+    id: idx + 1,
+    categoria,
+    titulo,
+    paciente: [a.petName, a.service || "Consulta", a.time].filter(Boolean).join(" · "),
+    descripcion,
+    tiempo: a.date || "",
+    grupo,
+    leida,
+    requiereAccion,
+    icono,
+    acciones,
+  };
+}
+
+const filtros: FiltroNotificacion[] = ["Todas", "No leídas", "Citas", "Seguimiento", "Historial"];
 
 export default function VeterinarioNotificacionesPage() {
-  const [notificaciones, setNotificaciones] = useState<Notificacion[]>(
-    notificacionesIniciales
-  );
-  const [filtroActivo, setFiltroActivo] =
-    useState<FiltroNotificacion>("Todas");
+  const [notificaciones, setNotificaciones] = useState<Notificacion[]>([]);
+  const [filtroActivo, setFiltroActivo] = useState<FiltroNotificacion>("Todas");
 
   const noLeidas = notificaciones.filter((item) => !item.leida).length;
 
   const requierenAccion = notificaciones.filter(
-    (item) => item.requiereAccion && !item.leida
+    (item) => item.requiereAccion && !item.leida,
   ).length;
+
+  useEffect(() => {
+    const user = getCurrentUser();
+    const limiteFecha = new Date(Date.now() - 7 * 86400000).toISOString().slice(0, 10);
+    fetchCitas(user ? Number(user.id) : undefined)
+      .then((appts) => {
+        const recientes = appts
+          .filter((a) => a.date >= limiteFecha && a.status !== "Cancelada")
+          .sort((a, b) => b.date.localeCompare(a.date) || b.time.localeCompare(a.time));
+        setNotificaciones(recientes.map(citaHaciaNotificacion));
+      })
+      .catch(() => {});
+  }, []);
 
   const notificacionesFiltradas = useMemo(() => {
     if (filtroActivo === "Todas") {
@@ -159,23 +142,29 @@ export default function VeterinarioNotificacionesPage() {
       return notificaciones.filter((item) => !item.leida);
     }
 
-    return notificaciones.filter(
-      (item) => item.categoria === filtroActivo
-    );
+    return notificaciones.filter((item) => item.categoria === filtroActivo);
   }, [filtroActivo, notificaciones]);
+
+  const grupos = useMemo(() => {
+    const seen = new Set<string>();
+    const result: string[] = [];
+    for (const n of notificacionesFiltradas) {
+      if (!seen.has(n.grupo)) {
+        seen.add(n.grupo);
+        result.push(n.grupo);
+      }
+    }
+    return result;
+  }, [notificacionesFiltradas]);
 
   function marcarComoLeida(id: number) {
     setNotificaciones((actuales) =>
-      actuales.map((item) =>
-        item.id === id ? { ...item, leida: true } : item
-      )
+      actuales.map((item) => (item.id === id ? { ...item, leida: true } : item)),
     );
   }
 
   function marcarTodasComoLeidas() {
-    setNotificaciones((actuales) =>
-      actuales.map((item) => ({ ...item, leida: true }))
-    );
+    setNotificaciones((actuales) => actuales.map((item) => ({ ...item, leida: true })));
   }
 
   return (
@@ -202,23 +191,15 @@ export default function VeterinarioNotificacionesPage() {
             </h1>
 
             <p className="mt-3 max-w-3xl text-[15px] leading-7 text-[#64748B] dark:text-[#94A3B8]">
-              Consulta avisos relacionados con tus citas asignadas, pacientes
-              en seguimiento e historiales clínicos actualizados.
+              Consulta avisos relacionados con tus citas asignadas, pacientes en seguimiento e
+              historiales clínicos actualizados.
             </p>
           </div>
 
           <div className="flex flex-wrap gap-3">
-            <ResumenBadge
-              valor={noLeidas}
-              texto="no leídas"
-              variante="blue"
-            />
+            <ResumenBadge valor={noLeidas} texto="no leídas" variante="blue" />
 
-            <ResumenBadge
-              valor={requierenAccion}
-              texto="requieren acción"
-              variante="orange"
-            />
+            <ResumenBadge valor={requierenAccion} texto="requieren acción" variante="orange" />
           </div>
         </div>
       </header>
@@ -232,8 +213,7 @@ export default function VeterinarioNotificacionesPage() {
             </h2>
 
             <p className="mt-1 text-[14px] text-[#64748B] dark:text-[#94A3B8]">
-              Revisa las alertas relevantes y accede directamente a cada
-              acción clínica.
+              Revisa las alertas relevantes y accede directamente a cada acción clínica.
             </p>
           </div>
 
@@ -281,9 +261,7 @@ export default function VeterinarioNotificacionesPage() {
         {notificacionesFiltradas.length > 0 ? (
           <div className="mt-6 space-y-7">
             {grupos.map((grupo) => {
-              const itemsGrupo = notificacionesFiltradas.filter(
-                (item) => item.grupo === grupo
-              );
+              const itemsGrupo = notificacionesFiltradas.filter((item) => item.grupo === grupo);
 
               if (itemsGrupo.length === 0) {
                 return null;
@@ -364,8 +342,7 @@ export default function VeterinarioNotificacionesPage() {
         }
 
         .notification-pulse span:first-child {
-          animation: notification-ring 1.8s cubic-bezier(0, 0, 0.2, 1)
-            infinite;
+          animation: notification-ring 1.8s cubic-bezier(0, 0, 0.2, 1) infinite;
         }
 
         .notification-panel {
@@ -454,9 +431,7 @@ function ResumenBadge({
       : "border-[#FDE68A] bg-[#FFFBEB] text-[#B45309] dark:border-[#78350F] dark:bg-[#451A03] dark:text-[#FDE68A]";
 
   return (
-    <div
-      className={`flex items-center gap-3 rounded-[16px] border px-4 py-3 ${estilos}`}
-    >
+    <div className={`flex items-center gap-3 rounded-[16px] border px-4 py-3 ${estilos}`}>
       <p className="text-[23px] font-bold leading-none">{valor}</p>
 
       <p className="text-[13px] font-semibold">{texto}</p>
@@ -486,15 +461,13 @@ function TarjetaNotificacion({
         } as CSSProperties
       }
     >
-      {!item.leida && (
-        <span className="absolute left-0 top-0 h-full w-1 bg-[#2F6BFF]" />
-      )}
+      {!item.leida && <span className="absolute left-0 top-0 h-full w-1 bg-[#2F6BFF]" />}
 
       <div className="flex flex-col justify-between gap-5 xl:flex-row xl:items-start">
         <div className="flex min-w-0 gap-4">
           <div
             className={`flex h-12 w-12 shrink-0 items-center justify-center rounded-[15px] ${estiloIcono(
-              item.categoria
+              item.categoria,
             )}`}
           >
             <NotificationIcon name={item.icono} />
@@ -502,9 +475,7 @@ function TarjetaNotificacion({
 
           <div className="min-w-0">
             <div className="flex flex-wrap items-center gap-3">
-              {!item.leida && (
-                <span className="h-2.5 w-2.5 rounded-full bg-[#2F6BFF]" />
-              )}
+              {!item.leida && <span className="h-2.5 w-2.5 rounded-full bg-[#2F6BFF]" />}
 
               <h4 className="text-[16px] font-semibold text-[#10213A] dark:text-white">
                 {item.titulo}
@@ -597,13 +568,7 @@ function estiloIcono(categoria: CategoriaNotificacion) {
   }
 }
 
-function NotificationIcon({
-  name,
-  className = "h-5 w-5",
-}: {
-  name: IconName;
-  className?: string;
-}) {
+function NotificationIcon({ name, className = "h-5 w-5" }: { name: IconName; className?: string }) {
   const props = {
     className,
     viewBox: "0 0 24 24",

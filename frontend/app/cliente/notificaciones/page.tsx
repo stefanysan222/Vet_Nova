@@ -1,6 +1,9 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
+import { getCurrentUser } from "../../../lib/auth";
+import { fetchCitas } from "../../../lib/api/citas";
+import { fetchPropietarioByUsuario } from "../../../lib/api/propietarios";
 
 type Notification = {
   title: string;
@@ -12,18 +15,84 @@ type Notification = {
   color: string;
 };
 
-const notifications: Notification[] = [];
+function citaHaciaNotificacion(a: {
+  id: string;
+  petName: string;
+  service: string;
+  date: string;
+  time: string;
+  status: string;
+  veterinarian?: string;
+}): Notification {
+  const esVacuna = /vacun/i.test(a.service);
+  const icon: Notification["icon"] = esVacuna ? "vaccine" : "calendar";
+  const color = esVacuna
+    ? "bg-green-100 text-green-600 dark:bg-green-900/30 dark:text-green-400"
+    : "bg-blue-100 text-blue-600 dark:bg-blue-900/30 dark:text-blue-400";
+
+  const titulos: Record<string, string> = {
+    Confirmada: "Cita confirmada",
+    Pendiente: "Solicitud de cita pendiente",
+    "En atención": "Tu mascota está en atención",
+    "En espera": "Tu mascota está en espera",
+    Finalizada: "Consulta finalizada",
+    Cancelada: "Cita cancelada",
+    "No asistió": "Cita sin asistencia",
+    Reprogramada: "Cita reprogramada",
+  };
+
+  const descripciones: Record<string, string> = {
+    Confirmada: `Tu cita para ${a.petName} (${a.service}) fue confirmada para el ${a.date} a las ${a.time}.`,
+    Pendiente: `Se registró una solicitud de cita para ${a.petName} (${a.service}). Espera confirmación.`,
+    "En atención": `${a.petName} está siendo atendido/a en este momento.`,
+    "En espera": `${a.petName} se encuentra en sala de espera para su cita de ${a.service}.`,
+    Finalizada: `La consulta de ${a.petName} (${a.service}) fue finalizada exitosamente.`,
+    Cancelada: `La cita de ${a.petName} para ${a.service} fue cancelada.`,
+    "No asistió": `${a.petName} no asistió a la cita de ${a.service} del ${a.date}.`,
+    Reprogramada: `La cita de ${a.petName} para ${a.service} fue reprogramada.`,
+  };
+
+  return {
+    title: titulos[a.status] ?? "Notificación de cita",
+    description: descripciones[a.status] ?? `Cita de ${a.petName} · ${a.service}`,
+    time: a.date,
+    category: esVacuna ? "Vacunas" : "Citas",
+    unread: ["Confirmada", "Pendiente", "En espera", "En atención"].includes(a.status),
+    icon,
+    color,
+  };
+}
 
 export default function NotificacionesPage() {
+  const [notifications, setNotifications] = useState<Notification[]>([]);
   const [selectedNotification, setSelectedNotification] = useState<Notification | null>(null);
   const [filter, setFilter] = useState<"all" | "unread" | "read">("all");
+
+  useEffect(() => {
+    const user = getCurrentUser();
+    if (!user) return;
+    const uid = Number(user.id);
+    fetchPropietarioByUsuario(uid)
+      .then((prop) => {
+        if (!prop) return fetchCitas(uid);
+        return fetchCitas(uid);
+      })
+      .then((appts) => {
+        const limiteFecha = new Date(Date.now() - 30 * 86400000).toISOString().slice(0, 10);
+        const recientes = appts
+          .filter((a) => a.date >= limiteFecha)
+          .sort((a, b) => b.date.localeCompare(a.date));
+        setNotifications(recientes.map(citaHaciaNotificacion));
+      })
+      .catch(() => {});
+  }, []);
 
   const unreadCount = notifications.filter((item) => item.unread).length;
   const filteredNotifications = useMemo(() => {
     if (filter === "unread") return notifications.filter((item) => item.unread);
     if (filter === "read") return notifications.filter((item) => !item.unread);
     return notifications;
-  }, [filter]);
+  }, [filter, notifications]);
 
   const selected = selectedNotification || null;
 
@@ -57,9 +126,17 @@ export default function NotificacionesPage() {
 
         <SummaryCard title="No leídas" value={unreadCount.toString()} icon={<UnreadIcon />} />
 
-        <SummaryCard title="Citas" value="2" icon={<CalendarCardIcon />} />
+        <SummaryCard
+          title="Citas"
+          value={notifications.filter((n) => n.category === "Citas").length.toString()}
+          icon={<CalendarCardIcon />}
+        />
 
-        <SummaryCard title="Recordatorios" value="1" icon={<ReminderIcon />} />
+        <SummaryCard
+          title="Recordatorios"
+          value={notifications.filter((n) => n.category === "Vacunas").length.toString()}
+          icon={<ReminderIcon />}
+        />
       </div>
 
       {/* Main content */}
@@ -226,9 +303,14 @@ export default function NotificacionesPage() {
           <section className="admin-card-padded">
             <h2 className="text-section-title">Resumen</h2>
             <div className="mt-4 space-y-3">
-              <SummaryLine label="Notificaciones nuevas" value="2" />
-              <SummaryLine label="Esta semana" value="5" />
-              <SummaryLine label="Recordatorios activos" value="3" />
+              <SummaryLine label="Notificaciones nuevas" value={unreadCount.toString()} />
+              <SummaryLine label="Este mes" value={notifications.length.toString()} />
+              <SummaryLine
+                label="Recordatorios activos"
+                value={notifications
+                  .filter((n) => n.unread && n.category === "Vacunas")
+                  .length.toString()}
+              />
             </div>
           </section>
         </div>

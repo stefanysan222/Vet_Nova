@@ -2,10 +2,11 @@
 
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
-import { KeyboardEvent, useCallback, useEffect, useMemo, useRef, useState } from "react";
-
-const PETS_STORAGE_KEY = "vetnova_mascotas_cliente";
-const APPOINTMENTS_STORAGE_KEY = "vetnova_citas_cliente";
+import { KeyboardEvent, useEffect, useMemo, useRef, useState } from "react";
+import { getCurrentUser } from "../../lib/auth";
+import { fetchCitas } from "../../lib/api/citas";
+import { fetchMascotas } from "../../lib/api/mascotas";
+import { fetchPropietarioByUsuario } from "../../lib/api/propietarios";
 
 type Mascota = {
   id: string;
@@ -33,51 +34,6 @@ type ResultadoBusqueda = {
   href: string;
 };
 
-const mascotasIniciales: Mascota[] = [
-  {
-    id: "max",
-    nombre: "Max",
-    especie: "Perro",
-    raza: "Golden Retriever",
-    dueño: "Juan Pérez",
-  },
-  {
-    id: "luna",
-    nombre: "Luna",
-    especie: "Gato",
-    raza: "Siamés",
-    dueño: "María García",
-  },
-  {
-    id: "rocky",
-    nombre: "Rocky",
-    especie: "Perro",
-    raza: "Pastor Alemán",
-    dueño: "Carlos López",
-  },
-  {
-    id: "bella",
-    nombre: "Bella",
-    especie: "Gato",
-    raza: "Persa",
-    dueño: "Ana Martínez",
-  },
-  {
-    id: "charlie",
-    nombre: "Charlie",
-    especie: "Perro",
-    raza: "Labrador",
-    dueño: "Luis Ramírez",
-  },
-  {
-    id: "mia",
-    nombre: "Mia",
-    especie: "Gato",
-    raza: "Angora",
-    dueño: "Sofía Torres",
-  },
-];
-
 export default function BuscadorCliente() {
   const router = useRouter();
   const pathname = usePathname();
@@ -85,38 +41,50 @@ export default function BuscadorCliente() {
 
   const [termino, setTermino] = useState("");
   const [abierto, setAbierto] = useState(false);
-  const [mascotas, setMascotas] = useState<Mascota[]>(mascotasIniciales);
+  const [mascotas, setMascotas] = useState<Mascota[]>([]);
   const [citas, setCitas] = useState<Cita[]>([]);
 
-  const cargarDatos = useCallback(() => {
-    const mascotasGuardadas = leerLocalStorage<Mascota[]>(PETS_STORAGE_KEY, []);
-
-    const citasGuardadas = leerLocalStorage<Cita[]>(APPOINTMENTS_STORAGE_KEY, []);
-
-    const mascotasCombinadas = [...mascotasGuardadas, ...mascotasIniciales];
-
-    const mascotasSinDuplicados = Array.from(
-      new Map(mascotasCombinadas.map((mascota) => [mascota.id, mascota])).values(),
-    );
-
-    setMascotas(mascotasSinDuplicados);
-    setCitas(citasGuardadas);
-  }, []);
-
   useEffect(() => {
-    // eslint-disable-next-line react-hooks/set-state-in-effect
-    cargarDatos();
+    const user = getCurrentUser();
+    if (!user) return;
 
-    window.addEventListener("storage", cargarDatos);
-    window.addEventListener("vetnova-pets-updated", cargarDatos);
-    window.addEventListener("vetnova-appointments-updated", cargarDatos);
+    const uid = Number(user.id);
 
-    return () => {
-      window.removeEventListener("storage", cargarDatos);
-      window.removeEventListener("vetnova-pets-updated", cargarDatos);
-      window.removeEventListener("vetnova-appointments-updated", cargarDatos);
-    };
-  }, [cargarDatos]);
+    fetchPropietarioByUsuario(uid)
+      .then((prop) => {
+        if (!prop) return;
+        return fetchMascotas(parseInt(prop.id, 10));
+      })
+      .then((pets) => {
+        if (!pets) return;
+        setMascotas(
+          pets.map((p) => ({
+            id: p.id,
+            nombre: p.nombre,
+            especie: p.especie,
+            raza: p.raza,
+            dueño: p.propietarioNombre,
+          })),
+        );
+      })
+      .catch(() => {});
+
+    fetchCitas(uid)
+      .then((appts) => {
+        setCitas(
+          appts.map((a) => ({
+            id: a.id,
+            mascota: a.petName,
+            servicio: a.service,
+            fecha: a.date,
+            hora: a.time,
+            veterinario: a.veterinarian,
+            estado: a.status,
+          })),
+        );
+      })
+      .catch(() => {});
+  }, []);
 
   useEffect(() => {
     // eslint-disable-next-line react-hooks/set-state-in-effect
@@ -185,7 +153,6 @@ export default function BuscadorCliente() {
   const handleInputChange = (value: string) => {
     setTermino(value);
     setAbierto(value.trim().length > 0);
-    cargarDatos();
   };
 
   const handleKeyDown = (event: KeyboardEvent<HTMLInputElement>) => {
@@ -217,8 +184,6 @@ export default function BuscadorCliente() {
           value={termino}
           onChange={(event) => handleInputChange(event.target.value)}
           onFocus={() => {
-            cargarDatos();
-
             if (termino.trim()) {
               setAbierto(true);
             }
@@ -312,23 +277,8 @@ export default function BuscadorCliente() {
   );
 }
 
-function leerLocalStorage<T>(key: string, valorInicial: T): T {
-  try {
-    const valor = localStorage.getItem(key);
-
-    if (!valor) return valorInicial;
-
-    return JSON.parse(valor) as T;
-  } catch {
-    return valorInicial;
-  }
-}
-
 function normalizarTexto(texto: string) {
-  return texto
-    .toLowerCase()
-    .normalize("NFD")
-    .replace(/[\u0300-\u036f]/g, "");
+  return texto.toLowerCase().normalize("NFD").replace(/[̀-ͯ]/g, "");
 }
 
 function SearchIcon() {
