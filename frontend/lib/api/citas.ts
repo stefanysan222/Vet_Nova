@@ -66,10 +66,22 @@ export function mapCitaToAppointment(c: CitaAPI): Appointment {
   };
 }
 
-export async function fetchCitas(id_usuario?: number): Promise<Appointment[]> {
-  const path = id_usuario ? `/citas?id_usuario=${id_usuario}` : "/citas";
-  const data = await api.get<CitaAPI[]>(path);
-  return data.map(mapCitaToAppointment);
+interface CitasPaginatedResponse {
+  data: CitaAPI[];
+  total: number;
+  page: number;
+  lastPage: number;
+}
+
+export async function fetchCitas(
+  id_usuario?: number,
+  page = 1,
+  limit = 100,
+): Promise<Appointment[]> {
+  const params = new URLSearchParams({ page: String(page), limit: String(limit) });
+  if (id_usuario) params.set("id_usuario", String(id_usuario));
+  const response = await api.get<CitasPaginatedResponse>(`/citas?${params}`);
+  return response.data.map(mapCitaToAppointment);
 }
 
 export async function createCita(
