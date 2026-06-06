@@ -10,7 +10,7 @@ export async function apiFetch<T>(path: string, options?: RequestInit): Promise<
   };
   if (token) headers["Authorization"] = `Bearer ${token}`;
 
-  const { headers: _h, ...restOptions } = options ?? {};
+  const { headers: _headers, ...restOptions } = options ?? {};
   const res = await fetch(`${BASE_URL}${path}`, {
     headers,
     ...restOptions,

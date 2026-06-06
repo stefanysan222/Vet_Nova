@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { fetchCitas } from "../../../lib/api/citas";
 import { CalendarDays, CheckCircle } from "lucide-react";
 import type { Appointment } from "../../../lib/recepcionista/types";
+import { SkeletonCardList } from "../../components/ui/Skeleton";
 
 type NotificacionItem = {
   id: string;
@@ -114,7 +115,7 @@ export default function AdminNotificationsPage() {
       </section>
 
       {loading ? (
-        <p className="text-sm text-slate-500">Cargando notificaciones...</p>
+        <SkeletonCardList count={4} />
       ) : (
         <section className="grid gap-6 xl:grid-cols-[1fr_360px]">
           <div className="space-y-6">

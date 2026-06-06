@@ -6,6 +6,7 @@ import { fetchVeterinarios } from "../../../lib/api/usuarios";
 import type { UsuarioAPI } from "../../../lib/api/usuarios";
 import type { Appointment } from "../../../lib/recepcionista/types";
 import { getClinicSlots, isClinicOpen, getScheduleLabel } from "../../../lib/utils/clinic-schedule";
+import { SkeletonCardList } from "../../components/ui/Skeleton";
 import { useToast } from "../../components/ui/Toast";
 import ConfirmDialog from "../../components/ui/ConfirmDialog";
 import { StatusBadge } from "../../../lib/utils/status-badge";
@@ -395,7 +396,7 @@ export default function CitasPage() {
           {/* Lista */}
           <div className="mt-6 space-y-4">
             {loading ? (
-              <p className="text-sm text-slate-500">Cargando citas...</p>
+              <SkeletonCardList count={5} />
             ) : citasFiltradas.length === 0 ? (
               <div className="rounded-2xl border border-slate-200/70 bg-slate-50 p-8 text-center dark:border-slate-700 dark:bg-slate-900">
                 <p className="text-slate-600 dark:text-slate-400">

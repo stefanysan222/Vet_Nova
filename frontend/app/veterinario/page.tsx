@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { getCurrentUser } from "../../lib/auth";
+import { SkeletonBanner, SkeletonStats, SkeletonCardList } from "../components/ui/Skeleton";
 import { fetchCitas } from "../../lib/api/citas";
 import type { Appointment } from "../../lib/recepcionista/types";
 import { getStatusStyle } from "../../lib/utils/status";
@@ -63,8 +64,10 @@ export default function VeterinarioPage() {
 
   if (loading) {
     return (
-      <div className="flex min-h-[400px] items-center justify-center">
-        <p className="text-[14px] text-[#64748B] dark:text-[#94A3B8]">Cargando agenda...</p>
+      <div className="space-y-6">
+        <SkeletonBanner />
+        <SkeletonStats count={4} />
+        <SkeletonCardList count={5} />
       </div>
     );
   }

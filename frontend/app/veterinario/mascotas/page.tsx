@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { Suspense, useEffect, useMemo, useState, type CSSProperties } from "react";
+import { SkeletonStats, SkeletonCardList } from "../../components/ui/Skeleton";
 import { fetchMascotas } from "../../../lib/api/mascotas";
 import { fetchCitas } from "../../../lib/api/citas";
 import type { PetRecord, Appointment } from "../../../lib/recepcionista/types";
@@ -692,10 +693,9 @@ function PacientesContent() {
 
 function CargandoPacientes() {
   return (
-    <div className="flex min-h-[400px] items-center justify-center rounded-[24px] border border-[#E2E8F0] bg-white dark:border-[#334155] dark:bg-[#111827]">
-      <p className="text-[14px] font-medium text-[#64748B] dark:text-[#94A3B8]">
-        Cargando pacientes...
-      </p>
+    <div className="space-y-6">
+      <SkeletonStats count={4} />
+      <SkeletonCardList count={6} />
     </div>
   );
 }

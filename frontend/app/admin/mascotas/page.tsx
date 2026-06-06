@@ -8,6 +8,7 @@ import { fetchPropietarios } from "../../../lib/api/propietarios";
 import { fetchCitas } from "../../../lib/api/citas";
 import { StatusBadge } from "../../../lib/utils/status-badge";
 import type { PetRecord, Owner, Appointment } from "../../../lib/recepcionista/types";
+import { SkeletonCardList } from "../../components/ui/Skeleton";
 
 type Tab = "info" | "historial";
 
@@ -429,13 +430,8 @@ export default function MascotasPage() {
           {/* Lista */}
           <div className="mt-5">
             {loading ? (
-              <div className="space-y-3">
-                {[1, 2, 3].map((i) => (
-                  <div
-                    key={i}
-                    className="h-20 animate-pulse rounded-2xl bg-slate-100 dark:bg-slate-800"
-                  />
-                ))}
+              <div>
+                <SkeletonCardList count={4} />
               </div>
             ) : petsFiltradas.length === 0 ? (
               <div className="flex flex-col items-center gap-3 rounded-2xl border border-slate-200/70 bg-slate-50 py-14 text-center dark:border-slate-700 dark:bg-slate-800/40">

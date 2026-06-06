@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { ChangeEvent, FormEvent, ReactNode, useEffect, useMemo, useState } from "react";
 import { fetchCitas, createCita } from "../../../lib/api/citas";
+import { SkeletonBanner, SkeletonStats, SkeletonCardList } from "../../components/ui/Skeleton";
 import { fetchMascotas } from "../../../lib/api/mascotas";
 import { fetchVeterinarios } from "../../../lib/api/usuarios";
 import type { UsuarioAPI } from "../../../lib/api/usuarios";
@@ -202,8 +203,10 @@ export default function VeterinarioCitasPage() {
 
   if (loading) {
     return (
-      <div className="flex min-h-[400px] items-center justify-center">
-        <p className="text-[14px] text-[#64748B] dark:text-[#94A3B8]">Cargando agenda...</p>
+      <div className="space-y-6">
+        <SkeletonBanner />
+        <SkeletonStats count={4} />
+        <SkeletonCardList count={5} />
       </div>
     );
   }

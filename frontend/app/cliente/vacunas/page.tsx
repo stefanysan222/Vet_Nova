@@ -5,6 +5,7 @@ import { useEffect, useMemo, useState } from "react";
 import { getCurrentUser } from "../../../lib/auth";
 import { fetchCitas } from "../../../lib/api/citas";
 import type { Appointment } from "../../../lib/recepcionista/types";
+import { SkeletonCardList } from "../../components/ui/Skeleton";
 
 function esVacuna(service: string) {
   return /vacun/i.test(service);
@@ -79,9 +80,7 @@ export default function ClientVacunasPage() {
       </div>
 
       {cargando ? (
-        <div className="flex items-center justify-center py-20">
-          <p className="text-[14px] text-[#64748B] dark:text-[#94A3B8]">Cargando vacunas...</p>
-        </div>
+        <SkeletonCardList count={4} />
       ) : citas.length === 0 ? (
         <EmptyState />
       ) : (

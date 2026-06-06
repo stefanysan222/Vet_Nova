@@ -4,6 +4,7 @@ import { useEffect, useMemo, useState } from "react";
 import { getCurrentUser } from "../../../lib/auth";
 import { fetchCitas } from "../../../lib/api/citas";
 import type { Appointment } from "../../../lib/recepcionista/types";
+import { SkeletonStats, SkeletonCardList } from "../../components/ui/Skeleton";
 
 const MONTHS = [
   "Enero",
@@ -113,8 +114,9 @@ export default function ClientHistorialPage() {
 
       {/* Content */}
       {cargando ? (
-        <div className="flex items-center justify-center py-20">
-          <p className="text-[14px] text-[#64748B] dark:text-[#94A3B8]">Cargando historial...</p>
+        <div className="space-y-6">
+          <SkeletonStats count={3} />
+          <SkeletonCardList count={5} />
         </div>
       ) : grupos.length === 0 ? (
         <div className="flex flex-col items-center justify-center rounded-xl border border-dashed border-[#CBD5E1] bg-white py-20 text-center dark:border-[#334155] dark:bg-[#111827]">
