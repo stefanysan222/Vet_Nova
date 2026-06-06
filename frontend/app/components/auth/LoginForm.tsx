@@ -45,14 +45,10 @@ export default function LoginForm() {
     return "/cliente";
   };
 
-  const handleGoogleSuccess = async (profile: {
-    name: string;
-    email: string;
-    picture?: string;
-  }) => {
+  const handleGoogleSuccess = async (data: { credential: string }) => {
     setLoading(true);
     setSubmitError(null);
-    const result = await loginOrRegisterGoogle(profile);
+    const result = await loginOrRegisterGoogle(data);
     setLoading(false);
     if (result.error) {
       setSubmitError(result.error);

@@ -4,7 +4,7 @@ import { useEffect, useRef, useState, useCallback } from "react";
 
 interface GoogleAuthButtonProps {
   label: string;
-  onSuccess: (profile: { name: string; email: string; picture?: string }) => void;
+  onSuccess: (data: { credential: string }) => void;
 }
 
 declare global {
@@ -79,16 +79,7 @@ export default function GoogleAuthButton({ label, onSuccess }: GoogleAuthButtonP
       setError("No se pudo autenticar con Google.");
       return;
     }
-    const payload = decodeJwt(response.credential);
-    if (!payload?.email) {
-      setError("Error al leer la respuesta de Google.");
-      return;
-    }
-    onSuccessRef.current({
-      name: payload.name || payload.email.split("@")[0],
-      email: payload.email,
-      picture: payload.picture,
-    });
+    onSuccessRef.current({ credential: response.credential });
   }, []);
 
   useEffect(() => {

@@ -120,16 +120,14 @@ export async function loginUser(
   }
 }
 
-export async function loginOrRegisterGoogle(profile: {
-  name: string;
-  email: string;
-  picture?: string;
+export async function loginOrRegisterGoogle(data: {
+  credential: string;
 }): Promise<{ token?: string; user?: AuthUser; error?: string }> {
   try {
     const res = await fetch(`${API_URL}/auth/google`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(profile),
+      body: JSON.stringify(data),
     });
     const json = await res.json();
     if (!res.ok) {
