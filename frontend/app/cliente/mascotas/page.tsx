@@ -53,8 +53,8 @@ export default function MascotasPage() {
 
   useEffect(() => {
     const user = getCurrentUser();
-    // eslint-disable-next-line react-hooks/set-state-in-effect
     if (!user) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setLoading(false);
       return;
     }
