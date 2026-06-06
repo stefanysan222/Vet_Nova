@@ -333,8 +333,10 @@ export default function NuevaMascotaPage() {
       });
 
       router.push("/cliente/mascotas");
-    } catch {
-      setErrorFormulario("No se pudo guardar la mascota. Intenta de nuevo.");
+    } catch (err) {
+      setErrorFormulario(
+        err instanceof Error ? err.message : "No se pudo guardar la mascota. Intenta de nuevo."
+      );
     } finally {
       setGuardando(false);
     }

@@ -185,9 +185,9 @@ export default function LoginForm() {
           />
           Recordarme
         </label>
-        <a href="#" className="text-sm font-medium text-blue-600 transition hover:text-blue-700 dark:text-blue-400 dark:hover:text-blue-300">
-          ¿Olvidaste tu contraseña?
-        </a>
+        <span className="text-sm text-slate-400 dark:text-slate-500">
+          ¿Olvidaste tu contraseña? Contacta al administrador
+        </span>
       </motion.div>
 
       <motion.div

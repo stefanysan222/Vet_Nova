@@ -11,7 +11,6 @@ const ASUNTOS = [
   "Otro",
 ];
 
-const EMAILJS_URL = "https://api.emailjs.com/api/v1.0/email/send";
 
 const inputClass =
   "w-full rounded-xl border border-surface-200 bg-white px-4 py-3 text-sm text-surface-900 outline-none transition placeholder:text-surface-400 focus:border-brand-500 focus:ring-2 focus:ring-brand-100";
@@ -46,55 +45,27 @@ export default function ReportSection() {
       return;
     }
 
-    const serviceId = process.env.NEXT_PUBLIC_EMAILJS_SERVICE_ID;
-    const templateAdmin = process.env.NEXT_PUBLIC_EMAILJS_TEMPLATE_ADMIN;
-    const templateClient = process.env.NEXT_PUBLIC_EMAILJS_TEMPLATE_CLIENT;
-    const publicKey = process.env.NEXT_PUBLIC_EMAILJS_PUBLIC_KEY;
-
-    if (!serviceId || !templateAdmin || !templateClient || !publicKey) {
-      setEstado("error");
-      return;
-    }
-
     setEstado("enviando");
 
-    const params = {
-      from_name: campos.nombre.trim(),
-      from_email: campos.email.trim(),
-      subject: asuntoFinal,
-      message: campos.mensaje.trim(),
-    };
-
-    const enviarEmail = (templateId: string) =>
-      fetch(EMAILJS_URL, {
+    try {
+      const res = await fetch("/api/email/contact", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          service_id: serviceId,
-          template_id: templateId,
-          user_id: publicKey,
-          template_params: params,
+          nombre: campos.nombre.trim(),
+          email: campos.email.trim(),
+          asunto: asuntoFinal,
+          mensaje: campos.mensaje.trim(),
         }),
       });
 
-    try {
-      const [resAdmin, resClient] = await Promise.all([
-        enviarEmail(templateAdmin),
-        enviarEmail(templateClient),
-      ]);
-
-      if (resAdmin.ok && resClient.ok) {
+      if (res.ok) {
         setEstado("ok");
         setCampos(VACIO);
       } else {
-        const err1 = resAdmin.ok ? "" : await resAdmin.text();
-        const err2 = resClient.ok ? "" : await resClient.text();
-        console.error("EmailJS error admin:", err1);
-        console.error("EmailJS error client:", err2);
         setEstado("error");
       }
-    } catch (err) {
-      console.error("EmailJS fetch error:", err);
+    } catch {
       setEstado("error");
     }
   };

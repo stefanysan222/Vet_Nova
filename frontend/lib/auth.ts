@@ -21,12 +21,16 @@ export function getToken(): string | null {
 export function setToken(token: string) {
   if (!isBrowser()) return;
   localStorage.setItem(TOKEN_KEY, token);
+  // Cookie para que middleware.ts pueda leer el token server-side.
+  // En Semana 2 se migra a httpOnly cookie via API Route.
+  document.cookie = `vetnova-token=${token}; path=/; SameSite=Strict`;
 }
 
 export function clearCurrentUser() {
   if (!isBrowser()) return;
   localStorage.removeItem(TOKEN_KEY);
   localStorage.removeItem("vetnova_cliente_perfil");
+  document.cookie = "vetnova-token=; path=/; max-age=0; SameSite=Strict";
 }
 
 function decodeToken(token: string): { sub: number; name: string; email: string; role: UserRole; exp: number } | null {
@@ -63,10 +67,7 @@ export function getCurrentUser(): AuthUser | null {
   };
 }
 
-const API_URL =
-  typeof window !== "undefined"
-    ? process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:3000"
-    : process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:3000";
+import { API_URL } from "./config";
 
 export async function registerUser(data: {
   nombre: string;

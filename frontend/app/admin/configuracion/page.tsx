@@ -64,6 +64,10 @@ export default function ConfiguracionPage() {
 
   const handleSavePassword = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (!currentPassword) {
+      error("Campo requerido", "Debes ingresar tu contraseña actual.");
+      return;
+    }
     if (!newPassword || !confirmPassword) return;
     if (newPassword.length < 8) {
       error("Contraseña muy corta", "La nueva contraseña debe tener al menos 8 caracteres.");
@@ -160,6 +164,17 @@ export default function ConfiguracionPage() {
               <h2 className="text-sm font-semibold text-slate-900 dark:text-white">Contraseña</h2>
             </div>
             <div className="space-y-3">
+              <div>
+                <label className="mb-1 block text-xs font-medium text-slate-500 dark:text-slate-400">Contraseña actual</label>
+                <input
+                  type="password"
+                  value={currentPassword}
+                  onChange={(e) => setCurrentPassword(e.target.value)}
+                  placeholder="••••••••"
+                  autoComplete="current-password"
+                  className={inputClass}
+                />
+              </div>
               <div>
                 <label className="mb-1 block text-xs font-medium text-slate-500 dark:text-slate-400">Nueva contraseña</label>
                 <div className="relative">

@@ -204,7 +204,6 @@ export default function ClientLayoutShell({
                 aria-label="Abrir notificaciones"
               >
                 <BellIcon />
-                <span className="absolute right-[4px] top-[3px] h-2.5 w-2.5 rounded-full bg-[#EF4444]" />
               </button>
 
               {/* Ventana de notificaciones */}
@@ -215,15 +214,10 @@ export default function ClientLayoutShell({
                       <h3 className="text-[16px] font-semibold text-[#10213A] dark:text-white">
                         Notificaciones
                       </h3>
-
                       <p className="mt-1 text-[13px] text-[#64748B] dark:text-[#94A3B8]">
-                        Tienes 2 notificaciones nuevas
+                        No tienes notificaciones nuevas
                       </p>
                     </div>
-
-                    <span className="rounded-full bg-[#DBEAFE] px-3 py-1 text-[12px] font-semibold text-[#2563EB] dark:bg-[#1E3A8A] dark:text-[#93C5FD]">
-                      2 nuevas
-                    </span>
                   </div>
 
                   <div className="max-h-[290px] divide-y divide-[#E2E8F0] overflow-y-auto dark:divide-[#334155]">

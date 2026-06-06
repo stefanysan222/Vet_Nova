@@ -1,9 +1,6 @@
 import { getToken, clearCurrentUser } from '../auth';
 
-const BASE_URL =
-  typeof window !== 'undefined'
-    ? process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:3000'
-    : process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:3000';
+import { API_URL as BASE_URL } from '../config';
 
 export async function apiFetch<T>(
   path: string,
