@@ -38,6 +38,7 @@ function PetAvatar({ pet, size = "md" }: { pet: PetRecord; size?: "sm" | "md" | 
       className={`${sizeMap[size]} ${color} flex shrink-0 items-center justify-center rounded-2xl font-bold`}
     >
       {pet.foto ? (
+        // eslint-disable-next-line @next/next/no-img-element
         <img src={pet.foto} alt={pet.nombre} className="h-full w-full rounded-2xl object-cover" />
       ) : (
         (pet.nombre[0]?.toUpperCase() ?? "?")

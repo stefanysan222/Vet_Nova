@@ -47,15 +47,12 @@ function espécieToTipo(especie: string): "perro" | "gato" | "otro" {
 
 export default function MascotasPage() {
   const [mascotas, setMascotas] = useState<Pet[]>([]);
-  const [loading, setLoading] = useState(true);
   const [busqueda, setBusqueda] = useState("");
   const [especieSeleccionada, setEspecieSeleccionada] = useState<SpeciesFilter>("todas");
 
   useEffect(() => {
     const user = getCurrentUser();
     if (!user) {
-      // eslint-disable-next-line react-hooks/set-state-in-effect
-      setLoading(false);
       return;
     }
 
@@ -87,8 +84,6 @@ export default function MascotasPage() {
         setMascotas(mapped);
       } catch {
         setMascotas([]);
-      } finally {
-        setLoading(false);
       }
     };
 

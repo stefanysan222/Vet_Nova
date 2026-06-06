@@ -1,12 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import {
-  FormEvent,
-  ReactNode,
-  useEffect,
-  useState,
-} from "react";
+import { FormEvent, ReactNode, useEffect, useState } from "react";
 import { fetchMascotas } from "../../../lib/api/mascotas";
 import { fetchCitas, createCita } from "../../../lib/api/citas";
 import type { PetRecord, Appointment } from "../../../lib/recepcionista/types";
@@ -19,12 +14,7 @@ type EstadoClinico =
   | "Tratamiento activo"
   | "Control programado";
 
-type TipoRegistro =
-  | "Consulta"
-  | "Procedimiento"
-  | "Vacunación"
-  | "Control"
-  | "Evolución clínica";
+type TipoRegistro = "Consulta" | "Procedimiento" | "Vacunación" | "Control" | "Evolución clínica";
 
 interface RegistroClinico {
   id: string;
@@ -62,7 +52,13 @@ interface FormularioEvolucion {
 }
 
 function formularioInicial(): FormularioEvolucion {
-  return { evolucion: "", cambioTratamiento: "", recomendaciones: "", proximoControl: "", nuevoEstado: "En seguimiento" };
+  return {
+    evolucion: "",
+    cambioTratamiento: "",
+    recomendaciones: "",
+    proximoControl: "",
+    nuevoEstado: "En seguimiento",
+  };
 }
 
 function fechaHoy(): string {
@@ -80,13 +76,23 @@ function mapServicioToTipo(servicio: string): TipoRegistro {
   if (s.includes("vacun")) return "Vacunación";
   if (s.includes("cirugía") || s.includes("proced")) return "Procedimiento";
   if (s.includes("control") || s.includes("post")) return "Control";
-  if (s.includes("evolución") || s.includes("evolucion") || s.includes("seguimiento")) return "Evolución clínica";
+  if (s.includes("evolución") || s.includes("evolucion") || s.includes("seguimiento"))
+    return "Evolución clínica";
   return "Consulta";
 }
 
-function parseNotas(raw: string | undefined): { diagnostico?: string; tratamiento?: string; recomendaciones?: string; tipo?: string } {
+function parseNotas(raw: string | undefined): {
+  diagnostico?: string;
+  tratamiento?: string;
+  recomendaciones?: string;
+  tipo?: string;
+} {
   if (!raw) return {};
-  try { return JSON.parse(raw); } catch { return { diagnostico: raw }; }
+  try {
+    return JSON.parse(raw);
+  } catch {
+    return { diagnostico: raw };
+  }
 }
 
 function derivarEstado(citas: Appointment[], mascotaId: string): EstadoClinico {
@@ -95,8 +101,10 @@ function derivarEstado(citas: Appointment[], mascotaId: string): EstadoClinico {
   const hoy = fechaHoy();
   if (propias.find((c) => c.date === hoy && c.status === "Confirmada")) return "Por atender";
   if (propias.find((c) => c.date === hoy && c.status === "Finalizada")) return "Atendido hoy";
-  if (propias.find((c) => c.status === "En atención" || c.status === "En espera")) return "Tratamiento activo";
-  if (propias.find((c) => c.status === "Confirmada" || c.status === "Pendiente")) return "En seguimiento";
+  if (propias.find((c) => c.status === "En atención" || c.status === "En espera"))
+    return "Tratamiento activo";
+  if (propias.find((c) => c.status === "Confirmada" || c.status === "Pendiente"))
+    return "En seguimiento";
   return "Control programado";
 }
 
@@ -146,7 +154,7 @@ function buildPacienteClinico(pet: PetRecord, citas: Appointment[]): PacienteCli
 
 export default function HistorialPage() {
   const [pacientes, setPacientes] = useState<PacienteClinico[]>([]);
-  const [todasLasCitas, setTodasLasCitas] = useState<Appointment[]>([]);
+  const [, setTodasLasCitas] = useState<Appointment[]>([]);
   const [pacienteSeleccionado, setPacienteSeleccionado] = useState<string>("");
   const [loading, setLoading] = useState(true);
   const [guardando, setGuardando] = useState(false);
@@ -172,7 +180,9 @@ export default function HistorialPage() {
         if (inicial) setPacienteSeleccionado(inicial.id);
         if (accion === "evolucion") setMostrarFormulario(true);
       })
-      .catch(() => setError("No se pudo cargar los expedientes. Verifica la conexión con el servidor."))
+      .catch(() =>
+        setError("No se pudo cargar los expedientes. Verifica la conexión con el servidor."),
+      )
       .finally(() => setLoading(false));
   }, []);
 
@@ -212,7 +222,11 @@ export default function HistorialPage() {
 
       const nuevaCita = await createCita({
         date: fechaHoy(),
-        time: new Date().toLocaleTimeString("es-CO", { hour: "2-digit", minute: "2-digit", hour12: false }),
+        time: new Date().toLocaleTimeString("es-CO", {
+          hour: "2-digit",
+          minute: "2-digit",
+          hour12: false,
+        }),
         petId: paciente.id,
         ownerId: paciente.propietarioId,
         petName: paciente.nombre,
@@ -247,8 +261,8 @@ export default function HistorialPage() {
                 tratamientoActual: formulario.cambioTratamiento || p.tratamientoActual,
                 registros: [nuevoRegistro, ...p.registros],
               }
-            : p
-        )
+            : p,
+        ),
       );
 
       setMostrarFormulario(false);
@@ -264,7 +278,9 @@ export default function HistorialPage() {
   if (loading) {
     return (
       <div className="flex min-h-[400px] items-center justify-center">
-        <p className="text-[14px] text-[#64748B] dark:text-[#94A3B8]">Cargando expedientes clínicos...</p>
+        <p className="text-[14px] text-[#64748B] dark:text-[#94A3B8]">
+          Cargando expedientes clínicos...
+        </p>
       </div>
     );
   }
@@ -272,9 +288,16 @@ export default function HistorialPage() {
   if (!paciente && pacientes.length === 0) {
     return (
       <div className="flex min-h-[400px] flex-col items-center justify-center gap-4 rounded-[24px] border border-[#E2E8F0] bg-white dark:border-[#334155] dark:bg-[#111827]">
-        <p className="text-[16px] font-semibold text-[#10213A] dark:text-white">No hay pacientes registrados</p>
-        <p className="text-[14px] text-[#64748B] dark:text-[#94A3B8]">Registra mascotas primero para ver sus expedientes.</p>
-        <Link href="/veterinario/mascotas" className="rounded-xl bg-[#2F6BFF] px-5 py-3 text-[13px] font-semibold text-white">
+        <p className="text-[16px] font-semibold text-[#10213A] dark:text-white">
+          No hay pacientes registrados
+        </p>
+        <p className="text-[14px] text-[#64748B] dark:text-[#94A3B8]">
+          Registra mascotas primero para ver sus expedientes.
+        </p>
+        <Link
+          href="/veterinario/mascotas"
+          className="rounded-xl bg-[#2F6BFF] px-5 py-3 text-[13px] font-semibold text-white"
+        >
           Ver pacientes
         </Link>
       </div>
@@ -323,7 +346,13 @@ export default function HistorialPage() {
       {error && (
         <div className="flex items-start justify-between gap-4 rounded-[16px] border border-[#FECACA] bg-[#FEF2F2] px-5 py-4 dark:border-[#7F1D1D] dark:bg-[#450A0A]">
           <p className="text-[14px] text-[#B91C1C] dark:text-[#FECACA]">{error}</p>
-          <button type="button" onClick={() => setError(null)} className="text-[18px] font-semibold text-[#B91C1C]">×</button>
+          <button
+            type="button"
+            onClick={() => setError(null)}
+            className="text-[18px] font-semibold text-[#B91C1C]"
+          >
+            ×
+          </button>
         </div>
       )}
 
@@ -332,18 +361,30 @@ export default function HistorialPage() {
           <div>
             <p className="text-[14px] font-semibold text-[#15803D]">Evolución clínica registrada</p>
             <p className="mt-1 text-[13px] text-[#166534]">
-              El nuevo registro fue agregado al historial de {paciente.nombre} sin modificar las atenciones anteriores.
+              El nuevo registro fue agregado al historial de {paciente.nombre} sin modificar las
+              atenciones anteriores.
             </p>
           </div>
-          <button type="button" onClick={() => setRegistroGuardado(false)} className="text-[18px] font-semibold text-[#15803D]" aria-label="Cerrar mensaje">×</button>
+          <button
+            type="button"
+            onClick={() => setRegistroGuardado(false)}
+            className="text-[18px] font-semibold text-[#15803D]"
+            aria-label="Cerrar mensaje"
+          >
+            ×
+          </button>
         </div>
       )}
 
       <div className="grid gap-5 xl:grid-cols-[300px_1fr]">
         {/* LISTA DE PACIENTES */}
         <aside className="rounded-[20px] border border-[#CBD5E1] bg-white p-5 shadow-[0_6px_20px_rgba(15,23,42,0.06)] dark:border-[#334155] dark:bg-[#111827]">
-          <h2 className="text-[17px] font-semibold text-[#10213A] dark:text-white">Seleccionar paciente</h2>
-          <p className="mt-1 text-[13px] text-[#64748B] dark:text-[#94A3B8]">Expedientes disponibles.</p>
+          <h2 className="text-[17px] font-semibold text-[#10213A] dark:text-white">
+            Seleccionar paciente
+          </h2>
+          <p className="mt-1 text-[13px] text-[#64748B] dark:text-[#94A3B8]">
+            Expedientes disponibles.
+          </p>
 
           <div className="mt-5 space-y-3">
             {pacientes.map((item) => (
@@ -357,9 +398,15 @@ export default function HistorialPage() {
                     : "border-[#E2E8F0] bg-[#F8FAFC] hover:border-[#BFDBFE] dark:border-[#334155] dark:bg-[#0F172A]"
                 }`}
               >
-                <p className="text-[14px] font-semibold text-[#10213A] dark:text-white">{item.nombre}</p>
-                <p className="mt-1 text-[12px] text-[#64748B] dark:text-[#94A3B8]">{item.especie} · {item.propietario}</p>
-                <span className={`mt-3 inline-flex rounded-full px-2.5 py-1 text-[11px] font-semibold ${estiloEstado(item.estado)}`}>
+                <p className="text-[14px] font-semibold text-[#10213A] dark:text-white">
+                  {item.nombre}
+                </p>
+                <p className="mt-1 text-[12px] text-[#64748B] dark:text-[#94A3B8]">
+                  {item.especie} · {item.propietario}
+                </p>
+                <span
+                  className={`mt-3 inline-flex rounded-full px-2.5 py-1 text-[11px] font-semibold ${estiloEstado(item.estado)}`}
+                >
                   {item.estado}
                 </span>
               </button>
@@ -375,8 +422,12 @@ export default function HistorialPage() {
               <div className="flex flex-col justify-between gap-4 sm:flex-row sm:items-start">
                 <div>
                   <div className="flex flex-wrap items-center gap-3">
-                    <h2 className="text-[25px] font-bold text-[#10213A] dark:text-white">{paciente.nombre}</h2>
-                    <span className={`rounded-full px-3 py-1.5 text-[12px] font-semibold ${estiloEstado(paciente.estado)}`}>
+                    <h2 className="text-[25px] font-bold text-[#10213A] dark:text-white">
+                      {paciente.nombre}
+                    </h2>
+                    <span
+                      className={`rounded-full px-3 py-1.5 text-[12px] font-semibold ${estiloEstado(paciente.estado)}`}
+                    >
                       {paciente.estado}
                     </span>
                   </div>
@@ -397,12 +448,19 @@ export default function HistorialPage() {
                 <DatoClinico titulo="Edad" valor={paciente.edad || "No registrada"} />
                 <DatoClinico titulo="Peso" valor={paciente.peso || "No registrado"} />
                 <DatoClinico titulo="Alergias" valor={paciente.alergias} />
-                <DatoClinico titulo="Registros clínicos" valor={`${paciente.registros.length} registros`} />
+                <DatoClinico
+                  titulo="Registros clínicos"
+                  valor={`${paciente.registros.length} registros`}
+                />
               </div>
 
               <div className="mt-5 rounded-[15px] border border-[#E2E8F0] px-4 py-4 dark:border-[#334155]">
-                <p className="text-[13px] font-semibold text-[#334155] dark:text-[#CBD5E1]">Antecedentes relevantes</p>
-                <p className="mt-2 text-[14px] leading-6 text-[#64748B] dark:text-[#94A3B8]">{paciente.antecedentes}</p>
+                <p className="text-[13px] font-semibold text-[#334155] dark:text-[#CBD5E1]">
+                  Antecedentes relevantes
+                </p>
+                <p className="mt-2 text-[14px] leading-6 text-[#64748B] dark:text-[#94A3B8]">
+                  {paciente.antecedentes}
+                </p>
               </div>
             </section>
 
@@ -410,8 +468,12 @@ export default function HistorialPage() {
               {/* LÍNEA DE TIEMPO */}
               <section className="rounded-[20px] border border-[#CBD5E1] bg-white p-6 shadow-[0_6px_20px_rgba(15,23,42,0.06)] dark:border-[#334155] dark:bg-[#111827]">
                 <div className="mb-5">
-                  <h2 className="text-[18px] font-semibold text-[#10213A] dark:text-white">Historial de atenciones</h2>
-                  <p className="mt-1 text-sm text-[#64748B] dark:text-[#94A3B8]">Registros ordenados del más reciente al más antiguo.</p>
+                  <h2 className="text-[18px] font-semibold text-[#10213A] dark:text-white">
+                    Historial de atenciones
+                  </h2>
+                  <p className="mt-1 text-sm text-[#64748B] dark:text-[#94A3B8]">
+                    Registros ordenados del más reciente al más antiguo.
+                  </p>
                 </div>
 
                 {paciente.registros.length === 0 ? (
@@ -429,10 +491,14 @@ export default function HistorialPage() {
                       >
                         <div className="flex flex-col justify-between gap-3 sm:flex-row sm:items-start">
                           <div>
-                            <span className={`inline-flex rounded-full px-3 py-1 text-[11px] font-semibold ${estiloTipoRegistro(registro.tipo)}`}>
+                            <span
+                              className={`inline-flex rounded-full px-3 py-1 text-[11px] font-semibold ${estiloTipoRegistro(registro.tipo)}`}
+                            >
                               {registro.tipo}
                             </span>
-                            <h3 className="mt-3 text-[15px] font-semibold text-[#10213A] dark:text-white">{registro.motivo}</h3>
+                            <h3 className="mt-3 text-[15px] font-semibold text-[#10213A] dark:text-white">
+                              {registro.motivo}
+                            </h3>
                             <p className="mt-1 text-[13px] text-[#64748B] dark:text-[#94A3B8]">
                               {registro.profesional} · {registro.fecha}
                             </p>
@@ -443,9 +509,15 @@ export default function HistorialPage() {
                         </div>
 
                         <div className="mt-4 space-y-3 text-[13px] leading-6">
-                          <DetalleRegistro titulo="Diagnóstico / evolución" valor={registro.diagnostico} />
+                          <DetalleRegistro
+                            titulo="Diagnóstico / evolución"
+                            valor={registro.diagnostico}
+                          />
                           <DetalleRegistro titulo="Tratamiento" valor={registro.tratamiento} />
-                          <DetalleRegistro titulo="Recomendaciones" valor={registro.recomendaciones} />
+                          <DetalleRegistro
+                            titulo="Recomendaciones"
+                            valor={registro.recomendaciones}
+                          />
                         </div>
                       </article>
                     ))}
@@ -456,8 +528,12 @@ export default function HistorialPage() {
               {/* COLUMNA DERECHA */}
               <div className="space-y-5">
                 <section className="rounded-[20px] border border-[#CBD5E1] bg-white p-5 shadow-[0_6px_20px_rgba(15,23,42,0.06)] dark:border-[#334155] dark:bg-[#111827]">
-                  <h3 className="text-[17px] font-semibold text-[#10213A] dark:text-white">Documento adjunto</h3>
-                  <p className="mt-1 text-[13px] text-[#64748B] dark:text-[#94A3B8]">Historia clínica cargada previamente.</p>
+                  <h3 className="text-[17px] font-semibold text-[#10213A] dark:text-white">
+                    Documento adjunto
+                  </h3>
+                  <p className="mt-1 text-[13px] text-[#64748B] dark:text-[#94A3B8]">
+                    Historia clínica cargada previamente.
+                  </p>
                   <div className="mt-4 rounded-[15px] border border-dashed border-[#CBD5E1] px-4 py-6 text-center dark:border-[#334155]">
                     <p className="text-[13px] text-[#64748B] dark:text-[#94A3B8]">
                       Los documentos adjuntos se gestionan desde el módulo de administración.
@@ -466,7 +542,9 @@ export default function HistorialPage() {
                 </section>
 
                 <section className="rounded-[20px] border border-[#CBD5E1] bg-white p-5 shadow-[0_6px_20px_rgba(15,23,42,0.06)] dark:border-[#334155] dark:bg-[#111827]">
-                  <h3 className="text-[17px] font-semibold text-[#10213A] dark:text-white">Tratamiento actual</h3>
+                  <h3 className="text-[17px] font-semibold text-[#10213A] dark:text-white">
+                    Tratamiento actual
+                  </h3>
 
                   {paciente.tratamientoActual ? (
                     <>
@@ -526,7 +604,9 @@ export default function HistorialPage() {
                   required
                   rows={4}
                   value={formulario.evolucion}
-                  onChange={(event) => setFormulario((actual) => ({ ...actual, evolucion: event.target.value }))}
+                  onChange={(event) =>
+                    setFormulario((actual) => ({ ...actual, evolucion: event.target.value }))
+                  }
                   placeholder="Describe la respuesta clínica, síntomas actuales y hallazgos..."
                   className={`${campoClases} min-h-[110px] resize-none py-3`}
                 />
@@ -536,7 +616,12 @@ export default function HistorialPage() {
                 <textarea
                   rows={3}
                   value={formulario.cambioTratamiento}
-                  onChange={(event) => setFormulario((actual) => ({ ...actual, cambioTratamiento: event.target.value }))}
+                  onChange={(event) =>
+                    setFormulario((actual) => ({
+                      ...actual,
+                      cambioTratamiento: event.target.value,
+                    }))
+                  }
                   placeholder="Ej. Continuar antibiótico por 3 días adicionales..."
                   className={`${campoClases} min-h-[90px] resize-none py-3`}
                 />
@@ -547,7 +632,9 @@ export default function HistorialPage() {
                   required
                   rows={3}
                   value={formulario.recomendaciones}
-                  onChange={(event) => setFormulario((actual) => ({ ...actual, recomendaciones: event.target.value }))}
+                  onChange={(event) =>
+                    setFormulario((actual) => ({ ...actual, recomendaciones: event.target.value }))
+                  }
                   placeholder="Cuidados, signos de alarma y recomendaciones para el propietario..."
                   className={`${campoClases} min-h-[90px] resize-none py-3`}
                 />
@@ -558,7 +645,9 @@ export default function HistorialPage() {
                   <input
                     type="date"
                     value={formulario.proximoControl}
-                    onChange={(event) => setFormulario((actual) => ({ ...actual, proximoControl: event.target.value }))}
+                    onChange={(event) =>
+                      setFormulario((actual) => ({ ...actual, proximoControl: event.target.value }))
+                    }
                     className={campoClases}
                   />
                 </Campo>
@@ -566,7 +655,12 @@ export default function HistorialPage() {
                 <Campo label="Estado clínico actualizado">
                   <select
                     value={formulario.nuevoEstado}
-                    onChange={(event) => setFormulario((actual) => ({ ...actual, nuevoEstado: event.target.value as EstadoClinico }))}
+                    onChange={(event) =>
+                      setFormulario((actual) => ({
+                        ...actual,
+                        nuevoEstado: event.target.value as EstadoClinico,
+                      }))
+                    }
                     className={campoClases}
                   >
                     <option value="Atendido hoy">Atendido hoy</option>
@@ -578,7 +672,8 @@ export default function HistorialPage() {
               </div>
 
               <div className="rounded-[14px] border border-[#DBEAFE] bg-[#EFF6FF] px-4 py-3 text-[13px] leading-6 text-[#1D4ED8] dark:border-[#1E3A8A] dark:bg-[#172554] dark:text-[#BFDBFE]">
-                Las evoluciones se agregan como nuevos registros cronológicos. Las consultas anteriores permanecen en modo de solo lectura.
+                Las evoluciones se agregan como nuevos registros cronológicos. Las consultas
+                anteriores permanecen en modo de solo lectura.
               </div>
 
               <div className="flex flex-col-reverse gap-3 border-t border-[#E2E8F0] pt-5 dark:border-[#334155] sm:flex-row sm:justify-end">
@@ -609,7 +704,9 @@ export default function HistorialPage() {
 function DatoClinico({ titulo, valor }: { titulo: string; valor: string }) {
   return (
     <div className="rounded-[14px] bg-[#F8FAFC] px-4 py-3 dark:bg-[#0F172A]">
-      <p className="text-[12px] font-semibold uppercase tracking-wide text-[#64748B] dark:text-[#94A3B8]">{titulo}</p>
+      <p className="text-[12px] font-semibold uppercase tracking-wide text-[#64748B] dark:text-[#94A3B8]">
+        {titulo}
+      </p>
       <p className="mt-2 text-[14px] font-medium text-[#10213A] dark:text-white">{valor}</p>
     </div>
   );
@@ -626,7 +723,9 @@ function DetalleRegistro({ titulo, valor }: { titulo: string; valor: string }) {
 function Campo({ label, children }: { label: string; children: ReactNode }) {
   return (
     <label className="block">
-      <span className="mb-2 block text-[13px] font-semibold text-[#334155] dark:text-[#CBD5E1]">{label}</span>
+      <span className="mb-2 block text-[13px] font-semibold text-[#334155] dark:text-[#CBD5E1]">
+        {label}
+      </span>
       {children}
     </label>
   );
@@ -634,21 +733,31 @@ function Campo({ label, children }: { label: string; children: ReactNode }) {
 
 function estiloEstado(estado: EstadoClinico) {
   switch (estado) {
-    case "Por atender": return "bg-[#FEF3C7] text-[#B45309] dark:bg-[#78350F] dark:text-[#FDE68A]";
-    case "Atendido hoy": return "bg-[#DCFCE7] text-[#15803D] dark:bg-[#14532D] dark:text-[#BBF7D0]";
-    case "En seguimiento": return "bg-[#DBEAFE] text-[#2563EB] dark:bg-[#1E3A8A] dark:text-[#BFDBFE]";
-    case "Tratamiento activo": return "bg-[#FEE2E2] text-[#B91C1C] dark:bg-[#7F1D1D] dark:text-[#FECACA]";
-    case "Control programado": return "bg-[#EDE9FE] text-[#6D28D9] dark:bg-[#4C1D95] dark:text-[#DDD6FE]";
+    case "Por atender":
+      return "bg-[#FEF3C7] text-[#B45309] dark:bg-[#78350F] dark:text-[#FDE68A]";
+    case "Atendido hoy":
+      return "bg-[#DCFCE7] text-[#15803D] dark:bg-[#14532D] dark:text-[#BBF7D0]";
+    case "En seguimiento":
+      return "bg-[#DBEAFE] text-[#2563EB] dark:bg-[#1E3A8A] dark:text-[#BFDBFE]";
+    case "Tratamiento activo":
+      return "bg-[#FEE2E2] text-[#B91C1C] dark:bg-[#7F1D1D] dark:text-[#FECACA]";
+    case "Control programado":
+      return "bg-[#EDE9FE] text-[#6D28D9] dark:bg-[#4C1D95] dark:text-[#DDD6FE]";
   }
 }
 
 function estiloTipoRegistro(tipo: TipoRegistro) {
   switch (tipo) {
-    case "Evolución clínica": return "bg-[#DCFCE7] text-[#15803D] dark:bg-[#14532D] dark:text-[#BBF7D0]";
-    case "Procedimiento": return "bg-[#FEE2E2] text-[#B91C1C] dark:bg-[#7F1D1D] dark:text-[#FECACA]";
-    case "Vacunación": return "bg-[#EDE9FE] text-[#6D28D9] dark:bg-[#4C1D95] dark:text-[#DDD6FE]";
-    case "Control": return "bg-[#DBEAFE] text-[#2563EB] dark:bg-[#1E3A8A] dark:text-[#BFDBFE]";
-    case "Consulta": return "bg-[#E0F2FE] text-[#0369A1] dark:bg-[#0C4A6E] dark:text-[#BAE6FD]";
+    case "Evolución clínica":
+      return "bg-[#DCFCE7] text-[#15803D] dark:bg-[#14532D] dark:text-[#BBF7D0]";
+    case "Procedimiento":
+      return "bg-[#FEE2E2] text-[#B91C1C] dark:bg-[#7F1D1D] dark:text-[#FECACA]";
+    case "Vacunación":
+      return "bg-[#EDE9FE] text-[#6D28D9] dark:bg-[#4C1D95] dark:text-[#DDD6FE]";
+    case "Control":
+      return "bg-[#DBEAFE] text-[#2563EB] dark:bg-[#1E3A8A] dark:text-[#BFDBFE]";
+    case "Consulta":
+      return "bg-[#E0F2FE] text-[#0369A1] dark:bg-[#0C4A6E] dark:text-[#BAE6FD]";
   }
 }
 

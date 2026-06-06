@@ -1,5 +1,5 @@
 /// <reference types="vitest/globals" />
-import { describe, it, expect, beforeEach, vi } from "vitest";
+import { describe, it, expect, beforeEach } from "vitest";
 import { getToken, setToken, clearCurrentUser, getCurrentUser } from "../auth";
 
 const TOKEN_KEY = "vetnova-token";

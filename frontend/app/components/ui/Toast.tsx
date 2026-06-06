@@ -1,6 +1,6 @@
 "use client";
 
-import { createContext, useCallback, useContext, useEffect, useRef, useState, type ReactNode } from "react";
+import { createContext, useCallback, useContext, useEffect, useState, type ReactNode } from "react";
 import { CheckCircle, XCircle, AlertTriangle, Info, X } from "lucide-react";
 
 // ─── Tipos ─────────────────────────────────────────────────────────────────
@@ -19,9 +19,9 @@ interface ToastContextValue {
   toasts: Toast[];
   toast: (opts: Omit<Toast, "id">) => void;
   success: (title: string, description?: string) => void;
-  error:   (title: string, description?: string) => void;
+  error: (title: string, description?: string) => void;
   warning: (title: string, description?: string) => void;
-  info:    (title: string, description?: string) => void;
+  info: (title: string, description?: string) => void;
   dismiss: (id: string) => void;
 }
 
@@ -44,25 +44,37 @@ export function ToastProvider({ children }: { children: ReactNode }) {
     setToasts((prev) => prev.filter((t) => t.id !== id));
   }, []);
 
-  const toast = useCallback((opts: Omit<Toast, "id">) => {
-    const id = `${Date.now()}-${Math.random()}`;
-    setToasts((prev) => [...prev.slice(-4), { ...opts, id }]); // máx 5
-    if (opts.duration !== 0) {
-      setTimeout(() => dismiss(id), opts.duration ?? 4000);
-    }
-  }, [dismiss]);
+  const toast = useCallback(
+    (opts: Omit<Toast, "id">) => {
+      const id = `${Date.now()}-${Math.random()}`;
+      setToasts((prev) => [...prev.slice(-4), { ...opts, id }]); // máx 5
+      if (opts.duration !== 0) {
+        setTimeout(() => dismiss(id), opts.duration ?? 4000);
+      }
+    },
+    [dismiss],
+  );
 
-  const success = useCallback((title: string, description?: string) =>
-    toast({ type: "success", title, description }), [toast]);
+  const success = useCallback(
+    (title: string, description?: string) => toast({ type: "success", title, description }),
+    [toast],
+  );
 
-  const error = useCallback((title: string, description?: string) =>
-    toast({ type: "error", title, description, duration: 0 }), [toast]);
+  const error = useCallback(
+    (title: string, description?: string) =>
+      toast({ type: "error", title, description, duration: 0 }),
+    [toast],
+  );
 
-  const warning = useCallback((title: string, description?: string) =>
-    toast({ type: "warning", title, description }), [toast]);
+  const warning = useCallback(
+    (title: string, description?: string) => toast({ type: "warning", title, description }),
+    [toast],
+  );
 
-  const info = useCallback((title: string, description?: string) =>
-    toast({ type: "info", title, description }), [toast]);
+  const info = useCallback(
+    (title: string, description?: string) => toast({ type: "info", title, description }),
+    [toast],
+  );
 
   return (
     <ToastContext.Provider value={{ toasts, toast, success, error, warning, info, dismiss }}>
@@ -74,28 +86,29 @@ export function ToastProvider({ children }: { children: ReactNode }) {
 
 // ─── Estilos por tipo ──────────────────────────────────────────────────────
 
-const STYLES: Record<ToastType, { wrapper: string; icon: typeof CheckCircle; iconClass: string }> = {
-  success: {
-    wrapper: "border-emerald-200 bg-white dark:border-emerald-800 dark:bg-slate-900",
-    icon: CheckCircle,
-    iconClass: "text-emerald-500",
-  },
-  error: {
-    wrapper: "border-red-200 bg-white dark:border-red-800 dark:bg-slate-900",
-    icon: XCircle,
-    iconClass: "text-red-500",
-  },
-  warning: {
-    wrapper: "border-amber-200 bg-white dark:border-amber-800 dark:bg-slate-900",
-    icon: AlertTriangle,
-    iconClass: "text-amber-500",
-  },
-  info: {
-    wrapper: "border-blue-200 bg-white dark:border-blue-800 dark:bg-slate-900",
-    icon: Info,
-    iconClass: "text-blue-500",
-  },
-};
+const STYLES: Record<ToastType, { wrapper: string; icon: typeof CheckCircle; iconClass: string }> =
+  {
+    success: {
+      wrapper: "border-emerald-200 bg-white dark:border-emerald-800 dark:bg-slate-900",
+      icon: CheckCircle,
+      iconClass: "text-emerald-500",
+    },
+    error: {
+      wrapper: "border-red-200 bg-white dark:border-red-800 dark:bg-slate-900",
+      icon: XCircle,
+      iconClass: "text-red-500",
+    },
+    warning: {
+      wrapper: "border-amber-200 bg-white dark:border-amber-800 dark:bg-slate-900",
+      icon: AlertTriangle,
+      iconClass: "text-amber-500",
+    },
+    info: {
+      wrapper: "border-blue-200 bg-white dark:border-blue-800 dark:bg-slate-900",
+      icon: Info,
+      iconClass: "text-blue-500",
+    },
+  };
 
 // ─── Item individual ───────────────────────────────────────────────────────
 
@@ -113,7 +126,7 @@ function ToastItem({ toast, dismiss }: { toast: Toast; dismiss: (id: string) => 
     <div
       role="alert"
       aria-live={toast.type === "error" ? "assertive" : "polite"}
-      className={`flex w-full max-w-sm items-start gap-3 rounded-xl border p-4 shadow-card-md transition-all duration-300 ${s.wrapper} ${
+      className={`shadow-card-md flex w-full max-w-sm items-start gap-3 rounded-xl border p-4 transition-all duration-300 ${s.wrapper} ${
         visible ? "translate-x-0 opacity-100" : "translate-x-4 opacity-0"
       }`}
     >
@@ -141,10 +154,7 @@ function ToastItem({ toast, dismiss }: { toast: Toast; dismiss: (id: string) => 
 function ToastContainer({ toasts, dismiss }: { toasts: Toast[]; dismiss: (id: string) => void }) {
   if (toasts.length === 0) return null;
   return (
-    <div
-      aria-label="Notificaciones"
-      className="fixed bottom-4 right-4 z-[200] flex flex-col gap-2"
-    >
+    <div aria-label="Notificaciones" className="fixed bottom-4 right-4 z-[200] flex flex-col gap-2">
       {toasts.map((t) => (
         <ToastItem key={t.id} toast={t} dismiss={dismiss} />
       ))}

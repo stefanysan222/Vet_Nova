@@ -84,7 +84,7 @@ export default function VeterinarioCitasPage() {
   const [citas, setCitas] = useState<Cita[]>([]);
   const [mascotas, setMascotas] = useState<PetRecord[]>([]);
   const [vets, setVets] = useState<UsuarioAPI[]>([]);
-  const [currentVetName, setCurrentVetName] = useState(() => getCurrentUser()?.name ?? "");
+  const [currentVetName] = useState(() => getCurrentUser()?.name ?? "");
   const [loading, setLoading] = useState(true);
   const [guardando, setGuardando] = useState(false);
   const [error, setError] = useState<string | null>(null);

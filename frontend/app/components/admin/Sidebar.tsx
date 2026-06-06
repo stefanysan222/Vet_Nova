@@ -1,13 +1,11 @@
 "use client";
 
-import Image from "next/image";
 import { useState } from "react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import {
   BarChart3,
   Bell,
-  Briefcase,
   CalendarDays,
   Home,
   LogOut,
@@ -28,27 +26,6 @@ const menuItems = [
   { label: "Notificaciones", icon: Bell, href: "/admin/notificaciones" },
   { label: "Configuración", icon: Settings, href: "/admin/configuracion" },
 ];
-
-function ThemeLogo({ size = 28 }: { size?: number }) {
-  return (
-    <>
-      <Image
-        src="/logos/vetnova-logo-light.png"
-        alt="VetNova"
-        width={size}
-        height={size}
-        className="block rounded-lg object-cover dark:hidden"
-      />
-      <Image
-        src="/logos/vetnova-logo-dark.png"
-        alt="VetNova"
-        width={size}
-        height={size}
-        className="hidden rounded-lg object-cover dark:block"
-      />
-    </>
-  );
-}
 
 function NavLinks({ onItemClick, pathname }: { onItemClick?: () => void; pathname: string }) {
   return (

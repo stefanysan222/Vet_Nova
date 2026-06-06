@@ -12,9 +12,6 @@ import {
   Users2,
   CalendarDays,
   PawPrint,
-  BarChart3,
-  Bell as BellIcon,
-  Settings,
   X,
 } from "lucide-react";
 import { AnimatePresence, motion } from "framer-motion";

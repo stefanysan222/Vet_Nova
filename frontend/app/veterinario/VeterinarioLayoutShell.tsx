@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { useEffect, useMemo, useRef, useState, type KeyboardEvent, type ReactNode } from "react";
@@ -126,8 +127,8 @@ export default function VeterinarioLayoutShell({ children }: { children: ReactNo
   const pathname = usePathname();
   const router = useRouter();
   const buscadorRef = useRef<HTMLDivElement>(null);
-  const [userName, setUserName] = useState(() => getCurrentUser()?.name ?? "Veterinario");
-  const [userInitials, setUserInitials] = useState(() => {
+  const [userName] = useState(() => getCurrentUser()?.name ?? "Veterinario");
+  const [userInitials] = useState(() => {
     const name = getCurrentUser()?.name;
     return name
       ? name
@@ -255,10 +256,12 @@ export default function VeterinarioLayoutShell({ children }: { children: ReactNo
         {/* SIDEBAR */}
         <aside className="hidden h-screen w-[215px] shrink-0 border-r border-[#E5EAF2] bg-white dark:border-[#1E293B] dark:bg-[#111827] lg:flex lg:flex-col">
           <div className="flex h-[78px] items-center gap-3 border-b border-[#E5EAF2] px-4 dark:border-[#1E293B]">
-            <img
+            <Image
               src={darkMode ? "/logos/vetnova-logo-dark.png" : "/logos/vetnova-logo-light.png"}
               alt="VetNova"
-              className="h-10 w-10 rounded-xl object-contain"
+              width={40}
+              height={40}
+              className="rounded-xl object-contain"
             />
 
             <div>
@@ -628,10 +631,12 @@ export default function VeterinarioLayoutShell({ children }: { children: ReactNo
           >
             <div className="flex h-[78px] items-center justify-between border-b border-[#E5EAF2] px-4 dark:border-[#1E293B]">
               <div className="flex items-center gap-3">
-                <img
+                <Image
                   src={darkMode ? "/logos/vetnova-logo-dark.png" : "/logos/vetnova-logo-light.png"}
                   alt="VetNova"
-                  className="h-10 w-10 rounded-xl object-contain"
+                  width={40}
+                  height={40}
+                  className="rounded-xl object-contain"
                 />
                 <div>
                   <h1 className="text-[20px] font-bold leading-none text-[#10213A] dark:text-white">

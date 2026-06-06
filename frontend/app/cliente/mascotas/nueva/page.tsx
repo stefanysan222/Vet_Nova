@@ -137,7 +137,7 @@ export default function NuevaMascotaPage() {
       }
 
       setFoto(json.url);
-    } catch (error) {
+    } catch {
       setErrorFoto("No se pudo subir la imagen. Intenta de nuevo.");
     } finally {
       setSubiendoFoto(false);

@@ -1,6 +1,6 @@
 ﻿"use client";
 
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { User, Mail, Lock, Eye, EyeOff } from "lucide-react";
 import { getCurrentUser } from "../../../lib/auth";
 import { updateUsuario } from "../../../lib/api/usuarios";

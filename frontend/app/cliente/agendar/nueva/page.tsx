@@ -68,7 +68,7 @@ export default function NuevaCitaPage() {
   const [error, setError] = useState("");
   const [guardando, setGuardando] = useState(false);
   const [propietarioId, setPropietarioId] = useState("");
-  const [propietarioNombre, setPropietarioNombre] = useState(() => getCurrentUser()?.name ?? "");
+  const [propietarioNombre] = useState(() => getCurrentUser()?.name ?? "");
 
   useEffect(() => {
     const user = getCurrentUser();

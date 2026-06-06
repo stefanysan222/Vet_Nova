@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { useEffect, useState, type ReactNode } from "react";
@@ -102,10 +103,12 @@ export default function ClientLayoutShell({ children }: { children: ReactNode })
         {/* Sidebar */}
         <aside className="hidden h-screen w-[260px] shrink-0 border-r border-[#E5EAF2] bg-white dark:border-[#1E293B] dark:bg-[#111827] lg:flex lg:flex-col">
           <div className="flex h-[78px] items-center gap-3 border-b border-[#E5EAF2] px-5 dark:border-[#1E293B]">
-            <img
+            <Image
               src={darkMode ? "/logos/vetnova-logo-dark.png" : "/logos/vetnova-logo-light.png"}
               alt="VetNova Logo"
-              className="h-10 w-10 rounded-xl object-contain"
+              width={40}
+              height={40}
+              className="rounded-xl object-contain"
             />
 
             <div>
@@ -402,10 +405,12 @@ export default function ClientLayoutShell({ children }: { children: ReactNode })
           >
             <div className="flex h-[64px] items-center justify-between border-b border-[#E5EAF2] px-5 dark:border-[#1E293B]">
               <div className="flex items-center gap-3">
-                <img
+                <Image
                   src={darkMode ? "/logos/vetnova-logo-dark.png" : "/logos/vetnova-logo-light.png"}
                   alt="VetNova"
-                  className="h-8 w-8 rounded-xl object-contain"
+                  width={32}
+                  height={32}
+                  className="rounded-xl object-contain"
                 />
                 <span className="text-[18px] font-semibold text-[#10213A] dark:text-white">
                   VetNova
@@ -611,21 +616,6 @@ function LogoutIcon() {
         strokeLinecap="round"
         strokeLinejoin="round"
       />
-    </svg>
-  );
-}
-
-function SearchIcon() {
-  return (
-    <svg
-      width="18"
-      height="18"
-      viewBox="0 0 24 24"
-      fill="none"
-      className="text-[#64748B] dark:text-[#94A3B8]"
-    >
-      <circle cx="11" cy="11" r="7" stroke="currentColor" strokeWidth="2" />
-      <path d="m20 20-3.5-3.5" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
     </svg>
   );
 }

@@ -20,7 +20,7 @@ export default function PerfilPage() {
   const [stats, setStats] = useState<Stats>({ mascotas: 0, citas: 0 });
   const [ultimaCita, setUltimaCita] = useState<Appointment | null>(null);
   const [ultimaMascota, setUltimaMascota] = useState<PetRecord | null>(null);
-  const [perfilTelefono, setPerfilTelefono] = useState(() => {
+  const [perfilTelefono] = useState(() => {
     if (typeof window === "undefined") return "";
     try {
       const stored = localStorage.getItem("vetnova_cliente_perfil");
@@ -54,6 +54,7 @@ export default function PerfilPage() {
       );
       setUltimaMascota(sortedMascotas[0] ?? null);
     });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   return (
