@@ -88,7 +88,7 @@ export default function ConfiguracionPage() {
     if (!user) return;
     setSavingPassword(true);
     try {
-      await updateUsuario(user.id, { password: newPassword });
+      await updateUsuario(user.id, { password: newPassword, currentPassword });
       success(
         "Contraseña actualizada",
         "La contraseña se cambió correctamente. Usa la nueva contraseña en tu próximo inicio de sesión.",
@@ -97,9 +97,10 @@ export default function ConfiguracionPage() {
       setNewPassword("");
       setConfirmPassword("");
     } catch (err) {
+      const msg = err instanceof Error ? err.message : "No se pudo actualizar la contraseña.";
       error(
         "Error al actualizar",
-        err instanceof Error ? err.message : "No se pudo actualizar la contraseña.",
+        msg === "Forbidden" ? "La contraseña actual es incorrecta." : msg,
       );
     } finally {
       setSavingPassword(false);

@@ -5,6 +5,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import {
   Bell,
+  CheckCircle,
   Search,
   Moon,
   Sun,
@@ -19,6 +20,13 @@ import { getCurrentUser } from "../../../lib/auth";
 import { fetchUsuarios } from "../../../lib/api/usuarios";
 import { fetchMascotas } from "../../../lib/api/mascotas";
 import { fetchCitas } from "../../../lib/api/citas";
+import {
+  fetchNotificacionesCount,
+  fetchNotificaciones,
+  marcarLeida,
+  marcarTodasLeidas,
+  type NotificacionAPI,
+} from "../../../lib/api/notificaciones";
 
 type SearchResult = {
   id: string;
@@ -89,42 +97,21 @@ const CATEGORY_ICON: Record<SearchResult["category"], React.ReactNode> = {
   Citas: <CalendarDays className="h-3.5 w-3.5" />,
 };
 
-type NavNotif = { id: string; title: string; desc: string; urgente: boolean };
-
-function buildNavNotifs(
-  citas: import("../../../lib/recepcionista/types").Appointment[],
-): NavNotif[] {
-  const items: NavNotif[] = [];
-  const hoy = new Date().toISOString().slice(0, 10);
-  const pendientes = citas.filter((c) => c.status === "Pendiente");
-  if (pendientes.length > 0)
-    items.push({
-      id: "p",
-      title: `${pendientes.length} cita${pendientes.length > 1 ? "s" : ""} pendiente${pendientes.length > 1 ? "s" : ""}`,
-      desc: pendientes
-        .slice(0, 2)
-        .map((c) => c.petName)
-        .join(", "),
-      urgente: pendientes.length >= 3,
-    });
-  const hoyList = citas.filter((c) => c.date === hoy && c.status !== "Cancelada");
-  if (hoyList.length > 0)
-    items.push({
-      id: "h",
-      title: `${hoyList.length} cita${hoyList.length > 1 ? "s" : ""} hoy`,
-      desc: hoyList
-        .slice(0, 2)
-        .map((c) => `${c.petName}${c.time ? ` ${c.time}` : ""}`)
-        .join(", "),
-      urgente: false,
-    });
-  return items;
+function timeAgo(dateStr: string): string {
+  const diff = Date.now() - new Date(dateStr).getTime();
+  const m = Math.floor(diff / 60000);
+  if (m < 1) return "Ahora";
+  if (m < 60) return `Hace ${m} min`;
+  const h = Math.floor(m / 60);
+  if (h < 24) return `Hace ${h}h`;
+  return `Hace ${Math.floor(h / 24)}d`;
 }
 
 export default function Navbar() {
   const router = useRouter();
   const [notifOpen, setNotifOpen] = useState(false);
-  const [notifs, setNotifs] = useState<NavNotif[]>([]);
+  const [notifCount, setNotifCount] = useState(0);
+  const [notifItems, setNotifItems] = useState<NotificacionAPI[] | null>(null);
   const [darkMode, setDarkMode] = useState(() => {
     if (typeof window === "undefined") return false;
     const saved = localStorage.getItem("vetnova-theme");
@@ -139,12 +126,46 @@ export default function Navbar() {
   const inputRef = useRef<HTMLInputElement>(null);
   const user = getCurrentUser();
 
-  // Notificaciones reales
+  // Badge: contar no leídas al montar y cada 30s
   useEffect(() => {
-    fetchCitas()
-      .then((citas) => setNotifs(buildNavNotifs(citas)))
-      .catch(() => setNotifs([]));
+    const load = () =>
+      fetchNotificacionesCount()
+        .then(setNotifCount)
+        .catch(() => {});
+    load();
+    const interval = setInterval(load, 30000);
+    return () => clearInterval(interval);
   }, []);
+
+  // Cargar lista al abrir el dropdown (null = cargando)
+  useEffect(() => {
+    if (!notifOpen) return;
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    setNotifItems(null);
+    let cancelled = false;
+    fetchNotificaciones(true)
+      .then((data) => {
+        if (!cancelled) setNotifItems(data);
+      })
+      .catch(() => {
+        if (!cancelled) setNotifItems([]);
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, [notifOpen]);
+
+  const handleMarcarLeida = async (id: number) => {
+    await marcarLeida(id).catch(() => {});
+    setNotifItems((prev) => prev?.filter((n) => n.id !== id) ?? prev);
+    setNotifCount((c) => Math.max(0, c - 1));
+  };
+
+  const handleMarcarTodas = async () => {
+    await marcarTodasLeidas().catch(() => {});
+    setNotifItems([]);
+    setNotifCount(0);
+  };
 
   // Tema — sincronizar DOM y escuchar cambios de sistema
   useEffect(() => {
@@ -419,9 +440,9 @@ export default function Navbar() {
               className="relative flex h-9 w-9 items-center justify-center rounded-xl text-slate-500 transition hover:bg-slate-100 dark:text-slate-400 dark:hover:bg-slate-800"
             >
               <Bell className="h-4 w-4" />
-              {notifs.length > 0 && (
+              {notifCount > 0 && (
                 <span className="absolute right-1.5 top-1.5 flex h-4 w-4 items-center justify-center rounded-full bg-red-500 text-[9px] font-bold text-white ring-2 ring-white dark:ring-slate-950">
-                  {notifs.length > 9 ? "9+" : notifs.length}
+                  {notifCount > 9 ? "9+" : notifCount}
                 </span>
               )}
             </button>
@@ -429,7 +450,6 @@ export default function Navbar() {
             <AnimatePresence>
               {notifOpen && (
                 <>
-                  {/* Overlay para cerrar al hacer clic fuera */}
                   <div className="fixed inset-0 z-40" onClick={() => setNotifOpen(false)} />
                   <motion.div
                     initial={{ opacity: 0, y: -8, scale: 0.97 }}
@@ -443,31 +463,55 @@ export default function Navbar() {
                       <p className="text-sm font-semibold text-slate-900 dark:text-white">
                         Notificaciones
                       </p>
-                      {notifs.length > 0 && (
-                        <span className="rounded-full bg-red-50 px-2 py-0.5 text-xs font-semibold text-red-600 dark:bg-red-950/50 dark:text-red-400">
-                          {notifs.length} activa{notifs.length > 1 ? "s" : ""}
-                        </span>
+                      {notifItems && notifItems.length > 0 && (
+                        <button
+                          onClick={handleMarcarTodas}
+                          className="text-xs font-semibold text-brand-600 hover:text-brand-700 dark:text-brand-400"
+                        >
+                          Marcar todas leídas
+                        </button>
                       )}
                     </div>
 
                     {/* Lista */}
-                    <div className="divide-y divide-slate-100 dark:divide-slate-800">
-                      {notifs.length === 0 ? (
-                        <p className="px-4 py-4 text-sm text-slate-500 dark:text-slate-400">
-                          Sin alertas activas.
+                    <div className="max-h-72 divide-y divide-slate-100 overflow-y-auto dark:divide-slate-800">
+                      {notifItems === null ? (
+                        <div className="space-y-2 p-3">
+                          {[1, 2, 3].map((i) => (
+                            <div
+                              key={i}
+                              className="h-12 animate-pulse rounded-xl bg-slate-100 dark:bg-slate-800"
+                            />
+                          ))}
+                        </div>
+                      ) : notifItems.length === 0 ? (
+                        <p className="px-4 py-6 text-center text-sm text-slate-500 dark:text-slate-400">
+                          Sin notificaciones nuevas.
                         </p>
                       ) : (
-                        notifs.map((n) => (
+                        (notifItems as NotificacionAPI[]).map((n) => (
                           <div
                             key={n.id}
-                            className={`px-4 py-3 ${n.urgente ? "bg-red-50/60 dark:bg-red-950/20" : ""}`}
+                            className="flex items-start gap-3 px-4 py-3 hover:bg-slate-50 dark:hover:bg-slate-800/50"
                           >
-                            <p className="text-sm font-medium text-slate-900 dark:text-white">
-                              {n.title}
-                            </p>
-                            <p className="mt-0.5 line-clamp-1 text-xs text-slate-500 dark:text-slate-400">
-                              {n.desc}
-                            </p>
+                            <div className="min-w-0 flex-1">
+                              <p className="text-sm font-medium text-slate-900 dark:text-white">
+                                {n.titulo}
+                              </p>
+                              <p className="mt-0.5 line-clamp-1 text-xs text-slate-500 dark:text-slate-400">
+                                {n.mensaje}
+                              </p>
+                              <p className="mt-1 text-[10px] text-slate-400">
+                                {timeAgo(n.creadaEn)}
+                              </p>
+                            </div>
+                            <button
+                              onClick={() => handleMarcarLeida(n.id)}
+                              className="mt-0.5 shrink-0 rounded-lg p-1 text-slate-400 hover:bg-slate-100 hover:text-slate-600 dark:hover:bg-slate-700"
+                              title="Marcar como leída"
+                            >
+                              <CheckCircle className="h-3.5 w-3.5" />
+                            </button>
                           </div>
                         ))
                       )}
@@ -480,7 +524,7 @@ export default function Navbar() {
                         onClick={() => setNotifOpen(false)}
                         className="text-xs font-semibold text-brand-600 hover:text-brand-700 dark:text-brand-400"
                       >
-                        Ver todas las alertas →
+                        Ver todas →
                       </Link>
                     </div>
                   </motion.div>

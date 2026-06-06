@@ -35,7 +35,13 @@ export async function createUsuario(data: {
 
 export async function updateUsuario(
   id: number,
-  data: { nombre?: string; email?: string; rol?: string; password?: string },
+  data: {
+    nombre?: string;
+    email?: string;
+    rol?: string;
+    password?: string;
+    currentPassword?: string;
+  },
 ): Promise<UsuarioAPI> {
   return api.put<UsuarioAPI>(`/usuarios/${id}`, data);
 }

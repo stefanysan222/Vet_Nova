@@ -142,13 +142,15 @@ export default function ConfiguracionVeterinarioPage() {
     setGuardandoPassword(true);
     setErrorSeguridad("");
     try {
-      await updateUsuario(user.id, { password: seguridad.nuevaContrasena });
+      await updateUsuario(user.id, {
+        password: seguridad.nuevaContrasena,
+        currentPassword: seguridad.contrasenaActual,
+      });
       setMensajeSeguridad("La contraseña fue actualizada correctamente.");
       setSeguridad(seguridadInicial);
     } catch (err) {
-      setErrorSeguridad(
-        err instanceof Error ? err.message : "No se pudo actualizar la contraseña.",
-      );
+      const msg = err instanceof Error ? err.message : "No se pudo actualizar la contraseña.";
+      setErrorSeguridad(msg === "Forbidden" ? "La contraseña actual es incorrecta." : msg);
     } finally {
       setGuardandoPassword(false);
     }
