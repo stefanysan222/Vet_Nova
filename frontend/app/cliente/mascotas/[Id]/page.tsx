@@ -137,17 +137,11 @@ export default function PerfilCompletoMascotaPage() {
           segmentosRuta[segmentosRuta.length - 1] ?? ""
         ).trim();
 
-        console.log("ID recibido desde la URL:", idRuta);
-
         const registroGuardado = localStorage.getItem(PETS_STORAGE_KEY);
-
-        console.log("Registro guardado:", registroGuardado);
 
         const mascotasRegistradas: Pet[] = registroGuardado
           ? JSON.parse(registroGuardado)
           : [];
-
-        console.log("Mascotas registradas:", mascotasRegistradas);
 
         const mascotaCreada = mascotasRegistradas.find(
           (item) => String(item.id).trim() === idRuta
@@ -158,8 +152,6 @@ export default function PerfilCompletoMascotaPage() {
         );
 
         const mascotaEncontrada = mascotaCreada ?? mascotaInicial ?? null;
-
-        console.log("Mascota encontrada:", mascotaEncontrada);
 
         setMascota(mascotaEncontrada);
       } catch (error) {
