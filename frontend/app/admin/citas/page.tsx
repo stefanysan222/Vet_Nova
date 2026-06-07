@@ -32,12 +32,21 @@ function RescheduleModal({
   const [time, setTime] = useState(appointment.time || "09:00");
   const [selectedVet, setSelectedVet] = useState(appointment.veterinarian ?? "");
   const [vets, setVets] = useState<UsuarioAPI[]>([]);
+  const [loadingVets, setLoadingVets] = useState(true);
+  const [vetsError, setVetsError] = useState(false);
   const today = new Date().toISOString().slice(0, 10);
 
   useEffect(() => {
     fetchVeterinarios()
-      .then(setVets)
-      .catch(() => setVets([]));
+      .then((data) => {
+        setVets(data);
+        setVetsError(false);
+      })
+      .catch(() => {
+        setVets([]);
+        setVetsError(true);
+      })
+      .finally(() => setLoadingVets(false));
   }, []);
 
   const slots = getClinicSlots(date);
@@ -180,8 +189,14 @@ function RescheduleModal({
                 )}
               </label>
 
-              {vets.length === 0 ? (
+              {loadingVets ? (
                 <p className="text-xs text-slate-400">Cargando veterinarios...</p>
+              ) : vetsError ? (
+                <p className="text-xs text-rose-500">
+                  No se pudo cargar la lista de veterinarios. Intenta cerrar y abrir de nuevo.
+                </p>
+              ) : vets.length === 0 ? (
+                <p className="text-xs text-slate-400">No hay veterinarios registrados.</p>
               ) : (
                 <div className="space-y-2">
                   {availableVets.map((v) => (
