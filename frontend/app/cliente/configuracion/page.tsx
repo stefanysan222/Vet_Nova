@@ -2,6 +2,7 @@
 
 import { ChangeEvent, FormEvent, useState } from "react";
 import { getCurrentUser } from "@/lib/auth";
+import { api } from "@/lib/api/client";
 
 const PROFILE_STORAGE_KEY = "vetnova_cliente_perfil";
 
@@ -44,35 +45,83 @@ function cargarPerfilInicial(): PerfilCliente {
   }
 }
 
+type PasswordForm = { currentPassword: string; newPassword: string; confirmPassword: string };
+const EMPTY_PWD: PasswordForm = { currentPassword: "", newPassword: "", confirmPassword: "" };
+
 export default function ConfiguracionPage() {
   const [perfil, setPerfil] = useState<PerfilCliente>(cargarPerfilInicial);
   const [perfilGuardado, setPerfilGuardado] = useState<PerfilCliente>(cargarPerfilInicial);
   const [mensaje, setMensaje] = useState("");
+  const [guardandoPerfil, setGuardandoPerfil] = useState(false);
+
+  const [pwd, setPwd] = useState<PasswordForm>(EMPTY_PWD);
+  const [mensajePwd, setMensajePwd] = useState("");
+  const [errorPwd, setErrorPwd] = useState("");
+  const [guardandoPwd, setGuardandoPwd] = useState(false);
 
   const actualizarCampo = (event: ChangeEvent<HTMLInputElement>) => {
     const { name, value } = event.target;
-
-    setPerfil((actual) => ({
-      ...actual,
-      [name]: value,
-    }));
-
+    setPerfil((actual) => ({ ...actual, [name]: value }));
     setMensaje("");
   };
 
-  const guardarPerfil = (event: FormEvent<HTMLFormElement>) => {
+  const guardarPerfil = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-
-    localStorage.setItem(PROFILE_STORAGE_KEY, JSON.stringify(perfil));
-    setPerfilGuardado(perfil);
-    setMensaje("Tu información personal fue actualizada correctamente.");
-
-    window.dispatchEvent(new Event("vetnova-profile-updated"));
+    setGuardandoPerfil(true);
+    const user = getCurrentUser();
+    try {
+      if (user?.id) {
+        await api.put(`/usuarios/${user.id}`, {
+          nombre: `${perfil.nombre} ${perfil.apellido}`.trim(),
+          email: perfil.email,
+        });
+      }
+      localStorage.setItem(PROFILE_STORAGE_KEY, JSON.stringify(perfil));
+      setPerfilGuardado(perfil);
+      setMensaje("Tu información personal fue actualizada correctamente.");
+      window.dispatchEvent(new Event("vetnova-profile-updated"));
+    } catch (err) {
+      setMensaje(err instanceof Error ? err.message : "No se pudo guardar la información.");
+    } finally {
+      setGuardandoPerfil(false);
+    }
   };
 
   const cancelarCambios = () => {
     setPerfil(perfilGuardado);
     setMensaje("");
+  };
+
+  const cambiarPassword = async (event: FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    setErrorPwd("");
+    setMensajePwd("");
+
+    if (pwd.newPassword.length < 8) {
+      setErrorPwd("La nueva contraseña debe tener al menos 8 caracteres.");
+      return;
+    }
+    if (pwd.newPassword !== pwd.confirmPassword) {
+      setErrorPwd("Las contraseñas no coinciden.");
+      return;
+    }
+
+    const user = getCurrentUser();
+    if (!user?.id) return;
+
+    setGuardandoPwd(true);
+    try {
+      await api.put(`/usuarios/${user.id}`, {
+        password: pwd.newPassword,
+        currentPassword: pwd.currentPassword,
+      });
+      setMensajePwd("Contraseña actualizada correctamente.");
+      setPwd(EMPTY_PWD);
+    } catch (err) {
+      setErrorPwd(err instanceof Error ? err.message : "No se pudo actualizar la contraseña.");
+    } finally {
+      setGuardandoPwd(false);
+    }
   };
 
   return (
@@ -129,37 +178,63 @@ export default function ConfiguracionPage() {
             <button type="button" onClick={cancelarCambios} className="btn-secondary">
               Cancelar
             </button>
-            <button type="submit" className="btn-primary">
-              Guardar Cambios
+            <button type="submit" disabled={guardandoPerfil} className="btn-primary">
+              {guardandoPerfil ? "Guardando..." : "Guardar Cambios"}
             </button>
           </div>
         </form>
 
-        <section className="admin-card p-7">
+        <form onSubmit={cambiarPassword} className="admin-card p-7">
           <div className="mb-7 flex items-center gap-3">
             <LockIcon />
             <h2 className="text-section-title">Seguridad</h2>
           </div>
 
+          {mensajePwd && (
+            <div className="mb-5 rounded-xl border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm font-medium text-emerald-700 dark:border-emerald-800 dark:bg-emerald-900/30 dark:text-emerald-400">
+              {mensajePwd}
+            </div>
+          )}
+          {errorPwd && (
+            <div className="mb-5 rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm font-medium text-red-700 dark:border-red-800 dark:bg-red-900/30 dark:text-red-400">
+              {errorPwd}
+            </div>
+          )}
+
           <div className="max-w-[760px]">
-            <PasswordField label="Contraseña Actual" />
+            <PasswordField
+              label="Contraseña Actual"
+              name="currentPassword"
+              value={pwd.currentPassword}
+              onChange={(e) => setPwd((p) => ({ ...p, currentPassword: e.target.value }))}
+            />
             <div className="mt-5">
-              <PasswordField label="Nueva Contraseña" />
+              <PasswordField
+                label="Nueva Contraseña"
+                name="newPassword"
+                value={pwd.newPassword}
+                onChange={(e) => setPwd((p) => ({ ...p, newPassword: e.target.value }))}
+              />
             </div>
             <div className="mt-5">
-              <PasswordField label="Confirmar Contraseña" />
+              <PasswordField
+                label="Confirmar Contraseña"
+                name="confirmPassword"
+                value={pwd.confirmPassword}
+                onChange={(e) => setPwd((p) => ({ ...p, confirmPassword: e.target.value }))}
+              />
             </div>
           </div>
 
           <div className="mt-7 flex justify-end gap-3">
-            <button type="button" className="btn-secondary">
+            <button type="button" onClick={() => { setPwd(EMPTY_PWD); setErrorPwd(""); setMensajePwd(""); }} className="btn-secondary">
               Cancelar
             </button>
-            <button type="button" className="btn-primary">
-              Actualizar Contraseña
+            <button type="submit" disabled={guardandoPwd} className="btn-primary">
+              {guardandoPwd ? "Actualizando..." : "Actualizar Contraseña"}
             </button>
           </div>
-        </section>
+        </form>
       </div>
     </div>
   );
@@ -195,14 +270,28 @@ function Field({
   );
 }
 
-function PasswordField({ label }: { label: string }) {
+function PasswordField({
+  label,
+  name,
+  value,
+  onChange,
+}: {
+  label: string;
+  name: string;
+  value: string;
+  onChange: (e: ChangeEvent<HTMLInputElement>) => void;
+}) {
   return (
     <label className="block">
       <span className="mb-2 block text-sm font-semibold text-slate-800 dark:text-white">
         {label}
       </span>
       <input
+        required
         type="password"
+        name={name}
+        value={value}
+        onChange={onChange}
         placeholder="••••••••"
         className="h-[45px] w-full rounded-lg border border-slate-200 bg-white px-4 text-sm text-slate-900 outline-none transition-all placeholder:text-slate-400 focus:border-brand-400 focus:ring-2 focus:ring-brand-400/10 dark:border-slate-700 dark:bg-slate-900 dark:text-white dark:placeholder:text-slate-600 dark:focus:border-brand-400"
       />
