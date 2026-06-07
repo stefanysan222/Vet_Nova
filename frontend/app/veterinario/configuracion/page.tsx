@@ -1,11 +1,10 @@
 "use client";
 
-import { FormEvent, useState, type ReactNode } from "react";
+import { FormEvent, useEffect, useState, type ReactNode } from "react";
 import { getCurrentUser } from "../../../lib/auth";
 import { updateUsuario } from "../../../lib/api/usuarios";
+import { fetchMiPerfilVeterinario, updateMiPerfilVeterinario } from "../../../lib/api/veterinarios";
 import { useToast } from "../../components/ui/Toast";
-
-const VET_PERFIL_KEY = "vetnova_vet_perfil";
 
 interface PerfilVeterinario {
   nombre: string;
@@ -23,16 +22,6 @@ interface FormularioSeguridad {
   confirmarContrasena: string;
 }
 
-function leerPerfilGuardado(): Partial<PerfilVeterinario> {
-  if (typeof window === "undefined") return {};
-  try {
-    const stored = localStorage.getItem(VET_PERFIL_KEY);
-    return stored ? JSON.parse(stored) : {};
-  } catch {
-    return {};
-  }
-}
-
 const seguridadInicial: FormularioSeguridad = {
   contrasenaActual: "",
   nuevaContrasena: "",
@@ -43,24 +32,41 @@ export default function ConfiguracionVeterinarioPage() {
   const user = getCurrentUser();
   const { success, error: toastError } = useToast();
 
-  const [perfil, setPerfil] = useState<PerfilVeterinario>(() => {
-    const guardado = leerPerfilGuardado();
-    return {
-      nombre: user?.name ?? "",
-      cargo: "Veterinario",
-      especialidad: guardado.especialidad ?? "",
-      registroProfesional: guardado.registroProfesional ?? "",
-      email: user?.email ?? "",
-      telefono: guardado.telefono ?? "",
-      horarioAtencion: guardado.horarioAtencion ?? "",
-    };
-  });
+  const perfilBase: PerfilVeterinario = {
+    nombre: user?.name ?? "",
+    cargo: "Veterinario",
+    especialidad: "",
+    registroProfesional: "",
+    email: user?.email ?? "",
+    telefono: "",
+    horarioAtencion: "",
+  };
+
+  const [perfil, setPerfil] = useState<PerfilVeterinario>(perfilBase);
+  const [perfilGuardado, setPerfilGuardado] = useState<PerfilVeterinario>(perfilBase);
   const [guardando, setGuardando] = useState(false);
   const [seguridad, setSeguridad] = useState<FormularioSeguridad>(seguridadInicial);
   const [guardandoPassword, setGuardandoPassword] = useState(false);
   const [mensajePerfil, setMensajePerfil] = useState("");
   const [mensajeSeguridad, setMensajeSeguridad] = useState("");
   const [errorSeguridad, setErrorSeguridad] = useState("");
+
+  useEffect(() => {
+    fetchMiPerfilVeterinario()
+      .then((extra) => {
+        const completo: PerfilVeterinario = {
+          ...perfilBase,
+          especialidad: extra.especialidad ?? "",
+          registroProfesional: extra.registroProfesional ?? "",
+          telefono: extra.telefono ?? "",
+          horarioAtencion: extra.horarioAtencion ?? "",
+        };
+        setPerfil(completo);
+        setPerfilGuardado(completo);
+      })
+      .catch(() => {});
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   function actualizarPerfil(campo: keyof PerfilVeterinario, valor: string) {
     setPerfil((actual) => ({
@@ -77,14 +83,22 @@ export default function ConfiguracionVeterinarioPage() {
     setGuardando(true);
     try {
       await updateUsuario(user.id, { nombre: perfil.nombre.trim(), email: perfil.email.trim() });
-      const extras = {
+      const extra = await updateMiPerfilVeterinario({
         especialidad: perfil.especialidad,
         telefono: perfil.telefono,
         horarioAtencion: perfil.horarioAtencion,
         registroProfesional: perfil.registroProfesional,
+      });
+      const actualizado: PerfilVeterinario = {
+        ...perfil,
+        especialidad: extra.especialidad ?? "",
+        registroProfesional: extra.registroProfesional ?? "",
+        telefono: extra.telefono ?? "",
+        horarioAtencion: extra.horarioAtencion ?? "",
       };
-      localStorage.setItem(VET_PERFIL_KEY, JSON.stringify(extras));
-      success("Perfil actualizado", "Los cambios se aplicarán en la próxima sesión.");
+      setPerfil(actualizado);
+      setPerfilGuardado(actualizado);
+      success("Perfil actualizado", "Los cambios se guardaron correctamente.");
       setMensajePerfil("La información personal fue actualizada correctamente.");
     } catch (err) {
       toastError(
@@ -97,16 +111,7 @@ export default function ConfiguracionVeterinarioPage() {
   }
 
   function cancelarCambiosPerfil() {
-    const guardado = leerPerfilGuardado();
-    setPerfil({
-      nombre: user?.name ?? "",
-      cargo: "Veterinario",
-      especialidad: guardado.especialidad ?? "",
-      registroProfesional: guardado.registroProfesional ?? "",
-      email: user?.email ?? "",
-      telefono: guardado.telefono ?? "",
-      horarioAtencion: guardado.horarioAtencion ?? "",
-    });
+    setPerfil(perfilGuardado);
     setMensajePerfil("");
   }
 

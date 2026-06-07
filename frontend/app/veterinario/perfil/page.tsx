@@ -4,26 +4,8 @@ import Link from "next/link";
 import { useEffect, useState } from "react";
 import { getCurrentUser } from "../../../lib/auth";
 import { fetchCitas } from "../../../lib/api/citas";
+import { fetchMiPerfilVeterinario, type VeterinarioPerfilAPI } from "../../../lib/api/veterinarios";
 import type { Appointment } from "../../../lib/recepcionista/types";
-
-const VET_PERFIL_KEY = "vetnova_vet_perfil";
-
-interface PerfilExtra {
-  especialidad?: string;
-  registroProfesional?: string;
-  telefono?: string;
-  horarioAtencion?: string;
-}
-
-function leerPerfilExtra(): PerfilExtra {
-  if (typeof window === "undefined") return {};
-  try {
-    const stored = localStorage.getItem(VET_PERFIL_KEY);
-    return stored ? JSON.parse(stored) : {};
-  } catch {
-    return {};
-  }
-}
 
 function fechaHoy(): string {
   return new Date().toISOString().slice(0, 10);
@@ -34,13 +16,16 @@ export default function PerfilVeterinarioPage() {
   const nombre = user?.name ?? "Veterinario";
   const email = user?.email ?? "—";
   const inicial = nombre.trim()[0]?.toUpperCase() ?? "V";
-  const extra = leerPerfilExtra();
 
   const [citas, setCitas] = useState<Appointment[]>([]);
+  const [extra, setExtra] = useState<VeterinarioPerfilAPI | null>(null);
 
   useEffect(() => {
     fetchCitas()
       .then(setCitas)
+      .catch(() => {});
+    fetchMiPerfilVeterinario()
+      .then(setExtra)
       .catch(() => {});
   }, []);
 
@@ -91,10 +76,10 @@ export default function PerfilVeterinarioPage() {
             <InfoRow label="Nombre completo" value={nombre} />
             <InfoRow label="Rol" value="Veterinario" />
             <InfoRow label="Email" value={email} />
-            <InfoRow label="Teléfono" value={extra.telefono || "—"} />
-            <InfoRow label="Especialidad" value={extra.especialidad || "—"} />
-            <InfoRow label="Registro profesional" value={extra.registroProfesional || "—"} />
-            <InfoRow label="Horario" value={extra.horarioAtencion || "—"} />
+            <InfoRow label="Teléfono" value={extra?.telefono || "—"} />
+            <InfoRow label="Especialidad" value={extra?.especialidad || "—"} />
+            <InfoRow label="Registro profesional" value={extra?.registroProfesional || "—"} />
+            <InfoRow label="Horario" value={extra?.horarioAtencion || "—"} />
           </div>
 
           <Link
