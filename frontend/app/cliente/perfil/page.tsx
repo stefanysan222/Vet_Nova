@@ -5,6 +5,7 @@ import { useEffect, useState } from "react";
 import { getCurrentUser } from "@/lib/auth";
 import { fetchMascotas } from "@/lib/api/mascotas";
 import { fetchCitas } from "@/lib/api/citas";
+import { fetchPropietarioByUsuario } from "@/lib/api/propietarios";
 import type { Appointment, PetRecord } from "@/lib/recepcionista/types";
 
 type Stats = { mascotas: number; citas: number };
@@ -20,18 +21,16 @@ export default function PerfilPage() {
   const [stats, setStats] = useState<Stats>({ mascotas: 0, citas: 0 });
   const [ultimaCita, setUltimaCita] = useState<Appointment | null>(null);
   const [ultimaMascota, setUltimaMascota] = useState<PetRecord | null>(null);
-  const [perfilTelefono] = useState(() => {
-    if (typeof window === "undefined") return "";
-    try {
-      const stored = localStorage.getItem("vetnova_cliente_perfil");
-      return stored ? (JSON.parse(stored).telefono ?? "") : "";
-    } catch {
-      return "";
-    }
-  });
+  const [perfilTelefono, setPerfilTelefono] = useState("");
 
   useEffect(() => {
     const uid = user?.id ? Number(user.id) : undefined;
+
+    if (uid) {
+      fetchPropietarioByUsuario(uid)
+        .then((owner) => setPerfilTelefono(owner?.phone ?? ""))
+        .catch(() => {});
+    }
 
     Promise.all([
       fetchMascotas(uid).catch(() => [] as PetRecord[]),

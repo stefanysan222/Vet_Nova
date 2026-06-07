@@ -1,7 +1,9 @@
 "use client";
 
-import { ChangeEvent, FormEvent, useState } from "react";
+import { ChangeEvent, FormEvent, useEffect, useState } from "react";
 import { getCurrentUser } from "@/lib/auth";
+import { fetchPropietarioByUsuario, updatePropietario } from "@/lib/api/propietarios";
+import type { Owner } from "@/lib/recepcionista/types";
 
 const PROFILE_STORAGE_KEY = "vetnova_cliente_perfil";
 
@@ -45,9 +47,26 @@ function cargarPerfilInicial(): PerfilCliente {
 }
 
 export default function ConfiguracionPage() {
+  const user = getCurrentUser();
   const [perfil, setPerfil] = useState<PerfilCliente>(cargarPerfilInicial);
   const [perfilGuardado, setPerfilGuardado] = useState<PerfilCliente>(cargarPerfilInicial);
+  const [propietario, setPropietario] = useState<Owner | null>(null);
   const [mensaje, setMensaje] = useState("");
+
+  // El teléfono se persiste en el backend (propietarios), no en localStorage
+  useEffect(() => {
+    const uid = user?.id ? Number(user.id) : undefined;
+    if (!uid) return;
+    fetchPropietarioByUsuario(uid)
+      .then((owner) => {
+        if (!owner) return;
+        setPropietario(owner);
+        setPerfil((actual) => ({ ...actual, telefono: owner.phone }));
+        setPerfilGuardado((actual) => ({ ...actual, telefono: owner.phone }));
+      })
+      .catch(() => {});
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const actualizarCampo = (event: ChangeEvent<HTMLInputElement>) => {
     const { name, value } = event.target;
@@ -60,10 +79,24 @@ export default function ConfiguracionPage() {
     setMensaje("");
   };
 
-  const guardarPerfil = (event: FormEvent<HTMLFormElement>) => {
+  const guardarPerfil = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
 
-    localStorage.setItem(PROFILE_STORAGE_KEY, JSON.stringify(perfil));
+    if (propietario) {
+      try {
+        await updatePropietario({ ...propietario, phone: perfil.telefono });
+      } catch {
+        setMensaje("No se pudo guardar el teléfono. Intenta de nuevo más tarde.");
+        return;
+      }
+    }
+
+    // nombre/apellido/email se mantienen en localStorage (ver lectura inicial: provienen del JWT
+    // y necesitan reflejarse al instante en el header sin esperar a un nuevo login)
+    localStorage.setItem(
+      PROFILE_STORAGE_KEY,
+      JSON.stringify({ nombre: perfil.nombre, apellido: perfil.apellido, email: perfil.email }),
+    );
     setPerfilGuardado(perfil);
     setMensaje("Tu información personal fue actualizada correctamente.");
 
