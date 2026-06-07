@@ -2,18 +2,6 @@
 import { describe, it, expect, beforeEach, vi } from "vitest";
 import { apiFetch, api } from "../api/client";
 
-const TOKEN_KEY = "vetnova-token";
-
-function b64(obj: object): string {
-  return btoa(unescape(encodeURIComponent(JSON.stringify(obj))));
-}
-
-function makeJWT(payload: object): string {
-  const header = b64({ alg: "HS256", typ: "JWT" });
-  const body = b64({ ...payload, exp: Math.floor(Date.now() / 1000) + 3600 });
-  return `${header}.${body}.fake-sig`;
-}
-
 function mockFetch(status: number, body: unknown, ok = status >= 200 && status < 300) {
   const responseBody = typeof body === "string" ? body : JSON.stringify(body);
   vi.stubGlobal(
@@ -47,16 +35,15 @@ describe("apiFetch — success", () => {
     expect(headers["Content-Type"]).toBe("application/json");
   });
 
-  it("sends Authorization header when token is present", async () => {
-    const token = makeJWT({ sub: 1, name: "Ana", email: "a@b.com", role: "Cliente" });
-    localStorage.setItem(TOKEN_KEY, token);
+  it("calls the backend proxy with credentials included", async () => {
     mockFetch(200, {});
     await apiFetch("/test");
-    const headers = (fetch as ReturnType<typeof vi.fn>).mock.calls[0][1].headers;
-    expect(headers["Authorization"]).toBe(`Bearer ${token}`);
+    const [url, opts] = (fetch as ReturnType<typeof vi.fn>).mock.calls[0];
+    expect(url).toBe("/api/backend/test");
+    expect(opts.credentials).toBe("include");
   });
 
-  it("omits Authorization header when no token", async () => {
+  it("never attaches an Authorization header (token lives in an httpOnly cookie)", async () => {
     mockFetch(200, {});
     await apiFetch("/test");
     const headers = (fetch as ReturnType<typeof vi.fn>).mock.calls[0][1].headers;
@@ -73,11 +60,9 @@ describe("apiFetch — success", () => {
 });
 
 describe("apiFetch — error handling", () => {
-  it("throws on 401 and clears session", async () => {
-    localStorage.setItem(TOKEN_KEY, makeJWT({ sub: 1 }));
+  it("throws on 401", async () => {
     mockFetch(401, { message: "Unauthorized" }, false);
     await expect(apiFetch("/secure")).rejects.toThrow("Sesión expirada");
-    expect(localStorage.getItem(TOKEN_KEY)).toBeNull();
   });
 
   it("throws on 403 with permission message", async () => {

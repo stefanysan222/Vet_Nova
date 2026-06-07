@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
-import { getCurrentUser } from "../../../lib/auth";
+import { useAuth } from "@/lib/auth-context";
 import { fetchCitas } from "../../../lib/api/citas";
 import type { Appointment } from "../../../lib/recepcionista/types";
 import { SkeletonStats, SkeletonCardList } from "../../components/ui/Skeleton";
@@ -48,11 +48,11 @@ function estadoBadge(status: string) {
 
 export default function ClientHistorialPage() {
   const [citas, setCitas] = useState<Appointment[]>([]);
-  const [cargando, setCargando] = useState(() => !!getCurrentUser());
+  const [cargando, setCargando] = useState(true);
   const [busqueda, setBusqueda] = useState("");
+  const { user } = useAuth();
 
   useEffect(() => {
-    const user = getCurrentUser();
     if (!user) return;
     fetchCitas(Number(user.id))
       .then((data) => {
@@ -60,7 +60,7 @@ export default function ClientHistorialPage() {
       })
       .catch(() => {})
       .finally(() => setCargando(false));
-  }, []);
+  }, [user]);
 
   const citasFiltradas = useMemo(() => {
     if (!busqueda.trim()) return citas;

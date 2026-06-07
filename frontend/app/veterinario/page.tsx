@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useEffect, useState } from "react";
-import { getCurrentUser } from "../../lib/auth";
+import { useAuth } from "@/lib/auth-context";
 import { SkeletonBanner, SkeletonStats, SkeletonCardList } from "../components/ui/Skeleton";
 import { fetchCitas } from "../../lib/api/citas";
 import type { Appointment } from "../../lib/recepcionista/types";
@@ -24,7 +24,8 @@ function parseNotas(raw: string | undefined): { diagnostico?: string; tratamient
 export default function VeterinarioPage() {
   const [citas, setCitas] = useState<Appointment[]>([]);
   const [loading, setLoading] = useState(true);
-  const [userName] = useState(() => getCurrentUser()?.name ?? "Veterinario");
+  const { user } = useAuth();
+  const userName = user?.name ?? "Veterinario";
 
   useEffect(() => {
     fetchCitas()

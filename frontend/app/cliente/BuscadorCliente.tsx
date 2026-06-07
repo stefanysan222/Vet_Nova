@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { KeyboardEvent, useEffect, useMemo, useRef, useState } from "react";
-import { getCurrentUser } from "../../lib/auth";
+import { useAuth } from "@/lib/auth-context";
 import { fetchCitas } from "../../lib/api/citas";
 import { fetchMascotas } from "../../lib/api/mascotas";
 import { fetchPropietarioByUsuario } from "../../lib/api/propietarios";
@@ -43,9 +43,9 @@ export default function BuscadorCliente() {
   const [abierto, setAbierto] = useState(false);
   const [mascotas, setMascotas] = useState<Mascota[]>([]);
   const [citas, setCitas] = useState<Cita[]>([]);
+  const { user } = useAuth();
 
   useEffect(() => {
-    const user = getCurrentUser();
     if (!user) return;
 
     const uid = Number(user.id);
@@ -84,7 +84,7 @@ export default function BuscadorCliente() {
         );
       })
       .catch(() => {});
-  }, []);
+  }, [user]);
 
   useEffect(() => {
     // Limpiar el buscador al cambiar de ruta — flips de booleano/string sin riesgo de cascada

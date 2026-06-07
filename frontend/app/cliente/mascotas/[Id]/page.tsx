@@ -5,7 +5,7 @@ import Link from "next/link";
 import { useParams } from "next/navigation";
 import { useEffect, useState } from "react";
 import { fetchMascotas } from "../../../../lib/api/mascotas";
-import { getCurrentUser } from "../../../../lib/auth";
+import { useAuth } from "@/lib/auth-context";
 import type { PetRecord } from "../../../../lib/recepcionista/types";
 
 type DocumentoClinicoAdjunto = {
@@ -24,11 +24,11 @@ export default function PerfilCompletoMascotaPage() {
   const [mascota, setMascota] = useState<PetRecord | null>(null);
   const [cargando, setCargando] = useState(true);
   const [error, setError] = useState("");
+  const { user } = useAuth();
 
   useEffect(() => {
     if (!id) return;
 
-    const user = getCurrentUser();
     const uid = user?.id ?? undefined;
 
     fetchMascotas(uid)
@@ -39,7 +39,7 @@ export default function PerfilCompletoMascotaPage() {
       })
       .catch(() => setError("No se pudo cargar la información de la mascota."))
       .finally(() => setCargando(false));
-  }, [id]);
+  }, [id, user]);
 
   if (cargando) {
     return (

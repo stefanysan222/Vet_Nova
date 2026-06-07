@@ -122,6 +122,7 @@ export async function updateCita(appointment: Appointment): Promise<Appointment>
     estado: STATUS_REVERSE_MAP[appointment.status] ?? "pendiente",
     servicio: appointment.service || undefined,
     notas: appointment.notes || undefined,
+    veterinario: appointment.veterinarian || undefined,
   });
   return mapCitaToAppointment(data);
 }

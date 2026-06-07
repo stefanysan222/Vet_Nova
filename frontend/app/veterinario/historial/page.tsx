@@ -6,7 +6,7 @@ import { FormEvent, ReactNode, Suspense, useEffect, useState } from "react";
 import { fetchMascotas } from "../../../lib/api/mascotas";
 import { fetchCitas, createCita } from "../../../lib/api/citas";
 import type { PetRecord, Appointment } from "../../../lib/recepcionista/types";
-import { getCurrentUser } from "../../../lib/auth";
+import { useAuth } from "@/lib/auth-context";
 
 type EstadoClinico =
   | "Por atender"
@@ -179,7 +179,7 @@ function HistorialContent() {
   const [error, setError] = useState<string | null>(null);
   const [formulario, setFormulario] = useState<FormularioEvolucion>(formularioInicial());
 
-  const user = getCurrentUser();
+  const { user } = useAuth();
 
   useEffect(() => {
     Promise.all([fetchMascotas(), fetchCitas()])

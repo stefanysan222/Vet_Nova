@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useMemo, useState } from "react";
-import { getCurrentUser } from "../../../../lib/auth";
+import { useAuth } from "@/lib/auth-context";
 import { fetchMascotas } from "../../../../lib/api/mascotas";
 import { fetchPropietarioByUsuario } from "../../../../lib/api/propietarios";
 import { createCita, fetchCitas } from "../../../../lib/api/citas";
@@ -68,10 +68,10 @@ export default function NuevaCitaPage() {
   const [error, setError] = useState("");
   const [guardando, setGuardando] = useState(false);
   const [propietarioId, setPropietarioId] = useState("");
-  const [propietarioNombre] = useState(() => getCurrentUser()?.name ?? "");
+  const { user } = useAuth();
+  const propietarioNombre = user?.name ?? "";
 
   useEffect(() => {
-    const user = getCurrentUser();
     if (!user) return;
 
     const cargar = async () => {
@@ -95,7 +95,7 @@ export default function NuevaCitaPage() {
       }
     };
     cargar();
-  }, []);
+  }, [user]);
 
   // Dynamic slots for the selected date; exclude past slots when date is today
   const slots = useMemo(() => {

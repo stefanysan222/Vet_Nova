@@ -4,7 +4,7 @@ import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { type ReactNode, useEffect, useMemo, useState, Suspense } from "react";
 import { motion } from "framer-motion";
-import { getCurrentUser } from "../../../lib/auth";
+import { useAuth } from "@/lib/auth-context";
 import { fetchCitas, updateCitaEstado } from "../../../lib/api/citas";
 import type { Appointment } from "../../../lib/recepcionista/types";
 import { getStatusStyle } from "../../../lib/utils/status";
@@ -76,9 +76,9 @@ function AgendarContent() {
   const [citaSeleccionada, setCitaSeleccionada] = useState<Cita | null>(null);
   const [cargado, setCargado] = useState(false);
   const [bannerVisible, setBannerVisible] = useState(solicitudEnviada);
+  const { user } = useAuth();
 
   const cargarCitas = async () => {
-    const user = getCurrentUser();
     if (!user) {
       setCargado(true);
       return;
@@ -97,7 +97,7 @@ function AgendarContent() {
     // Carga inicial de datos al montar — setCargado(true) tras el fetch es el patrón estándar
     // eslint-disable-next-line react-hooks/set-state-in-effect
     cargarCitas();
-  }, []);
+  }, [user]);
 
   const citasFiltradas = useMemo(() => {
     const termino = normalizarTexto(busqueda.trim());

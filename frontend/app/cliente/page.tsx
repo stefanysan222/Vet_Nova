@@ -4,7 +4,7 @@ import Link from "next/link";
 import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import NombreCliente from "./NombreCliente";
-import { getCurrentUser } from "../../lib/auth";
+import { useAuth } from "@/lib/auth-context";
 import { fetchCitas } from "../../lib/api/citas";
 import { fetchMascotas } from "../../lib/api/mascotas";
 import { fetchPropietarioByUsuario } from "../../lib/api/propietarios";
@@ -18,9 +18,9 @@ export default function ClientePage() {
   const [citas, setCitas] = useState<Appointment[]>([]);
   const [mascotas, setMascotas] = useState<PetRecord[]>([]);
   const [loading, setLoading] = useState(true);
+  const { user } = useAuth();
 
   useEffect(() => {
-    const user = getCurrentUser();
     if (!user) return;
 
     const loadData = async () => {
@@ -43,7 +43,7 @@ export default function ClientePage() {
     };
 
     loadData();
-  }, []);
+  }, [user]);
 
   const today = new Date().toISOString().split("T")[0];
   const proximas = citas
@@ -60,14 +60,24 @@ export default function ClientePage() {
   };
 
   const statsData = [
-    { icon: CalendarDays, label: "Citas hoy",  value: String(citasHoy),       accentBar: "bg-brand-500" },
-    { icon: PawPrint,     label: "Mascotas",   value: String(mascotas.length), accentBar: "bg-emerald-500" },
-    { icon: Clock,        label: "Próximas",   value: String(proximas.length), accentBar: "bg-amber-500", extra: "col-span-2 sm:col-span-1" },
+    { icon: CalendarDays, label: "Citas hoy", value: String(citasHoy), accentBar: "bg-brand-500" },
+    {
+      icon: PawPrint,
+      label: "Mascotas",
+      value: String(mascotas.length),
+      accentBar: "bg-emerald-500",
+    },
+    {
+      icon: Clock,
+      label: "Próximas",
+      value: String(proximas.length),
+      accentBar: "bg-amber-500",
+      extra: "col-span-2 sm:col-span-1",
+    },
   ];
 
   return (
-    <div className="h-full overflow-y-auto admin-page">
-
+    <div className="admin-page h-full overflow-y-auto">
       {/* Encabezado */}
       <motion.div
         className="mb-6"
@@ -78,7 +88,7 @@ export default function ClientePage() {
         <h1 className="text-page-title">
           Hola, <NombreCliente /> 🐾
         </h1>
-        <p className="mt-1 text-subtitle">
+        <p className="text-subtitle mt-1">
           {loading
             ? "Cargando tu información..."
             : proximas.length > 0
@@ -108,16 +118,16 @@ export default function ClientePage() {
       </div>
 
       <div className="grid gap-5 lg:grid-cols-[1fr_320px]">
-
         {/* Columna izquierda: citas */}
         <div className="space-y-4">
-
           {/* Próxima cita */}
           {loading ? (
             <div className="h-40 animate-pulse rounded-2xl bg-slate-200 dark:bg-slate-800" />
           ) : proximaCita ? (
             <section className="admin-header-banner">
-              <p className="text-xs font-semibold uppercase tracking-[0.3em] text-brand-200">Próxima cita</p>
+              <p className="text-xs font-semibold uppercase tracking-[0.3em] text-brand-200">
+                Próxima cita
+              </p>
               <div className="mt-3 flex items-start justify-between gap-4">
                 <div>
                   <h2 className="text-2xl font-bold">{proximaCita.petName}</h2>
@@ -144,9 +154,13 @@ export default function ClientePage() {
               <div className="flex h-14 w-14 items-center justify-center rounded-full bg-brand-50 text-brand-600 dark:bg-brand-900/30 dark:text-brand-400">
                 <CalendarDays className="h-6 w-6" />
               </div>
-              <p className="mt-4 text-base font-semibold text-slate-900 dark:text-white">Sin citas próximas</p>
-              <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">Agenda una cita para comenzar.</p>
-              <Link href="/cliente/agendar/nueva" className="mt-5 btn-primary">
+              <p className="mt-4 text-base font-semibold text-slate-900 dark:text-white">
+                Sin citas próximas
+              </p>
+              <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">
+                Agenda una cita para comenzar.
+              </p>
+              <Link href="/cliente/agendar/nueva" className="btn-primary mt-5">
                 <Plus className="h-4 w-4" />
                 Agendar cita
               </Link>
@@ -158,7 +172,10 @@ export default function ClientePage() {
             <section className="admin-card">
               <div className="flex items-center justify-between border-b border-slate-200/80 px-5 py-4 dark:border-slate-700">
                 <h3 className="text-section-title">Otras citas próximas</h3>
-                <Link href="/cliente/agendar" className="text-xs font-semibold text-brand-600 hover:underline dark:text-brand-400">
+                <Link
+                  href="/cliente/agendar"
+                  className="text-xs font-semibold text-brand-600 hover:underline dark:text-brand-400"
+                >
                   Ver todas
                 </Link>
               </div>
@@ -166,7 +183,9 @@ export default function ClientePage() {
                 {restoCitas.map((cita) => (
                   <div key={cita.id} className="flex items-center justify-between gap-4 px-5 py-3">
                     <div>
-                      <p className="text-sm font-semibold text-slate-900 dark:text-white">{cita.petName}</p>
+                      <p className="text-sm font-semibold text-slate-900 dark:text-white">
+                        {cita.petName}
+                      </p>
                       <p className="mt-0.5 text-xs text-slate-500 dark:text-slate-400">
                         {formatDate(cita.date)} · {cita.time}
                       </p>
@@ -179,7 +198,10 @@ export default function ClientePage() {
           )}
 
           {/* Botón agendar */}
-          <Link href="/cliente/agendar/nueva" className="btn-primary flex w-full items-center justify-center gap-2">
+          <Link
+            href="/cliente/agendar/nueva"
+            className="btn-primary flex w-full items-center justify-center gap-2"
+          >
             <Plus className="h-4 w-4" />
             Agendar nueva cita
           </Link>
@@ -190,7 +212,10 @@ export default function ClientePage() {
           <section className="admin-card">
             <div className="flex items-center justify-between border-b border-slate-200/80 px-5 py-4 dark:border-slate-700">
               <h3 className="text-section-title">Mis mascotas</h3>
-              <Link href="/cliente/mascotas" className="text-xs font-semibold text-brand-600 hover:underline dark:text-brand-400">
+              <Link
+                href="/cliente/mascotas"
+                className="text-xs font-semibold text-brand-600 hover:underline dark:text-brand-400"
+              >
                 Ver todas
               </Link>
             </div>
@@ -198,13 +223,18 @@ export default function ClientePage() {
             {loading ? (
               <div className="space-y-3 p-4">
                 {[1, 2].map((i) => (
-                  <div key={i} className="h-14 animate-pulse rounded-xl bg-slate-100 dark:bg-slate-800" />
+                  <div
+                    key={i}
+                    className="h-14 animate-pulse rounded-xl bg-slate-100 dark:bg-slate-800"
+                  />
                 ))}
               </div>
             ) : mascotas.length === 0 ? (
               <div className="flex flex-col items-center py-8 text-center">
                 <PawPrint className="h-8 w-8 text-slate-300 dark:text-slate-600" />
-                <p className="mt-3 text-sm text-slate-500 dark:text-slate-400">No tienes mascotas registradas.</p>
+                <p className="mt-3 text-sm text-slate-500 dark:text-slate-400">
+                  No tienes mascotas registradas.
+                </p>
               </div>
             ) : (
               <div className="divide-y divide-slate-200/80 dark:divide-slate-700">
@@ -218,9 +248,12 @@ export default function ClientePage() {
                       {mascota.nombre.charAt(0)}
                     </div>
                     <div className="min-w-0">
-                      <p className="truncate text-sm font-semibold text-slate-900 dark:text-white">{mascota.nombre}</p>
+                      <p className="truncate text-sm font-semibold text-slate-900 dark:text-white">
+                        {mascota.nombre}
+                      </p>
                       <p className="text-xs text-slate-500 dark:text-slate-400">
-                        {mascota.especie}{mascota.raza ? ` · ${mascota.raza}` : ""}
+                        {mascota.especie}
+                        {mascota.raza ? ` · ${mascota.raza}` : ""}
                       </p>
                     </div>
                     <ChevronRight className="ml-auto h-4 w-4 shrink-0 text-slate-300 dark:text-slate-600" />
@@ -235,11 +268,23 @@ export default function ClientePage() {
   );
 }
 
-function StatCard({ icon: Icon, label, value, accentBar, className = "" }: {
-  icon: React.ElementType; label: string; value: string; accentBar: string; className?: string;
+function StatCard({
+  icon: Icon,
+  label,
+  value,
+  accentBar,
+  className = "",
+}: {
+  icon: React.ElementType;
+  label: string;
+  value: string;
+  accentBar: string;
+  className?: string;
 }) {
   return (
-    <div className={`relative overflow-hidden admin-card flex items-center gap-3 px-4 py-3.5 transition-all duration-200 hover:-translate-y-0.5 hover:shadow-card-hover ${className}`}>
+    <div
+      className={`admin-card relative flex items-center gap-3 overflow-hidden px-4 py-3.5 transition-all duration-200 hover:-translate-y-0.5 hover:shadow-card-hover ${className}`}
+    >
       <div className={`absolute inset-y-0 left-0 w-1 rounded-l-2xl ${accentBar}`} />
       <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-brand-50 text-brand-600 dark:bg-brand-900/30 dark:text-brand-400">
         <Icon className="h-4 w-4" />

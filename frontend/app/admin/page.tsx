@@ -5,7 +5,7 @@ import StatsCards from "../components/admin/StatsCards";
 import NotificationsPanel from "../components/admin/NotificationsPanel";
 import RegisterUserModal from "../components/admin/RegisterUserModal";
 import { motion } from "framer-motion";
-import { getCurrentUser } from "../../lib/auth";
+import { useAuth } from "@/lib/auth-context";
 import { fetchCitas } from "../../lib/api/citas";
 import type { Appointment } from "../../lib/recepcionista/types";
 import { Chart as ChartJS, CategoryScale, LinearScale, BarElement, Tooltip } from "chart.js";
@@ -37,7 +37,8 @@ const valueLabelsPlugin = {
 const AdminDashboardPage: React.FC = () => {
   const [isRegisterModalOpen, setIsRegisterModalOpen] = useState(false);
   const [citas, setCitas] = useState<Appointment[]>([]);
-  const [userName] = useState(() => getCurrentUser()?.name ?? "Administrador");
+  const { user } = useAuth();
+  const userName = user?.name ?? "Administrador";
 
   useEffect(() => {
     fetchCitas()

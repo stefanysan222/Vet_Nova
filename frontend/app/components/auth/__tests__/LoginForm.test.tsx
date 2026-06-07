@@ -5,7 +5,7 @@ import LoginForm from "../LoginForm";
 const mockPush = vi.fn();
 const mockLoginUser = vi.fn();
 const mockLoginOrRegisterGoogle = vi.fn();
-const mockSetToken = vi.fn();
+const mockRefresh = vi.fn();
 
 vi.mock("next/navigation", () => ({
   useRouter: () => ({ push: mockPush }),
@@ -22,7 +22,10 @@ vi.mock("../GoogleAuthButton", () => ({
 vi.mock("../../../../lib/auth", () => ({
   loginUser: (...args: unknown[]) => mockLoginUser(...args),
   loginOrRegisterGoogle: (...args: unknown[]) => mockLoginOrRegisterGoogle(...args),
-  setToken: (...args: unknown[]) => mockSetToken(...args),
+}));
+
+vi.mock("@/lib/auth-context", () => ({
+  useAuth: () => ({ user: null, loading: false, refresh: mockRefresh }),
 }));
 
 vi.mock("framer-motion", () => {
@@ -118,7 +121,6 @@ describe("LoginForm", () => {
 
   it("redirige a /admin tras login exitoso con rol Administrador", async () => {
     mockLoginUser.mockResolvedValue({
-      token: "fake.jwt.token",
       user: { id: 1, name: "Admin", email: "admin@test.com", role: "Administrador" },
     });
     render(<LoginForm />);
@@ -130,14 +132,13 @@ describe("LoginForm", () => {
     });
     fireEvent.click(screen.getByRole("button", { name: /iniciar sesión/i }));
     await waitFor(() => {
-      expect(mockSetToken).toHaveBeenCalledWith("fake.jwt.token", false);
+      expect(mockRefresh).toHaveBeenCalled();
       expect(mockPush).toHaveBeenCalledWith("/admin");
     });
   });
 
   it("redirige a /veterinario tras login exitoso con rol Veterinario", async () => {
     mockLoginUser.mockResolvedValue({
-      token: "fake.jwt.token",
       user: { id: 2, name: "Vet", email: "vet@test.com", role: "Veterinario" },
     });
     render(<LoginForm />);
@@ -155,7 +156,6 @@ describe("LoginForm", () => {
 
   it("llama loginOrRegisterGoogle y redirige tras autenticación con Google", async () => {
     mockLoginOrRegisterGoogle.mockResolvedValue({
-      token: "google.jwt.token",
       user: { id: 3, name: "Cliente", email: "cliente@gmail.com", role: "Cliente" },
     });
     render(<LoginForm />);

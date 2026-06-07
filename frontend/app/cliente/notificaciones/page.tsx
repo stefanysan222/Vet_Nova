@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
-import { getCurrentUser } from "../../../lib/auth";
+import { useAuth } from "@/lib/auth-context";
 import { fetchCitas } from "../../../lib/api/citas";
 import { fetchPropietarioByUsuario } from "../../../lib/api/propietarios";
 
@@ -67,9 +67,9 @@ export default function NotificacionesPage() {
   const [notifications, setNotifications] = useState<Notification[]>([]);
   const [selectedNotification, setSelectedNotification] = useState<Notification | null>(null);
   const [filter, setFilter] = useState<"all" | "unread" | "read">("all");
+  const { user } = useAuth();
 
   useEffect(() => {
-    const user = getCurrentUser();
     if (!user) return;
     const uid = Number(user.id);
     fetchPropietarioByUsuario(uid)
@@ -85,7 +85,7 @@ export default function NotificacionesPage() {
         setNotifications(recientes.map(citaHaciaNotificacion));
       })
       .catch(() => {});
-  }, []);
+  }, [user]);
 
   const unreadCount = notifications.filter((item) => item.unread).length;
   const filteredNotifications = useMemo(() => {

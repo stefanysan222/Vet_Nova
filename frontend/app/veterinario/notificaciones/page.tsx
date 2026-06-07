@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useEffect, useMemo, useState, type CSSProperties } from "react";
-import { getCurrentUser } from "../../../lib/auth";
+import { useAuth } from "@/lib/auth-context";
 import { fetchCitas } from "../../../lib/api/citas";
 import type { Appointment } from "../../../lib/recepcionista/types";
 
@@ -113,6 +113,7 @@ const filtros: FiltroNotificacion[] = ["Todas", "No leídas", "Citas", "Seguimie
 export default function VeterinarioNotificacionesPage() {
   const [notificaciones, setNotificaciones] = useState<Notificacion[]>([]);
   const [filtroActivo, setFiltroActivo] = useState<FiltroNotificacion>("Todas");
+  const { user } = useAuth();
 
   const noLeidas = notificaciones.filter((item) => !item.leida).length;
 
@@ -121,7 +122,6 @@ export default function VeterinarioNotificacionesPage() {
   ).length;
 
   useEffect(() => {
-    const user = getCurrentUser();
     const limiteFecha = new Date(Date.now() - 7 * 86400000).toISOString().slice(0, 10);
     fetchCitas(user ? Number(user.id) : undefined)
       .then((appts) => {
@@ -131,7 +131,7 @@ export default function VeterinarioNotificacionesPage() {
         setNotificaciones(recientes.map(citaHaciaNotificacion));
       })
       .catch(() => {});
-  }, []);
+  }, [user]);
 
   const notificacionesFiltradas = useMemo(() => {
     if (filtroActivo === "Todas") {

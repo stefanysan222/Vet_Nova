@@ -4,7 +4,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
 import { motion } from "framer-motion";
-import { getCurrentUser } from "../../../lib/auth";
+import { useAuth } from "@/lib/auth-context";
 import { fetchPropietarioByUsuario } from "../../../lib/api/propietarios";
 import { fetchMascotas } from "../../../lib/api/mascotas";
 
@@ -49,9 +49,9 @@ export default function MascotasPage() {
   const [mascotas, setMascotas] = useState<Pet[]>([]);
   const [busqueda, setBusqueda] = useState("");
   const [especieSeleccionada, setEspecieSeleccionada] = useState<SpeciesFilter>("todas");
+  const { user } = useAuth();
 
   useEffect(() => {
-    const user = getCurrentUser();
     if (!user) {
       return;
     }
@@ -88,7 +88,7 @@ export default function MascotasPage() {
     };
 
     cargarMascotas();
-  }, []);
+  }, [user]);
 
   const mascotasFiltradas = useMemo(() => {
     const termino = normalizarTexto(busqueda.trim());

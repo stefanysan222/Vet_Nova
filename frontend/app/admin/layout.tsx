@@ -3,7 +3,7 @@
 import { useEffect, type ReactNode } from "react";
 import { useRouter, usePathname } from "next/navigation";
 import { AnimatePresence, motion } from "framer-motion";
-import { getCurrentUser } from "../../lib/auth";
+import { useAuth } from "@/lib/auth-context";
 import Sidebar from "../components/admin/Sidebar";
 import Navbar from "../components/admin/Navbar";
 
@@ -27,9 +27,10 @@ function PageTransition({ children, pathname }: { children: ReactNode; pathname:
 export default function AdminLayout({ children }: { children: ReactNode }) {
   const router = useRouter();
   const pathname = usePathname();
+  const { user, loading } = useAuth();
 
   useEffect(() => {
-    const user = getCurrentUser();
+    if (loading) return;
     if (!user) {
       router.replace("/login");
       return;
@@ -41,7 +42,7 @@ export default function AdminLayout({ children }: { children: ReactNode }) {
       };
       router.replace(routes[user.role] ?? "/login");
     }
-  }, [router]);
+  }, [user, loading, router]);
 
   return (
     <div className="flex h-screen overflow-hidden bg-slate-50 text-slate-900 dark:bg-slate-950 dark:text-slate-100">
@@ -49,9 +50,7 @@ export default function AdminLayout({ children }: { children: ReactNode }) {
       <div className="flex min-w-0 flex-1 flex-col overflow-hidden">
         <Navbar />
         <main className="flex-1 overflow-y-auto">
-          <PageTransition pathname={pathname}>
-            {children}
-          </PageTransition>
+          <PageTransition pathname={pathname}>{children}</PageTransition>
         </main>
       </div>
     </div>

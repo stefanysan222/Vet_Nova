@@ -5,7 +5,7 @@ import { useSearchParams } from "next/navigation";
 import { ChangeEvent, FormEvent, ReactNode, Suspense, useEffect, useMemo, useState } from "react";
 import { fetchCitas, updateCita } from "../../../lib/api/citas";
 import type { Appointment } from "../../../lib/recepcionista/types";
-import { getCurrentUser } from "../../../lib/auth";
+import { useAuth } from "@/lib/auth-context";
 
 type Seguimiento = "No" | "Sí";
 
@@ -91,7 +91,7 @@ function RegistrarConsultaContent() {
   const [error, setError] = useState<string | null>(null);
   const [formulario, setFormulario] = useState<FormularioConsulta>(formularioInicial());
 
-  const user = getCurrentUser();
+  const { user } = useAuth();
 
   useEffect(() => {
     fetchCitas()

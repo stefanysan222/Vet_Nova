@@ -1,24 +1,20 @@
-import { getToken, clearCurrentUser } from "../auth";
-
-import { API_URL as BASE_URL } from "../config";
+const PROXY_BASE = "/api/backend";
 
 export async function apiFetch<T>(path: string, options?: RequestInit): Promise<T> {
-  const token = getToken();
   const headers: Record<string, string> = {
     "Content-Type": "application/json",
     ...(options?.headers as Record<string, string> | undefined),
   };
-  if (token) headers["Authorization"] = `Bearer ${token}`;
 
   const { headers: _headers, ...restOptions } = options ?? {};
-  const res = await fetch(`${BASE_URL}${path}`, {
+  const res = await fetch(`${PROXY_BASE}${path}`, {
     headers,
+    credentials: "include",
     ...restOptions,
   });
 
   if (!res.ok) {
     if (res.status === 401) {
-      clearCurrentUser();
       if (typeof window !== "undefined") {
         window.location.href = "/login";
       }

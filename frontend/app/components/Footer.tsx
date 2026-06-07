@@ -7,7 +7,8 @@ export default function Footer() {
         <div className="max-w-xs">
           <p className="text-base font-bold text-surface-900">VetNova</p>
           <p className="mt-3 text-sm leading-6 text-surface-500">
-            Sistema de gestión veterinaria para clínicas que quieren organizarse mejor sin complicarse.
+            Sistema de gestión veterinaria para clínicas que quieren organizarse mejor sin
+            complicarse.
           </p>
         </div>
 
@@ -15,14 +16,22 @@ export default function Footer() {
           <div>
             <p className="font-semibold text-surface-700">Sistema</p>
             <div className="mt-3 space-y-2 text-surface-500">
-              <p><Link href="/login"    className="hover:text-brand-600 transition">Iniciar sesión</Link></p>
-              <p><Link href="/register" className="hover:text-brand-600 transition">Crear cuenta</Link></p>
+              <p>
+                <Link href="/login" className="transition hover:text-brand-600">
+                  Iniciar sesión
+                </Link>
+              </p>
+              <p>
+                <Link href="/register" className="transition hover:text-brand-600">
+                  Crear cuenta
+                </Link>
+              </p>
             </div>
           </div>
           <div>
             <p className="font-semibold text-surface-700">Contacto</p>
             <div className="mt-3 space-y-2 text-surface-500">
-              <p>soporte@vetnova.co</p>
+              <p>suportvetnova@gmail.com</p>
               <p>+57 300 123 4567</p>
               <p>Bogotá, Colombia</p>
             </div>

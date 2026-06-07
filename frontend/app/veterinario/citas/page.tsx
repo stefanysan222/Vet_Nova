@@ -9,7 +9,7 @@ import { fetchVeterinarios } from "../../../lib/api/usuarios";
 import type { UsuarioAPI } from "../../../lib/api/usuarios";
 import type { Appointment } from "../../../lib/recepcionista/types";
 import type { PetRecord } from "../../../lib/recepcionista/types";
-import { getCurrentUser } from "../../../lib/auth";
+import { useAuth } from "@/lib/auth-context";
 import { getClinicSlots, isClinicOpen, getScheduleLabel } from "../../../lib/utils/clinic-schedule";
 
 type EstadoCita = "Pendiente de confirmación" | "Confirmada" | "En proceso" | "Atendida";
@@ -85,16 +85,22 @@ export default function VeterinarioCitasPage() {
   const [citas, setCitas] = useState<Cita[]>([]);
   const [mascotas, setMascotas] = useState<PetRecord[]>([]);
   const [vets, setVets] = useState<UsuarioAPI[]>([]);
-  const [currentVetName] = useState(() => getCurrentUser()?.name ?? "");
+  const { user } = useAuth();
+  const [currentVetName, setCurrentVetName] = useState("");
   const [loading, setLoading] = useState(true);
   const [guardando, setGuardando] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [mostrarFormulario, setMostrarFormulario] = useState(false);
   const [mostrarMensaje, setMostrarMensaje] = useState(false);
   const [citaDetalle, setCitaDetalle] = useState<Cita | null>(null);
-  const [formulario, setFormulario] = useState<FormularioCita>(() =>
-    formularioVacio(getCurrentUser()?.name ?? ""),
-  );
+  const [formulario, setFormulario] = useState<FormularioCita>(() => formularioVacio(""));
+
+  useEffect(() => {
+    if (!user) return;
+    // Sincroniza el nombre del veterinario cuando llega el perfil real desde /auth/me
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    setCurrentVetName(user.name ?? "");
+  }, [user]);
 
   useEffect(() => {
     Promise.all([

@@ -6,9 +6,10 @@ import { useRouter } from "next/navigation";
 import { Eye, EyeOff, Lock, Mail } from "lucide-react";
 import { motion } from "framer-motion";
 import GoogleAuthButton from "./GoogleAuthButton";
-import { loginUser, loginOrRegisterGoogle, setToken } from "../../../lib/auth";
+import { loginUser, loginOrRegisterGoogle } from "../../../lib/auth";
+import { useAuth } from "@/lib/auth-context";
 
-const initialState = { email: "", password: "", remember: false };
+const initialState = { email: "", password: "" };
 
 const inputVariants = {
   rest: { scale: 1 },
@@ -23,6 +24,7 @@ export default function LoginForm() {
   const [submitError, setSubmitError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const router = useRouter();
+  const { refresh } = useAuth();
 
   const handleChange = (field: string, value: string | boolean) => {
     setFormData((c) => ({ ...c, [field]: value }));
@@ -54,8 +56,8 @@ export default function LoginForm() {
       setSubmitError(result.error);
       return;
     }
-    if (result.token && result.user) {
-      setToken(result.token, true);
+    if (result.user) {
+      await refresh();
       router.push(getDashboardRoute(result.user.role));
     }
   };
@@ -76,8 +78,8 @@ export default function LoginForm() {
       return;
     }
     setErrors({});
-    if (result.token && result.user) {
-      setToken(result.token, formData.remember);
+    if (result.user) {
+      await refresh();
       router.push(getDashboardRoute(result.user.role));
     }
   };
@@ -220,17 +222,8 @@ export default function LoginForm() {
         initial={{ opacity: 0, y: 8 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.3 }}
-        className="flex items-center justify-between"
+        className="flex items-center justify-end"
       >
-        <label className="inline-flex items-center gap-2 text-sm text-slate-600 dark:text-slate-400">
-          <input
-            type="checkbox"
-            checked={formData.remember}
-            onChange={(e) => handleChange("remember", e.target.checked)}
-            className="h-4 w-4 rounded border-slate-300 text-blue-600 focus:ring-blue-500"
-          />
-          Recordarme
-        </label>
         <a
           href="/forgot-password"
           className="text-sm font-semibold text-blue-600 transition hover:text-blue-700 dark:text-blue-400 dark:hover:text-blue-300"

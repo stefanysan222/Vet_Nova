@@ -15,7 +15,8 @@ import {
   Box,
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
-import { clearCurrentUser, getCurrentUser } from "../../../lib/auth";
+import { logout } from "../../../lib/auth";
+import { useAuth } from "@/lib/auth-context";
 
 const menuItems = [
   { label: "Dashboard", icon: Home, href: "/admin" },
@@ -57,10 +58,10 @@ export default function Sidebar() {
   const [mobileOpen, setMobileOpen] = useState(false);
   const pathname = usePathname();
   const router = useRouter();
-  const user = getCurrentUser();
+  const { user } = useAuth();
 
-  const handleLogout = () => {
-    clearCurrentUser();
+  const handleLogout = async () => {
+    await logout();
     router.push("/login");
   };
 

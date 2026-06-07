@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useEffect, useState } from "react";
-import { getCurrentUser } from "@/lib/auth";
+import { useAuth } from "@/lib/auth-context";
 import { fetchMascotas } from "@/lib/api/mascotas";
 import { fetchCitas } from "@/lib/api/citas";
 import { fetchPropietarioByUsuario } from "@/lib/api/propietarios";
@@ -11,7 +11,7 @@ import type { Appointment, PetRecord } from "@/lib/recepcionista/types";
 type Stats = { mascotas: number; citas: number };
 
 export default function PerfilPage() {
-  const user = getCurrentUser();
+  const { user } = useAuth();
   const partes = (user?.name ?? "").trim().split(" ");
   const nombre = partes[0] ?? "";
   const apellido = partes.slice(1).join(" ");
@@ -53,8 +53,7 @@ export default function PerfilPage() {
       );
       setUltimaMascota(sortedMascotas[0] ?? null);
     });
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [user]);
 
   return (
     <div className="h-full overflow-y-auto bg-[#F5F7FB] px-6 py-8 dark:bg-[#0F172A]">

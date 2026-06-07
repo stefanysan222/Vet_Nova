@@ -6,7 +6,8 @@ import { useRouter } from "next/navigation";
 import { Eye, EyeOff, Lock, Mail, UserCircle } from "lucide-react";
 import { motion } from "framer-motion";
 import GoogleAuthButton from "./GoogleAuthButton";
-import { registerUser, loginOrRegisterGoogle, setToken } from "../../../lib/auth";
+import { registerUser, loginOrRegisterGoogle } from "../../../lib/auth";
+import { useAuth } from "@/lib/auth-context";
 
 const initialState = { name: "", email: "", password: "", confirmPassword: "", acceptTerms: false };
 
@@ -18,6 +19,7 @@ export default function RegisterForm() {
   const [submitError, setSubmitError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const router = useRouter();
+  const { refresh } = useAuth();
 
   const handleChange = (field: string, value: string | boolean) => {
     setFormData((c) => ({ ...c, [field]: value }));
@@ -54,8 +56,8 @@ export default function RegisterForm() {
       setSubmitError(result.error);
       return;
     }
-    if (result.token && result.user) {
-      setToken(result.token);
+    if (result.user) {
+      await refresh();
       router.push(getDashboardRoute(result.user.role));
     }
   };
@@ -81,8 +83,8 @@ export default function RegisterForm() {
       return;
     }
     setErrors({});
-    if (result.token && result.user) {
-      setToken(result.token);
+    if (result.user) {
+      await refresh();
       router.push(getDashboardRoute(result.user.role));
     }
   };

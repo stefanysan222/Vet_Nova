@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useEffect, useState } from "react";
-import { getCurrentUser } from "../../../lib/auth";
+import { useAuth } from "@/lib/auth-context";
 import { fetchCitas } from "../../../lib/api/citas";
 import { fetchMiPerfilVeterinario, type VeterinarioPerfilAPI } from "../../../lib/api/veterinarios";
 import type { Appointment } from "../../../lib/recepcionista/types";
@@ -12,7 +12,7 @@ function fechaHoy(): string {
 }
 
 export default function PerfilVeterinarioPage() {
-  const user = getCurrentUser();
+  const { user } = useAuth();
   const nombre = user?.name ?? "Veterinario";
   const email = user?.email ?? "—";
   const inicial = nombre.trim()[0]?.toUpperCase() ?? "V";

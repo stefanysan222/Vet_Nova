@@ -35,7 +35,7 @@ function buildCsp(nonce: string): string {
     `script-src 'self' 'nonce-${nonce}' 'strict-dynamic' https://accounts.google.com`,
     "style-src 'self' 'unsafe-inline' https://accounts.google.com",
     "img-src 'self' data: blob: https://res.cloudinary.com https://lh3.googleusercontent.com",
-    `connect-src 'self' ${API_URL} https://api.emailjs.com https://accounts.google.com https://api.cloudinary.com`,
+    `connect-src 'self' ${API_URL} https://accounts.google.com https://api.cloudinary.com`,
     "font-src 'self'",
     "frame-src https://accounts.google.com",
     "object-src 'none'",
@@ -57,8 +57,7 @@ export function middleware(request: NextRequest) {
   const isProtected = PROTECTED_PREFIXES.some((prefix) => pathname.startsWith(prefix));
 
   if (isProtected) {
-    const token =
-      request.cookies.get("vetnova-token")?.value ?? request.headers.get("x-vetnova-token") ?? null;
+    const token = request.cookies.get("vetnova-token")?.value ?? null;
 
     if (!token) {
       return NextResponse.redirect(new URL("/login", request.url));

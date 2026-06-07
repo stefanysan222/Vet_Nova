@@ -1,7 +1,7 @@
 "use client";
 
 import { ChangeEvent, FormEvent, useEffect, useState } from "react";
-import { getCurrentUser } from "@/lib/auth";
+import { useAuth } from "@/lib/auth-context";
 import { api } from "@/lib/api/client";
 import { updateUsuario } from "@/lib/api/usuarios";
 import { fetchPropietarioByUsuario, updatePropietario } from "@/lib/api/propietarios";
@@ -21,7 +21,7 @@ type PasswordForm = { currentPassword: string; newPassword: string; confirmPassw
 const EMPTY_PWD: PasswordForm = { currentPassword: "", newPassword: "", confirmPassword: "" };
 
 export default function ConfiguracionPage() {
-  const user = getCurrentUser();
+  const { user } = useAuth();
   const { perfil: perfilContexto, refrescar } = useClienteProfile();
   const [perfil, setPerfil] = useState<PerfilCliente>({ ...EMPTY_PERFIL, ...perfilContexto });
   const [perfilGuardado, setPerfilGuardado] = useState<PerfilCliente>({
@@ -30,6 +30,7 @@ export default function ConfiguracionPage() {
   });
   const [propietario, setPropietario] = useState<Owner | null>(null);
   const [mensaje, setMensaje] = useState("");
+  const [mensajeEsError, setMensajeEsError] = useState(false);
   const [guardandoPerfil, setGuardandoPerfil] = useState(false);
 
   const [pwd, setPwd] = useState<PasswordForm>(EMPTY_PWD);
@@ -63,16 +64,19 @@ export default function ConfiguracionPage() {
     const { name, value } = event.target;
     setPerfil((actual) => ({ ...actual, [name]: value }));
     setMensaje("");
+    setMensajeEsError(false);
   };
 
   const guardarPerfil = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     setGuardandoPerfil(true);
+    setMensajeEsError(false);
 
     if (propietario) {
       try {
         await updatePropietario({ ...propietario, phone: perfil.telefono });
       } catch {
+        setMensajeEsError(true);
         setMensaje("No se pudo guardar el teléfono. Intenta de nuevo más tarde.");
         setGuardandoPerfil(false);
         return;
@@ -85,8 +89,13 @@ export default function ConfiguracionPage() {
           nombre: `${perfil.nombre} ${perfil.apellido}`.trim(),
           email: perfil.email,
         });
-      } catch {
-        setMensaje("No se pudo guardar tu información personal. Intenta de nuevo más tarde.");
+      } catch (err) {
+        setMensajeEsError(true);
+        setMensaje(
+          err instanceof Error
+            ? err.message
+            : "No se pudo guardar tu información personal. Intenta de nuevo más tarde.",
+        );
         setGuardandoPerfil(false);
         return;
       }
@@ -94,6 +103,7 @@ export default function ConfiguracionPage() {
 
     await refrescar();
     setPerfilGuardado(perfil);
+    setMensajeEsError(false);
     setMensaje("Tu información personal fue actualizada correctamente.");
     setGuardandoPerfil(false);
   };
@@ -101,6 +111,7 @@ export default function ConfiguracionPage() {
   const cancelarCambios = () => {
     setPerfil(perfilGuardado);
     setMensaje("");
+    setMensajeEsError(false);
   };
 
   const cambiarPassword = async (event: FormEvent<HTMLFormElement>) => {
@@ -117,7 +128,6 @@ export default function ConfiguracionPage() {
       return;
     }
 
-    const user = getCurrentUser();
     if (!user?.id) return;
 
     setGuardandoPwd(true);
@@ -150,7 +160,13 @@ export default function ConfiguracionPage() {
           </div>
 
           {mensaje && (
-            <div className="mb-7 rounded-xl border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm font-medium text-emerald-700 dark:border-emerald-800 dark:bg-emerald-900/30 dark:text-emerald-400">
+            <div
+              className={
+                mensajeEsError
+                  ? "mb-7 rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm font-medium text-red-700 dark:border-red-800 dark:bg-red-900/30 dark:text-red-400"
+                  : "mb-7 rounded-xl border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm font-medium text-emerald-700 dark:border-emerald-800 dark:bg-emerald-900/30 dark:text-emerald-400"
+              }
+            >
               {mensaje}
             </div>
           )}

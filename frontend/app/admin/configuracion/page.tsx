@@ -1,8 +1,8 @@
 ﻿"use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { User, Mail, Lock, Eye, EyeOff } from "lucide-react";
-import { getCurrentUser } from "../../../lib/auth";
+import { useAuth } from "@/lib/auth-context";
 import { updateUsuario } from "../../../lib/api/usuarios";
 import { useToast } from "../../components/ui/Toast";
 
@@ -10,11 +10,19 @@ const inputClass =
   "w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-2.5 text-sm text-slate-900 outline-none transition focus:border-brand-500 focus:ring-2 focus:ring-brand-100 dark:border-slate-700 dark:bg-slate-800 dark:text-white dark:placeholder-slate-500";
 
 export default function ConfiguracionPage() {
-  const user = getCurrentUser();
+  const { user } = useAuth();
   const { success, error } = useToast();
 
-  const [nombre, setNombre] = useState(() => user?.name ?? "");
-  const [email, setEmail] = useState(() => user?.email ?? "");
+  const [nombre, setNombre] = useState("");
+  const [email, setEmail] = useState("");
+
+  useEffect(() => {
+    if (!user) return;
+    // Sincroniza el formulario cuando llega el perfil real desde /auth/me
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    setNombre(user.name);
+    setEmail(user.email);
+  }, [user]);
   const [currentPassword, setCurrentPassword] = useState("");
   const [newPassword, setNewPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");

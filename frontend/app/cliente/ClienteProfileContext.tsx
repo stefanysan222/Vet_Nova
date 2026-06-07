@@ -1,7 +1,7 @@
 "use client";
 
-import { createContext, useCallback, useContext, useEffect, useState, type ReactNode } from "react";
-import { fetchMe, getCurrentUser, type AuthUser } from "@/lib/auth";
+import { createContext, useContext, useEffect, useMemo, useState, type ReactNode } from "react";
+import { useAuth } from "@/lib/auth-context";
 
 type ClienteProfile = { nombre: string; apellido: string; email: string };
 
@@ -18,33 +18,20 @@ function dividirNombre(nombreCompleto: string): { nombre: string; apellido: stri
 const ClienteProfileContext = createContext<ClienteProfileContextValue | null>(null);
 
 export function ClienteProfileProvider({ children }: { children: ReactNode }) {
-  const [perfil, setPerfil] = useState<ClienteProfile>(() => {
-    const user = getCurrentUser();
-    const { nombre, apellido } = dividirNombre(user?.name ?? "");
-    return { nombre, apellido, email: user?.email ?? "" };
-  });
-
-  const refrescar = useCallback(async () => {
-    try {
-      const me: AuthUser = await fetchMe();
-      const { nombre, apellido } = dividirNombre(me.name);
-      setPerfil({ nombre, apellido, email: me.email });
-    } catch {
-      // Si /auth/me falla se conserva el perfil derivado del JWT
-    }
-  }, []);
+  const { user, refresh } = useAuth();
+  const [perfil, setPerfil] = useState<ClienteProfile>({ nombre: "", apellido: "", email: "" });
 
   useEffect(() => {
-    // Carga el perfil real desde /auth/me al montar el provider
+    if (!user) return;
+    const { nombre, apellido } = dividirNombre(user.name);
+    // Sincroniza el perfil cuando AuthContext obtiene el usuario desde /auth/me
     // eslint-disable-next-line react-hooks/set-state-in-effect
-    refrescar();
-  }, [refrescar]);
+    setPerfil({ nombre, apellido, email: user.email });
+  }, [user]);
 
-  return (
-    <ClienteProfileContext.Provider value={{ perfil, refrescar }}>
-      {children}
-    </ClienteProfileContext.Provider>
-  );
+  const value = useMemo(() => ({ perfil, refrescar: refresh }), [perfil, refresh]);
+
+  return <ClienteProfileContext.Provider value={value}>{children}</ClienteProfileContext.Provider>;
 }
 
 export function useClienteProfile(): ClienteProfileContextValue {

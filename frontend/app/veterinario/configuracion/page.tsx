@@ -1,7 +1,7 @@
 "use client";
 
 import { FormEvent, useEffect, useState, type ReactNode } from "react";
-import { getCurrentUser } from "../../../lib/auth";
+import { useAuth } from "@/lib/auth-context";
 import { updateUsuario } from "../../../lib/api/usuarios";
 import { fetchMiPerfilVeterinario, updateMiPerfilVeterinario } from "../../../lib/api/veterinarios";
 import { useToast } from "../../components/ui/Toast";
@@ -29,21 +29,21 @@ const seguridadInicial: FormularioSeguridad = {
 };
 
 export default function ConfiguracionVeterinarioPage() {
-  const user = getCurrentUser();
+  const { user } = useAuth();
   const { success, error: toastError } = useToast();
 
-  const perfilBase: PerfilVeterinario = {
-    nombre: user?.name ?? "",
+  const perfilVacio: PerfilVeterinario = {
+    nombre: "",
     cargo: "Veterinario",
     especialidad: "",
     registroProfesional: "",
-    email: user?.email ?? "",
+    email: "",
     telefono: "",
     horarioAtencion: "",
   };
 
-  const [perfil, setPerfil] = useState<PerfilVeterinario>(perfilBase);
-  const [perfilGuardado, setPerfilGuardado] = useState<PerfilVeterinario>(perfilBase);
+  const [perfil, setPerfil] = useState<PerfilVeterinario>(perfilVacio);
+  const [perfilGuardado, setPerfilGuardado] = useState<PerfilVeterinario>(perfilVacio);
   const [guardando, setGuardando] = useState(false);
   const [seguridad, setSeguridad] = useState<FormularioSeguridad>(seguridadInicial);
   const [guardandoPassword, setGuardandoPassword] = useState(false);
@@ -52,6 +52,14 @@ export default function ConfiguracionVeterinarioPage() {
   const [errorSeguridad, setErrorSeguridad] = useState("");
 
   useEffect(() => {
+    if (!user) return;
+
+    const perfilBase: PerfilVeterinario = {
+      ...perfilVacio,
+      nombre: user.name ?? "",
+      email: user.email ?? "",
+    };
+
     fetchMiPerfilVeterinario()
       .then((extra) => {
         const completo: PerfilVeterinario = {
@@ -64,9 +72,12 @@ export default function ConfiguracionVeterinarioPage() {
         setPerfil(completo);
         setPerfilGuardado(completo);
       })
-      .catch(() => {});
+      .catch(() => {
+        setPerfil(perfilBase);
+        setPerfilGuardado(perfilBase);
+      });
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [user]);
 
   function actualizarPerfil(campo: keyof PerfilVeterinario, valor: string) {
     setPerfil((actual) => ({

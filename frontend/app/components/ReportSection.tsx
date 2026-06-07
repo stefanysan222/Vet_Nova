@@ -11,7 +11,6 @@ const ASUNTOS = [
   "Otro",
 ];
 
-
 const inputClass =
   "w-full rounded-xl border border-surface-200 bg-white px-4 py-3 text-sm text-surface-900 outline-none transition placeholder:text-surface-400 focus:border-brand-500 focus:ring-2 focus:ring-brand-100";
 
@@ -31,7 +30,9 @@ export default function ReportSection() {
   const [campos, setCampos] = useState<Campos>(VACIO);
   const [estado, setEstado] = useState<Estado>("idle");
 
-  const actualizar = (e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
+  const actualizar = (
+    e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>,
+  ) => {
     const { name, value } = e.target;
     setCampos((prev) => ({ ...prev, [name]: value }));
   };
@@ -96,7 +97,7 @@ export default function ReportSection() {
               <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-brand-50 text-brand-600">
                 <Mail className="h-4 w-4" />
               </div>
-              soporte@vetnova.co
+              suportvetnova@gmail.com
             </div>
             <div className="flex items-center gap-3 text-sm text-surface-600">
               <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-brand-50 text-brand-600">
@@ -121,8 +122,10 @@ export default function ReportSection() {
         </div>
 
         {/* Formulario */}
-        <form onSubmit={enviar} className="space-y-4 rounded-2xl border border-surface-100 bg-surface-50 p-6">
-
+        <form
+          onSubmit={enviar}
+          className="space-y-4 rounded-2xl border border-surface-100 bg-surface-50 p-6"
+        >
           {estado === "ok" && (
             <div className="flex items-start gap-3 rounded-xl border border-emerald-200 bg-emerald-50 px-4 py-3">
               <CheckCircle className="mt-0.5 h-4 w-4 shrink-0 text-emerald-600" />
@@ -136,7 +139,8 @@ export default function ReportSection() {
             <div className="flex items-start gap-3 rounded-xl border border-red-200 bg-red-50 px-4 py-3">
               <AlertCircle className="mt-0.5 h-4 w-4 shrink-0 text-red-600" />
               <p className="text-sm font-medium text-red-700">
-                No se pudo enviar el mensaje. Intenta nuevamente o escríbenos directamente a soporte@vetnova.co
+                No se pudo enviar el mensaje. Intenta nuevamente o escríbenos directamente a
+                suportvetnova@gmail.com
               </p>
             </div>
           )}
@@ -178,14 +182,18 @@ export default function ReportSection() {
             >
               <option value="">Selecciona un asunto</option>
               {ASUNTOS.map((a) => (
-                <option key={a} value={a}>{a}</option>
+                <option key={a} value={a}>
+                  {a}
+                </option>
               ))}
             </select>
           </div>
 
           {campos.asunto === "Otro" && (
             <div className="space-y-1.5">
-              <label className="block text-sm font-medium text-surface-700">Especifica el asunto</label>
+              <label className="block text-sm font-medium text-surface-700">
+                Especifica el asunto
+              </label>
               <input
                 required
                 type="text"

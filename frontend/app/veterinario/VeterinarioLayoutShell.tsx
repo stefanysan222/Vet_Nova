@@ -4,7 +4,8 @@ import Image from "next/image";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { useEffect, useMemo, useRef, useState, type KeyboardEvent, type ReactNode } from "react";
-import { getCurrentUser, clearCurrentUser } from "../../lib/auth";
+import { logout } from "../../lib/auth";
+import { useAuth } from "@/lib/auth-context";
 
 type IconName =
   | "dashboard"
@@ -127,18 +128,16 @@ export default function VeterinarioLayoutShell({ children }: { children: ReactNo
   const pathname = usePathname();
   const router = useRouter();
   const buscadorRef = useRef<HTMLDivElement>(null);
-  const [userName] = useState(() => getCurrentUser()?.name ?? "Veterinario");
-  const [userInitials] = useState(() => {
-    const name = getCurrentUser()?.name;
-    return name
-      ? name
-          .split(" ")
-          .map((p: string) => p[0])
-          .slice(0, 2)
-          .join("")
-          .toUpperCase()
-      : "V";
-  });
+  const { user, loading } = useAuth();
+  const userName = user?.name ?? "Veterinario";
+  const userInitials = user?.name
+    ? user.name
+        .split(" ")
+        .map((p: string) => p[0])
+        .slice(0, 2)
+        .join("")
+        .toUpperCase()
+    : "V";
 
   const [showNotifications, setShowNotifications] = useState(false);
   const [showUserMenu, setShowUserMenu] = useState(false);
@@ -169,7 +168,7 @@ export default function VeterinarioLayoutShell({ children }: { children: ReactNo
   }, [busquedaGlobal]);
 
   useEffect(() => {
-    const user = getCurrentUser();
+    if (loading) return;
     if (!user) {
       router.replace("/login");
       return;
@@ -182,7 +181,7 @@ export default function VeterinarioLayoutShell({ children }: { children: ReactNo
       router.replace(routes[user.role] ?? "/login");
       return;
     }
-  }, [router]);
+  }, [user, loading, router]);
 
   useEffect(() => {
     document.documentElement.classList.toggle("dark", darkMode);
@@ -292,8 +291,7 @@ export default function VeterinarioLayoutShell({ children }: { children: ReactNo
             <button
               type="button"
               onClick={() => {
-                clearCurrentUser();
-                router.push("/login");
+                logout().then(() => router.push("/login"));
               }}
               className="flex w-full items-center gap-3 rounded-xl px-4 py-3 text-[14px] font-semibold text-[#10213A] transition hover:bg-[#F1F5F9] dark:text-white dark:hover:bg-[#1E293B]"
             >
@@ -600,8 +598,7 @@ export default function VeterinarioLayoutShell({ children }: { children: ReactNo
                         type="button"
                         onClick={() => {
                           setShowUserMenu(false);
-                          clearCurrentUser();
-                          router.push("/login");
+                          logout().then(() => router.push("/login"));
                         }}
                         className="flex w-full items-center gap-3 px-5 py-3 text-[14px] font-semibold text-[#EF4444] transition hover:bg-[#FEF2F2] dark:hover:bg-[#3F1D1D]"
                       >
@@ -681,8 +678,7 @@ export default function VeterinarioLayoutShell({ children }: { children: ReactNo
               <button
                 type="button"
                 onClick={() => {
-                  clearCurrentUser();
-                  router.push("/login");
+                  logout().then(() => router.push("/login"));
                 }}
                 className="flex w-full items-center gap-3 rounded-xl px-4 py-3 text-[14px] font-semibold text-[#10213A] transition hover:bg-[#F1F5F9] dark:text-white dark:hover:bg-[#1E293B]"
               >

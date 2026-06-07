@@ -16,7 +16,7 @@ import {
   X,
 } from "lucide-react";
 import { AnimatePresence, motion } from "framer-motion";
-import { getCurrentUser } from "../../../lib/auth";
+import { useAuth } from "@/lib/auth-context";
 import { fetchUsuarios } from "../../../lib/api/usuarios";
 import { fetchMascotas } from "../../../lib/api/mascotas";
 import { fetchCitas } from "../../../lib/api/citas";
@@ -124,7 +124,7 @@ export default function Navbar() {
   const [activeIdx, setActiveIdx] = useState(0);
   const searchRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
-  const user = getCurrentUser();
+  const { user } = useAuth();
 
   // Badge: contar no leídas al montar y cada 30s
   useEffect(() => {

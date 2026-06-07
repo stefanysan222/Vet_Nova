@@ -7,7 +7,8 @@ import { useEffect, useState, type ReactNode } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import AvatarCliente from "./AvatarCliente";
 import BuscadorCliente from "./BuscadorCliente";
-import { getCurrentUser, clearCurrentUser } from "../../lib/auth";
+import { logout } from "../../lib/auth";
+import { useAuth } from "@/lib/auth-context";
 import { useClienteProfile } from "./ClienteProfileContext";
 
 const notificationPreview: { title: string; description: string; time: string; unread: boolean }[] =
@@ -24,10 +25,11 @@ export default function ClientLayoutShell({ children }: { children: ReactNode })
     return localStorage.getItem("vetnova-theme") === "dark";
   });
   const { perfil } = useClienteProfile();
+  const { user, loading } = useAuth();
   const [mobileOpen, setMobileOpen] = useState(false);
 
   useEffect(() => {
-    const user = getCurrentUser();
+    if (loading) return;
     if (!user) {
       router.replace("/login");
       return;
@@ -39,7 +41,7 @@ export default function ClientLayoutShell({ children }: { children: ReactNode })
       };
       router.replace(routes[user.role] ?? "/login");
     }
-  }, [router]);
+  }, [user, loading, router]);
 
   useEffect(() => {
     document.documentElement.classList.toggle("dark", darkMode);
@@ -121,8 +123,7 @@ export default function ClientLayoutShell({ children }: { children: ReactNode })
             <button
               type="button"
               onClick={() => {
-                clearCurrentUser();
-                router.push("/login");
+                logout().then(() => router.push("/login"));
               }}
               className="flex items-center gap-3 text-[15px] font-semibold text-[#10213A] transition-colors hover:text-[#2F6BFF] dark:text-white dark:hover:text-[#60A5FA]"
             >
@@ -327,8 +328,7 @@ export default function ClientLayoutShell({ children }: { children: ReactNode })
                         type="button"
                         onClick={() => {
                           setShowUserMenu(false);
-                          clearCurrentUser();
-                          router.push("/login");
+                          logout().then(() => router.push("/login"));
                         }}
                         className="flex w-full items-center gap-3 px-5 py-3 text-[14px] font-semibold text-[#EF4444] transition-colors hover:bg-[#FEF2F2] dark:hover:bg-[#28171B]"
                       >
@@ -436,8 +436,7 @@ export default function ClientLayoutShell({ children }: { children: ReactNode })
               <button
                 type="button"
                 onClick={() => {
-                  clearCurrentUser();
-                  router.push("/login");
+                  logout().then(() => router.push("/login"));
                 }}
                 className="flex items-center gap-3 text-[15px] font-semibold text-[#10213A] transition-colors hover:text-[#2F6BFF] dark:text-white"
               >
