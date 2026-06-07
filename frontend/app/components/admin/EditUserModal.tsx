@@ -21,6 +21,7 @@ export default function EditUserModal({ isOpen, onClose, onUpdated, user }: Edit
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
+    // Sincronizar el formulario cuando cambia el usuario a editar (modal reutilizable)
     // eslint-disable-next-line react-hooks/set-state-in-effect
     if (user) setForm({ nombre: user.name, email: user.email, rol: user.role });
   }, [user]);

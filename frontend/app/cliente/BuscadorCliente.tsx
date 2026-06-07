@@ -87,6 +87,7 @@ export default function BuscadorCliente() {
   }, []);
 
   useEffect(() => {
+    // Limpiar el buscador al cambiar de ruta — flips de booleano/string sin riesgo de cascada
     // eslint-disable-next-line react-hooks/set-state-in-effect
     setTermino("");
     setAbierto(false);

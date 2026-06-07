@@ -140,6 +140,7 @@ export default function Navbar() {
   // Cargar lista al abrir el dropdown (null = cargando)
   useEffect(() => {
     if (!notifOpen) return;
+    // Limpiar la lista (estado "cargando") antes de refetch al abrir el dropdown
     // eslint-disable-next-line react-hooks/set-state-in-effect
     setNotifItems(null);
     let cancelled = false;
@@ -280,6 +281,7 @@ export default function Navbar() {
   }, []);
 
   useEffect(() => {
+    // Reiniciar el índice activo cada vez que cambia la búsqueda — flip de número sin cascada
     // eslint-disable-next-line react-hooks/set-state-in-effect
     setActiveIdx(0);
     if (!query) {

@@ -94,6 +94,7 @@ function AgendarContent() {
   };
 
   useEffect(() => {
+    // Carga inicial de datos al montar — setCargado(true) tras el fetch es el patrón estándar
     // eslint-disable-next-line react-hooks/set-state-in-effect
     cargarCitas();
   }, []);

@@ -189,6 +189,7 @@ export default function VeterinarioLayoutShell({ children }: { children: ReactNo
   }, [darkMode]);
 
   useEffect(() => {
+    // Cerrar menús/búsqueda al cambiar de ruta — flips de booleano/string sin riesgo de cascada
     // eslint-disable-next-line react-hooks/set-state-in-effect
     setShowNotifications(false);
     setShowUserMenu(false);

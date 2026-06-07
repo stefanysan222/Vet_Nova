@@ -122,6 +122,7 @@ function PacientesContent() {
 
   useEffect(() => {
     if (pacienteBuscadoDesdeBarra) {
+      // Sincronizar el filtro local con el query param "buscar" de la URL
       // eslint-disable-next-line react-hooks/set-state-in-effect
       setBusqueda(pacienteBuscadoDesdeBarra);
       setFiltro("Todos");

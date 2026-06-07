@@ -43,6 +43,7 @@ export default function UsersTable({ refreshTrigger = 0 }: { refreshTrigger?: nu
   };
 
   useEffect(() => {
+    // Recargar la lista al montar y cada vez que el padre dispara refreshTrigger
     // eslint-disable-next-line react-hooks/set-state-in-effect
     cargar();
   }, [refreshTrigger]);

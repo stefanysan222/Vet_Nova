@@ -273,6 +273,7 @@ export default function MascotasPage() {
   };
 
   useEffect(() => {
+    // Carga inicial de datos al montar — setLoading(true) antes del fetch es el patrón estándar
     // eslint-disable-next-line react-hooks/set-state-in-effect
     cargar();
   }, []);
