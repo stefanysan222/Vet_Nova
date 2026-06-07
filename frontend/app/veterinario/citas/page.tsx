@@ -430,6 +430,10 @@ export default function VeterinarioCitasPage() {
                 <DatoDetalle titulo="Hora" valor={citaDetalle.hora} />
                 <DatoDetalle titulo="Servicio" valor={citaDetalle.servicio} />
                 <DatoDetalle titulo="Estado" valor={citaDetalle.estado} />
+                <DatoDetalle
+                  titulo="Veterinario asignado"
+                  valor={citaDetalle.veterinario || "Sin asignar"}
+                />
               </div>
 
               <section className="rounded-[18px] border border-[#E2E8F0] bg-[#FBFCFF] p-5 dark:border-[#334155] dark:bg-[#0F172A]">
