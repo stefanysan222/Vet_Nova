@@ -2,10 +2,10 @@
 
 import { ChangeEvent, FormEvent, useEffect, useState } from "react";
 import { getCurrentUser } from "@/lib/auth";
+import { updateUsuario } from "@/lib/api/usuarios";
 import { fetchPropietarioByUsuario, updatePropietario } from "@/lib/api/propietarios";
 import type { Owner } from "@/lib/recepcionista/types";
-
-const PROFILE_STORAGE_KEY = "vetnova_cliente_perfil";
+import { useClienteProfile } from "../ClienteProfileContext";
 
 type PerfilCliente = {
   nombre: string;
@@ -16,44 +16,25 @@ type PerfilCliente = {
 
 const EMPTY_PERFIL: PerfilCliente = { nombre: "", apellido: "", email: "", telefono: "" };
 
-function cargarPerfilInicial(): PerfilCliente {
-  if (typeof window === "undefined") return EMPTY_PERFIL;
-  const user = getCurrentUser();
-  const partes = (user?.name ?? "").trim().split(" ");
-  const nombreJWT = partes[0] ?? "";
-  const apellidoJWT = partes.slice(1).join(" ");
-  const emailJWT = user?.email ?? "";
-
-  const informacionGuardada = localStorage.getItem(PROFILE_STORAGE_KEY);
-
-  if (!informacionGuardada) {
-    return { nombre: nombreJWT, apellido: apellidoJWT, email: emailJWT, telefono: "" };
-  }
-
-  try {
-    const datosGuardados = JSON.parse(informacionGuardada) as Partial<PerfilCliente>;
-    const datosLimpios: PerfilCliente = {
-      nombre: datosGuardados.nombre || nombreJWT,
-      apellido: datosGuardados.apellido || apellidoJWT,
-      email: datosGuardados.email || emailJWT,
-      telefono: datosGuardados.telefono ?? "",
-    };
-    localStorage.setItem(PROFILE_STORAGE_KEY, JSON.stringify(datosLimpios));
-    return datosLimpios;
-  } catch {
-    localStorage.removeItem(PROFILE_STORAGE_KEY);
-    return { nombre: nombreJWT, apellido: apellidoJWT, email: emailJWT, telefono: "" };
-  }
-}
-
 export default function ConfiguracionPage() {
   const user = getCurrentUser();
-  const [perfil, setPerfil] = useState<PerfilCliente>(cargarPerfilInicial);
-  const [perfilGuardado, setPerfilGuardado] = useState<PerfilCliente>(cargarPerfilInicial);
+  const { perfil: perfilContexto, refrescar } = useClienteProfile();
+  const [perfil, setPerfil] = useState<PerfilCliente>({ ...EMPTY_PERFIL, ...perfilContexto });
+  const [perfilGuardado, setPerfilGuardado] = useState<PerfilCliente>({
+    ...EMPTY_PERFIL,
+    ...perfilContexto,
+  });
   const [propietario, setPropietario] = useState<Owner | null>(null);
   const [mensaje, setMensaje] = useState("");
 
-  // El teléfono se persiste en el backend (propietarios), no en localStorage
+  useEffect(() => {
+    // Sincroniza el formulario cuando llega el perfil real desde /auth/me
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    setPerfil((actual) => ({ ...actual, ...perfilContexto }));
+    setPerfilGuardado((actual) => ({ ...actual, ...perfilContexto }));
+  }, [perfilContexto]);
+
+  // El teléfono se persiste en el backend (propietarios)
   useEffect(() => {
     const uid = user?.id ? Number(user.id) : undefined;
     if (!uid) return;
@@ -91,16 +72,21 @@ export default function ConfiguracionPage() {
       }
     }
 
-    // nombre/apellido/email se mantienen en localStorage (ver lectura inicial: provienen del JWT
-    // y necesitan reflejarse al instante en el header sin esperar a un nuevo login)
-    localStorage.setItem(
-      PROFILE_STORAGE_KEY,
-      JSON.stringify({ nombre: perfil.nombre, apellido: perfil.apellido, email: perfil.email }),
-    );
+    if (user?.id) {
+      try {
+        await updateUsuario(Number(user.id), {
+          nombre: `${perfil.nombre} ${perfil.apellido}`.trim(),
+          email: perfil.email,
+        });
+      } catch {
+        setMensaje("No se pudo guardar tu información personal. Intenta de nuevo más tarde.");
+        return;
+      }
+    }
+
+    await refrescar();
     setPerfilGuardado(perfil);
     setMensaje("Tu información personal fue actualizada correctamente.");
-
-    window.dispatchEvent(new Event("vetnova-profile-updated"));
   };
 
   const cancelarCambios = () => {

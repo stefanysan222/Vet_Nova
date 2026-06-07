@@ -3,22 +3,16 @@
 import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { ChangeEvent, FormEvent, useEffect, useState } from "react";
+import { ChangeEvent, FormEvent, useState } from "react";
 import { getCurrentUser } from "../../../../lib/auth";
 import { fetchPropietarioByUsuario } from "../../../../lib/api/propietarios";
 import { createMascota } from "../../../../lib/api/mascotas";
+import { useClienteProfile } from "../../ClienteProfileContext";
 
-const PROFILE_STORAGE_KEY = "vetnova_cliente_perfil";
 const MAX_IMAGE_SIZE = 5 * 1024 * 1024; // 5 MB
 const MAX_DOCUMENT_SIZE = 5 * 1024 * 1024; // 5 MB
 const MAX_DOCUMENTS = 5;
 const DOCUMENT_TYPES = ["application/pdf", "image/jpeg", "image/png"];
-
-type PerfilCliente = {
-  nombre?: string;
-  apellido?: string;
-  foto?: string | null;
-};
 
 type DocumentoClinicoAdjunto = {
   id: string;
@@ -31,12 +25,6 @@ type DocumentoClinicoAdjunto = {
 
 type PropietarioActual = {
   nombreCompleto: string;
-  foto: string | null;
-};
-
-const propietarioInicial: PropietarioActual = {
-  nombreCompleto: "Cliente",
-  foto: null,
 };
 
 type FormularioMascota = {
@@ -72,8 +60,12 @@ const labelClassName = "text-[14px] font-semibold text-[#10213A] dark:text-white
 
 export default function NuevaMascotaPage() {
   const router = useRouter();
+  const { perfil: perfilCliente } = useClienteProfile();
 
-  const [propietario, setPropietario] = useState<PropietarioActual>(propietarioInicial);
+  const propietario: PropietarioActual = {
+    nombreCompleto:
+      `${perfilCliente.nombre.trim() || "Cliente"} ${perfilCliente.apellido.trim()}`.trim(),
+  };
 
   const [formulario, setFormulario] = useState<FormularioMascota>(formularioInicial);
 
@@ -84,22 +76,6 @@ export default function NuevaMascotaPage() {
   const [guardando, setGuardando] = useState(false);
   const [documentosClinicos, setDocumentosClinicos] = useState<DocumentoClinicoAdjunto[]>([]);
   const [errorDocumentos, setErrorDocumentos] = useState("");
-
-  useEffect(() => {
-    const cargarPropietario = () => {
-      setPropietario(leerPropietarioActual());
-    };
-
-    cargarPropietario();
-
-    window.addEventListener("vetnova-profile-updated", cargarPropietario);
-    window.addEventListener("storage", cargarPropietario);
-
-    return () => {
-      window.removeEventListener("vetnova-profile-updated", cargarPropietario);
-      window.removeEventListener("storage", cargarPropietario);
-    };
-  }, []);
 
   const actualizarCampo = (
     event: ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>,
@@ -597,33 +573,6 @@ export default function NuevaMascotaPage() {
   );
 }
 
-function leerPropietarioActual(): PropietarioActual {
-  if (typeof window === "undefined") {
-    return propietarioInicial;
-  }
-
-  try {
-    const perfilGuardado = localStorage.getItem(PROFILE_STORAGE_KEY);
-
-    if (!perfilGuardado) {
-      return propietarioInicial;
-    }
-
-    const perfil = JSON.parse(perfilGuardado) as PerfilCliente;
-
-    const nombreCompleto = `${perfil.nombre?.trim() || "Cliente"} ${
-      perfil.apellido?.trim() || ""
-    }`.trim();
-
-    return {
-      nombreCompleto,
-      foto: perfil.foto || null,
-    };
-  } catch {
-    return propietarioInicial;
-  }
-}
-
 function AvatarPropietario({ propietario }: { propietario: PropietarioActual }) {
   const iniciales = propietario.nombreCompleto
     .split(" ")
@@ -634,17 +583,7 @@ function AvatarPropietario({ propietario }: { propietario: PropietarioActual }) 
 
   return (
     <div className="relative flex h-[48px] w-[48px] shrink-0 items-center justify-center overflow-hidden rounded-full bg-[#2F6BFF] text-[17px] font-semibold text-white">
-      {propietario.foto ? (
-        <Image
-          src={propietario.foto}
-          alt={`Foto de ${propietario.nombreCompleto}`}
-          fill
-          unoptimized
-          className="object-cover"
-        />
-      ) : (
-        iniciales || "C"
-      )}
+      {iniciales || "C"}
     </div>
   );
 }

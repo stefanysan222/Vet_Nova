@@ -33,6 +33,7 @@ export function clearCurrentUser() {
   if (!isBrowser()) return;
   localStorage.removeItem(TOKEN_KEY);
   sessionStorage.removeItem(TOKEN_KEY);
+  // Limpia datos legacy de versiones previas que usaban localStorage para el perfil
   localStorage.removeItem("vetnova_cliente_perfil");
   const secure = location.protocol === "https:" ? "; Secure" : "";
   document.cookie = `vetnova-token=; path=/; max-age=0; SameSite=Strict${secure}`;
@@ -75,6 +76,15 @@ export function getCurrentUser(): AuthUser | null {
 }
 
 import { API_URL } from "./config";
+
+export async function fetchMe(): Promise<AuthUser> {
+  const token = getToken();
+  const res = await fetch(`${API_URL}/auth/me`, {
+    headers: token ? { Authorization: `Bearer ${token}` } : undefined,
+  });
+  if (!res.ok) throw new Error("No se pudo obtener el perfil del usuario.");
+  return res.json();
+}
 
 export async function registerUser(data: {
   nombre: string;

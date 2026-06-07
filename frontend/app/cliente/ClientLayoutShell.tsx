@@ -8,13 +8,7 @@ import { AnimatePresence, motion } from "framer-motion";
 import AvatarCliente from "./AvatarCliente";
 import BuscadorCliente from "./BuscadorCliente";
 import { getCurrentUser, clearCurrentUser } from "../../lib/auth";
-
-const PROFILE_STORAGE_KEY = "vetnova_cliente_perfil";
-
-type PerfilCliente = {
-  nombre: string;
-  apellido: string;
-};
+import { useClienteProfile } from "./ClienteProfileContext";
 
 const notificationPreview: { title: string; description: string; time: string; unread: boolean }[] =
   [];
@@ -29,12 +23,7 @@ export default function ClientLayoutShell({ children }: { children: ReactNode })
     if (typeof window === "undefined") return false;
     return localStorage.getItem("vetnova-theme") === "dark";
   });
-  const [perfil, setPerfil] = useState<PerfilCliente>(() => {
-    const user = getCurrentUser();
-    if (!user) return { nombre: "", apellido: "" };
-    const partes = user.name.trim().split(" ");
-    return { nombre: partes[0] ?? user.name, apellido: partes.slice(1).join(" ") || "" };
-  });
+  const { perfil } = useClienteProfile();
   const [mobileOpen, setMobileOpen] = useState(false);
 
   useEffect(() => {
@@ -55,30 +44,6 @@ export default function ClientLayoutShell({ children }: { children: ReactNode })
   useEffect(() => {
     document.documentElement.classList.toggle("dark", darkMode);
   }, [darkMode]);
-
-  useEffect(() => {
-    const cargarPerfil = () => {
-      const informacionGuardada = localStorage.getItem(PROFILE_STORAGE_KEY);
-      if (!informacionGuardada) return;
-      try {
-        const datos = JSON.parse(informacionGuardada) as Partial<PerfilCliente>;
-        setPerfil((prev) => ({
-          nombre: datos.nombre || prev.nombre,
-          apellido: datos.apellido ?? prev.apellido,
-        }));
-      } catch {
-        localStorage.removeItem(PROFILE_STORAGE_KEY);
-      }
-    };
-
-    cargarPerfil();
-    window.addEventListener("vetnova-profile-updated", cargarPerfil);
-    window.addEventListener("storage", cargarPerfil);
-    return () => {
-      window.removeEventListener("vetnova-profile-updated", cargarPerfil);
-      window.removeEventListener("storage", cargarPerfil);
-    };
-  }, []);
 
   useEffect(() => {
     // Close menus on route change — setState allowed here (no cascade risk, boolean flip)
