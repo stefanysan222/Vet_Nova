@@ -59,3 +59,47 @@ export async function loginOrRegisterGoogle(data: {
 }): Promise<{ user?: AuthUser; error?: string }> {
   return postAuth("google", data);
 }
+
+export type ForgotPasswordOutcome = "sent" | "rate-limited" | "error";
+
+export async function forgotPassword(email: string): Promise<ForgotPasswordOutcome> {
+  try {
+    const res = await fetch("/api/backend/auth/forgot-password", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      credentials: "include",
+      body: JSON.stringify({ email }),
+    });
+    if (res.status === 429) return "rate-limited";
+    if (res.status >= 500) return "error";
+    // Siempre "sent" para 2xx/4xx — nunca revelar si el email existe o no
+    return "sent";
+  } catch {
+    return "error";
+  }
+}
+
+export async function resetPassword(
+  token: string,
+  password: string,
+): Promise<{ ok: boolean; message?: string }> {
+  try {
+    const res = await fetch("/api/backend/auth/reset-password", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      credentials: "include",
+      body: JSON.stringify({ token, password }),
+    });
+    if (!res.ok) {
+      const json = await res.json().catch(() => ({}));
+      const msg = Array.isArray(json.message) ? json.message[0] : json.message;
+      return { ok: false, message: msg || "Error al restablecer la contraseña." };
+    }
+    return { ok: true };
+  } catch {
+    return {
+      ok: false,
+      message: "No se pudo restablecer la contraseña. El enlace puede haber expirado.",
+    };
+  }
+}

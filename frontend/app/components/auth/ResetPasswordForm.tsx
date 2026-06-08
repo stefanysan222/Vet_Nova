@@ -4,7 +4,7 @@ import { type FormEvent, useState } from "react";
 import { Eye, EyeOff, Lock } from "lucide-react";
 import { motion } from "framer-motion";
 import { useRouter, useSearchParams } from "next/navigation";
-import { API_URL } from "../../../lib/config";
+import { resetPassword } from "../../../lib/auth";
 
 export default function ResetPasswordForm() {
   const router = useRouter();
@@ -42,28 +42,14 @@ export default function ResetPasswordForm() {
     }
     setLoading(true);
     setSubmitError("");
-    try {
-      const res = await fetch(`${API_URL}/auth/reset-password`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ token, password }),
-      });
-      if (!res.ok) {
-        const json = await res.json().catch(() => ({}));
-        const msg = Array.isArray(json.message) ? json.message[0] : json.message;
-        throw new Error(msg || "Error al restablecer la contraseña.");
-      }
+    const result = await resetPassword(token, password);
+    if (result.ok) {
       setDone(true);
       setTimeout(() => router.push("/login"), 2500);
-    } catch (err) {
-      setSubmitError(
-        err instanceof Error
-          ? err.message
-          : "No se pudo restablecer la contraseña. El enlace puede haber expirado.",
-      );
-    } finally {
-      setLoading(false);
+    } else {
+      setSubmitError(result.message ?? "Error al restablecer la contraseña.");
     }
+    setLoading(false);
   };
 
   if (!token) {

@@ -3,7 +3,7 @@
 import { type FormEvent, useState } from "react";
 import { Mail } from "lucide-react";
 import { motion } from "framer-motion";
-import { API_URL } from "../../../lib/config";
+import { forgotPassword } from "../../../lib/auth";
 
 export default function ForgotPasswordForm() {
   const [email, setEmail] = useState("");
@@ -27,27 +27,19 @@ export default function ForgotPasswordForm() {
     }
     setLoading(true);
     setError("");
-    try {
-      const res = await fetch(`${API_URL}/auth/forgot-password`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email }),
-      });
-      if (res.status === 429) {
+    const outcome = await forgotPassword(email);
+    switch (outcome) {
+      case "rate-limited":
         setError("Demasiados intentos. Intenta de nuevo en unos minutos.");
-        return;
-      }
-      if (res.status >= 500) {
+        break;
+      case "error":
         setError("No se pudo enviar el correo. Intenta de nuevo más tarde.");
-        return;
-      }
-      // Siempre mostrar éxito para 2xx/4xx — nunca revelar si el email existe o no
-      setSent(true);
-    } catch {
-      setError("No se pudo enviar el correo. Intenta de nuevo.");
-    } finally {
-      setLoading(false);
+        break;
+      case "sent":
+        setSent(true);
+        break;
     }
+    setLoading(false);
   };
 
   if (sent) {
