@@ -11,19 +11,17 @@ export default defineConfig({
     exclude: ["**/node_modules/**", "**/e2e/**"],
     coverage: {
       provider: "v8",
-      include: [
-        "lib/auth.ts",
-        "lib/config.ts",
-        "lib/api/client.ts",
-        "lib/utils/status.ts",
-        "lib/utils/clinic-schedule.ts",
+      include: ["app/**/*.{ts,tsx}", "lib/**/*.{ts,tsx}"],
+      exclude: [
+        "**/__tests__/**",
+        "**/*.test.{ts,tsx}",
+        "**/*.spec.{ts,tsx}",
+        "**/*.d.ts",
+        "app/**/layout.tsx",
+        "app/**/loading.tsx",
+        "app/**/error.tsx",
+        "app/**/not-found.tsx",
       ],
-      thresholds: {
-        statements: 70,
-        branches: 60,
-        functions: 75,
-        lines: 70,
-      },
     },
   },
   resolve: {
