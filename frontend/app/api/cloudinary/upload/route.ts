@@ -1,13 +1,31 @@
 import { NextResponse } from "next/server";
 import { rateLimit } from "@/lib/rate-limit";
+import { API_URL } from "@/lib/config";
+import { getAuthToken } from "@/lib/server-auth";
 
 export const runtime = "nodejs";
 
 export async function POST(req: Request) {
-  const ip =
-    (req as Request & { headers: Headers }).headers.get("x-forwarded-for")?.split(",")[0].trim() ??
-    "unknown";
-  if (!(await rateLimit(`upload:${ip}`, 10, 60_000))) {
+  const token = await getAuthToken();
+  if (!token) {
+    return NextResponse.json(
+      { error: "Debes iniciar sesión para subir archivos." },
+      { status: 401 },
+    );
+  }
+
+  const meRes = await fetch(`${API_URL}/auth/me`, {
+    headers: { Authorization: `Bearer ${token}` },
+  });
+  if (!meRes.ok) {
+    return NextResponse.json(
+      { error: "Sesión expirada. Inicia sesión nuevamente." },
+      { status: 401 },
+    );
+  }
+  const me = await meRes.json();
+
+  if (!(await rateLimit(`upload:${me.id}`, 10, 60_000))) {
     return NextResponse.json(
       { error: "Demasiadas subidas. Intenta en un minuto." },
       { status: 429 },
