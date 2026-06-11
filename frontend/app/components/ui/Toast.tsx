@@ -89,24 +89,24 @@ export function ToastProvider({ children }: { children: ReactNode }) {
 const STYLES: Record<ToastType, { wrapper: string; icon: typeof CheckCircle; iconClass: string }> =
   {
     success: {
-      wrapper: "border-emerald-200 bg-white dark:border-emerald-800 dark:bg-slate-900",
+      wrapper: "border-success-200 bg-white dark:border-success-800 dark:bg-slate-900",
       icon: CheckCircle,
-      iconClass: "text-emerald-500",
+      iconClass: "text-success-500",
     },
     error: {
-      wrapper: "border-red-200 bg-white dark:border-red-800 dark:bg-slate-900",
+      wrapper: "border-danger-200 bg-white dark:border-danger-800 dark:bg-slate-900",
       icon: XCircle,
-      iconClass: "text-red-500",
+      iconClass: "text-danger-500",
     },
     warning: {
-      wrapper: "border-amber-200 bg-white dark:border-amber-800 dark:bg-slate-900",
+      wrapper: "border-warning-200 bg-white dark:border-warning-800 dark:bg-slate-900",
       icon: AlertTriangle,
-      iconClass: "text-amber-500",
+      iconClass: "text-warning-500",
     },
     info: {
-      wrapper: "border-blue-200 bg-white dark:border-blue-800 dark:bg-slate-900",
+      wrapper: "border-brand-200 bg-white dark:border-brand-800 dark:bg-slate-900",
       icon: Info,
-      iconClass: "text-blue-500",
+      iconClass: "text-brand-500",
     },
   };
 
@@ -126,7 +126,7 @@ function ToastItem({ toast, dismiss }: { toast: Toast; dismiss: (id: string) => 
     <div
       role="alert"
       aria-live={toast.type === "error" ? "assertive" : "polite"}
-      className={`shadow-card-md flex w-full max-w-sm items-start gap-3 rounded-xl border p-4 transition-all duration-300 ${s.wrapper} ${
+      className={`flex w-full max-w-sm items-start gap-3 rounded-xl border p-4 shadow-card transition-all duration-300 ${s.wrapper} ${
         visible ? "translate-x-0 opacity-100" : "translate-x-4 opacity-0"
       }`}
     >

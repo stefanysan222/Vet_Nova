@@ -5,38 +5,37 @@
 /* ─── Variables de diseño ─────────────────────────────────────── */
 :root {
   /* Colores semánticos de la app */
-  --color-brand:       #2563eb;
-  --color-brand-dark:  #1d4ed8;
-  --color-brand-tint:  #eff6ff;
-  --color-vet:         #10b981;
-  --color-surface:     #f8fafc;
-  --color-border:      #e2e8f0;
-  --color-text:        #0f172a;
-  --color-muted:       #64748b;
+  --color-brand: #6366f1;
+  --color-brand-dark: #4347c9;
+  --color-brand-tint: #e0e7ff;
+  --color-surface: #f8f8fc;
+  --color-border: #e4e4f0;
+  --color-text: #0f172a;
+  --color-muted: #71719c;
 
   /* App-shell (cliente / veterinario) */
-  --app-bg:        #f5f7fb;
-  --app-sidebar:   #ffffff;
-  --app-accent:    #2563eb;
-  --app-text:      #10213a;
-  --app-muted:     #64748b;
-  --app-border:    #e5eaf2;
+  --app-bg: #f8f8fc;
+  --app-sidebar: #ffffff;
+  --app-accent: #6366f1;
+  --app-text: #0f172a;
+  --app-muted: #71719c;
+  --app-border: #e4e4f0;
 
   --background: #ffffff;
   --foreground: #0f172a;
 }
 
 .dark {
-  --color-surface:   #0f172a;
-  --color-border:    #1e293b;
-  --color-text:      #f1f5f9;
-  --color-muted:     #94a3b8;
+  --color-surface: #0f172a;
+  --color-border: #25253d;
+  --color-text: #f1f1f8;
+  --color-muted: #9d9dbe;
 
-  --app-bg:        #0b1120;
-  --app-sidebar:   #111827;
-  --app-text:      #f1f5f9;
-  --app-muted:     #94a3b8;
-  --app-border:    #1e293b;
+  --app-bg: #0f172a;
+  --app-sidebar: #15152b;
+  --app-text: #f1f1f8;
+  --app-muted: #9d9dbe;
+  --app-border: #25253d;
 
   --background: #0a0a0a;
   --foreground: #ededed;
@@ -57,8 +56,14 @@ body {
   margin: 0;
   background-color: var(--background);
   color: var(--foreground);
-  font-family: var(--font-geist-sans), system-ui, -apple-system, sans-serif;
-  font-feature-settings: "rlig" 1, "calt" 1;
+  font-family:
+    var(--font-geist-sans),
+    system-ui,
+    -apple-system,
+    sans-serif;
+  font-feature-settings:
+    "rlig" 1,
+    "calt" 1;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
@@ -81,20 +86,24 @@ body {
 
 /* ─── Selección de texto ──────────────────────────────────────── */
 ::selection {
-  background-color: #bcdaf4;
-  color: #295488;
+  background-color: #e0e7ff;
+  color: #4347c9;
 }
 .dark ::selection {
-  background-color: #1c3f69;
-  color: #bcdaf4;
+  background-color: #2d2f82;
+  color: #c7d2fe;
 }
 
 /* ─── Sistema de tipografía semántica ─────────────────────────── */
 @layer components {
-
   /* — Eyebrow: etiqueta pequeña sobre el título — */
   .text-eyebrow {
     @apply text-xs font-semibold uppercase tracking-[0.3em] text-brand-600 dark:text-brand-400;
+  }
+
+  /* — Título destacado / hero — */
+  .text-display {
+    @apply text-3xl font-bold tracking-tight sm:text-4xl;
   }
 
   /* — Título de página — */
@@ -117,6 +126,11 @@ body {
     @apply text-xs font-medium text-slate-500 dark:text-slate-400;
   }
 
+  /* — Micro-etiqueta en mayúsculas — */
+  .text-caption {
+    @apply text-[11px] font-medium uppercase tracking-wide text-surface-400;
+  }
+
   /* — Texto de cuerpo — */
   .text-body {
     @apply text-sm leading-6 text-slate-600 dark:text-slate-300;
@@ -125,6 +139,11 @@ body {
   /* — Número estadístico grande — */
   .text-stat {
     @apply text-3xl font-bold tracking-tight;
+  }
+
+  /* — Número estadístico pequeño — */
+  .text-stat-sm {
+    @apply text-2xl font-bold tracking-tight;
   }
 
   /* ─── Wrappers de layout ──────────────────────────────────────── */
@@ -160,6 +179,20 @@ body {
   }
 
   .btn-danger {
-    @apply inline-flex items-center justify-center gap-2 rounded-xl bg-red-50 px-5 py-2.5 text-sm font-semibold text-red-600 transition-all duration-150 hover:-translate-y-0.5 hover:bg-red-100 active:translate-y-0 active:scale-[0.98] dark:bg-red-950/60 dark:text-red-400;
+    @apply inline-flex items-center justify-center gap-2 rounded-xl bg-danger-50 px-5 py-2.5 text-sm font-semibold text-danger-600 transition-all duration-150 hover:-translate-y-0.5 hover:bg-danger-100 active:translate-y-0 active:scale-[0.98] dark:bg-danger-900/60 dark:text-danger-400;
+  }
+
+  /* ─── Formularios ─────────────────────────────────────────────── */
+
+  .form-input {
+    @apply w-full rounded-xl border border-surface-200 bg-white px-3.5 py-2.5 text-sm text-surface-900 transition placeholder:text-surface-400 focus:border-brand-400 focus:bg-brand-50/40 focus:outline-none focus:ring-2 focus:ring-brand-100 dark:border-surface-700 dark:bg-surface-900 dark:text-white dark:placeholder:text-surface-500 dark:focus:border-brand-500 dark:focus:bg-surface-800 dark:focus:ring-brand-900/40;
+  }
+
+  .form-input-error {
+    @apply border-danger-400 bg-danger-50/40 focus:border-danger-400 focus:ring-danger-100;
+  }
+
+  .form-label {
+    @apply mb-1.5 block text-xs font-medium text-surface-500 dark:text-surface-400;
   }
 }
