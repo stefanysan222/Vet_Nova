@@ -105,10 +105,9 @@ export default function ConfiguracionPage() {
       setNewPassword("");
       setConfirmPassword("");
     } catch (err) {
-      const msg = err instanceof Error ? err.message : "No se pudo actualizar la contraseña.";
       error(
         "Error al actualizar",
-        msg === "Forbidden" ? "La contraseña actual es incorrecta." : msg,
+        err instanceof Error ? err.message : "No se pudo actualizar la contraseña.",
       );
     } finally {
       setSavingPassword(false);
@@ -257,7 +256,7 @@ export default function ConfiguracionPage() {
               {/* Indicador de coincidencia */}
               {newPassword && confirmPassword && (
                 <p
-                  className={`text-xs font-medium ${newPassword === confirmPassword ? "text-emerald-600 dark:text-emerald-400" : "text-rose-600 dark:text-rose-400"}`}
+                  className={`text-xs font-medium ${newPassword === confirmPassword ? "text-success-600 dark:text-success-400" : "text-danger-600 dark:text-danger-400"}`}
                 >
                   {newPassword === confirmPassword
                     ? "✓ Las contraseñas coinciden"

@@ -69,9 +69,9 @@ export default function AdminNotificationsPage() {
               </p>
             </div>
             {noLeidas > 0 && (
-              <div className="rounded-2xl border border-red-200 bg-red-50 px-5 py-4 shadow-xs dark:border-red-800 dark:bg-red-950/60">
-                <p className="text-label text-red-500 dark:text-red-400">No leídas</p>
-                <p className="text-stat mt-1 text-red-700 dark:text-red-300">{noLeidas}</p>
+              <div className="dark:bg-danger-950/60 rounded-2xl border border-danger-200 bg-danger-50 px-5 py-4 shadow-xs dark:border-danger-800">
+                <p className="text-label text-danger-500 dark:text-danger-400">No leídas</p>
+                <p className="text-stat mt-1 text-danger-700 dark:text-danger-300">{noLeidas}</p>
               </div>
             )}
           </div>
@@ -110,7 +110,7 @@ export default function AdminNotificationsPage() {
         <SkeletonCardList count={4} />
       ) : visibles.length === 0 ? (
         <div className="flex flex-col items-center justify-center rounded-2xl border border-slate-200 bg-white py-16 dark:border-slate-800 dark:bg-slate-950">
-          <CheckCircle className="h-10 w-10 text-emerald-500" />
+          <CheckCircle className="h-10 w-10 text-success-500" />
           <p className="mt-4 text-lg font-semibold text-slate-900 dark:text-white">
             {filtro === "no_leidas" ? "Sin notificaciones nuevas" : "Sin notificaciones"}
           </p>
@@ -157,7 +157,7 @@ export default function AdminNotificationsPage() {
                           e.stopPropagation();
                           handleLeida(n.id);
                         }}
-                        className="shrink-0 rounded-xl border border-slate-200 p-2 text-slate-400 transition hover:border-emerald-300 hover:bg-emerald-50 hover:text-emerald-600 dark:border-slate-700 dark:hover:bg-emerald-950/30"
+                        className="dark:hover:bg-success-950/30 shrink-0 rounded-xl border border-slate-200 p-2 text-slate-400 transition hover:border-success-300 hover:bg-success-50 hover:text-success-600 dark:border-slate-700"
                         title="Marcar como leída"
                       >
                         <Check className="h-3.5 w-3.5" />
@@ -224,9 +224,9 @@ export default function AdminNotificationsPage() {
                     </p>
                   </div>
                   {noLeidas > 0 && (
-                    <div className="rounded-2xl bg-red-50 p-4 dark:bg-red-950/30">
-                      <p className="text-xs text-red-500">No leídas</p>
-                      <p className="mt-1 text-2xl font-bold text-red-700 dark:text-red-300">
+                    <div className="dark:bg-danger-950/30 rounded-2xl bg-danger-50 p-4">
+                      <p className="text-xs text-danger-500">No leídas</p>
+                      <p className="mt-1 text-2xl font-bold text-danger-700 dark:text-danger-300">
                         {noLeidas}
                       </p>
                     </div>

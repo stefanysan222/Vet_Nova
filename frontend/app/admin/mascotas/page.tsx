@@ -2,18 +2,35 @@
 
 import { useEffect, useState, useMemo } from "react";
 import { AnimatePresence, motion } from "framer-motion";
-import { Search, X, FileText, Info, PawPrint, Plus } from "lucide-react";
-import { fetchMascotas, createMascota } from "../../../lib/api/mascotas";
+import { Search, X, FileText, Info, PawPrint, Plus, Pencil, Trash2 } from "lucide-react";
+import {
+  fetchMascotas,
+  createMascota,
+  updateMascota,
+  deleteMascota,
+} from "../../../lib/api/mascotas";
 import { fetchPropietarios } from "../../../lib/api/propietarios";
 import { fetchCitas } from "../../../lib/api/citas";
 import { StatusBadge } from "../../../lib/utils/status-badge";
 import type { PetRecord, Owner, Appointment } from "../../../lib/recepcionista/types";
 import { SkeletonCardList } from "../../components/ui/Skeleton";
+import { useToast } from "../../components/ui/Toast";
+import ConfirmDialog from "../../components/ui/ConfirmDialog";
 
 type Tab = "info" | "historial";
 
-const inputClass =
-  "w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-slate-900 outline-none transition focus:border-brand-500 focus:ring-2 focus:ring-brand-100 dark:border-slate-700 dark:bg-slate-900 dark:text-white";
+const inputClass = "form-input";
+
+/**
+ * Normaliza valores históricos como "Perro"/"Gato" a las categorías
+ * "Canino"/"Felino"/"Otro" usadas por los filtros y contadores.
+ */
+function normalizeEspecie(especie: string): "Canino" | "Felino" | "Otro" {
+  const value = especie.trim().toLowerCase();
+  if (value === "canino" || value === "perro") return "Canino";
+  if (value === "felino" || value === "gato") return "Felino";
+  return "Otro";
+}
 
 function parseNotas(notas?: string): Record<string, string> | null {
   if (!notas) return null;
@@ -53,11 +70,15 @@ function DetailModal({
   citas,
   loadingCitas,
   onClose,
+  onEdit,
+  onDelete,
 }: {
   pet: PetRecord;
   citas: Appointment[];
   loadingCitas: boolean;
   onClose: () => void;
+  onEdit: () => void;
+  onDelete: () => void;
 }) {
   const [tab, setTab] = useState<Tab>("info");
   const historial = citas
@@ -69,7 +90,7 @@ function DetailModal({
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
-      className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/50 px-4 backdrop-blur-sm"
+      className="fixed inset-0 z-[100] flex items-center justify-center bg-surface-900/50 px-4 backdrop-blur-sm"
       onClick={onClose}
     >
       <motion.div
@@ -77,7 +98,7 @@ function DetailModal({
         animate={{ scale: 1, opacity: 1, y: 0 }}
         exit={{ scale: 0.96, opacity: 0, y: 12 }}
         transition={{ type: "spring", bounce: 0.18, duration: 0.38 }}
-        className="flex max-h-[90vh] w-full max-w-2xl flex-col overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-2xl dark:border-slate-700 dark:bg-slate-900"
+        className="flex max-h-[90vh] w-full max-w-2xl flex-col overflow-hidden rounded-3xl border border-surface-200/60 bg-white shadow-modal dark:border-surface-700 dark:bg-surface-900"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Header */}
@@ -94,12 +115,28 @@ function DetailModal({
               {pet.raza || "Raza no especificada"} · Propietario: {pet.propietarioNombre || "—"}
             </p>
           </div>
-          <button
-            onClick={onClose}
-            className="flex h-8 w-8 shrink-0 items-center justify-center rounded-xl text-slate-400 transition hover:bg-slate-100 hover:text-slate-600 dark:hover:bg-slate-800"
-          >
-            <X className="h-4 w-4" />
-          </button>
+          <div className="flex shrink-0 items-center gap-1.5">
+            <button
+              onClick={onEdit}
+              className="flex h-8 w-8 items-center justify-center rounded-xl text-slate-400 transition hover:bg-slate-100 hover:text-slate-600 dark:hover:bg-slate-800"
+              title="Editar mascota"
+            >
+              <Pencil className="h-4 w-4" />
+            </button>
+            <button
+              onClick={onDelete}
+              className="dark:hover:bg-danger-950/30 flex h-8 w-8 items-center justify-center rounded-xl text-slate-400 transition hover:bg-danger-50 hover:text-danger-600 dark:hover:text-danger-400"
+              title="Eliminar mascota"
+            >
+              <Trash2 className="h-4 w-4" />
+            </button>
+            <button
+              onClick={onClose}
+              className="flex h-8 w-8 items-center justify-center rounded-xl text-slate-400 transition hover:bg-slate-100 hover:text-slate-600 dark:hover:bg-slate-800"
+            >
+              <X className="h-4 w-4" />
+            </button>
+          </div>
         </div>
 
         {/* Tabs */}
@@ -237,7 +274,18 @@ function DetailModal({
   );
 }
 
+const emptyForm = {
+  nombre: "",
+  especie: "Canino",
+  raza: "",
+  edad: "",
+  peso: "",
+  sexo: "No especificado",
+  propietarioId: "",
+};
+
 export default function MascotasPage() {
+  const { success, error: notifyError } = useToast();
   const [pets, setPets] = useState<PetRecord[]>([]);
   const [propietarios, setPropietarios] = useState<Owner[]>([]);
   const [citas, setCitas] = useState<Appointment[]>([]);
@@ -245,21 +293,16 @@ export default function MascotasPage() {
   const [loadingCitas, setLoadingCitas] = useState(true);
   const [selectedPet, setSelectedPet] = useState<PetRecord | null>(null);
   const [showForm, setShowForm] = useState(false);
+  const [editingPetId, setEditingPetId] = useState<string | null>(null);
+  const [confirmDeletePet, setConfirmDeletePet] = useState<PetRecord | null>(null);
+  const [deleting, setDeleting] = useState(false);
   const [search, setSearch] = useState("");
   const [filtroEspecie, setFiltroEspecie] = useState<"todas" | "Canino" | "Felino" | "Otro">(
     "todas",
   );
   const [saving, setSaving] = useState(false);
   const [formError, setFormError] = useState("");
-  const [form, setForm] = useState({
-    nombre: "",
-    especie: "Canino",
-    raza: "",
-    edad: "",
-    peso: "",
-    sexo: "No especificado",
-    propietarioId: "",
-  });
+  const [form, setForm] = useState(emptyForm);
 
   const cargar = () => {
     setLoading(true);
@@ -292,7 +335,8 @@ export default function MascotasPage() {
         p.nombre.toLowerCase().includes(search.toLowerCase()) ||
         (p.propietarioNombre ?? "").toLowerCase().includes(search.toLowerCase()) ||
         (p.raza ?? "").toLowerCase().includes(search.toLowerCase());
-      const matchEspecie = filtroEspecie === "todas" || p.especie === filtroEspecie;
+      const matchEspecie =
+        filtroEspecie === "todas" || normalizeEspecie(p.especie) === filtroEspecie;
       return matchSearch && matchEspecie;
     });
   }, [pets, search, filtroEspecie]);
@@ -315,7 +359,8 @@ export default function MascotasPage() {
     setSaving(true);
     setFormError("");
     try {
-      await createMascota({
+      const propietario = propietarios.find((o) => o.id === form.propietarioId);
+      const payload = {
         nombre: form.nombre.trim(),
         especie: form.especie,
         raza: form.raza.trim() || "",
@@ -324,30 +369,72 @@ export default function MascotasPage() {
         sexo: form.sexo as PetRecord["sexo"],
         foto: "",
         propietarioId: form.propietarioId,
-      });
+        propietarioNombre: propietario?.name ?? "",
+      };
+      if (editingPetId) {
+        await updateMascota({ id: editingPetId, ...payload });
+        success("Mascota actualizada", "Los datos de la mascota se guardaron correctamente.");
+      } else {
+        await createMascota(payload);
+        success("Mascota registrada", "La mascota se registró correctamente.");
+      }
       setShowForm(false);
-      setForm({
-        nombre: "",
-        especie: "Canino",
-        raza: "",
-        edad: "",
-        peso: "",
-        sexo: "No especificado",
-        propietarioId: "",
-      });
+      setEditingPetId(null);
+      setForm(emptyForm);
       cargar();
     } catch (err) {
-      setFormError(err instanceof Error ? err.message : "Error al registrar la mascota.");
+      setFormError(
+        err instanceof Error
+          ? err.message
+          : editingPetId
+            ? "Error al actualizar la mascota."
+            : "Error al registrar la mascota.",
+      );
     } finally {
       setSaving(false);
     }
   };
 
+  const openEditForm = (pet: PetRecord) => {
+    setEditingPetId(pet.id);
+    setForm({
+      nombre: pet.nombre,
+      especie: pet.especie,
+      raza: pet.raza ?? "",
+      edad: pet.edad ?? "",
+      peso: pet.peso ?? "",
+      sexo: pet.sexo,
+      propietarioId: pet.propietarioId,
+    });
+    setFormError("");
+    setSelectedPet(null);
+    setShowForm(true);
+  };
+
+  const handleDeletePet = async () => {
+    if (!confirmDeletePet) return;
+    setDeleting(true);
+    try {
+      await deleteMascota(confirmDeletePet.id);
+      success("Mascota eliminada", "La mascota se eliminó correctamente.");
+      setConfirmDeletePet(null);
+      setSelectedPet(null);
+      cargar();
+    } catch (err) {
+      notifyError(
+        "Error al eliminar",
+        err instanceof Error ? err.message : "No se pudo eliminar la mascota.",
+      );
+    } finally {
+      setDeleting(false);
+    }
+  };
+
   const especieCounts = useMemo(
     () => ({
-      Canino: pets.filter((p) => p.especie === "Canino").length,
-      Felino: pets.filter((p) => p.especie === "Felino").length,
-      Otro: pets.filter((p) => p.especie !== "Canino" && p.especie !== "Felino").length,
+      Canino: pets.filter((p) => normalizeEspecie(p.especie) === "Canino").length,
+      Felino: pets.filter((p) => normalizeEspecie(p.especie) === "Felino").length,
+      Otro: pets.filter((p) => normalizeEspecie(p.especie) === "Otro").length,
     }),
     [pets],
   );
@@ -512,6 +599,8 @@ export default function MascotasPage() {
             citas={citas}
             loadingCitas={loadingCitas}
             onClose={() => setSelectedPet(null)}
+            onEdit={() => openEditForm(selectedPet)}
+            onDelete={() => setConfirmDeletePet(selectedPet)}
           />
         )}
       </AnimatePresence>
@@ -523,21 +612,31 @@ export default function MascotasPage() {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/50 px-4 backdrop-blur-sm"
-            onClick={() => setShowForm(false)}
+            className="fixed inset-0 z-[100] flex items-center justify-center bg-surface-900/50 px-4 backdrop-blur-sm"
+            onClick={() => {
+              setShowForm(false);
+              setEditingPetId(null);
+              setForm(emptyForm);
+            }}
           >
             <motion.div
               initial={{ scale: 0.96, opacity: 0, y: 12 }}
               animate={{ scale: 1, opacity: 1, y: 0 }}
               exit={{ scale: 0.96, opacity: 0, y: 12 }}
               transition={{ type: "spring", bounce: 0.18, duration: 0.38 }}
-              className="flex max-h-[90vh] w-full max-w-2xl flex-col overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-2xl dark:border-slate-700 dark:bg-slate-900"
+              className="flex max-h-[90vh] w-full max-w-2xl flex-col overflow-hidden rounded-3xl border border-surface-200/60 bg-white shadow-modal dark:border-surface-700 dark:bg-surface-900"
               onClick={(e) => e.stopPropagation()}
             >
               <div className="flex items-center justify-between border-b border-slate-100 px-6 py-4 dark:border-slate-800">
-                <h2 className="text-lg font-bold text-slate-900 dark:text-white">Nueva mascota</h2>
+                <h2 className="text-lg font-bold text-slate-900 dark:text-white">
+                  {editingPetId ? "Editar mascota" : "Nueva mascota"}
+                </h2>
                 <button
-                  onClick={() => setShowForm(false)}
+                  onClick={() => {
+                    setShowForm(false);
+                    setEditingPetId(null);
+                    setForm(emptyForm);
+                  }}
                   className="flex h-8 w-8 items-center justify-center rounded-xl text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800"
                 >
                   <X className="h-4 w-4" />
@@ -646,7 +745,7 @@ export default function MascotasPage() {
                     </div>
                   </div>
                   {formError && (
-                    <div className="rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700 dark:border-red-800 dark:bg-red-950/30 dark:text-red-300">
+                    <div className="dark:bg-danger-950/30 rounded-xl border border-danger-200 bg-danger-50 px-4 py-3 text-sm text-danger-700 dark:border-danger-800 dark:text-danger-300">
                       {formError}
                     </div>
                   )}
@@ -655,7 +754,11 @@ export default function MascotasPage() {
               <div className="flex justify-end gap-3 border-t border-slate-100 px-6 py-4 dark:border-slate-800">
                 <button
                   type="button"
-                  onClick={() => setShowForm(false)}
+                  onClick={() => {
+                    setShowForm(false);
+                    setEditingPetId(null);
+                    setForm(emptyForm);
+                  }}
                   className="rounded-xl border border-slate-200 px-5 py-2.5 text-sm font-semibold text-slate-700 transition hover:bg-slate-50 dark:border-slate-700 dark:text-slate-300"
                 >
                   Cancelar
@@ -666,13 +769,29 @@ export default function MascotasPage() {
                   disabled={saving}
                   className="rounded-xl bg-brand-600 px-6 py-2.5 text-sm font-semibold text-white transition hover:bg-brand-700 disabled:opacity-60"
                 >
-                  {saving ? "Guardando..." : "Registrar mascota"}
+                  {saving ? "Guardando..." : editingPetId ? "Guardar cambios" : "Registrar mascota"}
                 </button>
               </div>
             </motion.div>
           </motion.div>
         )}
       </AnimatePresence>
+
+      {/* Confirmación de eliminación */}
+      <ConfirmDialog
+        open={confirmDeletePet !== null}
+        title="Eliminar mascota"
+        description={
+          confirmDeletePet
+            ? `¿Seguro que deseas eliminar a "${confirmDeletePet.nombre}"? Esta acción no se puede deshacer.`
+            : ""
+        }
+        confirmLabel={deleting ? "Eliminando..." : "Eliminar"}
+        cancelLabel="Cancelar"
+        variant="danger"
+        onConfirm={handleDeletePet}
+        onCancel={() => setConfirmDeletePet(null)}
+      />
     </>
   );
 }

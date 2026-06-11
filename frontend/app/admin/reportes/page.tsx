@@ -17,6 +17,7 @@ import {
   Legend,
 } from "chart.js";
 import { Bar } from "react-chartjs-2";
+import { CHART_COLORS } from "../../../lib/chart-colors";
 
 ChartJS.register(CategoryScale, LinearScale, BarElement, Tooltip, Legend);
 
@@ -83,41 +84,43 @@ export default function ReportesPage() {
       title: "Total veterinarios",
       value: stats?.veterinarios,
       icon: Stethoscope,
-      accent: "bg-emerald-50 text-emerald-600 dark:bg-emerald-950/40 dark:text-emerald-400",
-      accentBar: "bg-emerald-500",
-      border: "border-emerald-100 dark:border-emerald-900/40",
+      accent: "bg-success-50 text-success-600 dark:bg-success-950/40 dark:text-success-400",
+      accentBar: "bg-success-500",
+      border: "border-success-100 dark:border-success-900/40",
     },
     {
       title: "Total mascotas",
       value: stats?.mascotas,
       icon: PawPrint,
-      accent: "bg-amber-50 text-amber-600 dark:bg-amber-950/40 dark:text-amber-400",
-      accentBar: "bg-amber-500",
-      border: "border-amber-100 dark:border-amber-900/40",
+      accent: "bg-warning-50 text-warning-600 dark:bg-warning-950/40 dark:text-warning-400",
+      accentBar: "bg-warning-500",
+      border: "border-warning-100 dark:border-warning-900/40",
     },
     {
       title: "Citas hoy",
       value: stats?.citasHoy,
       icon: CalendarDays,
-      accent: "bg-violet-50 text-violet-600 dark:bg-violet-950/40 dark:text-violet-400",
-      accentBar: "bg-violet-500",
-      border: "border-violet-100 dark:border-violet-900/40",
+      accent: "bg-brand-50 text-brand-500 dark:bg-brand-950/40 dark:text-brand-300",
+      accentBar: "bg-brand-400",
+      border: "border-brand-100 dark:border-brand-900/40",
     },
     {
       title: "Citas pendientes",
       value: stats?.citasPendientes,
       icon: Clock,
-      accent: "bg-rose-50 text-rose-600 dark:bg-rose-950/40 dark:text-rose-400",
-      accentBar: "bg-rose-500",
-      border: "border-rose-100 dark:border-rose-900/40",
+      accent: "bg-accent-50 text-accent-600 dark:bg-accent-950/40 dark:text-accent-400",
+      accentBar: "bg-accent-500",
+      border: "border-accent-100 dark:border-accent-900/40",
     },
   ];
 
   // Datos para la gráfica de barras — citas programadas por día (últimos 30 días + próximos 14)
   const chartData = useMemo(() => {
     const hoy = new Date();
-    const desde = new Date(hoy); desde.setDate(hoy.getDate() - 29);
-    const hasta = new Date(hoy); hasta.setDate(hoy.getDate() + 14);
+    const desde = new Date(hoy);
+    desde.setDate(hoy.getDate() - 29);
+    const hasta = new Date(hoy);
+    hasta.setDate(hoy.getDate() + 14);
 
     // Generar rango de fechas
     const fechas: string[] = [];
@@ -131,7 +134,9 @@ export default function ReportesPage() {
     const conteo: Record<string, number> = {};
     citas
       .filter((c) => c.status !== "Cancelada")
-      .forEach((c) => { if (c.date) conteo[c.date] = (conteo[c.date] ?? 0) + 1; });
+      .forEach((c) => {
+        if (c.date) conteo[c.date] = (conteo[c.date] ?? 0) + 1;
+      });
 
     // Filtrar solo fechas que tienen citas o son hoy
     const todayStr = hoy.toISOString().slice(0, 10);
@@ -144,47 +149,73 @@ export default function ReportesPage() {
 
     const todayIndex = fechasConDatos.indexOf(todayStr);
     const backgroundColors = fechasConDatos.map((f) =>
-      f === todayStr ? "#4a87c3" : f < todayStr ? "#90c1ed" : "#bcdaf4"
+      f === todayStr ? CHART_COLORS.today : f < todayStr ? CHART_COLORS.past : CHART_COLORS.future,
     );
 
     return {
       labels,
       todayIndex,
-      datasets: [{
-        label: "Citas",
-        data: fechasConDatos.map((f) => conteo[f] ?? 0),
-        backgroundColor: backgroundColors,
-        borderRadius: 6,
-        borderSkipped: false,
-      }],
+      datasets: [
+        {
+          label: "Citas",
+          data: fechasConDatos.map((f) => conteo[f] ?? 0),
+          backgroundColor: backgroundColors,
+          borderRadius: 6,
+          borderSkipped: false,
+        },
+      ],
     };
   }, [citas]);
 
   // Distribución de citas por estado
-  const pendientes  = citas.filter((c) => c.status === "Pendiente").length;
+  const pendientes = citas.filter((c) => c.status === "Pendiente").length;
   const confirmadas = citas.filter((c) => c.status === "Confirmada").length;
   const finalizadas = citas.filter((c) => c.status === "Finalizada").length;
-  const canceladas  = citas.filter((c) => c.status === "Cancelada").length;
-  const otras       = citas.length - pendientes - confirmadas - finalizadas - canceladas;
-  const total       = citas.length || 1;
+  const canceladas = citas.filter((c) => c.status === "Cancelada").length;
+  const otras = citas.length - pendientes - confirmadas - finalizadas - canceladas;
+  const total = citas.length || 1;
 
   const distribucion = [
-    { label: "Pendientes",  valor: pendientes,  color: "bg-amber-400",   text: "text-amber-700 dark:text-amber-300" },
-    { label: "Confirmadas", valor: confirmadas, color: "bg-emerald-400", text: "text-emerald-700 dark:text-emerald-300" },
-    { label: "Finalizadas", valor: finalizadas, color: "bg-brand-400",    text: "text-brand-700 dark:text-brand-300" },
-    { label: "Canceladas",  valor: canceladas,  color: "bg-rose-400",    text: "text-rose-700 dark:text-rose-300" },
-    { label: "Otras",       valor: otras,       color: "bg-slate-300",   text: "text-slate-600 dark:text-slate-400" },
+    {
+      label: "Pendientes",
+      valor: pendientes,
+      color: "bg-accent-400",
+      text: "text-accent-700 dark:text-accent-300",
+    },
+    {
+      label: "Confirmadas",
+      valor: confirmadas,
+      color: "bg-success-400",
+      text: "text-success-700 dark:text-success-300",
+    },
+    {
+      label: "Finalizadas",
+      valor: finalizadas,
+      color: "bg-brand-400",
+      text: "text-brand-700 dark:text-brand-300",
+    },
+    {
+      label: "Canceladas",
+      valor: canceladas,
+      color: "bg-danger-400",
+      text: "text-danger-700 dark:text-danger-300",
+    },
+    {
+      label: "Otras",
+      valor: otras,
+      color: "bg-surface-300",
+      text: "text-surface-600 dark:text-surface-400",
+    },
   ].filter((d) => d.valor > 0);
 
   return (
     <div className="px-5 pb-12 pt-6 sm:px-6 lg:px-10">
       <section className="rounded-2xl border border-slate-200/60 bg-white p-6 shadow-card dark:border-slate-700 dark:bg-slate-900">
-
         {/* Header */}
         <div>
           <p className="text-eyebrow">Reportes</p>
-          <h1 className="mt-2 text-page-title">Resumen del sistema</h1>
-          <p className="mt-1 text-subtitle">
+          <h1 className="text-page-title mt-2">Resumen del sistema</h1>
+          <p className="text-subtitle mt-1">
             Indicadores en tiempo real obtenidos de la base de datos.
           </p>
         </div>
@@ -203,15 +234,21 @@ export default function ReportesPage() {
               >
                 <div className={`absolute inset-y-0 left-0 w-1 rounded-l-2xl ${ind.accentBar}`} />
                 <div className="px-5 py-4 pl-6">
-                  <div className={`mb-3 inline-flex h-9 w-9 items-center justify-center rounded-xl ${ind.accent}`}>
+                  <div
+                    className={`mb-3 inline-flex h-9 w-9 items-center justify-center rounded-xl ${ind.accent}`}
+                  >
                     <Icon className="h-4 w-4" />
                   </div>
                   <p className="mt-1 text-3xl font-bold tracking-tight text-slate-900 dark:text-white">
                     {loading ? (
                       <span className="inline-block h-8 w-10 animate-pulse rounded-lg bg-slate-100 dark:bg-slate-800" />
-                    ) : (ind.value ?? 0)}
+                    ) : (
+                      (ind.value ?? 0)
+                    )}
                   </p>
-                  <p className="mt-1 text-xs font-medium text-slate-500 dark:text-slate-400">{ind.title}</p>
+                  <p className="mt-1 text-xs font-medium text-slate-500 dark:text-slate-400">
+                    {ind.title}
+                  </p>
                 </div>
               </motion.article>
             );
@@ -230,10 +267,10 @@ export default function ReportesPage() {
                 <span className="inline-flex items-center gap-1">
                   <span className="inline-block h-2 w-2 rounded-sm bg-brand-600" /> Hoy
                 </span>{" "}
-                <span className="inline-flex items-center gap-1 ml-3">
+                <span className="ml-3 inline-flex items-center gap-1">
                   <span className="inline-block h-2 w-2 rounded-sm bg-brand-300" /> Pasado
                 </span>{" "}
-                <span className="inline-flex items-center gap-1 ml-3">
+                <span className="ml-3 inline-flex items-center gap-1">
                   <span className="inline-block h-2 w-2 rounded-sm bg-brand-100" /> Próximo
                 </span>
               </p>
@@ -249,18 +286,17 @@ export default function ReportesPage() {
                     plugins: {
                       legend: { display: false },
                       tooltip: {
-                        backgroundColor: "rgba(15,23,42,0.9)",
+                        backgroundColor: CHART_COLORS.tooltipBg,
                         padding: 12,
                         cornerRadius: 10,
-                        titleColor: "#e2e8f0",
-                        bodyColor: "#94a3b8",
+                        titleColor: CHART_COLORS.tooltipTitle,
+                        bodyColor: CHART_COLORS.tooltipBody,
                         callbacks: {
                           title: (items) => {
                             const idx = items[0]?.dataIndex ?? 0;
                             return `Fecha: ${chartData.labels[idx] ?? ""}`;
                           },
-                          label: (item) =>
-                            `  ${item.raw} cita${Number(item.raw) !== 1 ? "s" : ""}`,
+                          label: (item) => `  ${item.raw} cita${Number(item.raw) !== 1 ? "s" : ""}`,
                         },
                       },
                     },
@@ -332,7 +368,9 @@ export default function ReportesPage() {
                   >
                     <div className="min-w-0">
                       <p className="font-medium text-slate-900 dark:text-white">{c.petName}</p>
-                      <p className="text-xs text-slate-400">{c.date} · {c.time || "—"} · {c.service || "—"}</p>
+                      <p className="text-xs text-slate-400">
+                        {c.date} · {c.time || "—"} · {c.service || "—"}
+                      </p>
                     </div>
                     <StatusBadge status={c.status} />
                   </div>

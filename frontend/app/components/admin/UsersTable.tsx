@@ -22,7 +22,7 @@ function roleStyle(role: string): { bg: string; dot: string } {
     return { bg: "bg-brand-50 text-brand-700 border border-brand-200", dot: "bg-brand-500" };
   if (role.toLowerCase().includes("admin"))
     return { bg: "bg-slate-100 text-slate-700 border border-slate-200", dot: "bg-slate-400" };
-  return { bg: "bg-sky-50 text-sky-700 border border-sky-200", dot: "bg-sky-400" };
+  return { bg: "bg-accent-50 text-accent-700 border border-accent-200", dot: "bg-accent-400" };
 }
 
 export default function UsersTable({ refreshTrigger = 0 }: { refreshTrigger?: number }) {

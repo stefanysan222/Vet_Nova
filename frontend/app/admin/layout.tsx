@@ -37,6 +37,7 @@ export default function AdminLayout({ children }: { children: ReactNode }) {
     }
     if (user.role !== "Administrador") {
       const routes: Record<string, string> = {
+        SuperAdministrador: "/super-admin",
         Veterinario: "/veterinario",
         Cliente: "/cliente",
       };

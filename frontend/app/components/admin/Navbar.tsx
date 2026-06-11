@@ -370,7 +370,7 @@ export default function Navbar() {
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, y: -6 }}
                 transition={{ duration: 0.15 }}
-                className="shadow-card-lg absolute left-0 top-full mt-2 w-full min-w-[320px] overflow-hidden rounded-2xl border border-slate-200 bg-white dark:border-slate-700 dark:bg-slate-900"
+                className="absolute left-0 top-full mt-2 w-full min-w-[320px] overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-lg dark:border-slate-700 dark:bg-slate-900"
               >
                 {searching && results.length === 0 ? (
                   <p className="px-4 py-3 text-sm text-slate-400">Buscando...</p>
@@ -443,7 +443,7 @@ export default function Navbar() {
             >
               <Bell className="h-4 w-4" />
               {notifCount > 0 && (
-                <span className="absolute right-1.5 top-1.5 flex h-4 w-4 items-center justify-center rounded-full bg-red-500 text-[9px] font-bold text-white ring-2 ring-white dark:ring-slate-950">
+                <span className="absolute right-1.5 top-1.5 flex h-4 w-4 items-center justify-center rounded-full bg-accent-500 text-[9px] font-bold text-white ring-2 ring-white dark:ring-slate-950">
                   {notifCount > 9 ? "9+" : notifCount}
                 </span>
               )}

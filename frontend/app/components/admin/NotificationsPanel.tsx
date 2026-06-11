@@ -70,7 +70,7 @@ const NotificationsPanel: React.FC = () => {
           ))
         ) : items.length === 0 ? (
           <div className="flex items-center gap-3 rounded-2xl border border-slate-200/70 bg-slate-50 p-4 dark:border-slate-700 dark:bg-slate-800/50">
-            <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-xl bg-emerald-100 text-emerald-600 dark:bg-emerald-900/40 dark:text-emerald-400">
+            <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-xl bg-success-100 text-success-600 dark:bg-success-900/40 dark:text-success-400">
               <CheckCircle className="h-4 w-4" />
             </div>
             <div>

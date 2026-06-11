@@ -71,7 +71,7 @@ function RescheduleModal({
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
-      className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/50 px-4 backdrop-blur-sm"
+      className="fixed inset-0 z-[100] flex items-center justify-center bg-surface-900/50 px-4 backdrop-blur-sm"
       onClick={onClose}
     >
       <motion.div
@@ -79,7 +79,7 @@ function RescheduleModal({
         animate={{ scale: 1, opacity: 1, y: 0 }}
         exit={{ scale: 0.96, opacity: 0, y: 10 }}
         transition={{ type: "spring", bounce: 0.2, duration: 0.35 }}
-        className="flex max-h-[90vh] w-full max-w-md flex-col overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-modal dark:border-slate-700 dark:bg-slate-900"
+        className="flex max-h-[90vh] w-full max-w-md flex-col overflow-hidden rounded-3xl border border-surface-200/60 bg-white shadow-modal dark:border-surface-700 dark:bg-surface-900"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Scrollable body */}
@@ -133,7 +133,7 @@ function RescheduleModal({
               />
               {date && (
                 <p
-                  className={`mt-1 text-xs font-medium ${isClinicOpen(date) ? "text-emerald-600 dark:text-emerald-400" : "text-rose-600 dark:text-rose-400"}`}
+                  className={`mt-1 text-xs font-medium ${isClinicOpen(date) ? "text-success-600 dark:text-success-400" : "text-danger-600 dark:text-danger-400"}`}
                 >
                   {isClinicOpen(date)
                     ? `Horario: ${getScheduleLabel(date)}`
@@ -149,7 +149,7 @@ function RescheduleModal({
                 Nueva hora
               </label>
               {clinicaCerrada ? (
-                <div className="rounded-xl border border-rose-200 bg-rose-50 px-4 py-3 text-xs text-rose-700 dark:border-rose-900 dark:bg-rose-950/30 dark:text-rose-400">
+                <div className="dark:bg-danger-950/30 rounded-xl border border-danger-200 bg-danger-50 px-4 py-3 text-xs text-danger-700 dark:border-danger-900 dark:text-danger-400">
                   No hay turnos disponibles. La clínica está cerrada ese día.
                 </div>
               ) : !date ? (
@@ -192,7 +192,7 @@ function RescheduleModal({
               {loadingVets ? (
                 <p className="text-xs text-slate-400">Cargando veterinarios...</p>
               ) : vetsError ? (
-                <p className="text-xs text-rose-500">
+                <p className="text-xs text-danger-500">
                   No se pudo cargar la lista de veterinarios. Intenta cerrar y abrir de nuevo.
                 </p>
               ) : vets.length === 0 ? (
@@ -210,11 +210,11 @@ function RescheduleModal({
                           : "border-slate-200 bg-white text-slate-700 hover:border-brand-200 hover:bg-slate-50 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-300"
                       }`}
                     >
-                      <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg bg-emerald-100 text-xs font-bold text-emerald-700 dark:bg-emerald-900/40 dark:text-emerald-300">
+                      <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg bg-success-100 text-xs font-bold text-success-700 dark:bg-success-900/40 dark:text-success-300">
                         {(v.nombre ?? "?")[0].toUpperCase()}
                       </span>
                       <span className="flex-1 font-medium">{v.nombre}</span>
-                      <span className="text-xs text-emerald-600 dark:text-emerald-400">
+                      <span className="text-xs text-success-600 dark:text-success-400">
                         Disponible
                       </span>
                     </button>
@@ -231,7 +231,7 @@ function RescheduleModal({
                       <span className="flex-1 font-medium text-slate-500 dark:text-slate-400">
                         {v.nombre}
                       </span>
-                      <span className="text-xs text-rose-500">Ocupado</span>
+                      <span className="text-xs text-danger-500">Ocupado</span>
                     </div>
                   ))}
                 </div>
@@ -376,17 +376,17 @@ export default function CitasPage() {
                 {loading ? "—" : appointments.length}
               </p>
             </article>
-            <article className="relative overflow-hidden rounded-2xl border border-amber-200/70 bg-amber-50 p-5 shadow-xs dark:border-amber-900 dark:bg-amber-950/30">
-              <div className="absolute inset-y-0 left-0 w-1 rounded-l-2xl bg-amber-500" />
-              <p className="text-label pl-1 text-amber-600 dark:text-amber-400">Pendientes</p>
-              <p className="text-stat mt-1 pl-1 text-amber-800 dark:text-amber-300">
+            <article className="relative overflow-hidden rounded-2xl border border-accent-200/70 bg-accent-50 p-5 shadow-xs dark:border-accent-900 dark:bg-accent-950/30">
+              <div className="absolute inset-y-0 left-0 w-1 rounded-l-2xl bg-accent-500" />
+              <p className="text-label pl-1 text-accent-600 dark:text-accent-400">Pendientes</p>
+              <p className="text-stat mt-1 pl-1 text-accent-800 dark:text-accent-300">
                 {loading ? "—" : pendientes}
               </p>
             </article>
-            <article className="relative overflow-hidden rounded-2xl border border-emerald-200/70 bg-emerald-50 p-5 shadow-xs dark:border-emerald-900 dark:bg-emerald-950/30">
-              <div className="absolute inset-y-0 left-0 w-1 rounded-l-2xl bg-emerald-500" />
-              <p className="text-label pl-1 text-emerald-600 dark:text-emerald-400">Confirmadas</p>
-              <p className="text-stat mt-1 pl-1 text-emerald-800 dark:text-emerald-300">
+            <article className="dark:bg-success-950/30 relative overflow-hidden rounded-2xl border border-success-200/70 bg-success-50 p-5 shadow-xs dark:border-success-900">
+              <div className="absolute inset-y-0 left-0 w-1 rounded-l-2xl bg-success-500" />
+              <p className="text-label pl-1 text-success-600 dark:text-success-400">Confirmadas</p>
+              <p className="text-stat mt-1 pl-1 text-success-800 dark:text-success-300">
                 {loading ? "—" : confirmadas}
               </p>
             </article>
@@ -449,7 +449,7 @@ export default function CitasPage() {
                         <button
                           onClick={() => cambiarEstado(appointment.id, "Confirmada")}
                           disabled={updatingId === appointment.id}
-                          className="rounded-xl bg-emerald-600 px-4 py-2 text-sm font-semibold text-white transition hover:bg-emerald-700 disabled:opacity-50"
+                          className="rounded-xl bg-success-600 px-4 py-2 text-sm font-semibold text-white transition hover:bg-success-700 disabled:opacity-50"
                         >
                           {updatingId === appointment.id ? "..." : "Confirmar"}
                         </button>
@@ -469,7 +469,7 @@ export default function CitasPage() {
                         <button
                           onClick={() => setConfirmCancel(appointment)}
                           disabled={updatingId === appointment.id}
-                          className="rounded-xl border border-rose-200 bg-rose-50 px-4 py-2 text-sm font-semibold text-rose-700 transition hover:bg-rose-100 disabled:opacity-50"
+                          className="rounded-xl border border-danger-200 bg-danger-50 px-4 py-2 text-sm font-semibold text-danger-700 transition hover:bg-danger-100 disabled:opacity-50"
                         >
                           Cancelar
                         </button>

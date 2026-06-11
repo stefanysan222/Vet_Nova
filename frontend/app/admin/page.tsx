@@ -10,6 +10,7 @@ import { fetchCitas } from "../../lib/api/citas";
 import type { Appointment } from "../../lib/recepcionista/types";
 import { Chart as ChartJS, CategoryScale, LinearScale, BarElement, Tooltip } from "chart.js";
 import { Bar } from "react-chartjs-2";
+import { CHART_COLORS } from "../../lib/chart-colors";
 
 ChartJS.register(CategoryScale, LinearScale, BarElement, Tooltip);
 
@@ -80,7 +81,11 @@ const AdminDashboardPage: React.FC = () => {
           label: "Citas",
           data: fechasConDatos.map((f) => conteo[f] ?? 0),
           backgroundColor: fechasConDatos.map((f) =>
-            f === todayStr ? "#4a87c3" : f < todayStr ? "#90c1ed" : "#bcdaf4",
+            f === todayStr
+              ? CHART_COLORS.today
+              : f < todayStr
+                ? CHART_COLORS.past
+                : CHART_COLORS.future,
           ),
           borderRadius: 6,
           borderSkipped: false,
@@ -162,11 +167,11 @@ const AdminDashboardPage: React.FC = () => {
                 plugins: {
                   legend: { display: false },
                   tooltip: {
-                    backgroundColor: "rgba(15,23,42,0.9)",
+                    backgroundColor: CHART_COLORS.tooltipBg,
                     padding: 12,
                     cornerRadius: 10,
-                    titleColor: "#e2e8f0",
-                    bodyColor: "#94a3b8",
+                    titleColor: CHART_COLORS.tooltipTitle,
+                    bodyColor: CHART_COLORS.tooltipBody,
                     callbacks: {
                       title: (items) => {
                         const idx = items[0]?.dataIndex ?? 0;

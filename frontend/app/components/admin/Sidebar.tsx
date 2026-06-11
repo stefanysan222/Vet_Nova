@@ -86,7 +86,9 @@ export default function Sidebar() {
               <p className="truncate text-sm font-semibold text-slate-900 dark:text-white">
                 {user?.name ?? "Administrador"}
               </p>
-              <p className="text-xs text-slate-500 dark:text-slate-400">Administrador</p>
+              <p className="truncate text-xs text-slate-500 dark:text-slate-400">
+                {user?.clinicaNombre ?? "Administrador"}
+              </p>
             </div>
           </div>
         </div>
@@ -172,7 +174,9 @@ export default function Sidebar() {
                     <p className="text-sm font-semibold text-slate-900 dark:text-white">
                       {user?.name ?? "Administrador"}
                     </p>
-                    <p className="text-xs text-slate-500">Administrador</p>
+                    <p className="truncate text-xs text-slate-500">
+                      {user?.clinicaNombre ?? "Administrador"}
+                    </p>
                   </div>
                 </div>
               </div>

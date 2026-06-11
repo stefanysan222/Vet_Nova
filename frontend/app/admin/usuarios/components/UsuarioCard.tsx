@@ -41,10 +41,10 @@ export default function UsuarioCard({
           <p className="text-gray-300">{usuario.email}</p>
           <p className="text-gray-300">{usuario.telefono}</p>
           <p
-            className={`inline-block rounded-full px-2 py-1 text-sm font-semibold ${
+            className={`inline-block rounded-lg px-2 py-1 text-sm font-semibold ${
               usuario.estado === "Activo"
-                ? "bg-emerald-100 text-emerald-700"
-                : "bg-rose-100 text-rose-700"
+                ? "bg-success-100 text-success-700"
+                : "bg-danger-100 text-danger-700"
             }`}
           >
             {usuario.estado}

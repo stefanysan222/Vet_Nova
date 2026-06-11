@@ -30,7 +30,9 @@ const StatsCards: React.FC<{ refreshTrigger?: number }> = ({ refreshTrigger = 0 
           citasPendientes: citas.filter((c) => c.status === "Pendiente").length,
         });
       })
-      .catch(() => setStats({ clientes: 0, veterinarios: 0, mascotas: 0, citasHoy: 0, citasPendientes: 0 }));
+      .catch(() =>
+        setStats({ clientes: 0, veterinarios: 0, mascotas: 0, citasHoy: 0, citasPendientes: 0 }),
+      );
   }, [refreshTrigger]);
 
   const cards = [
@@ -46,33 +48,33 @@ const StatsCards: React.FC<{ refreshTrigger?: number }> = ({ refreshTrigger = 0 
       title: "Veterinarios",
       value: stats?.veterinarios,
       icon: Stethoscope,
-      accentBar: "bg-emerald-500",
-      iconBg: "bg-emerald-50 text-emerald-600 dark:bg-emerald-950/50 dark:text-emerald-400",
-      valueCls: "text-emerald-700 dark:text-emerald-300",
+      accentBar: "bg-success-500",
+      iconBg: "bg-success-50 text-success-600 dark:bg-success-950/50 dark:text-success-400",
+      valueCls: "text-success-700 dark:text-success-300",
     },
     {
       title: "Mascotas",
       value: stats?.mascotas,
       icon: PawPrint,
-      accentBar: "bg-amber-500",
-      iconBg: "bg-amber-50 text-amber-600 dark:bg-amber-950/50 dark:text-amber-400",
-      valueCls: "text-amber-700 dark:text-amber-300",
+      accentBar: "bg-warning-500",
+      iconBg: "bg-warning-50 text-warning-600 dark:bg-warning-950/50 dark:text-warning-400",
+      valueCls: "text-warning-700 dark:text-warning-300",
     },
     {
       title: "Citas hoy",
       value: stats?.citasHoy,
       icon: CalendarDays,
-      accentBar: "bg-violet-500",
-      iconBg: "bg-violet-50 text-violet-600 dark:bg-violet-950/50 dark:text-violet-400",
-      valueCls: "text-violet-700 dark:text-violet-300",
+      accentBar: "bg-brand-400",
+      iconBg: "bg-brand-50 text-brand-500 dark:bg-brand-950/50 dark:text-brand-300",
+      valueCls: "text-brand-600 dark:text-brand-200",
     },
     {
       title: "Pendientes",
       value: stats?.citasPendientes,
       icon: Clock,
-      accentBar: "bg-rose-500",
-      iconBg: "bg-rose-50 text-rose-600 dark:bg-rose-950/50 dark:text-rose-400",
-      valueCls: "text-rose-700 dark:text-rose-300",
+      accentBar: "bg-accent-500",
+      iconBg: "bg-accent-50 text-accent-600 dark:bg-accent-950/50 dark:text-accent-400",
+      valueCls: "text-accent-700 dark:text-accent-300",
     },
   ];
 
@@ -95,7 +97,9 @@ const StatsCards: React.FC<{ refreshTrigger?: number }> = ({ refreshTrigger = 0 
             <div className="px-5 py-4 pl-6">
               {/* Icono + valor en la misma fila */}
               <div className="flex items-start justify-between gap-2">
-                <div className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-xl ${card.iconBg}`}>
+                <div
+                  className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-xl ${card.iconBg}`}
+                >
                   <Icon className="h-4 w-4" />
                 </div>
               </div>
@@ -105,12 +109,14 @@ const StatsCards: React.FC<{ refreshTrigger?: number }> = ({ refreshTrigger = 0 
                 {isLoading ? (
                   <span className="inline-block h-8 w-10 animate-pulse rounded-lg bg-slate-100 dark:bg-slate-800" />
                 ) : (
-                  card.value ?? 0
+                  (card.value ?? 0)
                 )}
               </p>
 
               {/* Label */}
-              <p className="mt-1 text-xs font-medium text-slate-500 dark:text-slate-400">{card.title}</p>
+              <p className="mt-1 text-xs font-medium text-slate-500 dark:text-slate-400">
+                {card.title}
+              </p>
             </div>
           </motion.article>
         );
