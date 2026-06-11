@@ -2,10 +2,26 @@ import Link from "next/link";
 import { ArrowRight, CalendarCheck, ClipboardList, Heart, ShieldCheck } from "lucide-react";
 
 const FEATURES = [
-  { icon: CalendarCheck, label: "Citas sin complicaciones",    desc: "Agenda, confirma y recuerda citas desde cualquier dispositivo." },
-  { icon: ClipboardList, label: "Historia clínica digital",    desc: "Accede al expediente completo de cada paciente en segundos." },
-  { icon: Heart,         label: "Seguimiento de pacientes",    desc: "Evoluciones, tratamientos y alertas de seguimiento integrados." },
-  { icon: ShieldCheck,   label: "Roles y accesos seguros",     desc: "Administrador, veterinario y cliente con vistas personalizadas." },
+  {
+    icon: CalendarCheck,
+    label: "Citas sin complicaciones",
+    desc: "Agenda, confirma y recuerda citas desde cualquier dispositivo.",
+  },
+  {
+    icon: ClipboardList,
+    label: "Historia clínica digital",
+    desc: "Accede al expediente completo de cada paciente en segundos.",
+  },
+  {
+    icon: Heart,
+    label: "Seguimiento de pacientes",
+    desc: "Evoluciones, tratamientos y alertas de seguimiento integrados.",
+  },
+  {
+    icon: ShieldCheck,
+    label: "Roles y accesos seguros",
+    desc: "Administrador, veterinario y cliente con vistas personalizadas.",
+  },
 ] as const;
 
 export default function Hero() {
@@ -14,7 +30,7 @@ export default function Hero() {
       {/* Fondo suave */}
       <div className="absolute inset-0 -z-10 bg-gradient-to-b from-brand-50 via-white to-white" />
       <div className="pointer-events-none absolute -right-40 top-0 -z-10 h-[500px] w-[500px] rounded-full bg-brand-100/40 blur-3xl" />
-      <div className="pointer-events-none absolute -left-32 top-32 -z-10 h-80 w-80 rounded-full bg-vet-100/50 blur-3xl" />
+      <div className="pointer-events-none absolute -left-32 top-32 -z-10 h-80 w-80 rounded-full bg-success-100/50 blur-3xl" />
 
       <div className="mx-auto max-w-6xl px-6 pb-20 pt-10 sm:px-8 lg:px-12">
         {/* Badge */}
@@ -27,12 +43,15 @@ export default function Hero() {
         <div className="grid gap-16 lg:grid-cols-[1fr_auto] lg:items-start">
           <div className="max-w-2xl">
             <h1 className="text-[2.75rem] font-bold leading-[1.15] tracking-tight text-surface-900 sm:text-5xl">
-              Tu clínica, organizada.<br />
+              Tu clínica, organizada.
+              <br />
               <span className="text-brand-600">Tus pacientes, cuidados.</span>
             </h1>
 
             <p className="mt-6 text-lg leading-relaxed text-surface-500">
-              VetNova centraliza la agenda, la historia clínica y la gestión de tu clínica veterinaria en un solo sistema, pensado para que puedas concentrarte en lo que importa: el bienestar de cada mascota.
+              VetNova centraliza la agenda, la historia clínica y la gestión de tu clínica
+              veterinaria en un solo sistema, pensado para que puedas concentrarte en lo que
+              importa: el bienestar de cada mascota.
             </p>
 
             <div className="mt-8 flex flex-wrap gap-3">
@@ -58,31 +77,64 @@ export default function Hero() {
 
           {/* Panel de muestra — tarjetas de estado real */}
           <div className="hidden w-[340px] shrink-0 lg:block">
-            <div className="rounded-2xl border border-surface-200 bg-white p-5 shadow-card-md">
+            <div className="rounded-2xl border border-surface-200 bg-white p-5 shadow-card">
               <div className="mb-4 flex items-center justify-between">
-                <p className="text-xs font-semibold uppercase tracking-widest text-surface-400">Hoy en la clínica</p>
-                <span className="flex items-center gap-1 rounded-full bg-vet-50 px-2.5 py-1 text-[11px] font-semibold text-vet-700">
-                  <span className="h-1.5 w-1.5 rounded-full bg-vet-500" />
+                <p className="text-xs font-semibold uppercase tracking-widest text-surface-400">
+                  Hoy en la clínica
+                </p>
+                <span className="flex items-center gap-1 rounded-full bg-success-50 px-2.5 py-1 text-[11px] font-semibold text-success-700">
+                  <span className="h-1.5 w-1.5 rounded-full bg-success-500" />
                   En línea
                 </span>
               </div>
 
               <div className="space-y-3">
                 {[
-                  { hora: "09:00", nombre: "Luna",  servicio: "Vacunación",        estado: "Confirmada",  color: "bg-vet-50 text-vet-700" },
-                  { hora: "10:30", nombre: "Toby",  servicio: "Consulta general",  estado: "En atención", color: "bg-brand-50 text-brand-700" },
-                  { hora: "11:00", nombre: "Mochi", servicio: "Control post-op",   estado: "Pendiente",   color: "bg-amber-50 text-amber-700" },
-                  { hora: "14:00", nombre: "Rocky", servicio: "Desparasitación",   estado: "Confirmada",  color: "bg-vet-50 text-vet-700" },
+                  {
+                    hora: "09:00",
+                    nombre: "Luna",
+                    servicio: "Vacunación",
+                    estado: "Confirmada",
+                    color: "bg-brand-100 text-brand-600",
+                  },
+                  {
+                    hora: "10:30",
+                    nombre: "Toby",
+                    servicio: "Consulta general",
+                    estado: "En atención",
+                    color: "bg-brand-50 text-brand-700",
+                  },
+                  {
+                    hora: "11:00",
+                    nombre: "Mochi",
+                    servicio: "Control post-op",
+                    estado: "Pendiente",
+                    color: "bg-accent-100 text-accent-700",
+                  },
+                  {
+                    hora: "14:00",
+                    nombre: "Rocky",
+                    servicio: "Desparasitación",
+                    estado: "Confirmada",
+                    color: "bg-brand-100 text-brand-600",
+                  },
                 ].map((cita) => (
-                  <div key={cita.nombre} className="flex items-center justify-between rounded-xl bg-surface-50 px-4 py-3">
+                  <div
+                    key={cita.nombre}
+                    className="flex items-center justify-between rounded-xl bg-surface-50 px-4 py-3"
+                  >
                     <div className="flex items-center gap-3">
-                      <span className="w-10 text-xs font-semibold text-surface-400">{cita.hora}</span>
+                      <span className="w-10 text-xs font-semibold text-surface-400">
+                        {cita.hora}
+                      </span>
                       <div>
                         <p className="text-sm font-semibold text-surface-900">{cita.nombre}</p>
                         <p className="text-xs text-surface-400">{cita.servicio}</p>
                       </div>
                     </div>
-                    <span className={`rounded-full px-2.5 py-1 text-[11px] font-semibold ${cita.color}`}>
+                    <span
+                      className={`rounded-full px-2.5 py-1 text-[11px] font-semibold ${cita.color}`}
+                    >
                       {cita.estado}
                     </span>
                   </div>
@@ -112,7 +164,7 @@ export default function Hero() {
           {FEATURES.map(({ icon: Icon, label, desc }) => (
             <div
               key={label}
-              className="group rounded-2xl border border-surface-200 bg-white p-5 shadow-card transition hover:-translate-y-0.5 hover:border-brand-200 hover:shadow-card-md"
+              className="group rounded-2xl border border-surface-200 bg-white p-5 shadow-card transition hover:-translate-y-0.5 hover:border-brand-200 hover:shadow-card-hover"
             >
               <div className="mb-4 flex h-10 w-10 items-center justify-center rounded-xl bg-brand-50 text-brand-600 transition group-hover:bg-brand-100">
                 <Icon className="h-5 w-5" />

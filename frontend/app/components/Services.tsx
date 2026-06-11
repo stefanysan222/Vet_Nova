@@ -14,8 +14,8 @@ const SERVICES = [
     title: "Historia clínica",
     description:
       "Registra consultas, diagnósticos, vacunas y tratamientos. Todo queda guardado y accesible para el veterinario.",
-    accent: "bg-vet-50 text-vet-600",
-    border: "hover:border-vet-200",
+    accent: "bg-success-50 text-success-600",
+    border: "hover:border-success-200",
   },
   {
     icon: Users,
@@ -46,7 +46,8 @@ export default function Services() {
           Todo lo que necesita una clínica veterinaria moderna.
         </h2>
         <p className="mt-4 text-base leading-7 text-surface-500">
-          Cada módulo está diseñado para un rol específico: el administrador gestiona, el veterinario atiende y el cliente hace seguimiento.
+          Cada módulo está diseñado para un rol específico: el administrador gestiona, el
+          veterinario atiende y el cliente hace seguimiento.
         </p>
       </div>
 
@@ -54,9 +55,11 @@ export default function Services() {
         {SERVICES.map(({ icon: Icon, title, description, accent, border }) => (
           <article
             key={title}
-            className={`group rounded-2xl border border-surface-200 bg-white p-6 shadow-card transition hover:-translate-y-0.5 hover:shadow-card-md ${border}`}
+            className={`group rounded-2xl border border-surface-200 bg-white p-6 shadow-card transition hover:-translate-y-0.5 hover:shadow-card-hover ${border}`}
           >
-            <div className={`mb-5 inline-flex h-11 w-11 items-center justify-center rounded-xl ${accent}`}>
+            <div
+              className={`mb-5 inline-flex h-11 w-11 items-center justify-center rounded-xl ${accent}`}
+            >
               <Icon className="h-5 w-5" />
             </div>
             <h3 className="text-base font-semibold text-surface-900">{title}</h3>

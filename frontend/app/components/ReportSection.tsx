@@ -113,9 +113,9 @@ export default function ReportSection() {
             </div>
           </div>
 
-          <div className="rounded-xl border border-vet-100 bg-vet-50 px-5 py-4">
-            <p className="text-sm font-semibold text-vet-700">Tiempo de respuesta</p>
-            <p className="mt-1 text-sm text-vet-600">
+          <div className="rounded-xl border border-success-100 bg-success-50 px-5 py-4">
+            <p className="text-sm font-semibold text-success-700">Tiempo de respuesta</p>
+            <p className="mt-1 text-sm text-success-600">
               Respondemos dentro de las 24 horas hábiles siguientes.
             </p>
           </div>
