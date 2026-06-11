@@ -6,6 +6,22 @@ import { usePathname, useRouter } from "next/navigation";
 import { useEffect, useMemo, useRef, useState, type KeyboardEvent, type ReactNode } from "react";
 import { logout } from "../../lib/auth";
 import { useAuth } from "@/lib/auth-context";
+import {
+  LayoutDashboard,
+  CalendarDays,
+  PawPrint,
+  ClipboardList,
+  History,
+  User,
+  Search,
+  Bell,
+  LogOut,
+  Moon,
+  Sun,
+  Menu,
+  X,
+  type LucideIcon,
+} from "lucide-react";
 
 type IconName =
   | "dashboard"
@@ -175,6 +191,7 @@ export default function VeterinarioLayoutShell({ children }: { children: ReactNo
     }
     if (user.role !== "Veterinario") {
       const routes: Record<string, string> = {
+        SuperAdministrador: "/super-admin",
         Administrador: "/admin",
         Cliente: "/cliente",
       };
@@ -251,11 +268,11 @@ export default function VeterinarioLayoutShell({ children }: { children: ReactNo
   }
 
   return (
-    <main className="h-screen overflow-hidden bg-[#F5F7FB] text-[#10213A] dark:bg-[#0B1120] dark:text-white">
+    <main className="h-screen overflow-hidden bg-surface-50 text-surface-900 dark:bg-surface-950 dark:text-white">
       <div className="flex h-screen overflow-hidden">
         {/* SIDEBAR */}
-        <aside className="hidden h-screen w-[215px] shrink-0 border-r border-[#E5EAF2] bg-white dark:border-[#1E293B] dark:bg-[#111827] lg:flex lg:flex-col">
-          <div className="flex h-[78px] items-center gap-3 border-b border-[#E5EAF2] px-4 dark:border-[#1E293B]">
+        <aside className="hidden h-screen w-[260px] shrink-0 border-r border-surface-200 bg-white dark:border-surface-800 dark:bg-surface-900 lg:flex lg:flex-col">
+          <div className="flex h-[78px] items-center gap-3 border-b border-surface-200 px-5 dark:border-surface-800">
             <Image
               src={darkMode ? "/logos/vetnova-logo-dark.png" : "/logos/vetnova-logo-light.png"}
               alt="VetNova"
@@ -265,13 +282,11 @@ export default function VeterinarioLayoutShell({ children }: { children: ReactNo
             />
 
             <div>
-              <h1 className="text-[20px] font-bold leading-none text-[#10213A] dark:text-white">
+              <h1 className="text-xl font-semibold leading-none text-surface-900 dark:text-white">
                 VetNova
               </h1>
 
-              <p className="mt-1.5 text-[11px] text-[#64748B] dark:text-[#94A3B8]">
-                Sistema Veterinario
-              </p>
+              <p className="text-caption mt-1.5">Sistema Veterinario</p>
             </div>
           </div>
 
@@ -287,13 +302,13 @@ export default function VeterinarioLayoutShell({ children }: { children: ReactNo
             ))}
           </nav>
 
-          <div className="border-t border-[#E5EAF2] px-3 py-5 dark:border-[#1E293B]">
+          <div className="border-t border-surface-200 px-3 py-5 dark:border-surface-800">
             <button
               type="button"
               onClick={() => {
                 logout().then(() => router.push("/login"));
               }}
-              className="flex w-full items-center gap-3 rounded-xl px-4 py-3 text-[14px] font-semibold text-[#10213A] transition hover:bg-[#F1F5F9] dark:text-white dark:hover:bg-[#1E293B]"
+              className="flex w-full items-center gap-3 rounded-xl px-4 py-3 text-sm font-semibold text-surface-900 transition hover:bg-surface-100 dark:text-white dark:hover:bg-surface-800"
             >
               <AppIcon name="logout" />
               Cerrar Sesión
@@ -304,35 +319,19 @@ export default function VeterinarioLayoutShell({ children }: { children: ReactNo
         {/* ÁREA PRINCIPAL */}
         <section className="min-w-0 flex-1">
           {/* TOPBAR */}
-          <header className="relative z-40 flex h-[64px] items-center justify-between border-b border-[#E5EAF2] bg-white px-5 dark:border-[#1E293B] dark:bg-[#111827]">
+          <header className="relative z-40 flex h-[64px] items-center justify-between border-b border-surface-200 bg-white px-5 dark:border-surface-800 dark:bg-surface-900">
             <button
               type="button"
               onClick={() => setMobileOpen(true)}
-              className="mr-3 flex h-9 w-9 shrink-0 items-center justify-center rounded-xl border border-[#E5EAF2] bg-white dark:border-[#1E293B] dark:bg-[#111827] lg:hidden"
+              className="mr-3 flex h-9 w-9 shrink-0 items-center justify-center rounded-xl border border-surface-200 bg-white dark:border-surface-800 dark:bg-surface-900 lg:hidden"
               aria-label="Abrir menú"
             >
-              <svg
-                width="20"
-                height="20"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="2"
-                strokeLinecap="round"
-              >
-                <path d="M4 6h16M4 12h16M4 18h16" />
-              </svg>
+              <Menu className="h-5 w-5" />
             </button>
             {/* BUSCADOR GLOBAL */}
             <div ref={buscadorRef} className="relative w-full max-w-[520px]">
-              <div
-                className={`flex h-[42px] items-center gap-3 rounded-xl border bg-white px-3 transition duration-200 dark:bg-[#0F172A] ${
-                  mostrarResultados && busquedaGlobal.trim()
-                    ? "border-[#2F6BFF] shadow-[0_0_0_4px_rgba(47,107,255,0.10)] dark:border-[#2563EB]"
-                    : "border-[#CBD5E1] dark:border-[#334155]"
-                }`}
-              >
-                <AppIcon name="search" className="h-[18px] w-[18px] text-[#64748B]" />
+              <div className="flex h-[42px] items-center gap-3 rounded-xl border border-surface-300 bg-white px-4 transition-all focus-within:border-brand-400 focus-within:ring-2 focus-within:ring-brand-100 dark:border-surface-700 dark:bg-surface-900 dark:focus-within:border-brand-500">
+                <Search className="h-[18px] w-[18px] shrink-0 text-surface-500 dark:text-surface-400" />
 
                 <input
                   type="text"
@@ -344,35 +343,35 @@ export default function VeterinarioLayoutShell({ children }: { children: ReactNo
                   onFocus={() => setMostrarResultados(true)}
                   onKeyDown={handleTeclaBuscador}
                   placeholder="Buscar pacientes, citas o historiales..."
-                  className="w-full bg-transparent text-[14px] text-[#10213A] outline-none placeholder:text-[#94A3B8] dark:text-white"
+                  className="w-full bg-transparent text-sm text-surface-900 outline-none placeholder:text-surface-400 dark:text-white"
                 />
 
                 {busquedaGlobal && (
                   <button
                     type="button"
                     onClick={limpiarBusqueda}
-                    className="flex h-7 w-7 items-center justify-center rounded-lg text-[19px] text-[#64748B] transition hover:bg-[#F1F5F9] dark:hover:bg-[#1E293B]"
+                    className="text-surface-400 transition-colors hover:text-brand-600 dark:hover:text-brand-300"
                     aria-label="Limpiar búsqueda"
                   >
-                    ×
+                    <X className="h-[17px] w-[17px]" />
                   </button>
                 )}
               </div>
 
               {mostrarResultados && busquedaGlobal.trim() !== "" && (
-                <div className="absolute left-0 top-[50px] z-50 w-full overflow-hidden rounded-[18px] border border-[#E2E8F0] bg-white shadow-[0_18px_45px_rgba(15,23,42,0.16)] dark:border-[#334155] dark:bg-[#111827]">
-                  <div className="flex items-center justify-between border-b border-[#E2E8F0] px-4 py-3 dark:border-[#334155]">
+                <div className="absolute left-0 top-[50px] z-50 w-full overflow-hidden rounded-2xl border border-surface-200 bg-white shadow-modal dark:border-surface-700 dark:bg-surface-900">
+                  <div className="flex items-center justify-between border-b border-surface-200 px-4 py-3 dark:border-surface-700">
                     <div>
-                      <p className="text-[13px] font-semibold text-[#10213A] dark:text-white">
+                      <p className="text-sm font-semibold text-surface-900 dark:text-white">
                         Resultados de búsqueda
                       </p>
 
-                      <p className="mt-1 text-[12px] text-[#64748B] dark:text-[#94A3B8]">
+                      <p className="mt-1 text-xs text-surface-500 dark:text-surface-400">
                         Presiona Enter para abrir el primer resultado
                       </p>
                     </div>
 
-                    <span className="rounded-full bg-[#EEF4FF] px-3 py-1 text-[12px] font-semibold text-[#2563EB] dark:bg-[#1E293B] dark:text-[#93C5FD]">
+                    <span className="rounded-lg bg-brand-100 px-3 py-1 text-xs font-semibold text-brand-600 dark:bg-brand-900/40 dark:text-brand-300">
                       {resultadosBusqueda.length}
                     </span>
                   </div>
@@ -384,23 +383,23 @@ export default function VeterinarioLayoutShell({ children }: { children: ReactNo
                           key={resultado.id}
                           type="button"
                           onClick={() => abrirResultado(resultado)}
-                          className="group flex w-full items-center gap-3 px-4 py-3 text-left transition hover:bg-[#F5F9FF] dark:hover:bg-[#1E293B]"
+                          className="group flex w-full items-center gap-3 px-4 py-3 text-left transition hover:bg-surface-50 dark:hover:bg-surface-800"
                         >
-                          <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-[#EEF4FF] text-[#2563EB] transition group-hover:bg-[#DBEAFE] dark:bg-[#172554] dark:text-[#93C5FD]">
+                          <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-brand-100 text-brand-600 transition group-hover:bg-brand-200 dark:bg-brand-900/40 dark:text-brand-300">
                             <AppIcon name={resultado.icon} className="h-[19px] w-[19px]" />
                           </div>
 
                           <div className="min-w-0 flex-1">
-                            <p className="truncate text-[14px] font-semibold text-[#10213A] dark:text-white">
+                            <p className="truncate text-sm font-semibold text-surface-900 dark:text-white">
                               {resultado.titulo}
                             </p>
 
-                            <p className="mt-1 truncate text-[12px] text-[#64748B] dark:text-[#94A3B8]">
+                            <p className="mt-1 truncate text-xs text-surface-500 dark:text-surface-400">
                               {resultado.descripcion}
                             </p>
                           </div>
 
-                          <span className="shrink-0 rounded-full bg-[#F1F5F9] px-2.5 py-1 text-[11px] font-semibold text-[#64748B] dark:bg-[#0F172A] dark:text-[#CBD5E1]">
+                          <span className="shrink-0 rounded-lg bg-surface-100 px-2.5 py-1 text-xs font-semibold text-surface-500 dark:bg-surface-800 dark:text-surface-300">
                             {resultado.categoria}
                           </span>
                         </button>
@@ -408,15 +407,15 @@ export default function VeterinarioLayoutShell({ children }: { children: ReactNo
                     </div>
                   ) : (
                     <div className="px-5 py-8 text-center">
-                      <div className="mx-auto flex h-11 w-11 items-center justify-center rounded-full bg-[#F1F5F9] text-[#64748B] dark:bg-[#1E293B] dark:text-[#94A3B8]">
+                      <div className="mx-auto flex h-11 w-11 items-center justify-center rounded-full bg-surface-100 text-surface-500 dark:bg-surface-800 dark:text-surface-400">
                         <AppIcon name="search" className="h-5 w-5" />
                       </div>
 
-                      <p className="mt-3 text-[14px] font-semibold text-[#10213A] dark:text-white">
+                      <p className="mt-3 text-sm font-semibold text-surface-900 dark:text-white">
                         No se encontraron resultados
                       </p>
 
-                      <p className="mt-1 text-[12px] text-[#64748B] dark:text-[#94A3B8]">
+                      <p className="mt-1 text-xs text-surface-500 dark:text-surface-400">
                         Busca por paciente, cita, historial o módulo.
                       </p>
                     </div>
@@ -436,66 +435,66 @@ export default function VeterinarioLayoutShell({ children }: { children: ReactNo
                     setShowUserMenu(false);
                     setMostrarResultados(false);
                   }}
-                  className="relative flex h-10 w-10 items-center justify-center rounded-xl text-[#10213A] transition hover:bg-[#F1F5F9] dark:text-white dark:hover:bg-[#1E293B]"
+                  className="relative flex h-10 w-10 items-center justify-center rounded-xl text-surface-900 transition hover:bg-surface-100 dark:text-white dark:hover:bg-surface-800"
                 >
                   <AppIcon name="bell" />
 
-                  <span className="absolute right-[8px] top-[8px] h-2.5 w-2.5 rounded-full bg-[#EF4444]" />
+                  <span className="absolute right-[8px] top-[8px] h-2.5 w-2.5 rounded-full bg-danger-500" />
                 </button>
 
                 {showNotifications && (
-                  <div className="absolute right-0 top-[52px] z-50 w-[380px] overflow-hidden rounded-2xl border border-[#E2E8F0] bg-white shadow-[0_18px_45px_rgba(15,23,42,0.15)] dark:border-[#334155] dark:bg-[#111827]">
-                    <div className="flex items-center justify-between border-b border-[#E2E8F0] px-5 py-4 dark:border-[#334155]">
+                  <div className="absolute right-0 top-[52px] z-50 w-[380px] overflow-hidden rounded-2xl border border-surface-200 bg-white shadow-modal dark:border-surface-700 dark:bg-surface-900">
+                    <div className="flex items-center justify-between border-b border-surface-200 px-5 py-4 dark:border-surface-700">
                       <div>
-                        <h3 className="text-[16px] font-semibold text-[#10213A] dark:text-white">
+                        <h3 className="text-base font-semibold text-surface-900 dark:text-white">
                           Notificaciones
                         </h3>
 
-                        <p className="mt-1 text-[13px] text-[#64748B] dark:text-[#94A3B8]">
+                        <p className="mt-1 text-xs text-surface-500 dark:text-surface-400">
                           Tienes 2 notificaciones nuevas
                         </p>
                       </div>
 
-                      <span className="rounded-full bg-[#DBEAFE] px-3 py-1 text-[12px] font-semibold text-[#2563EB]">
+                      <span className="rounded-lg bg-brand-100 px-3 py-1 text-xs font-semibold text-brand-600 dark:bg-brand-900/40 dark:text-brand-300">
                         2 nuevas
                       </span>
                     </div>
 
-                    <div className="divide-y divide-[#E2E8F0] dark:divide-[#334155]">
+                    <div className="divide-y divide-surface-200 dark:divide-surface-700">
                       {notificationPreview.map((notification) => (
                         <div
                           key={notification.title}
-                          className="flex gap-3 px-5 py-4 transition hover:bg-[#F8FAFC] dark:hover:bg-[#1E293B]"
+                          className="flex gap-3 px-5 py-4 transition hover:bg-surface-50 dark:hover:bg-surface-800"
                         >
-                          <div className="mt-1 flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-[#DBEAFE] text-[#2563EB]">
+                          <div className="mt-1 flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-brand-100 text-brand-600 dark:bg-brand-900/40 dark:text-brand-300">
                             <AppIcon name="bell" className="h-5 w-5" />
                           </div>
 
                           <div className="min-w-0 flex-1">
                             <div className="flex items-center gap-2">
-                              <p className="text-[14px] font-semibold text-[#10213A] dark:text-white">
+                              <p className="text-sm font-semibold text-surface-900 dark:text-white">
                                 {notification.title}
                               </p>
 
                               {notification.unread && (
-                                <span className="h-2 w-2 rounded-full bg-[#EF4444]" />
+                                <span className="h-2 w-2 rounded-full bg-danger-500" />
                               )}
                             </div>
 
-                            <p className="mt-1 text-[13px] leading-5 text-[#64748B] dark:text-[#94A3B8]">
+                            <p className="mt-1 text-xs leading-5 text-surface-500 dark:text-surface-400">
                               {notification.description}
                             </p>
 
-                            <p className="mt-2 text-[12px] text-[#94A3B8]">{notification.time}</p>
+                            <p className="text-caption mt-2">{notification.time}</p>
                           </div>
                         </div>
                       ))}
                     </div>
 
-                    <div className="border-t border-[#E2E8F0] p-4 dark:border-[#334155]">
+                    <div className="border-t border-surface-200 p-4 dark:border-surface-700">
                       <Link
                         href="/veterinario/notificaciones"
-                        className="flex h-[42px] items-center justify-center rounded-xl bg-[#2F6BFF] text-[14px] font-semibold text-white transition hover:bg-[#2459DF]"
+                        className="flex h-[42px] items-center justify-center rounded-xl bg-brand-600 text-sm font-semibold text-white transition hover:bg-brand-700"
                       >
                         Ver todas las notificaciones
                       </Link>
@@ -504,7 +503,7 @@ export default function VeterinarioLayoutShell({ children }: { children: ReactNo
                 )}
               </div>
 
-              <div className="h-8 w-px bg-[#E2E8F0] dark:bg-[#334155]" />
+              <div className="h-8 w-px bg-surface-200 dark:bg-surface-700" />
 
               {/* USUARIO */}
               <div className="relative">
@@ -515,36 +514,34 @@ export default function VeterinarioLayoutShell({ children }: { children: ReactNo
                     setShowNotifications(false);
                     setMostrarResultados(false);
                   }}
-                  className="flex items-center gap-3 rounded-xl px-2 py-1.5 transition hover:bg-[#F8FAFC] dark:hover:bg-[#1E293B]"
+                  className="flex items-center gap-3 rounded-xl px-2 py-1.5 transition hover:bg-surface-50 dark:hover:bg-surface-800"
                 >
                   <div className="text-right">
-                    <p className="text-[14px] font-semibold leading-none text-[#10213A] dark:text-white">
+                    <p className="text-sm font-semibold leading-none text-surface-900 dark:text-white">
                       {userName}
                     </p>
 
-                    <p className="mt-1.5 text-[12px] text-[#64748B] dark:text-[#94A3B8]">
-                      Veterinario
-                    </p>
+                    <p className="text-caption mt-1.5">Veterinario</p>
                   </div>
 
-                  <div className="flex h-10 w-10 items-center justify-center rounded-full bg-[#2F6BFF] text-[15px] font-semibold text-white">
+                  <div className="flex h-10 w-10 items-center justify-center rounded-full bg-brand-600 text-sm font-semibold text-white">
                     {userInitials}
                   </div>
                 </button>
 
                 {showUserMenu && (
-                  <div className="absolute right-0 top-[54px] z-50 w-[285px] overflow-hidden rounded-2xl border border-[#E2E8F0] bg-white shadow-[0_18px_45px_rgba(15,23,42,0.15)] dark:border-[#334155] dark:bg-[#111827]">
-                    <div className="flex items-center gap-3 border-b border-[#E2E8F0] px-5 py-4 dark:border-[#334155]">
-                      <div className="flex h-11 w-11 items-center justify-center rounded-full bg-[#2F6BFF] font-semibold text-white">
+                  <div className="absolute right-0 top-[54px] z-50 w-[285px] overflow-hidden rounded-2xl border border-surface-200 bg-white shadow-modal dark:border-surface-700 dark:bg-surface-900">
+                    <div className="flex items-center gap-3 border-b border-surface-200 px-5 py-4 dark:border-surface-700">
+                      <div className="flex h-11 w-11 items-center justify-center rounded-full bg-brand-600 font-semibold text-white">
                         {userInitials}
                       </div>
 
                       <div>
-                        <p className="text-[15px] font-semibold text-[#10213A] dark:text-white">
+                        <p className="text-sm font-semibold text-surface-900 dark:text-white">
                           {userName}
                         </p>
 
-                        <p className="mt-1 text-[13px] text-[#64748B] dark:text-[#94A3B8]">
+                        <p className="mt-1 text-xs text-surface-500 dark:text-surface-400">
                           Veterinario
                         </p>
                       </div>
@@ -572,7 +569,7 @@ export default function VeterinarioLayoutShell({ children }: { children: ReactNo
                       <button
                         type="button"
                         onClick={toggleDarkMode}
-                        className="flex w-full items-center justify-between px-5 py-3 text-[14px] font-semibold text-[#10213A] transition hover:bg-[#F8FAFC] dark:text-white dark:hover:bg-[#1E293B]"
+                        className="flex w-full items-center justify-between px-5 py-3 text-sm font-semibold text-surface-900 transition hover:bg-surface-50 dark:text-white dark:hover:bg-surface-800"
                       >
                         <span className="flex items-center gap-3">
                           <AppIcon name={darkMode ? "sun" : "moon"} />
@@ -580,27 +577,27 @@ export default function VeterinarioLayoutShell({ children }: { children: ReactNo
                         </span>
 
                         <span
-                          className={`relative h-[22px] w-[40px] rounded-full transition ${
-                            darkMode ? "bg-[#2F6BFF]" : "bg-[#CBD5E1]"
+                          className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
+                            darkMode ? "bg-brand-500" : "bg-surface-300 dark:bg-surface-600"
                           }`}
                         >
                           <span
-                            className={`absolute top-[2px] h-[18px] w-[18px] rounded-full bg-white shadow-sm transition ${
-                              darkMode ? "left-[20px]" : "left-[2px]"
+                            className={`inline-block h-5 w-5 rounded-full bg-white transition-transform ${
+                              darkMode ? "translate-x-[22px]" : "translate-x-[2px]"
                             }`}
                           />
                         </span>
                       </button>
                     </div>
 
-                    <div className="border-t border-[#E2E8F0] py-2 dark:border-[#334155]">
+                    <div className="border-t border-surface-200 py-2 dark:border-surface-700">
                       <button
                         type="button"
                         onClick={() => {
                           setShowUserMenu(false);
                           logout().then(() => router.push("/login"));
                         }}
-                        className="flex w-full items-center gap-3 px-5 py-3 text-[14px] font-semibold text-[#EF4444] transition hover:bg-[#FEF2F2] dark:hover:bg-[#3F1D1D]"
+                        className="dark:hover:bg-danger-950/30 flex w-full items-center gap-3 px-5 py-3 text-sm font-semibold text-danger-500 transition hover:bg-danger-50"
                       >
                         <AppIcon name="logout" />
                         Cerrar sesión
@@ -613,7 +610,7 @@ export default function VeterinarioLayoutShell({ children }: { children: ReactNo
           </header>
 
           {/* CONTENIDO */}
-          <div className="h-[calc(100vh-64px)] overflow-y-auto bg-[#F5F7FB] px-6 py-6 dark:bg-[#0B1120]">
+          <div className="h-[calc(100vh-64px)] overflow-y-auto bg-surface-50 px-6 py-6 dark:bg-surface-950">
             {children}
           </div>
         </section>
@@ -622,47 +619,32 @@ export default function VeterinarioLayoutShell({ children }: { children: ReactNo
       {/* Drawer mobile */}
       {mobileOpen && (
         <div className="fixed inset-0 z-50 lg:hidden" onClick={() => setMobileOpen(false)}>
-          <div className="absolute inset-0 bg-black/40" />
+          <div className="absolute inset-0 bg-surface-900/40 backdrop-blur-sm" />
           <div
-            className="absolute left-0 top-0 h-full w-[215px] bg-white dark:bg-[#111827]"
+            className="absolute left-0 top-0 h-full w-[260px] bg-white dark:bg-surface-900"
             onClick={(e) => e.stopPropagation()}
           >
-            <div className="flex h-[78px] items-center justify-between border-b border-[#E5EAF2] px-4 dark:border-[#1E293B]">
+            <div className="flex h-[64px] items-center justify-between border-b border-surface-200 px-5 dark:border-surface-800">
               <div className="flex items-center gap-3">
                 <Image
                   src={darkMode ? "/logos/vetnova-logo-dark.png" : "/logos/vetnova-logo-light.png"}
                   alt="VetNova"
-                  width={40}
-                  height={40}
+                  width={32}
+                  height={32}
                   className="rounded-xl object-contain"
                 />
-                <div>
-                  <h1 className="text-[20px] font-bold leading-none text-[#10213A] dark:text-white">
-                    VetNova
-                  </h1>
-                  <p className="mt-1.5 text-[11px] text-[#64748B] dark:text-[#94A3B8]">
-                    Sistema Veterinario
-                  </p>
-                </div>
+                <span className="text-lg font-semibold text-surface-900 dark:text-white">
+                  VetNova
+                </span>
               </div>
               <button
                 onClick={() => setMobileOpen(false)}
-                className="flex h-8 w-8 items-center justify-center rounded-lg text-[#64748B] hover:bg-[#F1F5F9] dark:hover:bg-[#1E293B]"
+                className="flex h-8 w-8 items-center justify-center rounded-lg text-surface-500 hover:bg-surface-100 dark:hover:bg-surface-800"
               >
-                <svg
-                  width="18"
-                  height="18"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth="2"
-                  strokeLinecap="round"
-                >
-                  <path d="M18 6 6 18M6 6l12 12" />
-                </svg>
+                <X className="h-[18px] w-[18px]" />
               </button>
             </div>
-            <nav className="px-3 py-5">
+            <nav className="flex-1 px-3 py-5">
               {navigation.map((item) => (
                 <SidebarItem
                   key={item.href}
@@ -674,13 +656,13 @@ export default function VeterinarioLayoutShell({ children }: { children: ReactNo
                 />
               ))}
             </nav>
-            <div className="border-t border-[#E5EAF2] px-3 py-5 dark:border-[#1E293B]">
+            <div className="border-t border-surface-200 px-3 py-5 dark:border-surface-800">
               <button
                 type="button"
                 onClick={() => {
                   logout().then(() => router.push("/login"));
                 }}
-                className="flex w-full items-center gap-3 rounded-xl px-4 py-3 text-[14px] font-semibold text-[#10213A] transition hover:bg-[#F1F5F9] dark:text-white dark:hover:bg-[#1E293B]"
+                className="flex w-full items-center gap-3 rounded-xl px-4 py-3 text-sm font-semibold text-surface-900 transition hover:bg-surface-100 dark:text-white dark:hover:bg-surface-800"
               >
                 <AppIcon name="logout" />
                 Cerrar Sesión
@@ -710,10 +692,10 @@ function SidebarItem({
     <Link
       href={href}
       onClick={onClick}
-      className={`mb-2 flex items-center gap-3 rounded-xl px-4 py-3 text-[14px] font-semibold transition ${
+      className={`mb-2 flex items-center gap-3 rounded-xl px-4 py-3 text-sm font-semibold transition ${
         active
-          ? "bg-[#2F6BFF] text-white shadow-sm"
-          : "text-[#10213A] hover:bg-[#F1F5F9] dark:text-white dark:hover:bg-[#1E293B]"
+          ? "bg-brand-600 text-white shadow-brand-sm"
+          : "text-surface-900 hover:bg-surface-100 dark:text-white dark:hover:bg-surface-800"
       }`}
     >
       <AppIcon name={icon} />
@@ -726,7 +708,7 @@ function DropdownLink({ href, icon, label }: { href: string; icon: IconName; lab
   return (
     <Link
       href={href}
-      className="flex items-center gap-3 px-5 py-3 text-[14px] font-semibold text-[#10213A] transition hover:bg-[#F8FAFC] dark:text-white dark:hover:bg-[#1E293B]"
+      className="flex items-center gap-3 px-5 py-3 text-sm font-semibold text-surface-900 transition hover:bg-surface-50 dark:text-white dark:hover:bg-surface-800"
     >
       <AppIcon name={icon} />
       {label}
@@ -734,113 +716,23 @@ function DropdownLink({ href, icon, label }: { href: string; icon: IconName; lab
   );
 }
 
+const ICONS: Record<IconName, LucideIcon> = {
+  dashboard: LayoutDashboard,
+  calendar: CalendarDays,
+  patients: PawPrint,
+  consultation: ClipboardList,
+  history: History,
+  profile: User,
+  search: Search,
+  bell: Bell,
+  logout: LogOut,
+  moon: Moon,
+  sun: Sun,
+};
+
 function AppIcon({ name, className = "h-5 w-5" }: { name: IconName; className?: string }) {
-  const svgProps = {
-    className,
-    viewBox: "0 0 24 24",
-    fill: "none",
-    stroke: "currentColor",
-    strokeWidth: 1.8,
-    strokeLinecap: "round" as const,
-    strokeLinejoin: "round" as const,
-  };
-
-  switch (name) {
-    case "dashboard":
-      return (
-        <svg {...svgProps}>
-          <rect x="3.5" y="3.5" width="7" height="7" rx="1.5" />
-          <rect x="13.5" y="3.5" width="7" height="7" rx="1.5" />
-          <rect x="3.5" y="13.5" width="7" height="7" rx="1.5" />
-          <rect x="13.5" y="13.5" width="7" height="7" rx="1.5" />
-        </svg>
-      );
-
-    case "calendar":
-      return (
-        <svg {...svgProps}>
-          <rect x="3.5" y="5" width="17" height="15.5" rx="2.5" />
-          <path d="M7.5 3.5v3.5M16.5 3.5v3.5M3.5 9.5h17" />
-        </svg>
-      );
-
-    case "patients":
-      return (
-        <svg {...svgProps}>
-          <ellipse cx="8" cy="7" rx="2" ry="2.6" />
-          <ellipse cx="16" cy="7" rx="2" ry="2.6" />
-          <ellipse cx="6.5" cy="13" rx="2" ry="2.6" />
-          <ellipse cx="17.5" cy="13" rx="2" ry="2.6" />
-          <path d="M12 18.6c2.2 0 3.8-1.3 3.8-3 0-1.8-1.6-2.9-3.3-2.9-.8 0-1.5.2-2.1.7-.5.3-1 .4-1.5.4-1.5 0-2.7 1-2.7 2.4 0 1.4 1.2 2.4 2.8 2.4H12Z" />
-        </svg>
-      );
-
-    case "consultation":
-      return (
-        <svg {...svgProps}>
-          <path d="M9 4h6" />
-          <path d="M9 3.5h6a1.5 1.5 0 0 1 1.5 1.5v1H7.5V5A1.5 1.5 0 0 1 9 3.5Z" />
-          <rect x="5" y="6" width="14" height="15" rx="2" />
-          <path d="M9 11h6M9 15h6M9 18h4" />
-        </svg>
-      );
-
-    case "history":
-      return (
-        <svg {...svgProps}>
-          <path d="M12 7v5l3.5 2" />
-          <path d="M20.5 12a8.5 8.5 0 1 1-2.7-6.2" />
-          <path d="M20.5 4.5v5h-5" />
-        </svg>
-      );
-
-    case "profile":
-      return (
-        <svg {...svgProps}>
-          <path d="M12 12a4 4 0 1 0 0-8 4 4 0 0 0 0 8Z" />
-          <path d="M5 20c0-3.6 2.9-6 7-6s7 2.4 7 6" />
-        </svg>
-      );
-
-    case "search":
-      return (
-        <svg {...svgProps}>
-          <circle cx="11" cy="11" r="7" />
-          <path d="m20 20-3.8-3.8" />
-        </svg>
-      );
-
-    case "bell":
-      return (
-        <svg {...svgProps}>
-          <path d="M18 16.8H6c1-1 1.7-2.3 1.7-5 0-2.8 1.8-5 4.3-5s4.3 2.2 4.3 5c0 2.7.7 4 1.7 5Z" />
-          <path d="M10 19a2.2 2.2 0 0 0 4 0" />
-        </svg>
-      );
-
-    case "logout":
-      return (
-        <svg {...svgProps}>
-          <path d="M10 4H6a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h4" />
-          <path d="m14 16 4-4-4-4M18 12H9" />
-        </svg>
-      );
-
-    case "moon":
-      return (
-        <svg {...svgProps}>
-          <path d="M21 14.5A8.5 8.5 0 0 1 9.5 3 8.5 8.5 0 1 0 21 14.5Z" />
-        </svg>
-      );
-
-    case "sun":
-      return (
-        <svg {...svgProps}>
-          <circle cx="12" cy="12" r="4" />
-          <path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4" />
-        </svg>
-      );
-  }
+  const Icon = ICONS[name];
+  return <Icon className={className} strokeWidth={1.8} />;
 }
 
 function normalizarTexto(texto: string) {

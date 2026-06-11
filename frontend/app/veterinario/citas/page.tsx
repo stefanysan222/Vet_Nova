@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { ChangeEvent, FormEvent, ReactNode, useEffect, useMemo, useState } from "react";
+import { Plus, X, AlertCircle, CheckCircle2 } from "lucide-react";
 import { fetchCitas, createCita } from "../../../lib/api/citas";
 import { SkeletonBanner, SkeletonStats, SkeletonCardList } from "../../components/ui/Skeleton";
 import { fetchMascotas } from "../../../lib/api/mascotas";
@@ -11,6 +12,8 @@ import type { Appointment } from "../../../lib/recepcionista/types";
 import type { PetRecord } from "../../../lib/recepcionista/types";
 import { useAuth } from "@/lib/auth-context";
 import { getClinicSlots, isClinicOpen, getScheduleLabel } from "../../../lib/utils/clinic-schedule";
+import { StatusBadge } from "../../../lib/utils/status-badge";
+import type { AppointmentStatus } from "../../../lib/utils/status";
 
 type EstadoCita = "Pendiente de confirmación" | "Confirmada" | "En proceso" | "Atendida";
 
@@ -220,20 +223,16 @@ export default function VeterinarioCitasPage() {
   return (
     <div className="space-y-6">
       {/* ENCABEZADO */}
-      <header className="relative overflow-hidden rounded-[26px] border border-[#D9E4F3] bg-white p-7 shadow-[0_12px_30px_rgba(15,23,42,0.06)] dark:border-[#334155] dark:bg-[#111827]">
-        <div className="absolute -right-16 -top-20 h-52 w-52 rounded-full bg-[#DBEAFE]/65 blur-3xl dark:bg-[#2563EB]/20" />
-
-        <div className="relative flex flex-col justify-between gap-5 lg:flex-row lg:items-center">
+      <header className="overflow-hidden rounded-3xl border border-brand-200 bg-gradient-to-br from-brand-600 to-brand-700 p-7 text-white shadow-brand">
+        <div className="flex flex-col justify-between gap-5 lg:flex-row lg:items-center">
           <div>
-            <p className="text-sm font-semibold uppercase tracking-[0.24em] text-[#2563EB] dark:text-[#93C5FD]">
+            <p className="text-xs font-semibold uppercase tracking-[0.24em] text-brand-200">
               Agenda diaria
             </p>
 
-            <h1 className="mt-3 text-3xl font-bold text-[#10213A] dark:text-white">
-              Agenda Veterinaria
-            </h1>
+            <h1 className="text-display mt-2">Agenda Veterinaria</h1>
 
-            <p className="mt-3 max-w-3xl text-base leading-7 text-[#64748B] dark:text-[#94A3B8]">
+            <p className="mt-3 max-w-3xl text-sm leading-6 text-brand-100">
               Consulta las citas programadas y registra nuevas solicitudes de atención. Las citas
               creadas por el veterinario quedan pendientes de confirmación administrativa.
             </p>
@@ -242,9 +241,9 @@ export default function VeterinarioCitasPage() {
           <button
             type="button"
             onClick={abrirFormulario}
-            className="flex h-[50px] shrink-0 items-center justify-center gap-2 rounded-xl bg-[#2F6BFF] px-6 text-[15px] font-semibold text-white shadow-sm transition hover:-translate-y-0.5 hover:bg-[#2459DF] hover:shadow-[0_10px_20px_rgba(47,107,255,0.22)]"
+            className="flex h-11 shrink-0 items-center justify-center gap-2 rounded-xl bg-white px-6 text-sm font-semibold text-brand-700 shadow-sm transition hover:bg-brand-50"
           >
-            <span className="text-xl leading-none">+</span>
+            <Plus className="h-4 w-4" />
             Agendar cita
           </button>
         </div>
@@ -252,92 +251,91 @@ export default function VeterinarioCitasPage() {
 
       {/* ERROR */}
       {error && (
-        <div className="flex items-start justify-between gap-4 rounded-[16px] border border-[#FECACA] bg-[#FEF2F2] px-5 py-4 dark:border-[#7F1D1D] dark:bg-[#450A0A]">
-          <p className="text-[14px] text-[#B91C1C] dark:text-[#FECACA]">{error}</p>
+        <div className="dark:bg-danger-950/30 flex items-start justify-between gap-4 rounded-2xl border border-danger-200 bg-danger-50 px-5 py-4 dark:border-danger-800">
+          <div className="flex items-start gap-3">
+            <AlertCircle className="mt-0.5 h-5 w-5 shrink-0 text-danger-500" />
+            <p className="text-sm text-danger-700 dark:text-danger-400">{error}</p>
+          </div>
           <button
             type="button"
             onClick={() => setError(null)}
-            className="text-[18px] font-semibold text-[#B91C1C]"
+            className="text-danger-500 transition hover:text-danger-700 dark:hover:text-danger-300"
+            aria-label="Cerrar error"
           >
-            ×
+            <X className="h-5 w-5" />
           </button>
         </div>
       )}
 
       {/* MENSAJE DE REGISTRO */}
       {mostrarMensaje && (
-        <div className="flex items-start justify-between gap-4 rounded-[16px] border border-[#BBF7D0] bg-[#F0FDF4] px-5 py-4 dark:border-[#14532D] dark:bg-[#052E16]">
-          <div>
-            <p className="text-[14px] font-semibold text-[#15803D] dark:text-[#BBF7D0]">
-              Cita registrada correctamente
-            </p>
+        <div className="dark:bg-success-950/30 flex items-start justify-between gap-4 rounded-2xl border border-success-200 bg-success-50 px-5 py-4 dark:border-success-800">
+          <div className="flex items-start gap-3">
+            <CheckCircle2 className="mt-0.5 h-5 w-5 shrink-0 text-success-500" />
+            <div>
+              <p className="text-sm font-semibold text-success-700 dark:text-success-400">
+                Cita registrada correctamente
+              </p>
 
-            <p className="mt-1 text-[13px] leading-6 text-[#166534] dark:text-[#BBF7D0]">
-              La solicitud fue creada con estado <strong>Pendiente de confirmación</strong>. El
-              administrador deberá revisarla y confirmarla.
-            </p>
+              <p className="mt-1 text-sm leading-6 text-success-700/90 dark:text-success-400/90">
+                La solicitud fue creada con estado <strong>Pendiente de confirmación</strong>. El
+                administrador deberá revisarla y confirmarla.
+              </p>
+            </div>
           </div>
 
           <button
             type="button"
             onClick={() => setMostrarMensaje(false)}
-            className="text-[18px] font-semibold text-[#15803D] dark:text-[#BBF7D0]"
+            className="text-success-500 transition hover:text-success-700 dark:hover:text-success-300"
             aria-label="Cerrar mensaje"
           >
-            ×
+            <X className="h-5 w-5" />
           </button>
         </div>
       )}
 
       {/* INDICADORES */}
       <section className="grid gap-4 md:grid-cols-2">
-        <article className="rounded-[20px] border border-[#D9E2EF] bg-white p-6 shadow-[0_7px_20px_rgba(15,23,42,0.05)] transition hover:-translate-y-1 hover:shadow-[0_16px_32px_rgba(15,23,42,0.08)] dark:border-[#334155] dark:bg-[#111827]">
-          <p className="text-sm font-medium text-[#64748B] dark:text-[#94A3B8]">
-            Pendientes de confirmación
-          </p>
+        <article className="rounded-2xl border border-surface-200 bg-white p-6 shadow-card transition hover:-translate-y-1 hover:shadow-card-hover dark:border-surface-700 dark:bg-surface-900">
+          <p className="text-label">Pendientes de confirmación</p>
 
-          <p className="mt-4 text-4xl font-semibold text-[#10213A] dark:text-white">{pendientes}</p>
+          <p className="text-stat mt-3">{pendientes}</p>
 
-          <p className="mt-3 text-sm text-[#64748B] dark:text-[#94A3B8]">
+          <p className="mt-2 text-xs text-surface-500 dark:text-surface-400">
             Solicitudes registradas que deben ser confirmadas por administración.
           </p>
         </article>
 
-        <article className="rounded-[20px] border border-[#D9E2EF] bg-white p-6 shadow-[0_7px_20px_rgba(15,23,42,0.05)] transition hover:-translate-y-1 hover:shadow-[0_16px_32px_rgba(15,23,42,0.08)] dark:border-[#334155] dark:bg-[#111827]">
-          <p className="text-sm font-medium text-[#64748B] dark:text-[#94A3B8]">
-            Citas confirmadas
-          </p>
+        <article className="rounded-2xl border border-surface-200 bg-white p-6 shadow-card transition hover:-translate-y-1 hover:shadow-card-hover dark:border-surface-700 dark:bg-surface-900">
+          <p className="text-label">Citas confirmadas</p>
 
-          <p className="mt-4 text-4xl font-semibold text-[#10213A] dark:text-white">
-            {confirmadas}
-          </p>
+          <p className="text-stat mt-3">{confirmadas}</p>
 
-          <p className="mt-3 text-sm text-[#64748B] dark:text-[#94A3B8]">
+          <p className="mt-2 text-xs text-surface-500 dark:text-surface-400">
             Citas autorizadas previamente por administración para atención.
           </p>
         </article>
       </section>
 
       {/* LISTA DE CITAS */}
-      <section className="rounded-[22px] border border-[#D9E2EF] bg-white p-6 shadow-[0_8px_24px_rgba(15,23,42,0.05)] dark:border-[#334155] dark:bg-[#111827]">
+      <section className="rounded-2xl border border-surface-200 bg-white p-6 shadow-card dark:border-surface-700 dark:bg-surface-900">
         <div className="mb-6 flex flex-col justify-between gap-3 sm:flex-row sm:items-center">
           <div>
-            <h2 className="text-[20px] font-semibold text-[#10213A] dark:text-white">
-              Citas registradas
-            </h2>
+            <h2 className="text-section-title">Citas registradas</h2>
 
-            <p className="mt-1 text-sm text-[#64748B] dark:text-[#94A3B8]">
+            <p className="text-subtitle mt-1">
               Consulta el estado actual y revisa los detalles de cada cita.
             </p>
           </div>
 
-          <span className="w-fit rounded-full bg-[#EEF4FF] px-4 py-2 text-sm font-semibold text-[#2F6BFF] dark:bg-[#1E293B] dark:text-[#93C5FD]">
+          <span className="w-fit rounded-lg bg-brand-100 px-4 py-2 text-sm font-semibold text-brand-600 dark:bg-brand-900/40 dark:text-brand-300">
             {citas.length} citas
           </span>
         </div>
 
         {citas.length === 0 ? (
-          <p className="py-10 text-center text-[14px] text-[#64748B] dark:text-[#94A3B8]">
+          <p className="py-10 text-center text-sm text-surface-500 dark:text-surface-400">
             No hay citas registradas.
           </p>
         ) : (
@@ -345,15 +343,15 @@ export default function VeterinarioCitasPage() {
             {citas.map((cita) => (
               <article
                 key={cita.id}
-                className="group rounded-[20px] border border-[#E5EAF2] bg-[#F8FAFC] p-5 transition-all duration-300 hover:-translate-y-0.5 hover:border-[#D6E3FF] hover:shadow-[0_12px_26px_rgba(15,23,42,0.06)] dark:border-[#334155] dark:bg-[#0F172A]"
+                className="group rounded-2xl border border-surface-200 bg-surface-50 p-5 transition-all duration-300 hover:-translate-y-0.5 hover:border-brand-200 hover:shadow-card-hover dark:border-surface-700 dark:bg-surface-950"
               >
                 <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
                   <div>
-                    <p className="text-[15px] font-semibold text-[#10213A] transition group-hover:text-[#2563EB] dark:text-white">
+                    <p className="text-sm font-semibold text-surface-900 transition group-hover:text-brand-600 dark:text-white">
                       {formatearFecha(cita.fecha)} · {cita.hora} • {cita.mascota}
                     </p>
 
-                    <p className="mt-1 text-sm text-[#64748B] dark:text-[#94A3B8]">
+                    <p className="mt-1 text-sm text-surface-500 dark:text-surface-400">
                       {cita.cliente} · {cita.servicio}
                     </p>
                   </div>
@@ -362,16 +360,12 @@ export default function VeterinarioCitasPage() {
                     <button
                       type="button"
                       onClick={() => setCitaDetalle(cita)}
-                      className="flex h-[40px] items-center justify-center rounded-xl border border-[#D6E3FF] bg-white px-4 text-[13px] font-semibold text-[#2563EB] transition hover:-translate-y-0.5 hover:bg-[#EFF6FF] dark:border-[#334155] dark:bg-[#111827] dark:text-[#93C5FD] dark:hover:bg-[#1E293B]"
+                      className="flex h-10 items-center justify-center rounded-xl border border-brand-200 bg-white px-4 text-xs font-semibold text-brand-600 transition hover:-translate-y-0.5 hover:bg-brand-50 dark:border-surface-700 dark:bg-surface-900 dark:text-brand-400 dark:hover:bg-brand-950/30"
                     >
                       Ver detalles
                     </button>
 
-                    <span
-                      className={`rounded-full px-3 py-2 text-[13px] font-semibold ${estiloEstado(cita.estado)}`}
-                    >
-                      {cita.estado}
-                    </span>
+                    <StatusBadge status={cita.estado as AppointmentStatus} />
                   </div>
                 </div>
               </article>
@@ -382,38 +376,29 @@ export default function VeterinarioCitasPage() {
 
       {/* MODAL DETALLE DE LA CITA */}
       {citaDetalle && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-[#0F172A]/55 px-4 py-6 backdrop-blur-[2px]">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-surface-900/50 px-4 py-6 backdrop-blur-sm">
           <section
             role="dialog"
             aria-modal="true"
             aria-labelledby="titulo-detalle-cita"
-            className="max-h-[95vh] w-full max-w-[780px] overflow-y-auto rounded-[26px] bg-white shadow-[0_26px_80px_rgba(15,23,42,0.30)] dark:bg-[#111827]"
+            className="max-h-[95vh] w-full max-w-[780px] overflow-y-auto rounded-3xl border border-surface-200/60 bg-white shadow-modal dark:border-surface-700 dark:bg-surface-900"
           >
-            <div className="relative overflow-hidden border-b border-[#E2E8F0] px-6 py-6 dark:border-[#334155]">
-              <div className="absolute -right-10 -top-12 h-40 w-40 rounded-full bg-[#DBEAFE]/65 blur-3xl dark:bg-[#2563EB]/20" />
-
-              <div className="relative flex items-start justify-between gap-5">
+            <div className="border-b border-surface-100 px-6 py-6 dark:border-surface-800">
+              <div className="flex items-start justify-between gap-5">
                 <div>
-                  <p className="text-[12px] font-semibold uppercase tracking-[0.2em] text-[#2563EB] dark:text-[#93C5FD]">
+                  <p className="text-xs font-semibold uppercase tracking-[0.2em] text-brand-600 dark:text-brand-400">
                     Detalle de la cita
                   </p>
 
                   <div className="mt-3 flex flex-wrap items-center gap-3">
-                    <h2
-                      id="titulo-detalle-cita"
-                      className="text-[26px] font-bold text-[#10213A] dark:text-white"
-                    >
+                    <h2 id="titulo-detalle-cita" className="text-page-title">
                       {citaDetalle.mascota}
                     </h2>
 
-                    <span
-                      className={`rounded-full px-3 py-1.5 text-[12px] font-semibold ${estiloEstado(citaDetalle.estado)}`}
-                    >
-                      {citaDetalle.estado}
-                    </span>
+                    <StatusBadge status={citaDetalle.estado as AppointmentStatus} />
                   </div>
 
-                  <p className="mt-2 text-[14px] text-[#64748B] dark:text-[#94A3B8]">
+                  <p className="text-subtitle mt-2">
                     {citaDetalle.especie}
                     {citaDetalle.raza ? ` · ${citaDetalle.raza}` : ""}
                   </p>
@@ -422,10 +407,10 @@ export default function VeterinarioCitasPage() {
                 <button
                   type="button"
                   onClick={() => setCitaDetalle(null)}
-                  className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl text-[26px] text-[#64748B] transition hover:bg-[#F1F5F9] dark:hover:bg-[#1E293B]"
+                  className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl text-surface-500 transition hover:bg-surface-100 dark:hover:bg-surface-800"
                   aria-label="Cerrar detalle"
                 >
-                  ×
+                  <X className="h-5 w-5" />
                 </button>
               </div>
             </div>
@@ -442,8 +427,8 @@ export default function VeterinarioCitasPage() {
                 />
               </div>
 
-              <section className="rounded-[18px] border border-[#E2E8F0] bg-[#FBFCFF] p-5 dark:border-[#334155] dark:bg-[#0F172A]">
-                <h3 className="text-[16px] font-semibold text-[#10213A] dark:text-white">
+              <section className="rounded-2xl border border-surface-200 bg-surface-50 p-5 dark:border-surface-700 dark:bg-surface-950">
+                <h3 className="text-sm font-semibold text-surface-900 dark:text-white">
                   Información del paciente y propietario
                 </h3>
 
@@ -454,19 +439,19 @@ export default function VeterinarioCitasPage() {
                 </div>
               </section>
 
-              <section className="rounded-[18px] border border-[#E2E8F0] bg-[#FBFCFF] p-5 dark:border-[#334155] dark:bg-[#0F172A]">
-                <h3 className="text-[16px] font-semibold text-[#10213A] dark:text-white">
+              <section className="rounded-2xl border border-surface-200 bg-surface-50 p-5 dark:border-surface-700 dark:bg-surface-950">
+                <h3 className="text-sm font-semibold text-surface-900 dark:text-white">
                   Observaciones registradas
                 </h3>
 
-                <p className="mt-3 text-[14px] leading-7 text-[#64748B] dark:text-[#94A3B8]">
+                <p className="mt-3 text-sm leading-6 text-surface-500 dark:text-surface-400">
                   {citaDetalle.observaciones || "No hay observaciones registradas."}
                 </p>
               </section>
 
               {citaDetalle.estado === "Pendiente de confirmación" && (
-                <div className="rounded-[16px] border border-[#FDE68A] bg-[#FFFBEB] px-4 py-3 dark:border-[#78350F] dark:bg-[#451A03]">
-                  <p className="text-[13px] leading-6 text-[#92400E] dark:text-[#FDE68A]">
+                <div className="dark:bg-warning-950/30 rounded-2xl border border-warning-200 bg-warning-50 px-4 py-3 dark:border-warning-800">
+                  <p className="text-sm leading-6 text-warning-700 dark:text-warning-400">
                     <strong>Pendiente de confirmación:</strong> esta solicitud debe ser revisada por
                     administración antes de iniciar la atención clínica.
                   </p>
@@ -474,19 +459,19 @@ export default function VeterinarioCitasPage() {
               )}
 
               {(citaDetalle.estado === "Confirmada" || citaDetalle.estado === "En proceso") && (
-                <div className="rounded-[16px] border border-[#DBEAFE] bg-[#EFF6FF] px-4 py-3 dark:border-[#1E3A8A] dark:bg-[#172554]">
-                  <p className="text-[13px] leading-6 text-[#1D4ED8] dark:text-[#BFDBFE]">
+                <div className="rounded-2xl border border-brand-200 bg-brand-50 px-4 py-3 dark:border-brand-800 dark:bg-brand-950/30">
+                  <p className="text-sm leading-6 text-brand-700 dark:text-brand-300">
                     Esta cita está habilitada para atención. Puedes iniciar o continuar el registro
                     clínico del paciente.
                   </p>
                 </div>
               )}
 
-              <div className="flex flex-col-reverse gap-3 border-t border-[#E2E8F0] pt-5 dark:border-[#334155] sm:flex-row sm:justify-end">
+              <div className="flex flex-col-reverse gap-3 border-t border-surface-100 pt-5 dark:border-surface-800 sm:flex-row sm:justify-end">
                 <button
                   type="button"
                   onClick={() => setCitaDetalle(null)}
-                  className="flex h-[46px] items-center justify-center rounded-xl border border-[#CBD5E1] px-6 text-[14px] font-semibold text-[#475569] transition hover:bg-[#F8FAFC] dark:border-[#334155] dark:text-[#CBD5E1] dark:hover:bg-[#1E293B]"
+                  className="flex h-11 items-center justify-center rounded-xl border border-surface-300 px-6 text-sm font-semibold text-surface-600 transition hover:bg-surface-50 dark:border-surface-700 dark:text-surface-300 dark:hover:bg-surface-800"
                 >
                   Cerrar
                 </button>
@@ -494,7 +479,7 @@ export default function VeterinarioCitasPage() {
                 {(citaDetalle.estado === "Confirmada" || citaDetalle.estado === "En proceso") && (
                   <Link
                     href={`/veterinario/consulta?cita=${citaDetalle.id}`}
-                    className="flex h-[46px] items-center justify-center rounded-xl bg-[#2F6BFF] px-6 text-[14px] font-semibold text-white transition hover:bg-[#2459DF]"
+                    className="flex h-11 items-center justify-center rounded-xl bg-brand-600 px-6 text-sm font-semibold text-white transition hover:bg-brand-700"
                   >
                     Registrar consulta
                   </Link>
@@ -507,27 +492,24 @@ export default function VeterinarioCitasPage() {
 
       {/* MODAL AGENDAR CITA */}
       {mostrarFormulario && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-[#0F172A]/55 px-4 py-6 backdrop-blur-[2px]">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-surface-900/50 px-4 py-6 backdrop-blur-sm">
           <section
             role="dialog"
             aria-modal="true"
             aria-labelledby="titulo-agendar-cita"
-            className="max-h-[95vh] w-full max-w-[780px] overflow-y-auto rounded-[26px] bg-white shadow-[0_26px_80px_rgba(15,23,42,0.30)] dark:bg-[#111827]"
+            className="max-h-[95vh] w-full max-w-[780px] overflow-y-auto rounded-3xl border border-surface-200/60 bg-white shadow-modal dark:border-surface-700 dark:bg-surface-900"
           >
-            <div className="flex items-start justify-between border-b border-[#E2E8F0] px-6 py-5 dark:border-[#334155]">
+            <div className="flex items-start justify-between border-b border-surface-100 px-6 py-5 dark:border-surface-800">
               <div>
-                <p className="text-[12px] font-semibold uppercase tracking-[0.18em] text-[#2F6BFF]">
+                <p className="text-xs font-semibold uppercase tracking-[0.18em] text-brand-600 dark:text-brand-400">
                   Nueva solicitud
                 </p>
 
-                <h2
-                  id="titulo-agendar-cita"
-                  className="mt-2 text-[24px] font-bold text-[#10213A] dark:text-white"
-                >
+                <h2 id="titulo-agendar-cita" className="text-page-title mt-2">
                   Agendar cita
                 </h2>
 
-                <p className="mt-2 text-[14px] text-[#64748B] dark:text-[#94A3B8]">
+                <p className="text-subtitle mt-2">
                   Completa los datos. La cita quedará pendiente de confirmación administrativa.
                 </p>
               </div>
@@ -535,10 +517,10 @@ export default function VeterinarioCitasPage() {
               <button
                 type="button"
                 onClick={cerrarFormulario}
-                className="flex h-10 w-10 items-center justify-center rounded-xl text-[25px] text-[#64748B] transition hover:bg-[#F1F5F9] dark:hover:bg-[#1E293B]"
+                className="flex h-10 w-10 items-center justify-center rounded-xl text-surface-500 transition hover:bg-surface-100 dark:hover:bg-surface-800"
                 aria-label="Cerrar formulario"
               >
-                ×
+                <X className="h-5 w-5" />
               </button>
             </div>
 
@@ -570,13 +552,11 @@ export default function VeterinarioCitasPage() {
 
                 {/* Hora — slots dinámicos */}
                 <div>
-                  <span className="mb-2 block text-[13px] font-semibold text-[#334155] dark:text-[#CBD5E1]">
-                    Hora disponible
-                  </span>
+                  <span className="form-label">Hora disponible</span>
                   {!formulario.fecha ? (
-                    <p className="text-xs text-[#94A3B8]">Selecciona una fecha primero.</p>
+                    <p className="text-xs text-surface-400">Selecciona una fecha primero.</p>
                   ) : clinicaCerrada ? (
-                    <div className="rounded-xl border border-[#FECACA] bg-[#FEF2F2] px-4 py-3 text-xs text-[#B91C1C] dark:border-[#7F1D1D] dark:bg-[#450A0A] dark:text-[#FECACA]">
+                    <div className="dark:bg-danger-950/30 rounded-xl border border-danger-200 bg-danger-50 px-4 py-3 text-xs text-danger-700 dark:border-danger-800 dark:text-danger-400">
                       No hay turnos disponibles. La clínica está cerrada ese día.
                     </div>
                   ) : (
@@ -592,10 +572,10 @@ export default function VeterinarioCitasPage() {
                             title={bloqueado ? "Ya tienes una cita a esta hora" : undefined}
                             className={`rounded-xl border py-2 text-xs font-semibold transition ${
                               formulario.hora === slot
-                                ? "border-[#2F6BFF] bg-[#2F6BFF] text-white"
+                                ? "border-brand-600 bg-brand-600 text-white"
                                 : bloqueado
-                                  ? "cursor-not-allowed border-[#E5EAF2] bg-[#F8FAFC] text-[#94A3B8] line-through dark:border-[#334155] dark:bg-[#0F172A]"
-                                  : "border-[#CBD5E1] bg-white text-[#475569] hover:border-[#2F6BFF] dark:border-[#334155] dark:bg-[#0F172A] dark:text-[#CBD5E1]"
+                                  ? "cursor-not-allowed border-surface-200 bg-surface-50 text-surface-400 line-through dark:border-surface-700 dark:bg-surface-950"
+                                  : "border-surface-300 bg-white text-surface-600 hover:border-brand-400 dark:border-surface-700 dark:bg-surface-950 dark:text-surface-300"
                             }`}
                           >
                             {slot}
@@ -635,7 +615,7 @@ export default function VeterinarioCitasPage() {
                         type="text"
                         value={mascotaSeleccionada.especie}
                         readOnly
-                        className={`${campoClases} cursor-not-allowed bg-[#F8FAFC] text-[#64748B] dark:bg-[#0F172A]`}
+                        className={`${campoClases} cursor-not-allowed bg-surface-50 text-surface-500 dark:bg-surface-950`}
                       />
                     </CampoFormulario>
 
@@ -644,7 +624,7 @@ export default function VeterinarioCitasPage() {
                         type="text"
                         value={mascotaSeleccionada.propietarioNombre}
                         readOnly
-                        className={`${campoClases} cursor-not-allowed bg-[#F8FAFC] text-[#64748B] dark:bg-[#0F172A]`}
+                        className={`${campoClases} cursor-not-allowed bg-surface-50 text-surface-500 dark:bg-surface-950`}
                       />
                     </CampoFormulario>
                   </>
@@ -676,9 +656,9 @@ export default function VeterinarioCitasPage() {
                 {/* Veterinario — disponibilidad basada en fecha+hora */}
                 {formulario.fecha && formulario.hora && !clinicaCerrada && (
                   <div className="md:col-span-2">
-                    <span className="mb-2 block text-[13px] font-semibold text-[#334155] dark:text-[#CBD5E1]">
+                    <span className="form-label">
                       Veterinario asignado
-                      <span className="ml-2 text-xs font-normal text-[#94A3B8]">
+                      <span className="ml-2 font-normal normal-case text-surface-400">
                         {vetsDisponibles.length} disponible{vetsDisponibles.length !== 1 ? "s" : ""}{" "}
                         a las {formulario.hora}
                       </span>
@@ -695,22 +675,22 @@ export default function VeterinarioCitasPage() {
                                 f.veterinarioNombre === (v.nombre ?? "") ? "" : (v.nombre ?? ""),
                             }))
                           }
-                          className={`flex w-full items-center gap-3 rounded-xl border px-4 py-2.5 text-left text-[13px] transition ${
+                          className={`flex w-full items-center gap-3 rounded-xl border px-4 py-2.5 text-left text-sm transition ${
                             formulario.veterinarioNombre === v.nombre
-                              ? "border-[#2F6BFF] bg-[#EFF6FF] text-[#1D4ED8] dark:border-[#2563EB] dark:bg-[#172554] dark:text-[#BFDBFE]"
-                              : "border-[#E2E8F0] bg-white text-[#475569] hover:border-[#BFDBFE] hover:bg-[#F0F9FF] dark:border-[#334155] dark:bg-[#0F172A] dark:text-[#CBD5E1]"
+                              ? "border-brand-400 bg-brand-50 text-brand-700 dark:border-brand-600 dark:bg-brand-950/30 dark:text-brand-300"
+                              : "border-surface-200 bg-white text-surface-600 hover:border-brand-200 hover:bg-brand-50/40 dark:border-surface-700 dark:bg-surface-950 dark:text-surface-300"
                           }`}
                         >
-                          <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg bg-emerald-100 text-xs font-bold text-emerald-700 dark:bg-emerald-900/40 dark:text-emerald-300">
+                          <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg bg-success-100 text-xs font-bold text-success-700 dark:bg-success-900/40 dark:text-success-300">
                             {(v.nombre ?? "?")[0].toUpperCase()}
                           </span>
                           <span className="flex-1 font-medium">{v.nombre}</span>
                           {formulario.veterinarioNombre === v.nombre && (
-                            <span className="text-xs font-semibold text-[#2563EB] dark:text-[#93C5FD]">
+                            <span className="text-xs font-semibold text-brand-600 dark:text-brand-400">
                               Seleccionado
                             </span>
                           )}
-                          <span className="text-xs text-emerald-600 dark:text-emerald-400">
+                          <span className="text-xs text-success-600 dark:text-success-400">
                             Disponible
                           </span>
                         </button>
@@ -719,13 +699,13 @@ export default function VeterinarioCitasPage() {
                       {vetsOcupados.map((v) => (
                         <div
                           key={v.id}
-                          className="flex w-full items-center gap-3 rounded-xl border border-[#E5EAF2] bg-[#F8FAFC] px-4 py-2.5 text-[13px] opacity-50 dark:border-[#334155] dark:bg-[#0F172A]"
+                          className="flex w-full items-center gap-3 rounded-xl border border-surface-200 bg-surface-50 px-4 py-2.5 text-sm opacity-50 dark:border-surface-700 dark:bg-surface-950"
                         >
-                          <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg bg-slate-200 text-xs font-bold text-slate-500 dark:bg-slate-700">
+                          <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg bg-surface-200 text-xs font-bold text-surface-500 dark:bg-surface-700">
                             {(v.nombre ?? "?")[0].toUpperCase()}
                           </span>
-                          <span className="flex-1 font-medium text-[#64748B]">{v.nombre}</span>
-                          <span className="text-xs text-rose-500">Ocupado</span>
+                          <span className="flex-1 font-medium text-surface-500">{v.nombre}</span>
+                          <span className="text-xs text-danger-500">Ocupado</span>
                         </div>
                       ))}
                     </div>
@@ -744,18 +724,18 @@ export default function VeterinarioCitasPage() {
                 />
               </CampoFormulario>
 
-              <div className="rounded-[14px] border border-[#FDE68A] bg-[#FFFBEB] px-4 py-3 dark:border-[#78350F] dark:bg-[#451A03]">
-                <p className="text-[13px] leading-6 text-[#92400E] dark:text-[#FDE68A]">
+              <div className="dark:bg-warning-950/30 rounded-2xl border border-warning-200 bg-warning-50 px-4 py-3 dark:border-warning-800">
+                <p className="text-sm leading-6 text-warning-700 dark:text-warning-400">
                   <strong>Importante:</strong> el veterinario puede registrar la solicitud, pero no
                   confirmarla. El estado inicial será <strong>Pendiente de confirmación</strong>.
                 </p>
               </div>
 
-              <div className="flex flex-col-reverse gap-3 border-t border-[#E2E8F0] pt-5 dark:border-[#334155] sm:flex-row sm:justify-end">
+              <div className="flex flex-col-reverse gap-3 border-t border-surface-100 pt-5 dark:border-surface-800 sm:flex-row sm:justify-end">
                 <button
                   type="button"
                   onClick={cerrarFormulario}
-                  className="flex h-[46px] items-center justify-center rounded-xl border border-[#CBD5E1] px-6 text-[14px] font-semibold text-[#475569] transition hover:bg-[#F8FAFC] dark:border-[#334155] dark:text-[#CBD5E1] dark:hover:bg-[#1E293B]"
+                  className="flex h-11 items-center justify-center rounded-xl border border-surface-300 px-6 text-sm font-semibold text-surface-600 transition hover:bg-surface-50 dark:border-surface-700 dark:text-surface-300 dark:hover:bg-surface-800"
                 >
                   Cancelar
                 </button>
@@ -763,7 +743,7 @@ export default function VeterinarioCitasPage() {
                 <button
                   type="submit"
                   disabled={guardando || clinicaCerrada}
-                  className="flex h-[46px] items-center justify-center rounded-xl bg-[#2F6BFF] px-7 text-[14px] font-semibold text-white transition hover:bg-[#2459DF] disabled:opacity-60"
+                  className="flex h-11 items-center justify-center rounded-xl bg-brand-600 px-7 text-sm font-semibold text-white transition hover:bg-brand-700 disabled:opacity-60"
                 >
                   {guardando ? "Guardando..." : "Guardar solicitud"}
                 </button>
@@ -779,9 +759,7 @@ export default function VeterinarioCitasPage() {
 function CampoFormulario({ label, children }: { label: string; children: ReactNode }) {
   return (
     <label className="block">
-      <span className="mb-2 block text-[13px] font-semibold text-[#334155] dark:text-[#CBD5E1]">
-        {label}
-      </span>
+      <span className="form-label">{label}</span>
       {children}
     </label>
   );
@@ -789,26 +767,11 @@ function CampoFormulario({ label, children }: { label: string; children: ReactNo
 
 function DatoDetalle({ titulo, valor }: { titulo: string; valor: string }) {
   return (
-    <div className="rounded-[14px] bg-[#F8FAFC] px-4 py-3 dark:bg-[#0F172A]">
-      <p className="text-[11px] font-semibold uppercase tracking-wide text-[#64748B] dark:text-[#94A3B8]">
-        {titulo}
-      </p>
-      <p className="mt-2 text-[14px] font-medium text-[#10213A] dark:text-white">{valor}</p>
+    <div className="rounded-xl bg-surface-50 px-4 py-3 dark:bg-surface-950">
+      <p className="text-caption">{titulo}</p>
+      <p className="mt-2 text-sm font-medium text-surface-900 dark:text-white">{valor}</p>
     </div>
   );
-}
-
-function estiloEstado(estado: EstadoCita) {
-  switch (estado) {
-    case "Pendiente de confirmación":
-      return "bg-[#FEF3C7] text-[#B45309] dark:bg-[#78350F] dark:text-[#FDE68A]";
-    case "Confirmada":
-      return "bg-[#DCFCE7] text-[#15803D] dark:bg-[#14532D] dark:text-[#BBF7D0]";
-    case "En proceso":
-      return "bg-[#DBEAFE] text-[#2563EB] dark:bg-[#1E3A8A] dark:text-[#BFDBFE]";
-    case "Atendida":
-      return "bg-[#E0E7FF] text-[#4338CA] dark:bg-[#312E81] dark:text-[#C7D2FE]";
-  }
 }
 
 function formatearFecha(fecha: string) {
@@ -821,5 +784,4 @@ function formatearFecha(fecha: string) {
   });
 }
 
-const campoClases =
-  "h-[48px] w-full rounded-xl border border-[#CBD5E1] bg-white px-4 text-[14px] text-[#10213A] outline-none transition placeholder:text-[#94A3B8] focus:border-[#2F6BFF] focus:ring-4 focus:ring-[#2F6BFF]/10 dark:border-[#334155] dark:bg-[#0F172A] dark:text-white dark:placeholder:text-[#94A3B8]";
+const campoClases = "form-input";

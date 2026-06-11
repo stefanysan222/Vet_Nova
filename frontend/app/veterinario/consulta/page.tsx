@@ -3,6 +3,16 @@
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { ChangeEvent, FormEvent, ReactNode, Suspense, useEffect, useMemo, useState } from "react";
+import {
+  AlertCircle,
+  CheckCircle2,
+  X,
+  PawPrint,
+  ClipboardList,
+  Lock,
+  History,
+  Save,
+} from "lucide-react";
 import { fetchCitas, updateCita } from "../../../lib/api/citas";
 import type { Appointment } from "../../../lib/recepcionista/types";
 import { useAuth } from "@/lib/auth-context";
@@ -190,7 +200,7 @@ function RegistrarConsultaContent() {
   if (loading) {
     return (
       <div className="flex min-h-[400px] items-center justify-center">
-        <p className="text-[14px] text-[#64748B] dark:text-[#94A3B8]">
+        <p className="text-sm text-surface-500 dark:text-surface-400">
           Cargando citas confirmadas...
         </p>
       </div>
@@ -200,20 +210,16 @@ function RegistrarConsultaContent() {
   return (
     <div className="space-y-6">
       {/* ENCABEZADO */}
-      <section className="consulta-enter relative overflow-hidden rounded-[24px] border border-[#D9E4F3] bg-white p-6 shadow-[0_10px_28px_rgba(15,23,42,0.06)] dark:border-[#334155] dark:bg-[#111827]">
-        <div className="consulta-orb absolute -right-16 -top-20 h-52 w-52 rounded-full bg-[#DBEAFE]/70 blur-3xl dark:bg-[#2563EB]/20" />
-
-        <div className="relative flex flex-col justify-between gap-5 lg:flex-row lg:items-center">
+      <header className="overflow-hidden rounded-3xl border border-brand-200 bg-gradient-to-br from-brand-600 to-brand-700 p-7 text-white shadow-brand">
+        <div className="flex flex-col justify-between gap-5 lg:flex-row lg:items-center">
           <div>
-            <p className="text-[13px] font-semibold uppercase tracking-[0.2em] text-[#2563EB] dark:text-[#93C5FD]">
+            <p className="text-xs font-semibold uppercase tracking-[0.24em] text-brand-200">
               Atención clínica
             </p>
 
-            <h1 className="mt-3 text-[29px] font-bold text-[#10213A] dark:text-white">
-              Registrar consulta y tratamiento
-            </h1>
+            <h1 className="text-display mt-2">Registrar consulta y tratamiento</h1>
 
-            <p className="mt-3 max-w-3xl text-[14px] leading-7 text-[#64748B] dark:text-[#94A3B8]">
+            <p className="mt-3 max-w-3xl text-sm leading-6 text-brand-100">
               Documenta la valoración médica de un paciente asignado y actualiza su historial
               clínico con diagnóstico, tratamiento y seguimiento.
             </p>
@@ -221,52 +227,58 @@ function RegistrarConsultaContent() {
 
           <Link
             href="/veterinario/citas"
-            className="flex h-[48px] shrink-0 items-center justify-center rounded-xl border border-[#D6E3FF] bg-white px-5 text-[14px] font-semibold text-[#2563EB] transition hover:-translate-y-0.5 hover:bg-[#EFF6FF] dark:border-[#334155] dark:bg-[#111827] dark:text-[#93C5FD]"
+            className="flex h-11 shrink-0 items-center justify-center rounded-xl bg-white px-6 text-sm font-semibold text-brand-700 shadow-sm transition hover:bg-brand-50"
           >
             Volver a agenda diaria
           </Link>
         </div>
-      </section>
+      </header>
 
       {/* ERROR */}
       {error && (
-        <div className="flex items-start justify-between gap-4 rounded-[16px] border border-[#FECACA] bg-[#FEF2F2] px-5 py-4 dark:border-[#7F1D1D] dark:bg-[#450A0A]">
-          <p className="text-[14px] text-[#B91C1C] dark:text-[#FECACA]">{error}</p>
+        <div className="dark:bg-danger-950/30 flex items-start justify-between gap-4 rounded-2xl border border-danger-200 bg-danger-50 px-5 py-4 dark:border-danger-800">
+          <div className="flex items-start gap-3">
+            <AlertCircle className="mt-0.5 h-5 w-5 shrink-0 text-danger-500" />
+            <p className="text-sm text-danger-700 dark:text-danger-400">{error}</p>
+          </div>
           <button
             type="button"
             onClick={() => setError(null)}
-            className="text-[18px] font-semibold text-[#B91C1C]"
+            className="flex h-8 w-8 shrink-0 items-center justify-center rounded-xl text-danger-500 transition hover:bg-danger-100 dark:hover:bg-danger-900/40"
           >
-            ×
+            <X className="h-5 w-5" />
           </button>
         </div>
       )}
 
       {/* MENSAJE DE GUARDADO */}
       {guardado && (
-        <div className="consulta-alert-enter flex items-start justify-between gap-4 rounded-[16px] border border-[#BBF7D0] bg-[#F0FDF4] px-5 py-4 dark:border-[#14532D] dark:bg-[#052E16]">
-          <div>
-            <p className="text-[14px] font-semibold text-[#15803D] dark:text-[#BBF7D0]">
-              Consulta registrada correctamente
-            </p>
-            <p className="mt-1 text-[13px] leading-6 text-[#166534] dark:text-[#BBF7D0]">
-              La atención clínica fue registrada y el historial del paciente ha sido actualizado.
-            </p>
+        <div className="dark:bg-success-950/30 flex items-start justify-between gap-4 rounded-2xl border border-success-200 bg-success-50 px-5 py-4 dark:border-success-800">
+          <div className="flex items-start gap-3">
+            <CheckCircle2 className="mt-0.5 h-5 w-5 shrink-0 text-success-500" />
+            <div>
+              <p className="text-sm font-semibold text-success-700 dark:text-success-400">
+                Consulta registrada correctamente
+              </p>
+              <p className="mt-1 text-sm leading-6 text-success-600 dark:text-success-400">
+                La atención clínica fue registrada y el historial del paciente ha sido actualizado.
+              </p>
+            </div>
           </div>
           <button
             type="button"
             onClick={() => setGuardado(false)}
-            className="text-[19px] font-semibold text-[#15803D] dark:text-[#BBF7D0]"
+            className="flex h-8 w-8 shrink-0 items-center justify-center rounded-xl text-success-500 transition hover:bg-success-100 dark:hover:bg-success-900/40"
             aria-label="Cerrar mensaje"
           >
-            ×
+            <X className="h-5 w-5" />
           </button>
         </div>
       )}
 
       {citasHabilitadas.length === 0 && !loading && (
-        <div className="rounded-[16px] border border-[#DBEAFE] bg-[#EFF6FF] px-5 py-4 dark:border-[#1E3A8A] dark:bg-[#172554]">
-          <p className="text-[14px] text-[#1D4ED8] dark:text-[#BFDBFE]">
+        <div className="rounded-2xl border border-brand-200 bg-brand-50 px-5 py-4 dark:border-brand-800 dark:bg-brand-950/30">
+          <p className="text-sm text-brand-700 dark:text-brand-300">
             No hay citas confirmadas disponibles para atención en este momento.
           </p>
         </div>
@@ -274,30 +286,23 @@ function RegistrarConsultaContent() {
 
       <form onSubmit={handleSubmit} className="grid gap-5 xl:grid-cols-[0.92fr_1.18fr]">
         {/* DATOS DE LA ATENCIÓN */}
-        <section className="consulta-card rounded-[22px] border border-[#D9E2EF] bg-white p-6 shadow-[0_8px_24px_rgba(15,23,42,0.05)] dark:border-[#334155] dark:bg-[#111827]">
+        <section className="rounded-2xl border border-surface-200 bg-white p-6 shadow-card dark:border-surface-700 dark:bg-surface-900">
           <div className="mb-6">
             <div className="flex items-center gap-3">
-              <div className="flex h-11 w-11 items-center justify-center rounded-[14px] bg-[#EFF6FF] text-[#2563EB] dark:bg-[#1E3A8A] dark:text-[#BFDBFE]">
-                <ConsultaIcon name="patient" />
+              <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-brand-100 text-brand-600 dark:bg-brand-900/40 dark:text-brand-300">
+                <PawPrint className="h-5 w-5" />
               </div>
 
               <div>
-                <h2 className="text-[19px] font-semibold text-[#10213A] dark:text-white">
-                  Datos de la atención
-                </h2>
-                <p className="mt-1 text-[13px] text-[#64748B] dark:text-[#94A3B8]">
-                  Selecciona una cita habilitada.
-                </p>
+                <h2 className="text-section-title">Datos de la atención</h2>
+                <p className="text-subtitle mt-1">Selecciona una cita habilitada.</p>
               </div>
             </div>
           </div>
 
-          <div className="mb-6 flex items-start gap-3 rounded-[14px] border border-[#DBEAFE] bg-[#EFF6FF] px-4 py-3 dark:border-[#1E3A8A] dark:bg-[#172554]">
-            <ConsultaIcon
-              name="lock"
-              className="mt-0.5 h-[17px] w-[17px] shrink-0 text-[#2563EB] dark:text-[#93C5FD]"
-            />
-            <p className="text-[13px] leading-6 text-[#1D4ED8] dark:text-[#BFDBFE]">
+          <div className="mb-6 flex items-start gap-3 rounded-2xl border border-brand-200 bg-brand-50 px-4 py-3 dark:border-brand-800 dark:bg-brand-950/30">
+            <Lock className="mt-0.5 h-[17px] w-[17px] shrink-0 text-brand-600 dark:text-brand-300" />
+            <p className="text-sm leading-6 text-brand-700 dark:text-brand-300">
               Solo se muestran citas confirmadas para atención. Los datos generales no pueden
               editarse desde este módulo.
             </p>
@@ -325,21 +330,21 @@ function RegistrarConsultaContent() {
             </Campo>
 
             {citaSeleccionada && (
-              <div className="consulta-patient-summary rounded-[16px] border border-[#D6E3FF] bg-gradient-to-r from-[#F8FBFF] to-[#EFF6FF] p-4 dark:border-[#29406B] dark:from-[#0F172A] dark:to-[#172554]">
+              <div className="rounded-2xl border border-brand-200 bg-brand-50 p-4 dark:border-brand-800 dark:bg-brand-950/30">
                 <div className="flex items-center gap-4">
-                  <div className="flex h-12 w-12 items-center justify-center rounded-[15px] bg-[#DBEAFE] text-[18px] font-bold text-[#2563EB] dark:bg-[#1E3A8A] dark:text-[#BFDBFE]">
+                  <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-brand-100 text-lg font-bold text-brand-600 dark:bg-brand-900/40 dark:text-brand-300">
                     {citaSeleccionada.paciente.charAt(0)}
                   </div>
                   <div className="min-w-0">
                     <div className="flex flex-wrap items-center gap-2">
-                      <p className="text-[15px] font-semibold text-[#10213A] dark:text-white">
+                      <p className="text-sm font-semibold text-surface-900 dark:text-white">
                         {citaSeleccionada.paciente}
                       </p>
-                      <span className="rounded-full bg-[#DCFCE7] px-2.5 py-1 text-[11px] font-semibold text-[#15803D] dark:bg-[#14532D] dark:text-[#BBF7D0]">
+                      <span className="inline-flex items-center gap-1 rounded-lg bg-success-100 px-2.5 py-1 text-xs font-semibold text-success-700 dark:bg-success-900/40 dark:text-success-300">
                         Confirmada
                       </span>
                     </div>
-                    <p className="mt-1 text-[13px] text-[#64748B] dark:text-[#94A3B8]">
+                    <p className="mt-1 text-xs text-surface-500 dark:text-surface-400">
                       {citaSeleccionada.especie}
                       {citaSeleccionada.raza ? ` · ${citaSeleccionada.raza}` : ""}
                     </p>
@@ -354,7 +359,7 @@ function RegistrarConsultaContent() {
                 value={citaSeleccionada?.propietario ?? ""}
                 readOnly
                 placeholder="Se carga automáticamente al seleccionar la cita"
-                className={`${campoClases} campo-bloqueado`}
+                className={`${campoClases} cursor-not-allowed bg-surface-50 text-surface-500 dark:bg-surface-950`}
               />
             </Campo>
 
@@ -364,7 +369,7 @@ function RegistrarConsultaContent() {
                 value={citaSeleccionada?.servicio ?? ""}
                 readOnly
                 placeholder="Se carga automáticamente al seleccionar la cita"
-                className={`${campoClases} campo-bloqueado`}
+                className={`${campoClases} cursor-not-allowed bg-surface-50 text-surface-500 dark:bg-surface-950`}
               />
             </Campo>
 
@@ -375,7 +380,7 @@ function RegistrarConsultaContent() {
                   value={citaSeleccionada?.fecha ?? ""}
                   readOnly
                   placeholder="Fecha"
-                  className={`${campoClases} campo-bloqueado`}
+                  className={`${campoClases} cursor-not-allowed bg-surface-50 text-surface-500 dark:bg-surface-950`}
                 />
               </Campo>
 
@@ -385,7 +390,7 @@ function RegistrarConsultaContent() {
                   value={citaSeleccionada?.hora ?? ""}
                   readOnly
                   placeholder="Hora"
-                  className={`${campoClases} campo-bloqueado`}
+                  className={`${campoClases} cursor-not-allowed bg-surface-50 text-surface-500 dark:bg-surface-950`}
                 />
               </Campo>
             </div>
@@ -398,7 +403,7 @@ function RegistrarConsultaContent() {
                 rows={3}
                 required
                 placeholder="Ej. El propietario reporta pérdida de apetito y decaimiento desde hace dos días..."
-                className={`${campoClases} textarea-style`}
+                className={`${campoClases} min-h-[94px] resize-none py-3`}
               />
             </Campo>
 
@@ -442,16 +447,14 @@ function RegistrarConsultaContent() {
         </section>
 
         {/* REGISTRO CLÍNICO */}
-        <section className="consulta-card consulta-card-delay rounded-[22px] border border-[#D9E2EF] bg-white p-6 shadow-[0_8px_24px_rgba(15,23,42,0.05)] dark:border-[#334155] dark:bg-[#111827]">
+        <section className="rounded-2xl border border-surface-200 bg-white p-6 shadow-card dark:border-surface-700 dark:bg-surface-900">
           <div className="mb-6 flex items-center gap-3">
-            <div className="flex h-11 w-11 items-center justify-center rounded-[14px] bg-[#EFF6FF] text-[#2563EB] dark:bg-[#1E3A8A] dark:text-[#BFDBFE]">
-              <ConsultaIcon name="clipboard" />
+            <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-brand-100 text-brand-600 dark:bg-brand-900/40 dark:text-brand-300">
+              <ClipboardList className="h-5 w-5" />
             </div>
             <div>
-              <h2 className="text-[19px] font-semibold text-[#10213A] dark:text-white">
-                Registro clínico
-              </h2>
-              <p className="mt-1 text-[13px] text-[#64748B] dark:text-[#94A3B8]">
+              <h2 className="text-section-title">Registro clínico</h2>
+              <p className="text-subtitle mt-1">
                 Documenta diagnóstico, tratamiento y seguimiento.
               </p>
             </div>
@@ -466,7 +469,7 @@ function RegistrarConsultaContent() {
                 rows={3}
                 required
                 placeholder="Describe signos, síntomas y resultados de la valoración..."
-                className={`${campoClases} textarea-style`}
+                className={`${campoClases} min-h-[94px] resize-none py-3`}
               />
             </Campo>
 
@@ -478,7 +481,7 @@ function RegistrarConsultaContent() {
                 rows={3}
                 required
                 placeholder="Registra el diagnóstico clínico del paciente..."
-                className={`${campoClases} textarea-style`}
+                className={`${campoClases} min-h-[94px] resize-none py-3`}
               />
             </Campo>
 
@@ -490,7 +493,7 @@ function RegistrarConsultaContent() {
                 rows={3}
                 required
                 placeholder="Medicamentos, dosis, frecuencia y duración..."
-                className={`${campoClases} textarea-style`}
+                className={`${campoClases} min-h-[94px] resize-none py-3`}
               />
             </Campo>
 
@@ -502,14 +505,14 @@ function RegistrarConsultaContent() {
                 rows={3}
                 required
                 placeholder="Cuidados en casa, recomendaciones y signos de alarma..."
-                className={`${campoClases} textarea-style`}
+                className={`${campoClases} min-h-[94px] resize-none py-3`}
               />
             </Campo>
 
-            <div className="rounded-[16px] border border-[#E2E8F0] bg-[#FBFCFF] p-4 dark:border-[#334155] dark:bg-[#0F172A]">
+            <div className="rounded-2xl border border-surface-200 bg-surface-50 p-4 dark:border-surface-700 dark:bg-surface-950">
               <div className="mb-4 flex items-center gap-2">
-                <ConsultaIcon name="history" className="h-[18px] w-[18px] text-[#2563EB]" />
-                <h3 className="text-[14px] font-semibold text-[#10213A] dark:text-white">
+                <History className="h-[18px] w-[18px] text-brand-600 dark:text-brand-400" />
+                <h3 className="text-sm font-semibold text-surface-900 dark:text-white">
                   Seguimiento posterior
                 </h3>
               </div>
@@ -541,10 +544,10 @@ function RegistrarConsultaContent() {
               </div>
             </div>
 
-            <div className="flex flex-col-reverse gap-3 border-t border-[#E2E8F0] pt-6 dark:border-[#334155] sm:flex-row sm:justify-end">
+            <div className="flex flex-col-reverse gap-3 border-t border-surface-100 pt-6 dark:border-surface-800 sm:flex-row sm:justify-end">
               <Link
                 href="/veterinario/citas"
-                className="consulta-button-secondary flex h-[47px] items-center justify-center rounded-xl border border-[#CBD5E1] bg-white px-6 text-[14px] font-semibold text-[#475569] dark:border-[#334155] dark:bg-[#111827] dark:text-[#CBD5E1]"
+                className="flex h-11 items-center justify-center rounded-xl border border-surface-300 bg-white px-6 text-sm font-semibold text-surface-600 transition hover:bg-surface-50 dark:border-surface-700 dark:bg-surface-900 dark:text-surface-300 dark:hover:bg-surface-800"
               >
                 Cancelar
               </Link>
@@ -552,142 +555,15 @@ function RegistrarConsultaContent() {
               <button
                 type="submit"
                 disabled={guardando || !citaSeleccionada}
-                className="consulta-button-primary flex h-[47px] items-center justify-center gap-2 rounded-xl bg-[#2F6BFF] px-7 text-[14px] font-semibold text-white disabled:opacity-60"
+                className="flex h-11 items-center justify-center gap-2 rounded-xl bg-brand-600 px-7 text-sm font-semibold text-white transition hover:bg-brand-700 disabled:opacity-60"
               >
-                <ConsultaIcon name="save" className="h-[17px] w-[17px]" />
+                <Save className="h-[17px] w-[17px]" />
                 {guardando ? "Guardando..." : "Guardar consulta"}
               </button>
             </div>
           </div>
         </section>
       </form>
-
-      <style jsx global>{`
-        @keyframes consulta-fade-up {
-          from {
-            opacity: 0;
-            transform: translateY(14px);
-          }
-          to {
-            opacity: 1;
-            transform: translateY(0);
-          }
-        }
-        @keyframes consulta-orb {
-          0%,
-          100% {
-            transform: translate(0, 0);
-          }
-          50% {
-            transform: translate(-12px, 10px);
-          }
-        }
-        .consulta-enter {
-          animation: consulta-fade-up 0.45s ease-out both;
-        }
-        .consulta-orb {
-          animation: consulta-orb 7s ease-in-out infinite;
-        }
-        .consulta-alert-enter {
-          animation: consulta-fade-up 0.3s ease-out both;
-        }
-        .consulta-card {
-          animation: consulta-fade-up 0.45s ease-out 0.12s both;
-          transition:
-            border-color 0.25s ease,
-            box-shadow 0.25s ease;
-        }
-        .consulta-card-delay {
-          animation-delay: 0.2s;
-        }
-        .consulta-card:hover {
-          border-color: #bfdbfe;
-          box-shadow: 0 16px 32px rgba(15, 23, 42, 0.07);
-        }
-        .consulta-patient-summary {
-          animation: consulta-fade-up 0.25s ease-out both;
-        }
-        .input-style {
-          width: 100%;
-          height: 48px;
-          border: 1px solid #cbd5e1;
-          border-radius: 12px;
-          background: #ffffff;
-          padding: 0 14px;
-          font-size: 14px;
-          color: #10213a;
-          outline: none;
-          transition:
-            border-color 0.2s ease,
-            box-shadow 0.2s ease,
-            background 0.2s ease;
-        }
-        .input-style:focus {
-          border-color: #2563eb;
-          box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.1);
-        }
-        .input-style::placeholder {
-          color: #94a3b8;
-        }
-        .textarea-style {
-          height: auto;
-          min-height: 94px;
-          padding: 12px 14px;
-          resize: none;
-        }
-        .campo-bloqueado {
-          cursor: not-allowed;
-          background: #f8fafc;
-          color: #64748b;
-        }
-        .consulta-button-primary {
-          transition:
-            transform 0.2s ease,
-            background 0.2s ease,
-            box-shadow 0.2s ease;
-        }
-        .consulta-button-primary:hover:not(:disabled) {
-          transform: translateY(-2px);
-          background: #2459df;
-          box-shadow: 0 10px 18px rgba(47, 107, 255, 0.22);
-        }
-        .consulta-button-secondary {
-          transition:
-            transform 0.2s ease,
-            border-color 0.2s ease,
-            background 0.2s ease;
-        }
-        .consulta-button-secondary:hover {
-          transform: translateY(-2px);
-          border-color: #bfdbfe;
-          background: #f8fbff;
-        }
-        .dark .input-style {
-          border-color: #334155;
-          background: #0f172a;
-          color: #ffffff;
-        }
-        .dark .campo-bloqueado {
-          background: #0f172a;
-          color: #94a3b8;
-        }
-        .dark .consulta-button-secondary:hover {
-          background: #1e293b;
-        }
-        @media (prefers-reduced-motion: reduce) {
-          .consulta-enter,
-          .consulta-orb,
-          .consulta-alert-enter,
-          .consulta-card,
-          .consulta-patient-summary {
-            animation: none !important;
-          }
-          .consulta-button-primary:hover,
-          .consulta-button-secondary:hover {
-            transform: none !important;
-          }
-        }
-      `}</style>
     </div>
   );
 }
@@ -695,70 +571,10 @@ function RegistrarConsultaContent() {
 function Campo({ label, children }: { label: string; children: ReactNode }) {
   return (
     <label className="block">
-      <span className="mb-2 block text-[13px] font-semibold text-[#334155] dark:text-[#CBD5E1]">
-        {label}
-      </span>
+      <span className="form-label">{label}</span>
       {children}
     </label>
   );
 }
 
-type IconName = "patient" | "clipboard" | "lock" | "history" | "save";
-
-function ConsultaIcon({ name, className = "h-5 w-5" }: { name: IconName; className?: string }) {
-  const svgProps = {
-    className,
-    viewBox: "0 0 24 24",
-    fill: "none",
-    stroke: "currentColor",
-    strokeWidth: 1.8,
-    strokeLinecap: "round" as const,
-    strokeLinejoin: "round" as const,
-  };
-  switch (name) {
-    case "patient":
-      return (
-        <svg {...svgProps}>
-          <ellipse cx="8" cy="7" rx="2" ry="2.6" />
-          <ellipse cx="16" cy="7" rx="2" ry="2.6" />
-          <ellipse cx="6.5" cy="13" rx="2" ry="2.6" />
-          <ellipse cx="17.5" cy="13" rx="2" ry="2.6" />
-          <path d="M12 18.6c2.2 0 3.8-1.3 3.8-3 0-1.8-1.6-2.9-3.3-2.9-.8 0-1.5.2-2.1.7-.5.3-1 .4-1.5.4-1.5 0-2.7 1-2.7 2.4 0 1.4 1.2 2.4 2.8 2.4H12Z" />
-        </svg>
-      );
-    case "clipboard":
-      return (
-        <svg {...svgProps}>
-          <path d="M9 4h6" />
-          <path d="M9 3.5h6A1.5 1.5 0 0 1 16.5 5v1h-9V5A1.5 1.5 0 0 1 9 3.5Z" />
-          <rect x="5" y="6" width="14" height="15" rx="2" />
-          <path d="M9 11h6M9 15h6M9 18h4" />
-        </svg>
-      );
-    case "lock":
-      return (
-        <svg {...svgProps}>
-          <rect x="5" y="10" width="14" height="10" rx="2" />
-          <path d="M8 10V7a4 4 0 0 1 8 0v3" />
-        </svg>
-      );
-    case "history":
-      return (
-        <svg {...svgProps}>
-          <path d="M12 7v5l3.5 2" />
-          <path d="M20.5 12a8.5 8.5 0 1 1-2.7-6.2" />
-          <path d="M20.5 4.5v5h-5" />
-        </svg>
-      );
-    case "save":
-      return (
-        <svg {...svgProps}>
-          <path d="M5 4h11l3 3v13H5Z" />
-          <path d="M8 4v6h8V4" />
-          <path d="M8 20v-6h8v6" />
-        </svg>
-      );
-  }
-}
-
-const campoClases = "input-style";
+const campoClases = "form-input";

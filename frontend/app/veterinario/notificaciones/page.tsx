@@ -1,15 +1,21 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useMemo, useState, type CSSProperties } from "react";
+import { useEffect, useMemo, useState } from "react";
+import {
+  CalendarDays,
+  History,
+  Activity,
+  CheckCircle2,
+  BellOff,
+  type LucideIcon,
+} from "lucide-react";
 import { useAuth } from "@/lib/auth-context";
 import { fetchCitas } from "../../../lib/api/citas";
 import type { Appointment } from "../../../lib/recepcionista/types";
 
 type CategoriaNotificacion = "Citas" | "Seguimiento" | "Historial";
 type FiltroNotificacion = "Todas" | "No leídas" | CategoriaNotificacion;
-
-type IconName = "bell" | "calendar" | "history" | "activity" | "check" | "document" | "empty";
 
 interface AccionNotificacion {
   label: string;
@@ -27,7 +33,7 @@ interface Notificacion {
   grupo: string;
   leida: boolean;
   requiereAccion: boolean;
-  icono: IconName;
+  icono: LucideIcon;
   acciones: AccionNotificacion[];
 }
 
@@ -50,13 +56,13 @@ function citaHaciaNotificacion(a: Appointment, idx: number): Notificacion {
   };
   const categoria = categoriaMap[a.status] ?? "Citas";
 
-  const iconoMap: Record<string, IconName> = {
-    Finalizada: "check",
-    "En atención": "activity",
-    "En espera": "activity",
-    Reprogramada: "history",
+  const iconoMap: Record<string, LucideIcon> = {
+    Finalizada: CheckCircle2,
+    "En atención": Activity,
+    "En espera": Activity,
+    Reprogramada: History,
   };
-  const icono = iconoMap[a.status] ?? "calendar";
+  const icono = iconoMap[a.status] ?? CalendarDays;
 
   const requiereAccion = ["Confirmada", "En atención", "En espera"].includes(a.status);
   const leida = ["Finalizada", "Cancelada", "No asistió"].includes(a.status);
@@ -170,49 +176,36 @@ export default function VeterinarioNotificacionesPage() {
   return (
     <div className="space-y-6">
       {/* ENCABEZADO */}
-      <header className="notification-header relative overflow-hidden rounded-[28px] border border-[#D9E6FF] bg-gradient-to-r from-[#F7FAFF] via-white to-[#EEF6FF] p-7 shadow-[0_16px_38px_rgba(37,99,235,0.08)] dark:border-[#233552] dark:from-[#111827] dark:via-[#111827] dark:to-[#12213A]">
-        <div className="notification-orb absolute -right-16 -top-20 h-56 w-56 rounded-full bg-[#DBEAFE]/70 blur-3xl dark:bg-[#2563EB]/20" />
-
-        <div className="relative flex flex-col justify-between gap-6 xl:flex-row xl:items-center">
+      <header className="overflow-hidden rounded-3xl border border-brand-200 bg-gradient-to-br from-brand-600 to-brand-700 p-7 text-white shadow-brand">
+        <div className="flex flex-col justify-between gap-6 xl:flex-row xl:items-center">
           <div>
-            <div className="mb-4 flex items-center gap-3">
-              <span className="notification-pulse relative flex h-3 w-3">
-                <span className="absolute inline-flex h-full w-full rounded-full bg-[#2563EB] opacity-70" />
-                <span className="relative inline-flex h-3 w-3 rounded-full bg-[#2563EB]" />
-              </span>
+            <p className="mb-2 text-xs font-semibold uppercase tracking-[0.24em] text-brand-200">
+              Notificaciones clínicas
+            </p>
 
-              <p className="text-sm font-semibold uppercase tracking-[0.24em] text-[#2563EB] dark:text-[#93C5FD]">
-                Notificaciones clínicas
-              </p>
-            </div>
+            <h1 className="text-display">Alertas y seguimiento</h1>
 
-            <h1 className="text-[32px] font-bold leading-tight text-[#10213A] dark:text-white">
-              Alertas y seguimiento
-            </h1>
-
-            <p className="mt-3 max-w-3xl text-[15px] leading-7 text-[#64748B] dark:text-[#94A3B8]">
+            <p className="mt-3 max-w-3xl text-sm leading-6 text-brand-100">
               Consulta avisos relacionados con tus citas asignadas, pacientes en seguimiento e
               historiales clínicos actualizados.
             </p>
           </div>
 
           <div className="flex flex-wrap gap-3">
-            <ResumenBadge valor={noLeidas} texto="no leídas" variante="blue" />
+            <ResumenBadge valor={noLeidas} texto="no leídas" variante="brand" />
 
-            <ResumenBadge valor={requierenAccion} texto="requieren acción" variante="orange" />
+            <ResumenBadge valor={requierenAccion} texto="requieren acción" variante="warning" />
           </div>
         </div>
       </header>
 
       {/* CONTENEDOR PRINCIPAL */}
-      <section className="notification-panel rounded-[24px] border border-[#D9E2EF] bg-white p-6 shadow-[0_10px_30px_rgba(15,23,42,0.05)] dark:border-[#334155] dark:bg-[#111827]">
+      <section className="rounded-2xl border border-surface-200 bg-white p-6 shadow-card dark:border-surface-700 dark:bg-surface-900">
         <div className="flex flex-col justify-between gap-5 lg:flex-row lg:items-center">
           <div>
-            <h2 className="text-[20px] font-semibold text-[#10213A] dark:text-white">
-              Centro de notificaciones
-            </h2>
+            <h2 className="text-section-title">Centro de notificaciones</h2>
 
-            <p className="mt-1 text-[14px] text-[#64748B] dark:text-[#94A3B8]">
+            <p className="text-subtitle mt-1">
               Revisa las alertas relevantes y accede directamente a cada acción clínica.
             </p>
           </div>
@@ -221,33 +214,33 @@ export default function VeterinarioNotificacionesPage() {
             type="button"
             onClick={marcarTodasComoLeidas}
             disabled={noLeidas === 0}
-            className="flex h-[44px] items-center justify-center gap-2 rounded-xl border border-[#D6E3FF] bg-white px-5 text-[13px] font-semibold text-[#2563EB] transition hover:-translate-y-0.5 hover:bg-[#EFF6FF] disabled:cursor-not-allowed disabled:opacity-45 disabled:hover:translate-y-0 disabled:hover:bg-white dark:border-[#334155] dark:bg-[#111827] dark:text-[#93C5FD] dark:hover:bg-[#1E293B]"
+            className="flex h-11 items-center justify-center gap-2 rounded-xl border border-brand-200 bg-white px-5 text-sm font-semibold text-brand-600 transition hover:bg-brand-50 disabled:cursor-not-allowed disabled:opacity-45 disabled:hover:bg-white dark:border-surface-700 dark:bg-surface-900 dark:text-brand-400 dark:hover:bg-brand-950/30"
           >
-            <NotificationIcon name="check" className="h-[17px] w-[17px]" />
+            <CheckCircle2 className="h-[17px] w-[17px]" />
             Marcar todas como leídas
           </button>
         </div>
 
         {/* FILTROS */}
-        <div className="mt-7 flex flex-wrap gap-2 border-b border-[#E2E8F0] pb-5 dark:border-[#334155]">
+        <div className="mt-7 flex flex-wrap gap-2 border-b border-surface-100 pb-5 dark:border-surface-800">
           {filtros.map((filtro) => (
             <button
               key={filtro}
               type="button"
               onClick={() => setFiltroActivo(filtro)}
-              className={`rounded-full px-4 py-2 text-[13px] font-semibold transition ${
+              className={`rounded-xl px-4 py-2 text-sm font-semibold transition ${
                 filtroActivo === filtro
-                  ? "bg-[#2F6BFF] text-white shadow-[0_6px_14px_rgba(47,107,255,0.18)]"
-                  : "bg-[#F1F5F9] text-[#64748B] hover:bg-[#E2E8F0] dark:bg-[#1E293B] dark:text-[#CBD5E1] dark:hover:bg-[#334155]"
+                  ? "bg-brand-600 text-white"
+                  : "bg-surface-100 text-surface-500 hover:bg-surface-200 dark:bg-surface-800 dark:text-surface-300 dark:hover:bg-surface-700"
               }`}
             >
               {filtro}
               {filtro === "No leídas" && noLeidas > 0 && (
                 <span
-                  className={`ml-2 rounded-full px-2 py-0.5 text-[11px] ${
+                  className={`ml-2 rounded-lg px-2 py-0.5 text-xs ${
                     filtroActivo === filtro
                       ? "bg-white/20 text-white"
-                      : "bg-[#DBEAFE] text-[#2563EB] dark:bg-[#172554] dark:text-[#93C5FD]"
+                      : "bg-brand-100 text-brand-600 dark:bg-brand-900/40 dark:text-brand-300"
                   }`}
                 >
                   {noLeidas}
@@ -270,19 +263,18 @@ export default function VeterinarioNotificacionesPage() {
               return (
                 <div key={grupo}>
                   <div className="mb-4 flex items-center gap-3">
-                    <h3 className="text-[13px] font-bold uppercase tracking-[0.18em] text-[#64748B] dark:text-[#94A3B8]">
+                    <h3 className="text-xs font-bold uppercase tracking-[0.18em] text-surface-500 dark:text-surface-400">
                       {grupo}
                     </h3>
 
-                    <span className="h-px flex-1 bg-[#E2E8F0] dark:bg-[#334155]" />
+                    <span className="h-px flex-1 bg-surface-200 dark:bg-surface-700" />
                   </div>
 
                   <div className="space-y-4">
-                    {itemsGrupo.map((item, index) => (
+                    {itemsGrupo.map((item) => (
                       <TarjetaNotificacion
                         key={item.id}
                         item={item}
-                        index={index}
                         onMarcarLeida={() => marcarComoLeida(item.id)}
                       />
                     ))}
@@ -295,123 +287,6 @@ export default function VeterinarioNotificacionesPage() {
           <EstadoVacio filtro={filtroActivo} />
         )}
       </section>
-
-      <style jsx global>{`
-        @keyframes notification-fade-up {
-          from {
-            opacity: 0;
-            transform: translateY(16px);
-          }
-          to {
-            opacity: 1;
-            transform: translateY(0);
-          }
-        }
-
-        @keyframes notification-orb-motion {
-          0%,
-          100% {
-            transform: translate(0px, 0px) scale(1);
-          }
-          50% {
-            transform: translate(-14px, 10px) scale(1.06);
-          }
-        }
-
-        @keyframes notification-ring {
-          0% {
-            transform: scale(1);
-            opacity: 0.65;
-          }
-          70% {
-            transform: scale(2.1);
-            opacity: 0;
-          }
-          100% {
-            transform: scale(2.1);
-            opacity: 0;
-          }
-        }
-
-        .notification-header {
-          animation: notification-fade-up 0.48s ease-out both;
-        }
-
-        .notification-orb {
-          animation: notification-orb-motion 8s ease-in-out infinite;
-        }
-
-        .notification-pulse span:first-child {
-          animation: notification-ring 1.8s cubic-bezier(0, 0, 0.2, 1) infinite;
-        }
-
-        .notification-panel {
-          animation: notification-fade-up 0.48s ease-out 0.12s both;
-        }
-
-        .notification-card {
-          opacity: 0;
-          animation: notification-fade-up 0.42s ease-out var(--delay) forwards;
-          transition:
-            transform 0.25s ease,
-            border-color 0.25s ease,
-            box-shadow 0.25s ease;
-        }
-
-        .notification-card:hover {
-          transform: translateY(-2px);
-          border-color: #d6e3ff;
-          box-shadow: 0 12px 28px rgba(15, 23, 42, 0.07);
-        }
-
-        .notification-action-primary {
-          transition:
-            transform 0.2s ease,
-            background 0.2s ease,
-            box-shadow 0.2s ease;
-        }
-
-        .notification-action-primary:hover {
-          transform: translateY(-2px);
-          background: #2459df;
-          box-shadow: 0 9px 18px rgba(47, 107, 255, 0.2);
-        }
-
-        .notification-action-secondary {
-          transition:
-            transform 0.2s ease,
-            background 0.2s ease,
-            border-color 0.2s ease;
-        }
-
-        .notification-action-secondary:hover {
-          transform: translateY(-2px);
-          background: #eff6ff;
-          border-color: #bfdbfe;
-        }
-
-        .dark .notification-action-secondary:hover {
-          background: #1e293b;
-        }
-
-        @media (prefers-reduced-motion: reduce) {
-          .notification-header,
-          .notification-orb,
-          .notification-panel,
-          .notification-card,
-          .notification-pulse span:first-child {
-            animation: none !important;
-            opacity: 1 !important;
-            transform: none !important;
-          }
-
-          .notification-card:hover,
-          .notification-action-primary:hover,
-          .notification-action-secondary:hover {
-            transform: none !important;
-          }
-        }
-      `}</style>
     </div>
   );
 }
@@ -423,80 +298,75 @@ function ResumenBadge({
 }: {
   valor: number;
   texto: string;
-  variante: "blue" | "orange";
+  variante: "brand" | "warning";
 }) {
   const estilos =
-    variante === "blue"
-      ? "border-[#DBEAFE] bg-[#EFF6FF] text-[#2563EB] dark:border-[#1E3A8A] dark:bg-[#172554] dark:text-[#BFDBFE]"
-      : "border-[#FDE68A] bg-[#FFFBEB] text-[#B45309] dark:border-[#78350F] dark:bg-[#451A03] dark:text-[#FDE68A]";
+    variante === "brand"
+      ? "border-brand-200 bg-brand-50 text-brand-600 dark:border-brand-800 dark:bg-brand-950/30 dark:text-brand-300"
+      : "border-warning-200 bg-warning-50 text-warning-700 dark:border-warning-800 dark:bg-warning-950/30 dark:text-warning-300";
 
   return (
-    <div className={`flex items-center gap-3 rounded-[16px] border px-4 py-3 ${estilos}`}>
-      <p className="text-[23px] font-bold leading-none">{valor}</p>
+    <div className={`flex items-center gap-3 rounded-2xl border px-4 py-3 ${estilos}`}>
+      <p className="text-2xl font-bold leading-none">{valor}</p>
 
-      <p className="text-[13px] font-semibold">{texto}</p>
+      <p className="text-sm font-semibold">{texto}</p>
     </div>
   );
 }
 
 function TarjetaNotificacion({
   item,
-  index,
   onMarcarLeida,
 }: {
   item: Notificacion;
-  index: number;
   onMarcarLeida: () => void;
 }) {
+  const Icono = item.icono;
+
   return (
     <article
-      className={`notification-card relative overflow-hidden rounded-[20px] border p-5 ${
+      className={`relative overflow-hidden rounded-2xl border p-5 transition hover:-translate-y-0.5 hover:shadow-card-hover ${
         item.leida
-          ? "border-[#E5EAF2] bg-[#FBFCFF] dark:border-[#334155] dark:bg-[#0F172A]"
-          : "border-[#D6E3FF] bg-[#F7FAFF] dark:border-[#29406B] dark:bg-[#121D33]"
+          ? "border-surface-200 bg-surface-50 dark:border-surface-700 dark:bg-surface-950"
+          : "border-brand-200 bg-brand-50/40 dark:border-brand-800 dark:bg-brand-950/20"
       }`}
-      style={
-        {
-          "--delay": `${index * 70}ms`,
-        } as CSSProperties
-      }
     >
-      {!item.leida && <span className="absolute left-0 top-0 h-full w-1 bg-[#2F6BFF]" />}
+      {!item.leida && <span className="absolute left-0 top-0 h-full w-1 bg-brand-500" />}
 
       <div className="flex flex-col justify-between gap-5 xl:flex-row xl:items-start">
         <div className="flex min-w-0 gap-4">
           <div
-            className={`flex h-12 w-12 shrink-0 items-center justify-center rounded-[15px] ${estiloIcono(
+            className={`flex h-12 w-12 shrink-0 items-center justify-center rounded-xl ${estiloIcono(
               item.categoria,
             )}`}
           >
-            <NotificationIcon name={item.icono} />
+            <Icono className="h-5 w-5" />
           </div>
 
           <div className="min-w-0">
             <div className="flex flex-wrap items-center gap-3">
-              {!item.leida && <span className="h-2.5 w-2.5 rounded-full bg-[#2F6BFF]" />}
+              {!item.leida && <span className="h-2.5 w-2.5 rounded-full bg-brand-500" />}
 
-              <h4 className="text-[16px] font-semibold text-[#10213A] dark:text-white">
+              <h4 className="text-sm font-semibold text-surface-900 dark:text-white">
                 {item.titulo}
               </h4>
 
               {item.requiereAccion && (
-                <span className="rounded-full bg-[#FEF3C7] px-2.5 py-1 text-[11px] font-semibold text-[#B45309] dark:bg-[#78350F] dark:text-[#FDE68A]">
+                <span className="inline-flex items-center gap-1 rounded-lg bg-warning-100 px-2.5 py-1 text-xs font-semibold text-warning-700 dark:bg-warning-900/40 dark:text-warning-300">
                   Requiere acción
                 </span>
               )}
 
-              <span className="rounded-full bg-[#EEF4FF] px-2.5 py-1 text-[11px] font-semibold text-[#2563EB] dark:bg-[#1E293B] dark:text-[#93C5FD]">
+              <span className="inline-flex items-center gap-1 rounded-lg bg-brand-100 px-2.5 py-1 text-xs font-semibold text-brand-600 dark:bg-brand-900/40 dark:text-brand-300">
                 {item.categoria}
               </span>
             </div>
 
-            <p className="mt-3 text-[14px] font-semibold text-[#334155] dark:text-[#CBD5E1]">
+            <p className="mt-3 text-sm font-semibold text-surface-900 dark:text-white">
               {item.paciente}
             </p>
 
-            <p className="mt-2 max-w-3xl text-[14px] leading-6 text-[#64748B] dark:text-[#94A3B8]">
+            <p className="mt-2 max-w-3xl text-sm leading-6 text-surface-500 dark:text-surface-400">
               {item.descripcion}
             </p>
 
@@ -506,10 +376,10 @@ function TarjetaNotificacion({
                   key={accion.label}
                   href={accion.href}
                   onClick={onMarcarLeida}
-                  className={`flex h-[41px] items-center justify-center rounded-xl px-4 text-[13px] font-semibold ${
+                  className={`flex h-10 items-center justify-center rounded-xl px-4 text-xs font-semibold transition ${
                     accion.principal
-                      ? "notification-action-primary bg-[#2F6BFF] text-white"
-                      : "notification-action-secondary border border-[#D6E3FF] bg-white text-[#2563EB] dark:border-[#334155] dark:bg-[#111827] dark:text-[#93C5FD]"
+                      ? "bg-brand-600 text-white hover:bg-brand-700"
+                      : "border border-brand-200 bg-white text-brand-600 hover:bg-brand-50 dark:border-surface-700 dark:bg-surface-900 dark:text-brand-400 dark:hover:bg-brand-950/30"
                   }`}
                 >
                   {accion.label}
@@ -520,7 +390,7 @@ function TarjetaNotificacion({
                 <button
                   type="button"
                   onClick={onMarcarLeida}
-                  className="flex h-[41px] items-center justify-center rounded-xl px-4 text-[13px] font-semibold text-[#64748B] transition hover:bg-[#F1F5F9] dark:text-[#94A3B8] dark:hover:bg-[#1E293B]"
+                  className="flex h-10 items-center justify-center rounded-xl px-4 text-xs font-semibold text-surface-500 transition hover:bg-surface-100 dark:text-surface-400 dark:hover:bg-surface-800"
                 >
                   Marcar como leída
                 </button>
@@ -529,7 +399,7 @@ function TarjetaNotificacion({
           </div>
         </div>
 
-        <span className="shrink-0 rounded-full bg-[#F1F5F9] px-3 py-2 text-[12px] font-semibold text-[#64748B] dark:bg-[#1E293B] dark:text-[#CBD5E1]">
+        <span className="shrink-0 rounded-lg bg-surface-100 px-3 py-2 text-xs font-semibold text-surface-500 dark:bg-surface-800 dark:text-surface-300">
           {item.tiempo}
         </span>
       </div>
@@ -539,16 +409,16 @@ function TarjetaNotificacion({
 
 function EstadoVacio({ filtro }: { filtro: FiltroNotificacion }) {
   return (
-    <div className="mt-6 rounded-[20px] border border-dashed border-[#CBD5E1] bg-[#FBFCFF] px-6 py-14 text-center dark:border-[#334155] dark:bg-[#0F172A]">
-      <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-[#EFF6FF] text-[#2563EB] dark:bg-[#1E3A8A] dark:text-[#BFDBFE]">
-        <NotificationIcon name="empty" className="h-7 w-7" />
+    <div className="mt-6 rounded-2xl border border-dashed border-surface-300 bg-surface-50 px-6 py-14 text-center dark:border-surface-700 dark:bg-surface-950">
+      <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-2xl bg-brand-100 text-brand-600 dark:bg-brand-900/40 dark:text-brand-300">
+        <BellOff className="h-7 w-7" />
       </div>
 
-      <p className="mt-4 text-[16px] font-semibold text-[#10213A] dark:text-white">
+      <p className="mt-4 text-sm font-semibold text-surface-900 dark:text-white">
         No hay notificaciones en esta categoría
       </p>
 
-      <p className="mt-2 text-[14px] text-[#64748B] dark:text-[#94A3B8]">
+      <p className="mt-2 text-sm text-surface-500 dark:text-surface-400">
         No tienes alertas disponibles para el filtro <strong>{filtro}</strong>.
       </p>
     </div>
@@ -558,85 +428,12 @@ function EstadoVacio({ filtro }: { filtro: FiltroNotificacion }) {
 function estiloIcono(categoria: CategoriaNotificacion) {
   switch (categoria) {
     case "Citas":
-      return "bg-[#DBEAFE] text-[#2563EB] dark:bg-[#1E3A8A] dark:text-[#BFDBFE]";
+      return "bg-brand-100 text-brand-600 dark:bg-brand-900/40 dark:text-brand-300";
 
     case "Seguimiento":
-      return "bg-[#FEF3C7] text-[#B45309] dark:bg-[#78350F] dark:text-[#FDE68A]";
+      return "bg-warning-100 text-warning-700 dark:bg-warning-900/40 dark:text-warning-300";
 
     case "Historial":
-      return "bg-[#EDE9FE] text-[#7C3AED] dark:bg-[#4C1D95] dark:text-[#DDD6FE]";
-  }
-}
-
-function NotificationIcon({ name, className = "h-5 w-5" }: { name: IconName; className?: string }) {
-  const props = {
-    className,
-    viewBox: "0 0 24 24",
-    fill: "none",
-    stroke: "currentColor",
-    strokeWidth: 1.8,
-    strokeLinecap: "round" as const,
-    strokeLinejoin: "round" as const,
-  };
-
-  switch (name) {
-    case "bell":
-      return (
-        <svg {...props}>
-          <path d="M18 16.8H6c1-1 1.7-2.3 1.7-5 0-2.8 1.8-5 4.3-5s4.3 2.2 4.3 5c0 2.7.7 4 1.7 5Z" />
-          <path d="M10 19a2.2 2.2 0 0 0 4 0" />
-        </svg>
-      );
-
-    case "calendar":
-      return (
-        <svg {...props}>
-          <rect x="3.5" y="5" width="17" height="15.5" rx="2.5" />
-          <path d="M7.5 3.5v3.5M16.5 3.5v3.5M3.5 9.5h17" />
-          <path d="m8.5 14 2.1 2.1 4.6-5" />
-        </svg>
-      );
-
-    case "history":
-      return (
-        <svg {...props}>
-          <path d="M12 7v5l3.5 2" />
-          <path d="M20.5 12a8.5 8.5 0 1 1-2.7-6.2" />
-          <path d="M20.5 4.5v5h-5" />
-        </svg>
-      );
-
-    case "activity":
-      return (
-        <svg {...props}>
-          <path d="M3 12h4l2.2-4 4.1 8 2.3-4H21" />
-          <path d="M12 21a9 9 0 1 0-9-9" />
-        </svg>
-      );
-
-    case "check":
-      return (
-        <svg {...props}>
-          <circle cx="12" cy="12" r="9" />
-          <path d="m8 12 2.6 2.7L16.5 9" />
-        </svg>
-      );
-
-    case "document":
-      return (
-        <svg {...props}>
-          <path d="M7 3.5h7l3 3V20.5H7a2 2 0 0 1-2-2v-13a2 2 0 0 1 2-2Z" />
-          <path d="M14 3.5v4h4" />
-          <path d="M9 12h6M9 15.5h6" />
-        </svg>
-      );
-
-    case "empty":
-      return (
-        <svg {...props}>
-          <path d="M18 16.8H6c1-1 1.7-2.3 1.7-5 0-2.8 1.8-5 4.3-5s4.3 2.2 4.3 5c0 2.7.7 4 1.7 5Z" />
-          <path d="M9 4.5 15 20" />
-        </svg>
-      );
+      return "bg-brand-100 text-brand-700 dark:bg-brand-900/40 dark:text-brand-300";
   }
 }

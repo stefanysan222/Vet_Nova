@@ -43,36 +43,28 @@ export default function PerfilVeterinarioPage() {
     .sort((a, b) => a.date.localeCompare(b.date))[0];
 
   return (
-    <div className="h-full overflow-y-auto bg-[#F5F7FB] px-6 py-8 dark:bg-[#0F172A]">
+    <div className="h-full overflow-y-auto bg-surface-50 px-6 py-8 dark:bg-surface-950">
       <div className="mb-8">
-        <h1 className="text-[24px] font-semibold leading-none text-[#10213A] dark:text-white">
-          Mi Perfil
-        </h1>
-        <p className="mt-4 text-[16px] text-[#64748B] dark:text-[#94A3B8]">
+        <h1 className="text-page-title">Mi Perfil</h1>
+        <p className="text-subtitle mt-2">
           Consulta tus datos personales y la información profesional asociada a tu cuenta.
         </p>
       </div>
 
       <div className="grid grid-cols-1 gap-7 xl:grid-cols-[0.75fr_1fr]">
         {/* TARJETA PRINCIPAL */}
-        <section className="rounded-xl border border-[#CBD5E1] bg-white p-7 shadow-sm transition-all duration-300 ease-out hover:-translate-y-1 hover:border-[#2F6BFF]/60 hover:shadow-[0_14px_30px_rgba(15,23,42,0.14)] dark:border-[#334155] dark:bg-[#111827] dark:hover:border-[#2F6BFF]">
+        <section className="rounded-2xl border border-surface-200 bg-white p-6 shadow-card transition hover:-translate-y-1 hover:shadow-card-hover dark:border-surface-700 dark:bg-surface-900">
           <div className="flex flex-col items-center text-center">
-            <div className="flex h-[92px] w-[92px] items-center justify-center rounded-full bg-[#2F6BFF] text-[36px] font-semibold text-white">
+            <div className="flex h-24 w-24 items-center justify-center rounded-full bg-brand-600 text-3xl font-semibold text-white">
               {inicial}
             </div>
-
-            <h2 className="mt-5 text-[24px] font-semibold text-[#10213A] dark:text-white">
-              {nombre}
-            </h2>
-
-            <p className="mt-2 text-[15px] text-[#64748B] dark:text-[#94A3B8]">Veterinario</p>
-
-            <span className="mt-4 rounded-full bg-[#DDF5DE] px-4 py-1.5 text-[13px] font-semibold text-[#2F9E44] dark:bg-[#123B22] dark:text-[#86EFAC]">
+            <h2 className="text-section-title mt-5">{nombre}</h2>
+            <p className="mt-2 text-sm text-surface-500 dark:text-surface-400">Veterinario</p>
+            <span className="mt-4 inline-flex items-center gap-1 rounded-lg bg-success-100 px-2.5 py-1 text-xs font-semibold text-success-700 dark:bg-success-900/40 dark:text-success-300">
               Perfil activo
             </span>
           </div>
-
-          <div className="mt-8 space-y-4 border-t border-[#E2E8F0] pt-6 dark:border-[#334155]">
+          <div className="mt-8 space-y-4 border-t border-surface-100 pt-6 dark:border-surface-800">
             <InfoRow label="Nombre completo" value={nombre} />
             <InfoRow label="Rol" value="Veterinario" />
             <InfoRow label="Email" value={email} />
@@ -81,10 +73,9 @@ export default function PerfilVeterinarioPage() {
             <InfoRow label="Registro profesional" value={extra?.registroProfesional || "—"} />
             <InfoRow label="Horario" value={extra?.horarioAtencion || "—"} />
           </div>
-
           <Link
             href="/veterinario/configuracion"
-            className="mt-8 flex h-[45px] w-full items-center justify-center rounded-xl bg-[#2F6BFF] text-[15px] font-semibold text-white shadow-sm transition-all duration-300 ease-out hover:-translate-y-0.5 hover:bg-[#2457D6] hover:shadow-[0_10px_20px_rgba(47,107,255,0.28)]"
+            className="mt-8 flex h-11 w-full items-center justify-center rounded-xl bg-brand-600 text-sm font-semibold text-white transition hover:bg-brand-700"
           >
             Configurar perfil
           </Link>
@@ -99,11 +90,8 @@ export default function PerfilVeterinarioPage() {
           </div>
 
           {/* ACTIVIDAD RECIENTE */}
-          <div className="rounded-xl border border-[#CBD5E1] bg-white p-7 shadow-sm transition-all duration-300 ease-out hover:-translate-y-1 hover:border-[#2F6BFF]/60 hover:shadow-[0_14px_30px_rgba(15,23,42,0.14)] dark:border-[#334155] dark:bg-[#111827] dark:hover:border-[#2F6BFF]">
-            <h3 className="text-[20px] font-semibold text-[#10213A] dark:text-white">
-              Actividad reciente
-            </h3>
-
+          <div className="rounded-2xl border border-surface-200 bg-white p-6 shadow-card transition hover:-translate-y-1 hover:shadow-card-hover dark:border-surface-700 dark:bg-surface-900">
+            <h3 className="text-section-title">Actividad reciente</h3>
             <div className="mt-6 space-y-5">
               {ultimaCita ? (
                 <ActivityItem
@@ -116,7 +104,6 @@ export default function PerfilVeterinarioPage() {
                   description="Sin consultas finalizadas aún"
                 />
               )}
-
               {proximaCita ? (
                 <ActivityItem
                   title="Próxima cita agendada"
@@ -132,11 +119,8 @@ export default function PerfilVeterinarioPage() {
           </div>
 
           {/* ACCESOS RÁPIDOS */}
-          <div className="rounded-xl border border-[#CBD5E1] bg-white p-7 shadow-sm transition-all duration-300 ease-out hover:-translate-y-1 hover:border-[#2F6BFF]/60 hover:shadow-[0_14px_30px_rgba(15,23,42,0.14)] dark:border-[#334155] dark:bg-[#111827] dark:hover:border-[#2F6BFF]">
-            <h3 className="text-[20px] font-semibold text-[#10213A] dark:text-white">
-              Accesos rápidos
-            </h3>
-
+          <div className="rounded-2xl border border-surface-200 bg-white p-6 shadow-card transition hover:-translate-y-1 hover:shadow-card-hover dark:border-surface-700 dark:bg-surface-900">
+            <h3 className="text-section-title">Accesos rápidos</h3>
             <div className="mt-6 grid grid-cols-1 gap-4 md:grid-cols-2">
               <QuickLink href="/veterinario/mascotas">Ver pacientes</QuickLink>
               <QuickLink href="/veterinario/citas">Ver agenda</QuickLink>
@@ -153,8 +137,8 @@ export default function PerfilVeterinarioPage() {
 function InfoRow({ label, value }: { label: string; value: string }) {
   return (
     <div className="flex items-center justify-between gap-4">
-      <span className="text-[14px] text-[#64748B] dark:text-[#94A3B8]">{label}</span>
-      <span className="text-right text-[14px] font-semibold text-[#10213A] dark:text-white">
+      <span className="text-sm text-surface-500 dark:text-surface-400">{label}</span>
+      <span className="text-right text-sm font-semibold text-surface-900 dark:text-white">
         {value}
       </span>
     </div>
@@ -163,18 +147,18 @@ function InfoRow({ label, value }: { label: string; value: string }) {
 
 function ProfileStat({ title, value }: { title: string; value: string }) {
   return (
-    <article className="rounded-xl border border-[#CBD5E1] bg-white p-5 shadow-sm transition-all duration-300 ease-out hover:-translate-y-1 hover:border-[#2F6BFF]/60 hover:shadow-[0_14px_30px_rgba(15,23,42,0.14)] dark:border-[#334155] dark:bg-[#111827] dark:hover:border-[#2F6BFF]">
-      <p className="text-[14px] text-[#64748B] dark:text-[#94A3B8]">{title}</p>
-      <h3 className="mt-3 text-[26px] font-semibold text-[#10213A] dark:text-white">{value}</h3>
+    <article className="rounded-2xl border border-surface-200 bg-white p-5 shadow-card transition hover:-translate-y-1 hover:shadow-card-hover dark:border-surface-700 dark:bg-surface-900">
+      <p className="text-label">{title}</p>
+      <h3 className="text-stat mt-3">{value}</h3>
     </article>
   );
 }
 
 function ActivityItem({ title, description }: { title: string; description: string }) {
   return (
-    <div className="border-b border-[#E2E8F0] pb-4 last:border-b-0 last:pb-0 dark:border-[#334155]">
-      <h4 className="text-[15px] font-semibold text-[#10213A] dark:text-white">{title}</h4>
-      <p className="mt-2 text-[14px] text-[#64748B] dark:text-[#94A3B8]">{description}</p>
+    <div className="border-b border-surface-100 pb-4 last:border-b-0 last:pb-0 dark:border-surface-800">
+      <h4 className="text-sm font-semibold text-surface-900 dark:text-white">{title}</h4>
+      <p className="mt-2 text-sm text-surface-500 dark:text-surface-400">{description}</p>
     </div>
   );
 }
@@ -183,7 +167,7 @@ function QuickLink({ href, children }: { href: string; children: React.ReactNode
   return (
     <Link
       href={href}
-      className="flex h-[48px] items-center justify-center rounded-xl border border-[#CBD5E1] bg-[#F8FAFC] text-[14px] font-semibold text-[#475569] transition hover:border-[#2F6BFF] hover:bg-[#EFF6FF] hover:text-[#2F6BFF] dark:border-[#334155] dark:bg-[#0F172A] dark:text-[#94A3B8] dark:hover:border-[#2F6BFF] dark:hover:text-[#93C5FD]"
+      className="flex h-11 items-center justify-center rounded-xl border border-surface-200 bg-surface-50 text-sm font-semibold text-surface-600 transition hover:border-brand-200 hover:bg-brand-50 hover:text-brand-600 dark:border-surface-700 dark:bg-surface-950 dark:text-surface-300 dark:hover:border-brand-700 dark:hover:text-brand-400"
     >
       {children}
     </Link>

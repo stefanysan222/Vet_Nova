@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { FormEvent, ReactNode, Suspense, useEffect, useState } from "react";
+import { AlertCircle, CheckCircle2, X, Plus } from "lucide-react";
 import { fetchMascotas } from "../../../lib/api/mascotas";
 import { fetchCitas, createCita } from "../../../lib/api/citas";
 import type { PetRecord, Appointment } from "../../../lib/recepcionista/types";
@@ -293,7 +294,7 @@ function HistorialContent() {
   if (loading) {
     return (
       <div className="flex min-h-[400px] items-center justify-center">
-        <p className="text-[14px] text-[#64748B] dark:text-[#94A3B8]">
+        <p className="text-sm text-surface-500 dark:text-surface-400">
           Cargando expedientes clínicos...
         </p>
       </div>
@@ -302,16 +303,16 @@ function HistorialContent() {
 
   if (!paciente && pacientes.length === 0) {
     return (
-      <div className="flex min-h-[400px] flex-col items-center justify-center gap-4 rounded-[24px] border border-[#E2E8F0] bg-white dark:border-[#334155] dark:bg-[#111827]">
-        <p className="text-[16px] font-semibold text-[#10213A] dark:text-white">
+      <div className="flex min-h-[400px] flex-col items-center justify-center gap-4 rounded-3xl border border-surface-200 bg-white dark:border-surface-700 dark:bg-surface-900">
+        <p className="text-base font-semibold text-surface-900 dark:text-white">
           No hay pacientes registrados
         </p>
-        <p className="text-[14px] text-[#64748B] dark:text-[#94A3B8]">
+        <p className="text-sm text-surface-500 dark:text-surface-400">
           Registra mascotas primero para ver sus expedientes.
         </p>
         <Link
           href="/veterinario/mascotas"
-          className="rounded-xl bg-[#2F6BFF] px-5 py-3 text-[13px] font-semibold text-white"
+          className="rounded-xl bg-brand-600 px-5 py-3 text-sm font-semibold text-white transition hover:bg-brand-700"
         >
           Ver pacientes
         </Link>
@@ -322,16 +323,14 @@ function HistorialContent() {
   return (
     <div className="space-y-6">
       {/* ENCABEZADO */}
-      <header className="rounded-[24px] border border-[#CBD5E1] bg-white p-6 shadow-[0_12px_30px_rgba(15,23,42,0.08)] dark:border-[#334155] dark:bg-[#111827]">
+      <header className="overflow-hidden rounded-3xl border border-brand-200 bg-gradient-to-br from-brand-600 to-brand-700 p-7 text-white shadow-brand">
         <div className="flex flex-col justify-between gap-5 lg:flex-row lg:items-center">
           <div>
-            <p className="text-sm font-semibold uppercase tracking-[0.24em] text-[#64748B] dark:text-[#94A3B8]">
+            <p className="text-xs font-semibold uppercase tracking-[0.24em] text-brand-200">
               Historial clínico
             </p>
-            <h1 className="mt-3 text-3xl font-bold text-[#10213A] dark:text-white">
-              Expediente clínico del paciente
-            </h1>
-            <p className="mt-3 max-w-3xl text-base leading-7 text-[#64748B] dark:text-[#94A3B8]">
+            <h1 className="text-display mt-2">Expediente clínico del paciente</h1>
+            <p className="mt-3 max-w-3xl text-sm leading-6 text-brand-100">
               Consulta antecedentes, tratamientos y evoluciones médicas registradas.
             </p>
           </div>
@@ -339,7 +338,7 @@ function HistorialContent() {
           <div className="flex flex-col gap-3 sm:flex-row">
             <Link
               href="/veterinario/mascotas"
-              className="flex h-[48px] items-center justify-center rounded-xl border border-[#CBD5E1] px-5 text-[14px] font-semibold text-[#475569] transition hover:bg-[#F8FAFC] dark:border-[#334155] dark:text-[#CBD5E1]"
+              className="flex h-11 items-center justify-center rounded-xl border border-white/30 px-5 text-sm font-semibold text-white transition hover:bg-white/10"
             >
               Volver a pacientes
             </Link>
@@ -348,9 +347,10 @@ function HistorialContent() {
               <button
                 type="button"
                 onClick={abrirFormulario}
-                className="flex h-[48px] items-center justify-center rounded-xl bg-[#2F6BFF] px-5 text-[14px] font-semibold text-white transition hover:bg-[#2459DF]"
+                className="flex h-11 items-center justify-center gap-2 rounded-xl bg-white px-5 text-sm font-semibold text-brand-700 shadow-sm transition hover:bg-brand-50"
               >
-                + Agregar evolución clínica
+                <Plus className="h-4 w-4" />
+                Agregar evolución clínica
               </button>
             )}
           </div>
@@ -359,47 +359,51 @@ function HistorialContent() {
 
       {/* ERROR */}
       {error && (
-        <div className="flex items-start justify-between gap-4 rounded-[16px] border border-[#FECACA] bg-[#FEF2F2] px-5 py-4 dark:border-[#7F1D1D] dark:bg-[#450A0A]">
-          <p className="text-[14px] text-[#B91C1C] dark:text-[#FECACA]">{error}</p>
+        <div className="dark:bg-danger-950/30 flex items-start justify-between gap-4 rounded-2xl border border-danger-200 bg-danger-50 px-5 py-4 dark:border-danger-800">
+          <div className="flex items-start gap-3">
+            <AlertCircle className="mt-0.5 h-5 w-5 shrink-0 text-danger-500" />
+            <p className="text-sm text-danger-700 dark:text-danger-400">{error}</p>
+          </div>
           <button
             type="button"
             onClick={() => setError(null)}
-            className="text-[18px] font-semibold text-[#B91C1C]"
+            className="flex h-8 w-8 shrink-0 items-center justify-center rounded-xl text-danger-500 transition hover:bg-danger-100 dark:hover:bg-danger-900/40"
           >
-            ×
+            <X className="h-5 w-5" />
           </button>
         </div>
       )}
 
       {registroGuardado && paciente && (
-        <div className="flex items-start justify-between gap-4 rounded-[16px] border border-[#BBF7D0] bg-[#F0FDF4] px-5 py-4">
-          <div>
-            <p className="text-[14px] font-semibold text-[#15803D]">Evolución clínica registrada</p>
-            <p className="mt-1 text-[13px] text-[#166534]">
-              El nuevo registro fue agregado al historial de {paciente.nombre} sin modificar las
-              atenciones anteriores.
-            </p>
+        <div className="dark:bg-success-950/30 flex items-start justify-between gap-4 rounded-2xl border border-success-200 bg-success-50 px-5 py-4 dark:border-success-800">
+          <div className="flex items-start gap-3">
+            <CheckCircle2 className="mt-0.5 h-5 w-5 shrink-0 text-success-500" />
+            <div>
+              <p className="text-sm font-semibold text-success-700 dark:text-success-400">
+                Evolución clínica registrada
+              </p>
+              <p className="mt-1 text-sm text-success-600 dark:text-success-400">
+                El nuevo registro fue agregado al historial de {paciente.nombre} sin modificar las
+                atenciones anteriores.
+              </p>
+            </div>
           </div>
           <button
             type="button"
             onClick={() => setRegistroGuardado(false)}
-            className="text-[18px] font-semibold text-[#15803D]"
+            className="flex h-8 w-8 shrink-0 items-center justify-center rounded-xl text-success-500 transition hover:bg-success-100 dark:hover:bg-success-900/40"
             aria-label="Cerrar mensaje"
           >
-            ×
+            <X className="h-5 w-5" />
           </button>
         </div>
       )}
 
       <div className="grid gap-5 xl:grid-cols-[300px_1fr]">
         {/* LISTA DE PACIENTES */}
-        <aside className="rounded-[20px] border border-[#CBD5E1] bg-white p-5 shadow-[0_6px_20px_rgba(15,23,42,0.06)] dark:border-[#334155] dark:bg-[#111827]">
-          <h2 className="text-[17px] font-semibold text-[#10213A] dark:text-white">
-            Seleccionar paciente
-          </h2>
-          <p className="mt-1 text-[13px] text-[#64748B] dark:text-[#94A3B8]">
-            Expedientes disponibles.
-          </p>
+        <aside className="rounded-2xl border border-surface-200 bg-white p-5 shadow-card dark:border-surface-700 dark:bg-surface-900">
+          <h2 className="text-section-title">Seleccionar paciente</h2>
+          <p className="text-subtitle mt-1">Expedientes disponibles.</p>
 
           <div className="mt-5 space-y-3">
             {pacientes.map((item) => (
@@ -407,20 +411,20 @@ function HistorialContent() {
                 key={item.id}
                 type="button"
                 onClick={() => seleccionarPaciente(item.id)}
-                className={`w-full rounded-[15px] border px-4 py-4 text-left transition ${
+                className={`w-full rounded-2xl border px-4 py-4 text-left transition ${
                   item.id === pacienteSeleccionado
-                    ? "border-[#2F6BFF] bg-[#EFF6FF] dark:bg-[#172554]"
-                    : "border-[#E2E8F0] bg-[#F8FAFC] hover:border-[#BFDBFE] dark:border-[#334155] dark:bg-[#0F172A]"
+                    ? "border-brand-400 bg-brand-50 dark:border-brand-600 dark:bg-brand-950/30"
+                    : "border-surface-200 bg-surface-50 hover:border-brand-200 dark:border-surface-700 dark:bg-surface-950"
                 }`}
               >
-                <p className="text-[14px] font-semibold text-[#10213A] dark:text-white">
+                <p className="text-sm font-semibold text-surface-900 dark:text-white">
                   {item.nombre}
                 </p>
-                <p className="mt-1 text-[12px] text-[#64748B] dark:text-[#94A3B8]">
+                <p className="mt-1 text-xs text-surface-500 dark:text-surface-400">
                   {item.especie} · {item.propietario}
                 </p>
                 <span
-                  className={`mt-3 inline-flex rounded-full px-2.5 py-1 text-[11px] font-semibold ${estiloEstado(item.estado)}`}
+                  className={`mt-3 inline-flex items-center gap-1 rounded-lg px-2.5 py-1 text-xs font-semibold ${estiloEstado(item.estado)}`}
                 >
                   {item.estado}
                 </span>
@@ -433,27 +437,25 @@ function HistorialContent() {
         {paciente && (
           <main className="space-y-5">
             {/* DATOS DEL PACIENTE */}
-            <section className="rounded-[20px] border border-[#CBD5E1] bg-white p-6 shadow-[0_6px_20px_rgba(15,23,42,0.06)] dark:border-[#334155] dark:bg-[#111827]">
+            <section className="rounded-2xl border border-surface-200 bg-white p-6 shadow-card dark:border-surface-700 dark:bg-surface-900">
               <div className="flex flex-col justify-between gap-4 sm:flex-row sm:items-start">
                 <div>
                   <div className="flex flex-wrap items-center gap-3">
-                    <h2 className="text-[25px] font-bold text-[#10213A] dark:text-white">
-                      {paciente.nombre}
-                    </h2>
+                    <h2 className="text-page-title">{paciente.nombre}</h2>
                     <span
-                      className={`rounded-full px-3 py-1.5 text-[12px] font-semibold ${estiloEstado(paciente.estado)}`}
+                      className={`inline-flex items-center gap-1 rounded-lg px-2.5 py-1 text-xs font-semibold ${estiloEstado(paciente.estado)}`}
                     >
                       {paciente.estado}
                     </span>
                   </div>
-                  <p className="mt-2 text-[14px] text-[#64748B] dark:text-[#94A3B8]">
+                  <p className="text-subtitle mt-2">
                     {paciente.especie} · {paciente.raza} · Propietario: {paciente.propietario}
                   </p>
                 </div>
 
                 <Link
                   href={`/veterinario/consulta?paciente=${paciente.id}`}
-                  className="flex h-[44px] items-center justify-center rounded-xl border border-[#D6E3FF] px-4 text-[13px] font-semibold text-[#2563EB] transition hover:bg-[#EFF6FF]"
+                  className="flex h-11 items-center justify-center rounded-xl border border-brand-200 bg-white px-4 text-sm font-semibold text-brand-600 transition hover:bg-brand-50 dark:border-surface-700 dark:bg-surface-900 dark:text-brand-400 dark:hover:bg-brand-950/30"
                 >
                   Registrar nueva consulta
                 </Link>
@@ -469,11 +471,11 @@ function HistorialContent() {
                 />
               </div>
 
-              <div className="mt-5 rounded-[15px] border border-[#E2E8F0] px-4 py-4 dark:border-[#334155]">
-                <p className="text-[13px] font-semibold text-[#334155] dark:text-[#CBD5E1]">
+              <div className="mt-5 rounded-2xl border border-surface-200 bg-surface-50 px-4 py-4 dark:border-surface-700 dark:bg-surface-950">
+                <p className="text-sm font-semibold text-surface-900 dark:text-white">
                   Antecedentes relevantes
                 </p>
-                <p className="mt-2 text-[14px] leading-6 text-[#64748B] dark:text-[#94A3B8]">
+                <p className="mt-2 text-sm leading-6 text-surface-500 dark:text-surface-400">
                   {paciente.antecedentes}
                 </p>
               </div>
@@ -481,19 +483,17 @@ function HistorialContent() {
 
             <div className="grid gap-5 lg:grid-cols-[1fr_310px]">
               {/* LÍNEA DE TIEMPO */}
-              <section className="rounded-[20px] border border-[#CBD5E1] bg-white p-6 shadow-[0_6px_20px_rgba(15,23,42,0.06)] dark:border-[#334155] dark:bg-[#111827]">
+              <section className="rounded-2xl border border-surface-200 bg-white p-6 shadow-card dark:border-surface-700 dark:bg-surface-900">
                 <div className="mb-5">
-                  <h2 className="text-[18px] font-semibold text-[#10213A] dark:text-white">
-                    Historial de atenciones
-                  </h2>
-                  <p className="mt-1 text-sm text-[#64748B] dark:text-[#94A3B8]">
+                  <h2 className="text-section-title">Historial de atenciones</h2>
+                  <p className="text-subtitle mt-1">
                     Registros ordenados del más reciente al más antiguo.
                   </p>
                 </div>
 
                 {paciente.registros.length === 0 ? (
-                  <div className="rounded-[18px] border border-dashed border-[#CBD5E1] px-5 py-10 text-center dark:border-[#334155]">
-                    <p className="text-[14px] text-[#64748B] dark:text-[#94A3B8]">
+                  <div className="rounded-2xl border border-dashed border-surface-300 bg-surface-50 px-5 py-10 text-center dark:border-surface-700 dark:bg-surface-950">
+                    <p className="text-sm text-surface-500 dark:text-surface-400">
                       Este paciente no tiene atenciones registradas aún.
                     </p>
                   </div>
@@ -502,28 +502,28 @@ function HistorialContent() {
                     {paciente.registros.map((registro) => (
                       <article
                         key={registro.id}
-                        className="rounded-[18px] border border-[#E5EAF2] bg-[#F8FAFC] p-5 dark:border-[#334155] dark:bg-[#0F172A]"
+                        className="rounded-2xl border border-surface-200 bg-surface-50 p-5 dark:border-surface-700 dark:bg-surface-950"
                       >
                         <div className="flex flex-col justify-between gap-3 sm:flex-row sm:items-start">
                           <div>
                             <span
-                              className={`inline-flex rounded-full px-3 py-1 text-[11px] font-semibold ${estiloTipoRegistro(registro.tipo)}`}
+                              className={`inline-flex items-center gap-1 rounded-lg px-2.5 py-1 text-xs font-semibold ${estiloTipoRegistro(registro.tipo)}`}
                             >
                               {registro.tipo}
                             </span>
-                            <h3 className="mt-3 text-[15px] font-semibold text-[#10213A] dark:text-white">
+                            <h3 className="mt-3 text-sm font-semibold text-surface-900 dark:text-white">
                               {registro.motivo}
                             </h3>
-                            <p className="mt-1 text-[13px] text-[#64748B] dark:text-[#94A3B8]">
+                            <p className="mt-1 text-xs text-surface-500 dark:text-surface-400">
                               {registro.profesional} · {registro.fecha}
                             </p>
                           </div>
-                          <span className="rounded-full bg-[#F1F5F9] px-3 py-1 text-[11px] font-semibold text-[#64748B] dark:bg-[#1E293B] dark:text-[#CBD5E1]">
+                          <span className="inline-flex items-center gap-1 rounded-lg bg-surface-200 px-2.5 py-1 text-xs font-semibold text-surface-600 dark:bg-surface-800 dark:text-surface-300">
                             Solo lectura
                           </span>
                         </div>
 
-                        <div className="mt-4 space-y-3 text-[13px] leading-6">
+                        <div className="mt-4 space-y-3 text-sm leading-6">
                           <DetalleRegistro
                             titulo="Diagnóstico / evolución"
                             valor={registro.diagnostico}
@@ -542,40 +542,38 @@ function HistorialContent() {
 
               {/* COLUMNA DERECHA */}
               <div className="space-y-5">
-                <section className="rounded-[20px] border border-[#CBD5E1] bg-white p-5 shadow-[0_6px_20px_rgba(15,23,42,0.06)] dark:border-[#334155] dark:bg-[#111827]">
-                  <h3 className="text-[17px] font-semibold text-[#10213A] dark:text-white">
+                <section className="rounded-2xl border border-surface-200 bg-white p-5 shadow-card dark:border-surface-700 dark:bg-surface-900">
+                  <h3 className="text-sm font-semibold text-surface-900 dark:text-white">
                     Documento adjunto
                   </h3>
-                  <p className="mt-1 text-[13px] text-[#64748B] dark:text-[#94A3B8]">
-                    Historia clínica cargada previamente.
-                  </p>
-                  <div className="mt-4 rounded-[15px] border border-dashed border-[#CBD5E1] px-4 py-6 text-center dark:border-[#334155]">
-                    <p className="text-[13px] text-[#64748B] dark:text-[#94A3B8]">
+                  <p className="text-subtitle mt-1">Historia clínica cargada previamente.</p>
+                  <div className="mt-4 rounded-2xl border border-dashed border-surface-300 px-4 py-6 text-center dark:border-surface-700">
+                    <p className="text-sm text-surface-500 dark:text-surface-400">
                       Los documentos adjuntos se gestionan desde el módulo de administración.
                     </p>
                   </div>
                 </section>
 
-                <section className="rounded-[20px] border border-[#CBD5E1] bg-white p-5 shadow-[0_6px_20px_rgba(15,23,42,0.06)] dark:border-[#334155] dark:bg-[#111827]">
-                  <h3 className="text-[17px] font-semibold text-[#10213A] dark:text-white">
+                <section className="rounded-2xl border border-surface-200 bg-white p-5 shadow-card dark:border-surface-700 dark:bg-surface-900">
+                  <h3 className="text-sm font-semibold text-surface-900 dark:text-white">
                     Tratamiento actual
                   </h3>
 
                   {paciente.tratamientoActual ? (
                     <>
-                      <p className="mt-3 text-[14px] leading-6 text-[#475569] dark:text-[#CBD5E1]">
+                      <p className="mt-3 text-sm leading-6 text-surface-500 dark:text-surface-400">
                         {paciente.tratamientoActual}
                       </p>
                       <button
                         type="button"
                         onClick={abrirFormulario}
-                        className="mt-4 flex h-[42px] w-full items-center justify-center rounded-xl bg-[#2F6BFF] text-[13px] font-semibold text-white transition hover:bg-[#2459DF]"
+                        className="mt-4 flex h-11 w-full items-center justify-center rounded-xl bg-brand-600 text-sm font-semibold text-white transition hover:bg-brand-700"
                       >
                         Registrar cambio
                       </button>
                     </>
                   ) : (
-                    <p className="mt-3 text-[13px] text-[#64748B] dark:text-[#94A3B8]">
+                    <p className="mt-3 text-sm text-surface-500 dark:text-surface-400">
                       No hay tratamiento activo registrado.
                     </p>
                   )}
@@ -588,17 +586,15 @@ function HistorialContent() {
 
       {/* MODAL AGREGAR EVOLUCIÓN */}
       {mostrarFormulario && paciente && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-[#0F172A]/50 px-4 py-6">
-          <section className="max-h-[95vh] w-full max-w-[760px] overflow-y-auto rounded-[24px] bg-white shadow-[0_24px_70px_rgba(15,23,42,0.28)] dark:bg-[#111827]">
-            <div className="flex items-start justify-between border-b border-[#E2E8F0] px-6 py-5 dark:border-[#334155]">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-surface-900/50 px-4 py-6 backdrop-blur-sm">
+          <section className="max-h-[95vh] w-full max-w-[760px] overflow-y-auto rounded-3xl border border-surface-200/60 bg-white shadow-modal dark:border-surface-700 dark:bg-surface-900">
+            <div className="flex items-start justify-between border-b border-surface-100 px-6 py-5 dark:border-surface-800">
               <div>
-                <p className="text-[12px] font-semibold uppercase tracking-[0.2em] text-[#2563EB]">
+                <p className="text-xs font-semibold uppercase tracking-[0.2em] text-brand-600 dark:text-brand-400">
                   Seguimiento clínico
                 </p>
-                <h2 className="mt-2 text-[24px] font-bold text-[#10213A] dark:text-white">
-                  Agregar evolución de {paciente.nombre}
-                </h2>
-                <p className="mt-2 text-[14px] text-[#64748B] dark:text-[#94A3B8]">
+                <h2 className="text-page-title mt-2">Agregar evolución de {paciente.nombre}</h2>
+                <p className="text-subtitle mt-2">
                   Este registro será añadido al historial sin modificar la información anterior.
                 </p>
               </div>
@@ -606,10 +602,10 @@ function HistorialContent() {
               <button
                 type="button"
                 onClick={cerrarFormulario}
-                className="flex h-10 w-10 items-center justify-center rounded-xl text-[25px] text-[#64748B] transition hover:bg-[#F1F5F9] dark:hover:bg-[#1E293B]"
+                className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl text-surface-500 transition hover:bg-surface-100 dark:hover:bg-surface-800"
                 aria-label="Cerrar formulario"
               >
-                ×
+                <X className="h-5 w-5" />
               </button>
             </div>
 
@@ -686,16 +682,16 @@ function HistorialContent() {
                 </Campo>
               </div>
 
-              <div className="rounded-[14px] border border-[#DBEAFE] bg-[#EFF6FF] px-4 py-3 text-[13px] leading-6 text-[#1D4ED8] dark:border-[#1E3A8A] dark:bg-[#172554] dark:text-[#BFDBFE]">
+              <div className="rounded-2xl border border-brand-200 bg-brand-50 px-4 py-3 text-sm leading-6 text-brand-700 dark:border-brand-800 dark:bg-brand-950/30 dark:text-brand-300">
                 Las evoluciones se agregan como nuevos registros cronológicos. Las consultas
                 anteriores permanecen en modo de solo lectura.
               </div>
 
-              <div className="flex flex-col-reverse gap-3 border-t border-[#E2E8F0] pt-5 dark:border-[#334155] sm:flex-row sm:justify-end">
+              <div className="flex flex-col-reverse gap-3 border-t border-surface-100 pt-5 dark:border-surface-800 sm:flex-row sm:justify-end">
                 <button
                   type="button"
                   onClick={cerrarFormulario}
-                  className="flex h-[46px] items-center justify-center rounded-xl border border-[#CBD5E1] px-6 text-[14px] font-semibold text-[#475569] transition hover:bg-[#F8FAFC] dark:border-[#334155] dark:text-[#CBD5E1]"
+                  className="flex h-11 items-center justify-center rounded-xl border border-surface-300 px-6 text-sm font-semibold text-surface-600 transition hover:bg-surface-50 dark:border-surface-700 dark:text-surface-300 dark:hover:bg-surface-800"
                 >
                   Cancelar
                 </button>
@@ -703,7 +699,7 @@ function HistorialContent() {
                 <button
                   type="submit"
                   disabled={guardando}
-                  className="flex h-[46px] items-center justify-center rounded-xl bg-[#2F6BFF] px-7 text-[14px] font-semibold text-white transition hover:bg-[#2459DF] disabled:opacity-60"
+                  className="flex h-11 items-center justify-center rounded-xl bg-brand-600 px-7 text-sm font-semibold text-white transition hover:bg-brand-700 disabled:opacity-60"
                 >
                   {guardando ? "Guardando..." : "Guardar evolución"}
                 </button>
@@ -718,18 +714,16 @@ function HistorialContent() {
 
 function DatoClinico({ titulo, valor }: { titulo: string; valor: string }) {
   return (
-    <div className="rounded-[14px] bg-[#F8FAFC] px-4 py-3 dark:bg-[#0F172A]">
-      <p className="text-[12px] font-semibold uppercase tracking-wide text-[#64748B] dark:text-[#94A3B8]">
-        {titulo}
-      </p>
-      <p className="mt-2 text-[14px] font-medium text-[#10213A] dark:text-white">{valor}</p>
+    <div className="rounded-xl bg-surface-50 px-4 py-3 dark:bg-surface-950">
+      <p className="text-caption">{titulo}</p>
+      <p className="mt-2 text-sm font-medium text-surface-900 dark:text-white">{valor}</p>
     </div>
   );
 }
 
 function DetalleRegistro({ titulo, valor }: { titulo: string; valor: string }) {
   return (
-    <p className="text-[#475569] dark:text-[#CBD5E1]">
+    <p className="text-surface-600 dark:text-surface-300">
       <span className="font-semibold">{titulo}:</span> {valor}
     </p>
   );
@@ -738,9 +732,7 @@ function DetalleRegistro({ titulo, valor }: { titulo: string; valor: string }) {
 function Campo({ label, children }: { label: string; children: ReactNode }) {
   return (
     <label className="block">
-      <span className="mb-2 block text-[13px] font-semibold text-[#334155] dark:text-[#CBD5E1]">
-        {label}
-      </span>
+      <span className="form-label">{label}</span>
       {children}
     </label>
   );
@@ -749,32 +741,31 @@ function Campo({ label, children }: { label: string; children: ReactNode }) {
 function estiloEstado(estado: EstadoClinico) {
   switch (estado) {
     case "Por atender":
-      return "bg-[#FEF3C7] text-[#B45309] dark:bg-[#78350F] dark:text-[#FDE68A]";
+      return "bg-warning-100 text-warning-700 dark:bg-warning-900/40 dark:text-warning-300";
     case "Atendido hoy":
-      return "bg-[#DCFCE7] text-[#15803D] dark:bg-[#14532D] dark:text-[#BBF7D0]";
+      return "bg-success-100 text-success-700 dark:bg-success-900/40 dark:text-success-300";
     case "En seguimiento":
-      return "bg-[#DBEAFE] text-[#2563EB] dark:bg-[#1E3A8A] dark:text-[#BFDBFE]";
+      return "bg-brand-100 text-brand-600 dark:bg-brand-900/40 dark:text-brand-300";
     case "Tratamiento activo":
-      return "bg-[#FEE2E2] text-[#B91C1C] dark:bg-[#7F1D1D] dark:text-[#FECACA]";
+      return "bg-danger-100 text-danger-700 dark:bg-danger-900/40 dark:text-danger-300";
     case "Control programado":
-      return "bg-[#EDE9FE] text-[#6D28D9] dark:bg-[#4C1D95] dark:text-[#DDD6FE]";
+      return "bg-brand-100 text-brand-700 dark:bg-brand-900/40 dark:text-brand-300";
   }
 }
 
 function estiloTipoRegistro(tipo: TipoRegistro) {
   switch (tipo) {
     case "Evolución clínica":
-      return "bg-[#DCFCE7] text-[#15803D] dark:bg-[#14532D] dark:text-[#BBF7D0]";
+      return "bg-success-100 text-success-700 dark:bg-success-900/40 dark:text-success-300";
     case "Procedimiento":
-      return "bg-[#FEE2E2] text-[#B91C1C] dark:bg-[#7F1D1D] dark:text-[#FECACA]";
+      return "bg-danger-100 text-danger-700 dark:bg-danger-900/40 dark:text-danger-300";
     case "Vacunación":
-      return "bg-[#EDE9FE] text-[#6D28D9] dark:bg-[#4C1D95] dark:text-[#DDD6FE]";
+      return "bg-brand-100 text-brand-700 dark:bg-brand-900/40 dark:text-brand-300";
     case "Control":
-      return "bg-[#DBEAFE] text-[#2563EB] dark:bg-[#1E3A8A] dark:text-[#BFDBFE]";
+      return "bg-brand-100 text-brand-600 dark:bg-brand-900/40 dark:text-brand-300";
     case "Consulta":
-      return "bg-[#E0F2FE] text-[#0369A1] dark:bg-[#0C4A6E] dark:text-[#BAE6FD]";
+      return "bg-brand-50 text-brand-600 dark:bg-brand-950/30 dark:text-brand-300";
   }
 }
 
-const campoClases =
-  "h-[48px] w-full rounded-xl border border-[#CBD5E1] bg-white px-4 text-[14px] text-[#10213A] outline-none transition focus:border-[#2F6BFF] focus:ring-4 focus:ring-[#2F6BFF]/10 dark:border-[#334155] dark:bg-[#0F172A] dark:text-white dark:placeholder:text-[#94A3B8]";
+const campoClases = "form-input";

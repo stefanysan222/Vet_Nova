@@ -2,11 +2,13 @@
 
 import Link from "next/link";
 import { useEffect, useState } from "react";
+import { Plus } from "lucide-react";
 import { useAuth } from "@/lib/auth-context";
 import { SkeletonBanner, SkeletonStats, SkeletonCardList } from "../components/ui/Skeleton";
 import { fetchCitas } from "../../lib/api/citas";
 import type { Appointment } from "../../lib/recepcionista/types";
-import { getStatusStyle } from "../../lib/utils/status";
+import { StatusBadge } from "../../lib/utils/status-badge";
+import type { AppointmentStatus } from "../../lib/utils/status";
 
 function fechaHoy(): string {
   return new Date().toISOString().slice(0, 10);
@@ -83,7 +85,7 @@ export default function VeterinarioPage() {
               Módulo veterinario
             </p>
 
-            <h1 className="text-[28px] font-bold leading-tight">Hola, {userName} 👋</h1>
+            <h1 className="text-display">Hola, {userName} 👋</h1>
 
             <p className="mt-3 max-w-2xl text-sm leading-6 text-brand-100">
               Consulta tu agenda diaria, registra valoraciones y tratamientos, y revisa la historia
@@ -93,9 +95,10 @@ export default function VeterinarioPage() {
 
           <Link
             href="/veterinario/consulta"
-            className="flex h-[44px] shrink-0 items-center justify-center rounded-xl bg-white px-6 text-sm font-semibold text-brand-700 shadow-sm transition hover:bg-brand-50"
+            className="flex h-11 shrink-0 items-center justify-center gap-2 rounded-xl bg-white px-6 text-sm font-semibold text-brand-700 shadow-sm transition hover:bg-brand-50"
           >
-            + Registrar consulta
+            <Plus className="h-4 w-4" />
+            Registrar consulta
           </Link>
         </div>
       </section>
@@ -105,17 +108,13 @@ export default function VeterinarioPage() {
         {stats.map((stat) => (
           <article
             key={stat.title}
-            className="rounded-[18px] border border-[#E2E8F0] bg-white px-5 py-5 shadow-[0_4px_18px_rgba(15,23,42,0.05)] transition hover:-translate-y-1 hover:shadow-[0_12px_28px_rgba(15,23,42,0.09)] dark:border-[#334155] dark:bg-[#111827]"
+            className="rounded-2xl border border-surface-200 bg-white px-5 py-5 shadow-card transition hover:-translate-y-1 hover:shadow-card-hover dark:border-surface-700 dark:bg-surface-900"
           >
-            <p className="text-[13px] font-medium text-[#64748B] dark:text-[#94A3B8]">
-              {stat.title}
-            </p>
+            <p className="text-label">{stat.title}</p>
 
-            <p className="mt-3 text-[30px] font-bold text-[#10213A] dark:text-white">
-              {stat.value}
-            </p>
+            <p className="text-stat mt-3">{stat.value}</p>
 
-            <p className="mt-2 text-[12px] text-[#64748B] dark:text-[#94A3B8]">
+            <p className="mt-2 text-xs text-surface-500 dark:text-surface-400">
               {stat.description}
             </p>
           </article>
@@ -125,21 +124,17 @@ export default function VeterinarioPage() {
       {/* CONTENIDO */}
       <section className="grid gap-5 xl:grid-cols-[1.25fr_0.95fr]">
         {/* AGENDA DIARIA */}
-        <article className="rounded-[20px] border border-[#E2E8F0] bg-white p-6 shadow-[0_4px_18px_rgba(15,23,42,0.05)] dark:border-[#334155] dark:bg-[#111827]">
+        <article className="rounded-2xl border border-surface-200 bg-white p-6 shadow-card dark:border-surface-700 dark:bg-surface-900">
           <div className="mb-6 flex items-center justify-between">
             <div>
-              <h2 className="text-[19px] font-semibold text-[#10213A] dark:text-white">
-                Agenda diaria
-              </h2>
+              <h2 className="text-section-title">Agenda diaria</h2>
 
-              <p className="mt-1 text-[13px] text-[#64748B] dark:text-[#94A3B8]">
-                Consultas programadas para hoy.
-              </p>
+              <p className="text-subtitle mt-1">Consultas programadas para hoy.</p>
             </div>
 
             <Link
               href="/veterinario/citas"
-              className="text-[14px] font-semibold text-[#2563EB] transition hover:text-[#1D4ED8]"
+              className="text-sm font-semibold text-brand-600 transition hover:text-brand-700 dark:text-brand-400 dark:hover:text-brand-300"
             >
               Ver agenda completa
             </Link>
@@ -147,45 +142,41 @@ export default function VeterinarioPage() {
 
           <div className="space-y-3">
             {agendaDiaria.length === 0 ? (
-              <p className="py-8 text-center text-[14px] text-[#64748B] dark:text-[#94A3B8]">
+              <p className="py-8 text-center text-sm text-surface-500 dark:text-surface-400">
                 No hay citas programadas para hoy.
               </p>
             ) : (
               agendaDiaria.map((cita) => (
                 <div
                   key={cita.id}
-                  className="flex flex-col justify-between gap-4 rounded-[16px] border border-[#E5EAF2] bg-[#F8FAFC] px-4 py-4 dark:border-[#334155] dark:bg-[#0F172A] sm:flex-row sm:items-center"
+                  className="flex flex-col justify-between gap-4 rounded-2xl border border-surface-200 bg-surface-50 px-4 py-4 dark:border-surface-700 dark:bg-surface-950 sm:flex-row sm:items-center"
                 >
                   <div className="flex items-center gap-4">
-                    <div className="flex h-[48px] w-[60px] shrink-0 items-center justify-center rounded-xl bg-[#EEF4FF] text-[14px] font-bold text-[#2563EB] dark:bg-[#1E293B] dark:text-[#93C5FD]">
+                    <div className="flex h-12 w-[60px] shrink-0 items-center justify-center rounded-xl bg-brand-100 text-sm font-bold text-brand-600 dark:bg-brand-900/40 dark:text-brand-300">
                       {cita.time}
                     </div>
 
                     <div>
-                      <p className="text-[15px] font-semibold text-[#10213A] dark:text-white">
+                      <p className="text-sm font-semibold text-surface-900 dark:text-white">
                         {cita.petName}{" "}
-                        <span className="font-normal text-[#64748B] dark:text-[#94A3B8]">
+                        <span className="font-normal text-surface-500 dark:text-surface-400">
                           · {cita.petEspecie ?? ""}
                         </span>
                       </p>
 
-                      <p className="mt-1 text-[13px] text-[#64748B] dark:text-[#94A3B8]">
+                      <p className="mt-1 text-xs text-surface-500 dark:text-surface-400">
                         {cita.ownerName} · {cita.service}
                       </p>
                     </div>
                   </div>
 
                   <div className="flex items-center gap-3">
-                    <span
-                      className={`inline-flex items-center rounded-full px-3 py-1.5 text-[12px] font-semibold ${getStatusStyle(cita.status).badge}`}
-                    >
-                      {cita.status}
-                    </span>
+                    <StatusBadge status={cita.status as AppointmentStatus} />
 
                     {cita.status !== "Finalizada" && cita.status !== "Cancelada" && (
                       <Link
                         href="/veterinario/consulta"
-                        className="rounded-lg border border-[#D6E3FF] bg-white px-3 py-2 text-[12px] font-semibold text-[#2563EB] transition hover:bg-[#EFF6FF] dark:border-[#334155] dark:bg-[#111827]"
+                        className="rounded-lg border border-brand-200 bg-white px-3 py-2 text-xs font-semibold text-brand-600 transition hover:bg-brand-50 dark:border-surface-700 dark:bg-surface-900 dark:text-brand-400 dark:hover:bg-brand-950/30"
                       >
                         Atender
                       </Link>
@@ -198,26 +189,25 @@ export default function VeterinarioPage() {
         </article>
 
         {/* PACIENTES ATENDIDOS */}
-        <article className="rounded-[20px] border border-[#E2E8F0] bg-white p-6 shadow-[0_4px_18px_rgba(15,23,42,0.05)] dark:border-[#334155] dark:bg-[#111827]">
+        <article className="rounded-2xl border border-surface-200 bg-white p-6 shadow-card dark:border-surface-700 dark:bg-surface-900">
           <div className="mb-6 flex items-center justify-between">
             <div>
-              <h2 className="text-[19px] font-semibold text-[#10213A] dark:text-white">
-                Pacientes atendidos
-              </h2>
+              <h2 className="text-section-title">Pacientes atendidos</h2>
 
-              <p className="mt-1 text-[13px] text-[#64748B] dark:text-[#94A3B8]">
-                Últimas valoraciones registradas.
-              </p>
+              <p className="text-subtitle mt-1">Últimas valoraciones registradas.</p>
             </div>
 
-            <Link href="/veterinario/mascotas" className="text-[14px] font-semibold text-[#2563EB]">
+            <Link
+              href="/veterinario/mascotas"
+              className="text-sm font-semibold text-brand-600 transition hover:text-brand-700 dark:text-brand-400 dark:hover:text-brand-300"
+            >
               Ver todos
             </Link>
           </div>
 
           <div className="space-y-3">
             {pacientesAtendidos.length === 0 ? (
-              <p className="py-8 text-center text-[14px] text-[#64748B] dark:text-[#94A3B8]">
+              <p className="py-8 text-center text-sm text-surface-500 dark:text-surface-400">
                 No hay pacientes atendidos recientemente.
               </p>
             ) : (
@@ -226,30 +216,30 @@ export default function VeterinarioPage() {
                 return (
                   <div
                     key={cita.id}
-                    className="rounded-[16px] border border-[#E5EAF2] px-4 py-4 dark:border-[#334155]"
+                    className="rounded-2xl border border-surface-200 px-4 py-4 dark:border-surface-700"
                   >
                     <div className="flex items-start justify-between gap-3">
                       <div>
-                        <p className="text-[15px] font-semibold text-[#10213A] dark:text-white">
+                        <p className="text-sm font-semibold text-surface-900 dark:text-white">
                           {cita.petName}
                         </p>
 
-                        <p className="mt-1 text-[13px] text-[#64748B] dark:text-[#94A3B8]">
+                        <p className="mt-1 text-xs text-surface-500 dark:text-surface-400">
                           Propietario: {cita.ownerName}
                         </p>
                       </div>
 
-                      <span className="text-[12px] text-[#94A3B8]">{cita.date}</span>
+                      <span className="text-xs text-surface-400">{cita.date}</span>
                     </div>
 
-                    <div className="mt-3 rounded-xl bg-[#F8FAFC] px-3 py-3 text-[13px] dark:bg-[#0F172A]">
-                      <p className="text-[#475569] dark:text-[#CBD5E1]">
+                    <div className="mt-3 rounded-xl bg-surface-50 px-3 py-3 text-xs dark:bg-surface-950">
+                      <p className="text-surface-600 dark:text-surface-300">
                         <span className="font-semibold">Diagnóstico:</span>{" "}
                         {notas.diagnostico ?? cita.service}
                       </p>
 
                       {notas.tratamiento && (
-                        <p className="mt-1 text-[#475569] dark:text-[#CBD5E1]">
+                        <p className="mt-1 text-surface-600 dark:text-surface-300">
                           <span className="font-semibold">Tratamiento:</span> {notas.tratamiento}
                         </p>
                       )}
@@ -257,7 +247,7 @@ export default function VeterinarioPage() {
 
                     <Link
                       href={`/veterinario/historial?paciente=${cita.petId}`}
-                      className="mt-3 inline-flex text-[13px] font-semibold text-[#2563EB]"
+                      className="mt-3 inline-flex text-xs font-semibold text-brand-600 dark:text-brand-400"
                     >
                       Consultar historial clínico
                     </Link>
