@@ -5,6 +5,19 @@ import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { useEffect, useState, type ReactNode } from "react";
 import { AnimatePresence, motion } from "framer-motion";
+import {
+  Home,
+  CalendarDays,
+  PawPrint,
+  Settings,
+  LogOut,
+  Bell,
+  User,
+  Moon,
+  Sun,
+  Menu,
+  X,
+} from "lucide-react";
 import AvatarCliente from "./AvatarCliente";
 import BuscadorCliente from "./BuscadorCliente";
 import { logout } from "../../lib/auth";
@@ -36,6 +49,7 @@ export default function ClientLayoutShell({ children }: { children: ReactNode })
     }
     if (user.role !== "Cliente") {
       const routes: Record<string, string> = {
+        SuperAdministrador: "/super-admin",
         Administrador: "/admin",
         Veterinario: "/veterinario",
       };
@@ -65,11 +79,11 @@ export default function ClientLayoutShell({ children }: { children: ReactNode })
   const nombreCompleto = `${perfil.nombre} ${perfil.apellido}`;
 
   return (
-    <main className="h-screen overflow-hidden bg-[#F5F7FB] text-[#10213A] dark:bg-[#0F172A] dark:text-white">
+    <main className="h-screen overflow-hidden bg-surface-50 text-surface-900 dark:bg-surface-950 dark:text-white">
       <div className="flex h-screen overflow-hidden">
         {/* Sidebar */}
-        <aside className="hidden h-screen w-[260px] shrink-0 border-r border-[#E5EAF2] bg-white dark:border-[#1E293B] dark:bg-[#111827] lg:flex lg:flex-col">
-          <div className="flex h-[78px] items-center gap-3 border-b border-[#E5EAF2] px-5 dark:border-[#1E293B]">
+        <aside className="hidden h-screen w-[260px] shrink-0 border-r border-surface-200 bg-white dark:border-surface-800 dark:bg-surface-900 lg:flex lg:flex-col">
+          <div className="flex h-[78px] items-center gap-3 border-b border-surface-200 px-5 dark:border-surface-800">
             <Image
               src={darkMode ? "/logos/vetnova-logo-dark.png" : "/logos/vetnova-logo-light.png"}
               alt="VetNova Logo"
@@ -79,25 +93,27 @@ export default function ClientLayoutShell({ children }: { children: ReactNode })
             />
 
             <div>
-              <h1 className="text-[22px] font-semibold leading-none text-[#10213A] dark:text-white">
+              <h1 className="text-xl font-semibold leading-none text-surface-900 dark:text-white">
                 VetNova
               </h1>
 
-              <p className="mt-1.5 text-[12px] text-[#64748B] dark:text-[#94A3B8]">
-                Sistema Veterinario
-              </p>
+              <p className="text-caption mt-1.5">Sistema Veterinario</p>
             </div>
           </div>
 
           <nav className="flex-1 px-4 py-4">
-            <SidebarItem href="/cliente" active={pathname === "/cliente"} icon={<HomeIcon />}>
+            <SidebarItem
+              href="/cliente"
+              active={pathname === "/cliente"}
+              icon={<Home className="h-5 w-5" />}
+            >
               Dashboard
             </SidebarItem>
 
             <SidebarItem
               href="/cliente/agendar"
               active={pathname.startsWith("/cliente/agendar")}
-              icon={<CalendarMenuIcon />}
+              icon={<CalendarDays className="h-5 w-5" />}
             >
               Citas
             </SidebarItem>
@@ -105,7 +121,7 @@ export default function ClientLayoutShell({ children }: { children: ReactNode })
             <SidebarItem
               href="/cliente/mascotas"
               active={pathname.startsWith("/cliente/mascotas")}
-              icon={<PawMenuIcon />}
+              icon={<PawPrint className="h-5 w-5" />}
             >
               Mascotas
             </SidebarItem>
@@ -113,21 +129,21 @@ export default function ClientLayoutShell({ children }: { children: ReactNode })
             <SidebarItem
               href="/cliente/configuracion"
               active={pathname.startsWith("/cliente/configuracion")}
-              icon={<SettingsIcon />}
+              icon={<Settings className="h-5 w-5" />}
             >
               Configuración
             </SidebarItem>
           </nav>
 
-          <div className="border-t border-[#E5EAF2] px-5 py-5 dark:border-[#1E293B]">
+          <div className="border-t border-surface-200 px-5 py-5 dark:border-surface-800">
             <button
               type="button"
               onClick={() => {
                 logout().then(() => router.push("/login"));
               }}
-              className="flex items-center gap-3 text-[15px] font-semibold text-[#10213A] transition-colors hover:text-[#2F6BFF] dark:text-white dark:hover:text-[#60A5FA]"
+              className="flex items-center gap-3 text-sm font-semibold text-surface-900 transition-colors hover:text-brand-600 dark:text-white dark:hover:text-brand-300"
             >
-              <LogoutIcon />
+              <LogOut className="h-[19px] w-[19px]" />
               Cerrar Sesión
             </button>
           </div>
@@ -136,24 +152,14 @@ export default function ClientLayoutShell({ children }: { children: ReactNode })
         {/* Contenido principal */}
         <section className="min-w-0 flex-1">
           {/* Barra superior */}
-          <header className="relative flex h-[64px] items-center justify-between border-b border-[#E5EAF2] bg-white px-5 dark:border-[#1E293B] dark:bg-[#111827]">
+          <header className="relative flex h-[64px] items-center justify-between border-b border-surface-200 bg-white px-5 dark:border-surface-800 dark:bg-surface-900">
             <button
               type="button"
               onClick={() => setMobileOpen(true)}
-              className="mr-3 flex h-9 w-9 shrink-0 items-center justify-center rounded-xl border border-[#E5EAF2] bg-white dark:border-[#1E293B] dark:bg-[#111827] lg:hidden"
+              className="mr-3 flex h-9 w-9 shrink-0 items-center justify-center rounded-xl border border-surface-200 bg-white dark:border-surface-800 dark:bg-surface-900 lg:hidden"
               aria-label="Abrir menú"
             >
-              <svg
-                width="20"
-                height="20"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="2"
-                strokeLinecap="round"
-              >
-                <path d="M4 6h16M4 12h16M4 18h16" />
-              </svg>
+              <Menu className="h-5 w-5" />
             </button>
             <BuscadorCliente />
 
@@ -165,60 +171,60 @@ export default function ClientLayoutShell({ children }: { children: ReactNode })
                   setShowNotifications(!showNotifications);
                   setShowUserMenu(false);
                 }}
-                className="relative flex h-8 w-8 items-center justify-center rounded-lg transition-colors hover:bg-[#F1F5F9] dark:hover:bg-[#1E293B]"
+                className="relative flex h-8 w-8 items-center justify-center rounded-lg text-surface-900 transition-colors hover:bg-surface-100 dark:text-white dark:hover:bg-surface-800"
                 aria-label="Abrir notificaciones"
               >
-                <BellIcon />
+                <Bell className="h-[19px] w-[19px]" />
               </button>
 
               {/* Ventana de notificaciones */}
               {showNotifications && (
-                <div className="absolute right-[112px] top-[58px] z-50 w-[380px] overflow-hidden rounded-xl border border-[#CBD5E1] bg-white shadow-[0_12px_30px_rgba(15,23,42,0.16)] dark:border-[#334155] dark:bg-[#111827]">
-                  <div className="flex items-center justify-between border-b border-[#E2E8F0] px-5 py-4 dark:border-[#334155]">
+                <div className="absolute right-[112px] top-[58px] z-50 w-[380px] overflow-hidden rounded-2xl border border-surface-200 bg-white shadow-modal dark:border-surface-700 dark:bg-surface-900">
+                  <div className="flex items-center justify-between border-b border-surface-200 px-5 py-4 dark:border-surface-700">
                     <div>
-                      <h3 className="text-[16px] font-semibold text-[#10213A] dark:text-white">
+                      <h3 className="text-base font-semibold text-surface-900 dark:text-white">
                         Notificaciones
                       </h3>
-                      <p className="mt-1 text-[13px] text-[#64748B] dark:text-[#94A3B8]">
+                      <p className="mt-1 text-xs text-surface-500 dark:text-surface-400">
                         No tienes notificaciones nuevas
                       </p>
                     </div>
                   </div>
 
-                  <div className="max-h-[290px] divide-y divide-[#E2E8F0] overflow-y-auto dark:divide-[#334155]">
+                  <div className="max-h-[290px] divide-y divide-surface-200 overflow-y-auto dark:divide-surface-700">
                     {notificationPreview.map((item) => (
                       <div
                         key={item.title}
-                        className="flex gap-3 px-5 py-4 transition-colors hover:bg-[#F8FAFC] dark:hover:bg-[#1E293B]"
+                        className="flex gap-3 px-5 py-4 transition-colors hover:bg-surface-50 dark:hover:bg-surface-800"
                       >
-                        <div className="mt-1 flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-[#DBEAFE] text-[#2563EB] dark:bg-[#1E3A8A] dark:text-[#93C5FD]">
-                          <BellSmallIcon />
+                        <div className="mt-1 flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-brand-100 text-brand-600 dark:bg-brand-900/40 dark:text-brand-300">
+                          <Bell className="h-[18px] w-[18px]" />
                         </div>
 
                         <div className="min-w-0 flex-1">
                           <div className="flex items-center gap-2">
-                            <h4 className="text-[14px] font-semibold text-[#10213A] dark:text-white">
+                            <h4 className="text-sm font-semibold text-surface-900 dark:text-white">
                               {item.title}
                             </h4>
 
-                            {item.unread && <span className="h-2 w-2 rounded-full bg-[#EF4444]" />}
+                            {item.unread && <span className="h-2 w-2 rounded-full bg-danger-500" />}
                           </div>
 
-                          <p className="mt-1 text-[13px] leading-5 text-[#64748B] dark:text-[#94A3B8]">
+                          <p className="mt-1 text-xs leading-5 text-surface-500 dark:text-surface-400">
                             {item.description}
                           </p>
 
-                          <p className="mt-2 text-[12px] text-[#94A3B8]">{item.time}</p>
+                          <p className="text-caption mt-2">{item.time}</p>
                         </div>
                       </div>
                     ))}
                   </div>
 
-                  <div className="border-t border-[#E2E8F0] p-4 dark:border-[#334155]">
+                  <div className="border-t border-surface-200 p-4 dark:border-surface-700">
                     <Link
                       href="/cliente/notificaciones"
                       onClick={() => setShowNotifications(false)}
-                      className="flex h-[40px] w-full items-center justify-center rounded-xl bg-[#2F6BFF] text-[14px] font-semibold text-white transition-colors hover:bg-[#2457D6]"
+                      className="flex h-[40px] w-full items-center justify-center rounded-xl bg-brand-600 text-sm font-semibold text-white transition-colors hover:bg-brand-700"
                     >
                       Ver más
                     </Link>
@@ -226,7 +232,7 @@ export default function ClientLayoutShell({ children }: { children: ReactNode })
                 </div>
               )}
 
-              <div className="h-8 w-px bg-[#E2E8F0] dark:bg-[#334155]" />
+              <div className="h-8 w-px bg-surface-200 dark:bg-surface-700" />
 
               {/* Perfil del cliente */}
               <div className="relative">
@@ -236,31 +242,31 @@ export default function ClientLayoutShell({ children }: { children: ReactNode })
                     setShowUserMenu(!showUserMenu);
                     setShowNotifications(false);
                   }}
-                  className="flex items-center gap-3 rounded-xl px-2 py-1.5 transition-colors hover:bg-[#F8FAFC] dark:hover:bg-[#1E293B]"
+                  className="flex items-center gap-3 rounded-xl px-2 py-1.5 transition-colors hover:bg-surface-50 dark:hover:bg-surface-800"
                   aria-label="Abrir menú de perfil"
                 >
                   <div className="text-right">
-                    <p className="text-[14px] font-semibold leading-none text-[#10213A] dark:text-white">
+                    <p className="text-sm font-semibold leading-none text-surface-900 dark:text-white">
                       {nombreCompleto}
                     </p>
 
-                    <p className="mt-1.5 text-[12px] text-[#64748B] dark:text-[#94A3B8]">Cliente</p>
+                    <p className="text-caption mt-1.5">Cliente</p>
                   </div>
 
                   <AvatarCliente size="small" />
                 </button>
 
                 {showUserMenu && (
-                  <div className="absolute right-0 top-[48px] z-50 w-[280px] overflow-hidden rounded-xl border border-[#CBD5E1] bg-white shadow-[0_12px_30px_rgba(15,23,42,0.16)] dark:border-[#334155] dark:bg-[#111827]">
-                    <div className="flex items-center gap-3 border-b border-[#E2E8F0] px-5 py-4 dark:border-[#334155]">
+                  <div className="absolute right-0 top-[48px] z-50 w-[280px] overflow-hidden rounded-2xl border border-surface-200 bg-white shadow-modal dark:border-surface-700 dark:bg-surface-900">
+                    <div className="flex items-center gap-3 border-b border-surface-200 px-5 py-4 dark:border-surface-700">
                       <AvatarCliente />
 
                       <div>
-                        <p className="text-[15px] font-semibold text-[#10213A] dark:text-white">
+                        <p className="text-sm font-semibold text-surface-900 dark:text-white">
                           {nombreCompleto}
                         </p>
 
-                        <p className="mt-1 text-[13px] text-[#64748B] dark:text-[#94A3B8]">
+                        <p className="mt-1 text-xs text-surface-500 dark:text-surface-400">
                           Cliente
                         </p>
                       </div>
@@ -270,7 +276,7 @@ export default function ClientLayoutShell({ children }: { children: ReactNode })
                       <UserMenuItem
                         href="/cliente/perfil"
                         onClick={() => setShowUserMenu(false)}
-                        icon={<UserMenuIcon />}
+                        icon={<User className="h-[19px] w-[19px]" />}
                       >
                         Ver perfil
                       </UserMenuItem>
@@ -278,7 +284,7 @@ export default function ClientLayoutShell({ children }: { children: ReactNode })
                       <UserMenuItem
                         href="/cliente/mascotas"
                         onClick={() => setShowUserMenu(false)}
-                        icon={<PawMenuIcon />}
+                        icon={<PawPrint className="h-[19px] w-[19px]" />}
                       >
                         Mis mascotas
                       </UserMenuItem>
@@ -286,7 +292,7 @@ export default function ClientLayoutShell({ children }: { children: ReactNode })
                       <UserMenuItem
                         href="/cliente/agendar"
                         onClick={() => setShowUserMenu(false)}
-                        icon={<CalendarMenuIcon />}
+                        icon={<CalendarDays className="h-[19px] w-[19px]" />}
                       >
                         Mis citas
                       </UserMenuItem>
@@ -294,7 +300,7 @@ export default function ClientLayoutShell({ children }: { children: ReactNode })
                       <UserMenuItem
                         href="/cliente/configuracion"
                         onClick={() => setShowUserMenu(false)}
-                        icon={<SettingsIcon />}
+                        icon={<Settings className="h-[19px] w-[19px]" />}
                       >
                         Configuración del perfil
                       </UserMenuItem>
@@ -302,16 +308,20 @@ export default function ClientLayoutShell({ children }: { children: ReactNode })
                       <button
                         type="button"
                         onClick={toggleDarkMode}
-                        className="flex w-full items-center justify-between px-5 py-3 text-[14px] font-semibold text-[#10213A] transition-colors hover:bg-[#F8FAFC] dark:text-white dark:hover:bg-[#1E293B]"
+                        className="flex w-full items-center justify-between px-5 py-3 text-sm font-semibold text-surface-900 transition-colors hover:bg-surface-50 dark:text-white dark:hover:bg-surface-800"
                       >
                         <span className="flex items-center gap-3">
-                          {darkMode ? <SunIcon /> : <MoonIcon />}
+                          {darkMode ? (
+                            <Sun className="h-[19px] w-[19px]" />
+                          ) : (
+                            <Moon className="h-[19px] w-[19px]" />
+                          )}
                           {darkMode ? "Modo claro" : "Modo oscuro"}
                         </span>
 
                         <span
                           className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
-                            darkMode ? "bg-[#2F6BFF]" : "bg-[#94A3B8]"
+                            darkMode ? "bg-brand-500" : "bg-surface-300 dark:bg-surface-600"
                           }`}
                         >
                           <span
@@ -323,16 +333,16 @@ export default function ClientLayoutShell({ children }: { children: ReactNode })
                       </button>
                     </div>
 
-                    <div className="border-t border-[#E2E8F0] py-2 dark:border-[#334155]">
+                    <div className="border-t border-surface-200 py-2 dark:border-surface-700">
                       <button
                         type="button"
                         onClick={() => {
                           setShowUserMenu(false);
                           logout().then(() => router.push("/login"));
                         }}
-                        className="flex w-full items-center gap-3 px-5 py-3 text-[14px] font-semibold text-[#EF4444] transition-colors hover:bg-[#FEF2F2] dark:hover:bg-[#28171B]"
+                        className="dark:hover:bg-danger-950/30 flex w-full items-center gap-3 px-5 py-3 text-sm font-semibold text-danger-500 transition-colors hover:bg-danger-50"
                       >
-                        <LogoutIcon />
+                        <LogOut className="h-[19px] w-[19px]" />
                         Cerrar sesión
                       </button>
                     </div>
@@ -363,12 +373,12 @@ export default function ClientLayoutShell({ children }: { children: ReactNode })
       {/* Drawer mobile */}
       {mobileOpen && (
         <div className="fixed inset-0 z-50 lg:hidden" onClick={() => setMobileOpen(false)}>
-          <div className="absolute inset-0 bg-black/40" />
+          <div className="absolute inset-0 bg-surface-900/40 backdrop-blur-sm" />
           <div
-            className="absolute left-0 top-0 h-full w-[260px] bg-white dark:bg-[#111827]"
+            className="absolute left-0 top-0 h-full w-[260px] bg-white dark:bg-surface-900"
             onClick={(e) => e.stopPropagation()}
           >
-            <div className="flex h-[64px] items-center justify-between border-b border-[#E5EAF2] px-5 dark:border-[#1E293B]">
+            <div className="flex h-[64px] items-center justify-between border-b border-surface-200 px-5 dark:border-surface-800">
               <div className="flex items-center gap-3">
                 <Image
                   src={darkMode ? "/logos/vetnova-logo-dark.png" : "/logos/vetnova-logo-light.png"}
@@ -377,32 +387,22 @@ export default function ClientLayoutShell({ children }: { children: ReactNode })
                   height={32}
                   className="rounded-xl object-contain"
                 />
-                <span className="text-[18px] font-semibold text-[#10213A] dark:text-white">
+                <span className="text-lg font-semibold text-surface-900 dark:text-white">
                   VetNova
                 </span>
               </div>
               <button
                 onClick={() => setMobileOpen(false)}
-                className="flex h-8 w-8 items-center justify-center rounded-lg text-[#64748B] hover:bg-[#F1F5F9] dark:hover:bg-[#1E293B]"
+                className="flex h-8 w-8 items-center justify-center rounded-lg text-surface-500 hover:bg-surface-100 dark:hover:bg-surface-800"
               >
-                <svg
-                  width="18"
-                  height="18"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth="2"
-                  strokeLinecap="round"
-                >
-                  <path d="M18 6 6 18M6 6l12 12" />
-                </svg>
+                <X className="h-[18px] w-[18px]" />
               </button>
             </div>
             <nav className="flex-1 px-4 py-4">
               <SidebarItem
                 href="/cliente"
                 active={pathname === "/cliente"}
-                icon={<HomeIcon />}
+                icon={<Home className="h-5 w-5" />}
                 onClick={() => setMobileOpen(false)}
               >
                 Dashboard
@@ -410,7 +410,7 @@ export default function ClientLayoutShell({ children }: { children: ReactNode })
               <SidebarItem
                 href="/cliente/agendar"
                 active={pathname.startsWith("/cliente/agendar")}
-                icon={<CalendarMenuIcon />}
+                icon={<CalendarDays className="h-5 w-5" />}
                 onClick={() => setMobileOpen(false)}
               >
                 Citas
@@ -418,7 +418,7 @@ export default function ClientLayoutShell({ children }: { children: ReactNode })
               <SidebarItem
                 href="/cliente/mascotas"
                 active={pathname.startsWith("/cliente/mascotas")}
-                icon={<PawMenuIcon />}
+                icon={<PawPrint className="h-5 w-5" />}
                 onClick={() => setMobileOpen(false)}
               >
                 Mascotas
@@ -426,21 +426,21 @@ export default function ClientLayoutShell({ children }: { children: ReactNode })
               <SidebarItem
                 href="/cliente/configuracion"
                 active={pathname.startsWith("/cliente/configuracion")}
-                icon={<SettingsIcon />}
+                icon={<Settings className="h-5 w-5" />}
                 onClick={() => setMobileOpen(false)}
               >
                 Configuración
               </SidebarItem>
             </nav>
-            <div className="border-t border-[#E5EAF2] px-5 py-5 dark:border-[#1E293B]">
+            <div className="border-t border-surface-200 px-5 py-5 dark:border-surface-800">
               <button
                 type="button"
                 onClick={() => {
                   logout().then(() => router.push("/login"));
                 }}
-                className="flex items-center gap-3 text-[15px] font-semibold text-[#10213A] transition-colors hover:text-[#2F6BFF] dark:text-white"
+                className="flex items-center gap-3 text-sm font-semibold text-surface-900 transition-colors hover:text-brand-600 dark:text-white"
               >
-                <LogoutIcon />
+                <LogOut className="h-[19px] w-[19px]" />
                 Cerrar Sesión
               </button>
             </div>
@@ -468,7 +468,7 @@ function SidebarItem({
     <Link
       href={href}
       onClick={onClick}
-      className={`mb-2 flex h-[44px] items-center gap-3 rounded-xl px-4 text-[15px] font-semibold transition-all ${
+      className={`mb-2 flex h-11 items-center gap-3 rounded-xl px-4 text-sm font-semibold transition-all ${
         active
           ? "bg-brand-600 text-white shadow-brand-sm"
           : "text-slate-700 hover:bg-slate-100 dark:text-white dark:hover:bg-slate-800"
@@ -497,164 +497,14 @@ function UserMenuItem({
     <Link
       href={href}
       onClick={onClick}
-      className={`flex items-center gap-3 px-5 py-3 text-[14px] font-semibold transition-colors ${
+      className={`flex items-center gap-3 px-5 py-3 text-sm font-semibold transition-colors ${
         danger
-          ? "text-[#EF4444] hover:bg-[#FEF2F2] dark:hover:bg-[#28171B]"
-          : "text-[#10213A] hover:bg-[#F8FAFC] dark:text-white dark:hover:bg-[#1E293B]"
+          ? "dark:hover:bg-danger-950/30 text-danger-500 hover:bg-danger-50"
+          : "text-surface-900 hover:bg-surface-50 dark:text-white dark:hover:bg-surface-800"
       }`}
     >
       {icon}
       {children}
     </Link>
-  );
-}
-
-function HomeIcon() {
-  return (
-    <svg width="19" height="19" viewBox="0 0 24 24" fill="none">
-      <path
-        d="M4 10.5 12 4l8 6.5V19a1 1 0 0 1-1 1h-4.5v-5h-5v5H5a1 1 0 0 1-1-1v-8.5Z"
-        stroke="currentColor"
-        strokeWidth="2"
-        strokeLinejoin="round"
-      />
-    </svg>
-  );
-}
-
-function CalendarMenuIcon() {
-  return (
-    <svg width="19" height="19" viewBox="0 0 24 24" fill="none">
-      <path
-        d="M7 3v4M17 3v4M4.5 9.5h15M6.5 5h11a2 2 0 0 1 2 2v11.5a2 2 0 0 1-2 2h-11a2 2 0 0 1-2-2V7a2 2 0 0 1 2-2Z"
-        stroke="currentColor"
-        strokeWidth="1.9"
-        strokeLinecap="round"
-      />
-    </svg>
-  );
-}
-
-function PawMenuIcon() {
-  return (
-    <svg width="19" height="19" viewBox="0 0 24 24" fill="none">
-      <path
-        d="M8 12.5c-2 0-3.5 1.5-3.5 3.4 0 2.2 1.8 3.6 4 3.6h7c2.2 0 4-1.4 4-3.6 0-1.9-1.5-3.4-3.5-3.4"
-        stroke="currentColor"
-        strokeWidth="1.8"
-      />
-      <path
-        d="M9 8.5C9 10.4 8 12 6.7 12S4.5 10.4 4.5 8.5 5.5 5 6.7 5 9 6.6 9 8.5Zm10.5 0c0 1.9-1 3.5-2.2 3.5S15 10.4 15 8.5 16 5 17.3 5s2.2 1.6 2.2 3.5ZM14.5 8c0 2-1.1 3.6-2.5 3.6S9.5 10 9.5 8 10.6 4.4 12 4.4 14.5 6 14.5 8Z"
-        stroke="currentColor"
-        strokeWidth="1.8"
-      />
-    </svg>
-  );
-}
-
-function SettingsIcon() {
-  return (
-    <svg width="19" height="19" viewBox="0 0 24 24" fill="none">
-      <path
-        d="M12 15.2a3.2 3.2 0 1 0 0-6.4 3.2 3.2 0 0 0 0 6.4Z"
-        stroke="currentColor"
-        strokeWidth="1.9"
-      />
-      <path
-        d="M19 12c0-.5-.1-1-.2-1.5l2-1.5-2-3.4-2.4 1a7.3 7.3 0 0 0-2.5-1.5L13.5 2h-4l-.4 3.1a7.3 7.3 0 0 0-2.5 1.5l-2.4-1-2 3.4 2 1.5a7 7 0 0 0 0 3l-2 1.5 2 3.4 2.4-1a7.3 7.3 0 0 0 2.5 1.5l.4 3.1h4l.4-3.1a7.3 7.3 0 0 0 2.5-1.5l2.4 1 2-3.4-2-1.5c.1-.5.2-1 .2-1.5Z"
-        stroke="currentColor"
-        strokeWidth="1.7"
-        strokeLinejoin="round"
-      />
-    </svg>
-  );
-}
-
-function LogoutIcon() {
-  return (
-    <svg width="19" height="19" viewBox="0 0 24 24" fill="none">
-      <path
-        d="M10 4H5v16h5M14 8l4 4-4 4M18 12H9"
-        stroke="currentColor"
-        strokeWidth="1.9"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-      />
-    </svg>
-  );
-}
-
-function BellIcon() {
-  return (
-    <svg
-      width="19"
-      height="19"
-      viewBox="0 0 24 24"
-      fill="none"
-      className="text-[#10213A] dark:text-white"
-    >
-      <path
-        d="M18 9.5c0-3.3-2.4-5.5-6-5.5S6 6.2 6 9.5V14l-1.5 2h15L18 14V9.5ZM10 19h4"
-        stroke="currentColor"
-        strokeWidth="1.9"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-      />
-    </svg>
-  );
-}
-
-function BellSmallIcon() {
-  return (
-    <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
-      <path
-        d="M18 9.5c0-3.3-2.4-5.5-6-5.5S6 6.2 6 9.5V14l-1.5 2h15L18 14V9.5ZM10 19h4"
-        stroke="currentColor"
-        strokeWidth="1.9"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-      />
-    </svg>
-  );
-}
-
-function UserMenuIcon() {
-  return (
-    <svg width="19" height="19" viewBox="0 0 24 24" fill="none">
-      <circle cx="12" cy="8" r="3.5" stroke="currentColor" strokeWidth="1.9" />
-      <path
-        d="M5.5 20c.5-3.7 3-5.5 6.5-5.5s6 1.8 6.5 5.5"
-        stroke="currentColor"
-        strokeWidth="1.9"
-        strokeLinecap="round"
-      />
-    </svg>
-  );
-}
-
-function MoonIcon() {
-  return (
-    <svg width="19" height="19" viewBox="0 0 24 24" fill="none">
-      <path
-        d="M20 15.5A8.5 8.5 0 0 1 8.5 4 8.6 8.6 0 1 0 20 15.5Z"
-        stroke="currentColor"
-        strokeWidth="1.9"
-        strokeLinejoin="round"
-      />
-    </svg>
-  );
-}
-
-function SunIcon() {
-  return (
-    <svg width="19" height="19" viewBox="0 0 24 24" fill="none">
-      <circle cx="12" cy="12" r="4" stroke="currentColor" strokeWidth="1.9" />
-      <path
-        d="M12 2.5v3M12 18.5v3M2.5 12h3M18.5 12h3M5.3 5.3l2.1 2.1M16.6 16.6l2.1 2.1M18.7 5.3l-2.1 2.1M7.4 16.6l-2.1 2.1"
-        stroke="currentColor"
-        strokeWidth="1.9"
-        strokeLinecap="round"
-      />
-    </svg>
   );
 }

@@ -47,8 +47,8 @@ beforeEach(() => {
   mockFetchPropietarioByUsuario.mockResolvedValue(null);
 });
 
-const ERROR_BANNER_CLASS = "border-red-200";
-const SUCCESS_BANNER_CLASS = "border-emerald-200";
+const ERROR_BANNER_CLASS = "border-danger-200";
+const SUCCESS_BANNER_CLASS = "border-success-200";
 
 describe("ConfiguracionPage — información personal", () => {
   it("muestra el mensaje de éxito en verde cuando el guardado funciona", async () => {

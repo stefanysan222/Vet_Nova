@@ -5,6 +5,9 @@ import { useAuth } from "@/lib/auth-context";
 import { fetchCitas } from "../../../lib/api/citas";
 import type { Appointment } from "../../../lib/recepcionista/types";
 import { SkeletonStats, SkeletonCardList } from "../../components/ui/Skeleton";
+import { StatusBadge } from "../../../lib/utils/status-badge";
+import type { AppointmentStatus } from "../../../lib/utils/status";
+import { Search, PawPrint, CalendarDays, History } from "lucide-react";
 
 const MONTHS = [
   "Enero",
@@ -32,18 +35,6 @@ function agruparPorMes(citas: Appointment[]): { etiqueta: string; items: Appoint
     map.get(key)!.items.push(c);
   }
   return [...map.entries()].sort(([a], [b]) => b.localeCompare(a)).map(([, value]) => value);
-}
-
-function estadoBadge(status: string) {
-  const styles: Record<string, string> = {
-    Finalizada: "bg-[#DDF5DE] text-[#2F9E44] dark:bg-[#123B22] dark:text-[#86EFAC]",
-    Cancelada: "bg-[#FFE4E6] text-[#E11D48] dark:bg-[#4C0519] dark:text-[#FDA4AF]",
-    "No asistió": "bg-[#FEF3C7] text-[#B45309] dark:bg-[#78350F] dark:text-[#FDE68A]",
-    Confirmada: "bg-[#DBEAFE] text-[#2563EB] dark:bg-[#1E3A8A] dark:text-[#93C5FD]",
-    Pendiente: "bg-[#F1F5F9] text-[#475569] dark:bg-[#1E293B] dark:text-[#CBD5E1]",
-    Reprogramada: "bg-[#EDE9FE] text-[#7C3AED] dark:bg-[#4C1D95] dark:text-[#DDD6FE]",
-  };
-  return styles[status] ?? styles.Pendiente;
 }
 
 export default function ClientHistorialPage() {
@@ -80,13 +71,11 @@ export default function ClientHistorialPage() {
   const canceladas = citas.filter((c) => c.status === "Cancelada").length;
 
   return (
-    <div className="h-full overflow-y-auto bg-[#F5F7FB] px-6 py-8 dark:bg-[#0F172A]">
+    <div className="h-full overflow-y-auto bg-surface-50 px-6 py-8 dark:bg-surface-950">
       {/* Header */}
       <div className="mb-8">
-        <h1 className="text-[24px] font-semibold leading-none text-[#10213A] dark:text-white">
-          Historial Médico
-        </h1>
-        <p className="mt-4 text-[16px] text-[#64748B] dark:text-[#94A3B8]">
+        <h1 className="text-page-title">Historial Médico</h1>
+        <p className="text-subtitle mt-2">
           Revisa el historial de consultas y tratamientos de tus mascotas.
         </p>
       </div>
@@ -100,14 +89,14 @@ export default function ClientHistorialPage() {
 
       {/* Search */}
       <div className="mb-6">
-        <div className="flex h-[44px] max-w-md items-center gap-3 rounded-xl border border-[#CBD5E1] bg-white px-4 focus-within:border-[#2F6BFF] focus-within:ring-2 focus-within:ring-[#2F6BFF]/10 dark:border-[#334155] dark:bg-[#111827]">
-          <SearchIcon />
+        <div className="flex h-11 max-w-md items-center gap-3 rounded-xl border border-surface-200 bg-white px-4 transition-colors focus-within:border-brand-400 focus-within:ring-2 focus-within:ring-brand-400/10 dark:border-surface-700 dark:bg-surface-900">
+          <Search className="h-[18px] w-[18px] shrink-0 text-surface-400" />
           <input
             type="text"
             value={busqueda}
             onChange={(e) => setBusqueda(e.target.value)}
             placeholder="Buscar por mascota, servicio, veterinario..."
-            className="w-full bg-transparent text-[14px] text-[#10213A] outline-none placeholder:text-[#94A3B8] dark:text-white"
+            className="w-full bg-transparent text-sm text-surface-900 outline-none placeholder:text-surface-400 dark:text-white"
           />
         </div>
       </div>
@@ -119,14 +108,14 @@ export default function ClientHistorialPage() {
           <SkeletonCardList count={5} />
         </div>
       ) : grupos.length === 0 ? (
-        <div className="flex flex-col items-center justify-center rounded-xl border border-dashed border-[#CBD5E1] bg-white py-20 text-center dark:border-[#334155] dark:bg-[#111827]">
-          <div className="mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-[#EFF6FF] text-[#2F6BFF]">
-            <HistorialIcon />
+        <div className="flex flex-col items-center justify-center rounded-2xl border border-dashed border-surface-300 bg-white py-20 text-center dark:border-surface-700 dark:bg-surface-900">
+          <div className="mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-brand-50 text-brand-600 dark:bg-brand-900/30 dark:text-brand-400">
+            <History className="h-7 w-7" />
           </div>
-          <p className="text-[16px] font-semibold text-[#10213A] dark:text-white">
+          <p className="text-sm font-semibold text-surface-900 dark:text-white">
             {busqueda ? "No se encontraron resultados" : "No hay historial disponible"}
           </p>
-          <p className="mt-2 text-[14px] text-[#64748B] dark:text-[#94A3B8]">
+          <p className="mt-2 text-sm text-surface-500 dark:text-surface-400">
             {busqueda
               ? "Intenta con otro término de búsqueda."
               : "Las consultas de tus mascotas aparecerán aquí."}
@@ -137,11 +126,9 @@ export default function ClientHistorialPage() {
           {grupos.map(({ etiqueta, items }) => (
             <div key={etiqueta}>
               <div className="mb-4 flex items-center gap-3">
-                <h2 className="text-[13px] font-bold uppercase tracking-[0.18em] text-[#64748B] dark:text-[#94A3B8]">
-                  {etiqueta}
-                </h2>
-                <span className="h-px flex-1 bg-[#E2E8F0] dark:bg-[#334155]" />
-                <span className="rounded-full bg-[#F1F5F9] px-2.5 py-0.5 text-[12px] font-semibold text-[#64748B] dark:bg-[#1E293B] dark:text-[#94A3B8]">
+                <h2 className="text-caption">{etiqueta}</h2>
+                <span className="h-px flex-1 bg-surface-200 dark:bg-surface-700" />
+                <span className="rounded-lg bg-surface-100 px-2.5 py-0.5 text-xs font-semibold text-surface-500 dark:bg-surface-800 dark:text-surface-400">
                   {items.length}
                 </span>
               </div>
@@ -150,41 +137,37 @@ export default function ClientHistorialPage() {
                 {items.map((c) => (
                   <article
                     key={c.id}
-                    className="rounded-xl border border-[#CBD5E1] bg-white p-5 shadow-sm transition-all duration-200 hover:-translate-y-0.5 hover:border-[#2F6BFF]/50 hover:shadow-[0_8px_20px_rgba(15,23,42,0.08)] dark:border-[#334155] dark:bg-[#111827]"
+                    className="rounded-2xl border border-surface-200 bg-white p-5 shadow-card transition-all duration-200 hover:-translate-y-0.5 hover:shadow-card-hover dark:border-surface-700 dark:bg-surface-900"
                   >
                     <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
                       <div className="flex min-w-0 gap-4">
-                        <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-[#EFF6FF] text-[#2F6BFF] dark:bg-[#1E293B] dark:text-[#93C5FD]">
-                          <PawIcon />
+                        <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-brand-50 text-brand-600 dark:bg-brand-900/30 dark:text-brand-400">
+                          <PawPrint className="h-[22px] w-[22px]" />
                         </div>
                         <div className="min-w-0">
                           <div className="flex flex-wrap items-center gap-2">
-                            <p className="text-[15px] font-semibold text-[#10213A] dark:text-white">
+                            <p className="text-sm font-semibold text-surface-900 dark:text-white">
                               {c.petName || "—"}
                             </p>
-                            <span
-                              className={`rounded-full px-2.5 py-0.5 text-[12px] font-semibold ${estadoBadge(c.status)}`}
-                            >
-                              {c.status}
-                            </span>
+                            <StatusBadge status={c.status as AppointmentStatus} />
                           </div>
-                          <p className="mt-1 text-[14px] text-[#475569] dark:text-[#CBD5E1]">
+                          <p className="mt-1 text-sm text-surface-600 dark:text-surface-300">
                             {c.service || "Consulta"}
                           </p>
                           {c.veterinarian && (
-                            <p className="mt-1 text-[13px] text-[#64748B] dark:text-[#94A3B8]">
+                            <p className="mt-1 text-xs text-surface-500 dark:text-surface-400">
                               Dr. {c.veterinarian}
                             </p>
                           )}
                           {c.notes && (
-                            <p className="mt-2 rounded-lg bg-[#F8FAFC] px-3 py-2 text-[13px] text-[#64748B] dark:bg-[#0F172A] dark:text-[#94A3B8]">
+                            <p className="mt-2 rounded-lg bg-surface-50 px-3 py-2 text-xs text-surface-500 dark:bg-surface-950 dark:text-surface-400">
                               {c.notes}
                             </p>
                           )}
                         </div>
                       </div>
-                      <div className="flex shrink-0 items-center gap-2 text-[13px] text-[#64748B] dark:text-[#94A3B8]">
-                        <CalendarIcon />
+                      <div className="flex shrink-0 items-center gap-2 text-xs text-surface-500 dark:text-surface-400">
+                        <CalendarDays className="h-[15px] w-[15px]" />
                         <span>
                           {c.date
                             ? new Date(c.date + "T00:00:00").toLocaleDateString("es-CO", {
@@ -219,67 +202,14 @@ function StatCard({
 }) {
   const colorClass =
     color === "green"
-      ? "text-[#2F9E44]"
+      ? "text-success-600 dark:text-success-400"
       : color === "red"
-        ? "text-[#E11D48]"
-        : "text-[#10213A] dark:text-white";
+        ? "text-danger-600 dark:text-danger-400"
+        : "text-surface-900 dark:text-white";
   return (
-    <article className="rounded-xl border border-[#CBD5E1] bg-white px-5 py-4 shadow-sm dark:border-[#334155] dark:bg-[#111827]">
-      <p className="text-[13px] text-[#64748B] dark:text-[#94A3B8]">{title}</p>
-      <h3 className={`mt-2 text-[26px] font-bold ${colorClass}`}>{value}</h3>
+    <article className="rounded-2xl border border-surface-200 bg-white px-5 py-4 shadow-card dark:border-surface-700 dark:bg-surface-900">
+      <p className="text-label">{title}</p>
+      <h3 className={`text-stat-sm mt-2 ${colorClass}`}>{value}</h3>
     </article>
-  );
-}
-
-function SearchIcon() {
-  return (
-    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" className="shrink-0 text-[#94A3B8]">
-      <circle cx="11" cy="11" r="7" stroke="currentColor" strokeWidth="2" />
-      <path d="m20 20-3.5-3.5" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
-    </svg>
-  );
-}
-
-function PawIcon() {
-  return (
-    <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
-      <path
-        d="M8 12.5c-2 0-3.5 1.5-3.5 3.4 0 2.2 1.8 3.6 4 3.6h7c2.2 0 4-1.4 4-3.6 0-1.9-1.5-3.4-3.5-3.4"
-        stroke="currentColor"
-        strokeWidth="1.7"
-      />
-      <path
-        d="M9 8.5C9 10.4 8 12 6.7 12S4.5 10.4 4.5 8.5 5.5 5 6.7 5 9 6.6 9 8.5Zm10.5 0c0 1.9-1 3.5-2.2 3.5S15 10.4 15 8.5 16 5 17.3 5s2.2 1.6 2.2 3.5ZM14.5 8c0 2-1.1 3.6-2.5 3.6S9.5 10 9.5 8 10.6 4.4 12 4.4 14.5 6 14.5 8Z"
-        stroke="currentColor"
-        strokeWidth="1.7"
-      />
-    </svg>
-  );
-}
-
-function CalendarIcon() {
-  return (
-    <svg width="15" height="15" viewBox="0 0 24 24" fill="none">
-      <path
-        d="M7 3v4M17 3v4M4.5 9.5h15M6.5 5h11a2 2 0 0 1 2 2v11.5a2 2 0 0 1-2 2h-11a2 2 0 0 1-2-2V7a2 2 0 0 1 2-2Z"
-        stroke="currentColor"
-        strokeWidth="1.8"
-        strokeLinecap="round"
-      />
-    </svg>
-  );
-}
-
-function HistorialIcon() {
-  return (
-    <svg width="28" height="28" viewBox="0 0 24 24" fill="none">
-      <path
-        d="M12 7v5l3.5 2M20.5 12a8.5 8.5 0 1 1-2.7-6.2M20.5 4.5v5h-5"
-        stroke="currentColor"
-        strokeWidth="2"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-      />
-    </svg>
   );
 }

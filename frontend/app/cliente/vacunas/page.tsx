@@ -6,21 +6,12 @@ import { useAuth } from "@/lib/auth-context";
 import { fetchCitas } from "../../../lib/api/citas";
 import type { Appointment } from "../../../lib/recepcionista/types";
 import { SkeletonCardList } from "../../components/ui/Skeleton";
+import { StatusBadge } from "../../../lib/utils/status-badge";
+import type { AppointmentStatus } from "../../../lib/utils/status";
+import { Syringe, CalendarDays } from "lucide-react";
 
 function esVacuna(service: string) {
   return /vacun/i.test(service);
-}
-
-function estadoBadge(status: string) {
-  const styles: Record<string, string> = {
-    Finalizada: "bg-[#DDF5DE] text-[#2F9E44] dark:bg-[#123B22] dark:text-[#86EFAC]",
-    Confirmada: "bg-[#DBEAFE] text-[#2563EB] dark:bg-[#1E3A8A] dark:text-[#93C5FD]",
-    Pendiente: "bg-[#FEF3C7] text-[#B45309] dark:bg-[#78350F] dark:text-[#FDE68A]",
-    Cancelada: "bg-[#FFE4E6] text-[#E11D48] dark:bg-[#4C0519] dark:text-[#FDA4AF]",
-    "En espera": "bg-[#F1F5F9] text-[#475569] dark:bg-[#1E293B] dark:text-[#CBD5E1]",
-    "En atención": "bg-[#EDE9FE] text-[#7C3AED] dark:bg-[#4C1D95] dark:text-[#DDD6FE]",
-  };
-  return styles[status] ?? styles.Pendiente;
 }
 
 export default function ClientVacunasPage() {
@@ -57,13 +48,11 @@ export default function ClientVacunasPage() {
   );
 
   return (
-    <div className="h-full overflow-y-auto bg-[#F5F7FB] px-6 py-8 dark:bg-[#0F172A]">
+    <div className="h-full overflow-y-auto bg-surface-50 px-6 py-8 dark:bg-surface-950">
       {/* Header */}
       <div className="mb-8">
-        <h1 className="text-[24px] font-semibold leading-none text-[#10213A] dark:text-white">
-          Vacunas
-        </h1>
-        <p className="mt-4 text-[16px] text-[#64748B] dark:text-[#94A3B8]">
+        <h1 className="text-page-title">Vacunas</h1>
+        <p className="text-subtitle mt-2">
           Consulta las vacunas pendientes y el historial de vacunación de tus mascotas.
         </p>
       </div>
@@ -110,17 +99,12 @@ export default function ClientVacunasPage() {
       )}
 
       {/* CTA */}
-      <div className="mt-8 rounded-xl border border-[#CBD5E1] bg-white p-6 shadow-sm dark:border-[#334155] dark:bg-[#111827]">
-        <h2 className="text-[16px] font-semibold text-[#10213A] dark:text-white">
-          ¿Necesitas agendar una vacunación?
-        </h2>
-        <p className="mt-2 text-[14px] text-[#64748B] dark:text-[#94A3B8]">
+      <div className="mt-8 rounded-2xl border border-surface-200 bg-white p-6 shadow-card dark:border-surface-700 dark:bg-surface-900">
+        <h2 className="text-section-title">¿Necesitas agendar una vacunación?</h2>
+        <p className="text-body mt-2">
           Agenda una cita de vacunación para tu mascota y mantén su esquema al día.
         </p>
-        <Link
-          href="/cliente/agendar/nueva"
-          className="mt-4 inline-flex h-[44px] items-center justify-center rounded-xl bg-[#2F6BFF] px-6 text-[14px] font-semibold text-white shadow-sm transition hover:-translate-y-0.5 hover:bg-[#2457D6] hover:shadow-[0_10px_20px_rgba(47,107,255,0.28)]"
-        >
+        <Link href="/cliente/agendar/nueva" className="btn-primary mt-4">
           Agendar vacunación
         </Link>
       </div>
@@ -139,10 +123,10 @@ function VacunaCard({ cita, destacada }: { cita: Appointment; destacada?: boolea
 
   return (
     <article
-      className={`rounded-xl border p-5 shadow-sm transition-all duration-200 hover:-translate-y-0.5 ${
+      className={`rounded-2xl border p-5 shadow-card transition-all duration-200 hover:-translate-y-0.5 hover:shadow-card-hover ${
         destacada
-          ? "border-[#BFDBFE] bg-[#EFF6FF] hover:border-[#2F6BFF] hover:shadow-[0_8px_20px_rgba(47,107,255,0.12)] dark:border-[#1E3A8A] dark:bg-[#121D33]"
-          : "border-[#CBD5E1] bg-white hover:border-[#2F6BFF]/50 hover:shadow-[0_8px_20px_rgba(15,23,42,0.08)] dark:border-[#334155] dark:bg-[#111827]"
+          ? "border-brand-200 bg-brand-50/60 dark:border-brand-800 dark:bg-brand-950/20"
+          : "border-surface-200 bg-white dark:border-surface-700 dark:bg-surface-900"
       }`}
     >
       <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
@@ -150,33 +134,29 @@ function VacunaCard({ cita, destacada }: { cita: Appointment; destacada?: boolea
           <div
             className={`flex h-12 w-12 shrink-0 items-center justify-center rounded-xl ${
               destacada
-                ? "bg-[#DBEAFE] text-[#2563EB] dark:bg-[#1E3A8A] dark:text-[#93C5FD]"
-                : "bg-[#DDF5DE] text-[#2F9E44] dark:bg-[#123B22] dark:text-[#86EFAC]"
+                ? "bg-brand-100 text-brand-600 dark:bg-brand-900/40 dark:text-brand-300"
+                : "bg-success-100 text-success-700 dark:bg-success-900/30 dark:text-success-400"
             }`}
           >
-            <VaccineIcon />
+            <Syringe className="h-[22px] w-[22px]" />
           </div>
           <div>
             <div className="flex flex-wrap items-center gap-2">
-              <p className="text-[15px] font-semibold text-[#10213A] dark:text-white">
+              <p className="text-sm font-semibold text-surface-900 dark:text-white">
                 {cita.petName || "—"}
               </p>
-              <span
-                className={`rounded-full px-2.5 py-0.5 text-[12px] font-semibold ${estadoBadge(cita.status)}`}
-              >
-                {cita.status}
-              </span>
+              <StatusBadge status={cita.status as AppointmentStatus} />
             </div>
-            <p className="mt-1 text-[14px] text-[#475569] dark:text-[#CBD5E1]">{cita.service}</p>
+            <p className="mt-1 text-sm text-surface-600 dark:text-surface-300">{cita.service}</p>
             {cita.veterinarian && (
-              <p className="mt-0.5 text-[13px] text-[#64748B] dark:text-[#94A3B8]">
+              <p className="mt-0.5 text-xs text-surface-500 dark:text-surface-400">
                 Dr. {cita.veterinarian}
               </p>
             )}
           </div>
         </div>
-        <div className="flex shrink-0 items-center gap-1.5 text-[13px] text-[#64748B] dark:text-[#94A3B8]">
-          <CalendarIcon />
+        <div className="flex shrink-0 items-center gap-1.5 text-xs text-surface-500 dark:text-surface-400">
+          <CalendarDays className="h-[15px] w-[15px]" />
           <span>
             {fecha}
             {cita.time ? ` · ${cita.time}` : ""}
@@ -190,11 +170,9 @@ function VacunaCard({ cita, destacada }: { cita: Appointment; destacada?: boolea
 function SectionHeader({ label, count }: { label: string; count: number }) {
   return (
     <div className="flex items-center gap-3">
-      <h2 className="text-[13px] font-bold uppercase tracking-[0.18em] text-[#64748B] dark:text-[#94A3B8]">
-        {label}
-      </h2>
-      <span className="h-px flex-1 bg-[#E2E8F0] dark:bg-[#334155]" />
-      <span className="rounded-full bg-[#F1F5F9] px-2.5 py-0.5 text-[12px] font-semibold text-[#64748B] dark:bg-[#1E293B] dark:text-[#94A3B8]">
+      <h2 className="text-caption">{label}</h2>
+      <span className="h-px flex-1 bg-surface-200 dark:bg-surface-700" />
+      <span className="rounded-lg bg-surface-100 px-2.5 py-0.5 text-xs font-semibold text-surface-500 dark:bg-surface-800 dark:text-surface-400">
         {count}
       </span>
     </div>
@@ -212,64 +190,33 @@ function StatCard({
 }) {
   const valueClass =
     color === "green"
-      ? "text-[#2F9E44]"
+      ? "text-success-600 dark:text-success-400"
       : color === "blue"
-        ? "text-[#2563EB]"
-        : "text-[#10213A] dark:text-white";
+        ? "text-brand-600 dark:text-brand-400"
+        : "text-surface-900 dark:text-white";
   return (
-    <article className="rounded-xl border border-[#CBD5E1] bg-white px-5 py-4 shadow-sm dark:border-[#334155] dark:bg-[#111827]">
-      <p className="text-[13px] text-[#64748B] dark:text-[#94A3B8]">{title}</p>
-      <h3 className={`mt-2 text-[26px] font-bold ${valueClass}`}>{value}</h3>
+    <article className="rounded-2xl border border-surface-200 bg-white px-5 py-4 shadow-card dark:border-surface-700 dark:bg-surface-900">
+      <p className="text-label">{title}</p>
+      <h3 className={`text-stat-sm mt-2 ${valueClass}`}>{value}</h3>
     </article>
   );
 }
 
 function EmptyState() {
   return (
-    <div className="flex flex-col items-center justify-center rounded-xl border border-dashed border-[#CBD5E1] bg-white py-20 text-center dark:border-[#334155] dark:bg-[#111827]">
-      <div className="mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-[#DDF5DE] text-[#2F9E44]">
-        <VaccineIcon large />
+    <div className="flex flex-col items-center justify-center rounded-2xl border border-dashed border-surface-300 bg-white py-20 text-center dark:border-surface-700 dark:bg-surface-900">
+      <div className="mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-success-100 text-success-700 dark:bg-success-900/30 dark:text-success-400">
+        <Syringe className="h-7 w-7" />
       </div>
-      <p className="text-[16px] font-semibold text-[#10213A] dark:text-white">
+      <p className="text-sm font-semibold text-surface-900 dark:text-white">
         Sin vacunaciones registradas
       </p>
-      <p className="mt-2 text-[14px] text-[#64748B] dark:text-[#94A3B8]">
+      <p className="mt-2 text-sm text-surface-500 dark:text-surface-400">
         Agenda una cita de vacunación para mantener a tus mascotas protegidas.
       </p>
-      <Link
-        href="/cliente/agendar/nueva"
-        className="mt-6 inline-flex h-[44px] items-center justify-center rounded-xl bg-[#2F6BFF] px-6 text-[14px] font-semibold text-white transition hover:bg-[#2457D6]"
-      >
+      <Link href="/cliente/agendar/nueva" className="btn-primary mt-6">
         Agendar ahora
       </Link>
     </div>
-  );
-}
-
-function VaccineIcon({ large }: { large?: boolean }) {
-  const size = large ? 28 : 22;
-  return (
-    <svg width={size} height={size} viewBox="0 0 24 24" fill="none">
-      <path
-        d="m14 5 5 5M4 20l6.5-6.5M10 7l7 7M8 9l7 7M6.5 17.5 4 15l8-8 5 5-8 8-2.5-2.5Z"
-        stroke="currentColor"
-        strokeWidth="2"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-      />
-    </svg>
-  );
-}
-
-function CalendarIcon() {
-  return (
-    <svg width="15" height="15" viewBox="0 0 24 24" fill="none">
-      <path
-        d="M7 3v4M17 3v4M4.5 9.5h15M6.5 5h11a2 2 0 0 1 2 2v11.5a2 2 0 0 1-2 2h-11a2 2 0 0 1-2-2V7a2 2 0 0 1 2-2Z"
-        stroke="currentColor"
-        strokeWidth="1.8"
-        strokeLinecap="round"
-      />
-    </svg>
   );
 }

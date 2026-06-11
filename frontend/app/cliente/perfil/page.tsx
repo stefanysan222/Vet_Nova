@@ -56,43 +56,36 @@ export default function PerfilPage() {
   }, [user]);
 
   return (
-    <div className="h-full overflow-y-auto bg-[#F5F7FB] px-6 py-8 dark:bg-[#0F172A]">
+    <div className="h-full overflow-y-auto bg-surface-50 px-6 py-8 dark:bg-surface-950">
       <div className="mb-8">
-        <h1 className="text-[24px] font-semibold leading-none text-[#10213A] dark:text-white">
-          Mi Perfil
-        </h1>
-        <p className="mt-4 text-[16px] text-[#64748B] dark:text-[#94A3B8]">
-          Vista general de tu cuenta en VetNova
-        </p>
+        <h1 className="text-page-title">Mi Perfil</h1>
+        <p className="text-subtitle mt-2">Vista general de tu cuenta en VetNova</p>
       </div>
 
       <div className="grid grid-cols-1 gap-7 xl:grid-cols-[0.75fr_1fr]">
-        <section className="rounded-xl border border-[#CBD5E1] bg-white p-7 shadow-sm dark:border-[#334155] dark:bg-[#111827]">
+        <section className="rounded-xl border border-surface-200 bg-white p-7 shadow-sm dark:border-surface-700 dark:bg-surface-900">
           <div className="flex flex-col items-center text-center">
-            <div className="flex h-[92px] w-[92px] items-center justify-center rounded-full bg-brand-600 text-[36px] font-semibold text-white">
+            <div className="flex h-24 w-24 items-center justify-center rounded-full bg-brand-600 text-3xl font-semibold text-white">
               {iniciales}
             </div>
 
-            <h2 className="mt-5 text-[24px] font-semibold text-[#10213A] dark:text-white">
+            <h2 className="mt-5 text-xl font-semibold text-surface-900 dark:text-white">
               {nombre} {apellido}
             </h2>
 
-            <p className="mt-2 text-[15px] text-[#64748B] dark:text-[#94A3B8]">Cliente</p>
+            <p className="mt-2 text-sm text-surface-500 dark:text-surface-400">Cliente</p>
 
-            <span className="mt-4 rounded-full bg-[#DDF5DE] px-4 py-1.5 text-[13px] font-semibold text-[#2F9E44]">
+            <span className="mt-4 rounded-lg bg-success-100 px-4 py-1.5 text-xs font-semibold text-success-700 dark:bg-success-900/30 dark:text-success-400">
               Cuenta activa
             </span>
           </div>
 
-          <div className="mt-8 space-y-4 border-t border-[#E2E8F0] pt-6 dark:border-[#334155]">
+          <div className="mt-8 space-y-4 border-t border-surface-200 pt-6 dark:border-surface-700">
             <InfoRow label="Email" value={email || "—"} />
             <InfoRow label="Teléfono" value={perfilTelefono || "—"} />
           </div>
 
-          <Link
-            href="/cliente/configuracion"
-            className="mt-8 flex h-[45px] w-full items-center justify-center rounded-xl bg-brand-600 text-[15px] font-semibold text-white shadow-sm transition-colors hover:bg-brand-700"
-          >
+          <Link href="/cliente/configuracion" className="btn-primary mt-8 w-full">
             Configuración del perfil
           </Link>
         </section>
@@ -103,10 +96,8 @@ export default function PerfilPage() {
             <ProfileStat title="Citas activas" value={String(stats.citas)} />
           </div>
 
-          <div className="rounded-xl border border-[#CBD5E1] bg-white p-7 shadow-sm dark:border-[#334155] dark:bg-[#111827]">
-            <h3 className="text-[20px] font-semibold text-[#10213A] dark:text-white">
-              Resumen de actividad
-            </h3>
+          <div className="rounded-xl border border-surface-200 bg-white p-7 shadow-sm dark:border-surface-700 dark:bg-surface-900">
+            <h3 className="text-section-title">Resumen de actividad</h3>
 
             <div className="mt-6 space-y-5">
               {ultimaCita ? (
@@ -129,10 +120,8 @@ export default function PerfilPage() {
             </div>
           </div>
 
-          <div className="rounded-xl border border-[#CBD5E1] bg-white p-7 shadow-sm dark:border-[#334155] dark:bg-[#111827]">
-            <h3 className="text-[20px] font-semibold text-[#10213A] dark:text-white">
-              Accesos rápidos
-            </h3>
+          <div className="rounded-xl border border-surface-200 bg-white p-7 shadow-sm dark:border-surface-700 dark:bg-surface-900">
+            <h3 className="text-section-title">Accesos rápidos</h3>
 
             <div className="mt-6 grid grid-cols-1 gap-4 md:grid-cols-2">
               <QuickLink href="/cliente/mascotas">Ver mis mascotas</QuickLink>
@@ -150,8 +139,8 @@ export default function PerfilPage() {
 function InfoRow({ label, value }: { label: string; value: string }) {
   return (
     <div className="flex items-center justify-between gap-4">
-      <span className="text-[14px] text-[#64748B] dark:text-[#94A3B8]">{label}</span>
-      <span className="text-right text-[14px] font-semibold text-[#10213A] dark:text-white">
+      <span className="text-sm text-surface-500 dark:text-surface-400">{label}</span>
+      <span className="text-right text-sm font-semibold text-surface-900 dark:text-white">
         {value}
       </span>
     </div>
@@ -160,18 +149,18 @@ function InfoRow({ label, value }: { label: string; value: string }) {
 
 function ProfileStat({ title, value }: { title: string; value: string }) {
   return (
-    <article className="rounded-xl border border-[#CBD5E1] bg-white p-5 shadow-sm dark:border-[#334155] dark:bg-[#111827]">
-      <p className="text-[14px] text-[#64748B] dark:text-[#94A3B8]">{title}</p>
-      <h3 className="mt-3 text-[26px] font-semibold text-[#10213A] dark:text-white">{value}</h3>
+    <article className="rounded-2xl border border-surface-200 bg-white p-5 shadow-card dark:border-surface-700 dark:bg-surface-900">
+      <p className="text-label">{title}</p>
+      <h3 className="text-stat-sm mt-3">{value}</h3>
     </article>
   );
 }
 
 function ActivityItem({ title, description }: { title: string; description: string }) {
   return (
-    <div className="border-b border-[#E2E8F0] pb-4 last:border-b-0 last:pb-0 dark:border-[#334155]">
-      <h4 className="text-[15px] font-semibold text-[#10213A] dark:text-white">{title}</h4>
-      <p className="mt-2 text-[14px] text-[#64748B] dark:text-[#94A3B8]">{description}</p>
+    <div className="border-b border-surface-200 pb-4 last:border-b-0 last:pb-0 dark:border-surface-700">
+      <h4 className="text-sm font-semibold text-surface-900 dark:text-white">{title}</h4>
+      <p className="mt-2 text-sm text-surface-500 dark:text-surface-400">{description}</p>
     </div>
   );
 }
@@ -180,7 +169,7 @@ function QuickLink({ href, children }: { href: string; children: React.ReactNode
   return (
     <Link
       href={href}
-      className="rounded-xl border border-[#CBD5E1] bg-white px-5 py-4 text-[15px] font-semibold text-[#10213A] hover:bg-[#F8FAFC] dark:border-[#334155] dark:bg-[#0F172A] dark:text-white dark:hover:bg-[#1E293B]"
+      className="rounded-xl border border-surface-200 bg-white px-5 py-4 text-sm font-semibold text-surface-900 transition-colors hover:border-brand-400 hover:text-brand-600 dark:border-surface-700 dark:bg-surface-950 dark:text-white dark:hover:bg-surface-800"
     >
       {children}
     </Link>

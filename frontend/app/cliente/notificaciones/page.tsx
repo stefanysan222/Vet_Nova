@@ -4,6 +4,16 @@ import { useEffect, useMemo, useState } from "react";
 import { useAuth } from "@/lib/auth-context";
 import { fetchCitas } from "../../../lib/api/citas";
 import { fetchPropietarioByUsuario } from "../../../lib/api/propietarios";
+import {
+  Check,
+  Bell,
+  BellRing,
+  CalendarDays,
+  Clock,
+  Syringe,
+  CreditCard,
+  Settings,
+} from "lucide-react";
 
 type Notification = {
   title: string;
@@ -27,8 +37,8 @@ function citaHaciaNotificacion(a: {
   const esVacuna = /vacun/i.test(a.service);
   const icon: Notification["icon"] = esVacuna ? "vaccine" : "calendar";
   const color = esVacuna
-    ? "bg-green-100 text-green-600 dark:bg-green-900/30 dark:text-green-400"
-    : "bg-blue-100 text-blue-600 dark:bg-blue-900/30 dark:text-blue-400";
+    ? "bg-success-100 text-success-700 dark:bg-success-900/30 dark:text-success-400"
+    : "bg-brand-100 text-brand-600 dark:bg-brand-900/40 dark:text-brand-300";
 
   const titulos: Record<string, string> = {
     Confirmada: "Cita confirmada",
@@ -111,7 +121,7 @@ export default function NotificacionesPage() {
         </div>
 
         <button type="button" onClick={handleViewAll} className="btn-primary whitespace-nowrap">
-          <CheckIcon />
+          <Check className="h-[18px] w-[18px]" />
           Ver todas
         </button>
       </div>
@@ -121,21 +131,25 @@ export default function NotificacionesPage() {
         <SummaryCard
           title="Total"
           value={notifications.length.toString()}
-          icon={<BellCardIcon />}
+          icon={<Bell className="h-[22px] w-[22px]" />}
         />
 
-        <SummaryCard title="No leídas" value={unreadCount.toString()} icon={<UnreadIcon />} />
+        <SummaryCard
+          title="No leídas"
+          value={unreadCount.toString()}
+          icon={<BellRing className="h-[22px] w-[22px]" />}
+        />
 
         <SummaryCard
           title="Citas"
           value={notifications.filter((n) => n.category === "Citas").length.toString()}
-          icon={<CalendarCardIcon />}
+          icon={<CalendarDays className="h-[22px] w-[22px]" />}
         />
 
         <SummaryCard
           title="Recordatorios"
           value={notifications.filter((n) => n.category === "Vacunas").length.toString()}
-          icon={<ReminderIcon />}
+          icon={<Clock className="h-[22px] w-[22px]" />}
         />
       </div>
 
@@ -190,10 +204,10 @@ export default function NotificacionesPage() {
                     <div
                       className={`flex h-12 w-12 shrink-0 items-center justify-center rounded-xl ${item.color}`}
                     >
-                      {item.icon === "calendar" && <CalendarIcon />}
-                      {item.icon === "vaccine" && <VaccineIcon />}
-                      {item.icon === "payment" && <PaymentIcon />}
-                      {item.icon === "system" && <SystemIcon />}
+                      {item.icon === "calendar" && <CalendarDays className="h-[22px] w-[22px]" />}
+                      {item.icon === "vaccine" && <Syringe className="h-[22px] w-[22px]" />}
+                      {item.icon === "payment" && <CreditCard className="h-[22px] w-[22px]" />}
+                      {item.icon === "system" && <Settings className="h-[22px] w-[22px]" />}
                     </div>
 
                     <div className="min-w-0">
@@ -201,13 +215,13 @@ export default function NotificacionesPage() {
                         <h3 className="text-sm font-semibold text-slate-900 dark:text-white">
                           {item.title}
                         </h3>
-                        {item.unread && <span className="h-2 w-2 rounded-full bg-red-500" />}
+                        {item.unread && <span className="h-2 w-2 rounded-full bg-accent-500" />}
                       </div>
                       <p className="mt-1 max-w-[720px] text-sm leading-6 text-slate-500 dark:text-slate-400">
                         {item.description}
                       </p>
                       <div className="mt-2 flex items-center gap-3">
-                        <span className="rounded-full bg-slate-100 px-2.5 py-0.5 text-xs font-semibold text-slate-600 dark:bg-slate-800 dark:text-slate-300">
+                        <span className="rounded-lg bg-slate-100 px-2.5 py-0.5 text-xs font-semibold text-slate-600 dark:bg-slate-800 dark:text-slate-300">
                           {item.category}
                         </span>
                         <span className="text-xs text-slate-400">{item.time}</span>
@@ -240,7 +254,7 @@ export default function NotificacionesPage() {
                     <h2 className="text-section-title mt-1">{selected.title}</h2>
                   </div>
                   <span
-                    className={`rounded-full px-2.5 py-1 text-xs font-semibold ${selected.unread ? "bg-amber-50 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400" : "bg-slate-100 text-slate-600 dark:bg-slate-800 dark:text-slate-300"}`}
+                    className={`rounded-lg px-2.5 py-1 text-xs font-semibold ${selected.unread ? "bg-warning-100 text-warning-700 dark:bg-warning-900/30 dark:text-warning-400" : "bg-slate-100 text-slate-600 dark:bg-slate-800 dark:text-slate-300"}`}
                   >
                     {selected.unread ? "No leída" : "Leída"}
                   </span>
@@ -362,122 +376,5 @@ function SummaryLine({ label, value }: { label: string; value: string }) {
       <span className="text-sm text-slate-500 dark:text-slate-400">{label}</span>
       <span className="text-sm font-semibold text-slate-900 dark:text-white">{value}</span>
     </div>
-  );
-}
-
-/* Icons */
-
-function CheckIcon() {
-  return (
-    <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
-      <path
-        d="m5 13 4 4L19 7"
-        stroke="white"
-        strokeWidth="2.2"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-      />
-    </svg>
-  );
-}
-
-function BellCardIcon() {
-  return (
-    <svg width="23" height="23" viewBox="0 0 24 24" fill="none">
-      <path
-        d="M15 18H6.5c.7-.8 1.5-2.2 1.5-4.8 0-3.2 1.8-5.2 4.5-5.2s4.5 2 4.5 5.2c0 2.6.8 4 1.5 4.8H15Z"
-        stroke="#2563EB"
-        strokeWidth="2"
-        strokeLinejoin="round"
-      />
-      <path d="M10 19.2a2.2 2.2 0 0 0 4 0" stroke="#2563EB" strokeWidth="2" strokeLinecap="round" />
-    </svg>
-  );
-}
-
-function UnreadIcon() {
-  return (
-    <svg width="23" height="23" viewBox="0 0 24 24" fill="none">
-      <circle cx="12" cy="12" r="8" stroke="#2563EB" strokeWidth="2" />
-      <circle cx="12" cy="12" r="3" fill="#2563EB" />
-    </svg>
-  );
-}
-
-function CalendarCardIcon() {
-  return (
-    <svg width="23" height="23" viewBox="0 0 24 24" fill="none">
-      <rect x="3.5" y="5.5" width="17" height="15" rx="2.5" stroke="#2563EB" strokeWidth="2" />
-      <path
-        d="M7 3.8v3.4M17 3.8v3.4M3.5 9.5h17"
-        stroke="#2563EB"
-        strokeWidth="2"
-        strokeLinecap="round"
-      />
-    </svg>
-  );
-}
-
-function ReminderIcon() {
-  return (
-    <svg width="23" height="23" viewBox="0 0 24 24" fill="none">
-      <path
-        d="M12 7v5l3 2"
-        stroke="#2563EB"
-        strokeWidth="2"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-      />
-      <circle cx="12" cy="12" r="9" stroke="#2563EB" strokeWidth="2" />
-    </svg>
-  );
-}
-
-function CalendarIcon() {
-  return <CalendarCardIcon />;
-}
-
-function VaccineIcon() {
-  return (
-    <svg width="23" height="23" viewBox="0 0 24 24" fill="none">
-      <path
-        d="m14 5 5 5M4 20l6.5-6.5M10 7l7 7M8 9l7 7M6.5 17.5 4 15l8-8 5 5-8 8-2.5-2.5Z"
-        stroke="currentColor"
-        strokeWidth="2"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-      />
-    </svg>
-  );
-}
-
-function PaymentIcon() {
-  return (
-    <svg width="23" height="23" viewBox="0 0 24 24" fill="none">
-      <path
-        d="M12 3v18M15.8 7.2c-.7-.9-2-1.5-3.6-1.5-2.3 0-3.9 1.1-3.9 2.9 0 1.9 1.6 2.5 4.2 3.1 2.5.6 4.1 1.2 4.1 3.1 0 1.8-1.7 3.1-4.1 3.1-1.9 0-3.4-.7-4.2-1.8"
-        stroke="currentColor"
-        strokeWidth="2"
-        strokeLinecap="round"
-      />
-    </svg>
-  );
-}
-
-function SystemIcon() {
-  return (
-    <svg width="23" height="23" viewBox="0 0 24 24" fill="none">
-      <path
-        d="M12 15.2a3.2 3.2 0 1 0 0-6.4 3.2 3.2 0 0 0 0 6.4Z"
-        stroke="currentColor"
-        strokeWidth="2"
-      />
-      <path
-        d="M19.4 13.2c.1-.4.1-.8.1-1.2s0-.8-.1-1.2l2-1.5-2-3.5-2.4 1a8 8 0 0 0-2-.9L14.7 3h-5.4L9 5.9c-.7.2-1.4.5-2 .9l-2.4-1-2 3.5 2 1.5A7 7 0 0 0 4.5 12c0 .4 0 .8.1 1.2l-2 1.5 2 3.5 2.4-1c.6.4 1.3.7 2 .9l.3 2.9h5.4l.3-2.9c.7-.2 1.4-.5 2-.9l2.4 1 2-3.5-2-1.5Z"
-        stroke="currentColor"
-        strokeWidth="2"
-        strokeLinejoin="round"
-      />
-    </svg>
   );
 }

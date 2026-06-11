@@ -60,18 +60,26 @@ export default function ClientePage() {
   };
 
   const statsData = [
-    { icon: CalendarDays, label: "Citas hoy", value: String(citasHoy), accentBar: "bg-brand-500" },
+    {
+      icon: CalendarDays,
+      label: "Citas hoy",
+      value: String(citasHoy),
+      accentBar: "bg-brand-500",
+      iconBg: "bg-brand-50 text-brand-600 dark:bg-brand-900/30 dark:text-brand-400",
+    },
     {
       icon: PawPrint,
       label: "Mascotas",
       value: String(mascotas.length),
-      accentBar: "bg-emerald-500",
+      accentBar: "bg-success-500",
+      iconBg: "bg-success-50 text-success-600 dark:bg-success-950/40 dark:text-success-400",
     },
     {
       icon: Clock,
       label: "Próximas",
       value: String(proximas.length),
-      accentBar: "bg-amber-500",
+      accentBar: "bg-warning-500",
+      iconBg: "bg-warning-50 text-warning-600 dark:bg-warning-950/40 dark:text-warning-400",
       extra: "col-span-2 sm:col-span-1",
     },
   ];
@@ -112,6 +120,7 @@ export default function ClientePage() {
               label={s.label}
               value={loading ? "—" : s.value}
               accentBar={s.accentBar}
+              iconBg={s.iconBg}
             />
           </motion.div>
         ))}
@@ -273,12 +282,14 @@ function StatCard({
   label,
   value,
   accentBar,
+  iconBg,
   className = "",
 }: {
   icon: React.ElementType;
   label: string;
   value: string;
   accentBar: string;
+  iconBg: string;
   className?: string;
 }) {
   return (
@@ -286,7 +297,7 @@ function StatCard({
       className={`admin-card relative flex items-center gap-3 overflow-hidden px-4 py-3.5 transition-all duration-200 hover:-translate-y-0.5 hover:shadow-card-hover ${className}`}
     >
       <div className={`absolute inset-y-0 left-0 w-1 rounded-l-2xl ${accentBar}`} />
-      <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-brand-50 text-brand-600 dark:bg-brand-900/30 dark:text-brand-400">
+      <div className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-lg ${iconBg}`}>
         <Icon className="h-4 w-4" />
       </div>
       <div>

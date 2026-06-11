@@ -372,7 +372,7 @@ export default function NuevaCitaPage() {
                 />
                 {fecha && (
                   <p
-                    className={`mt-1.5 text-xs font-medium ${isClinicOpen(fecha) ? "text-emerald-600" : "text-rose-600"}`}
+                    className={`mt-1.5 text-xs font-medium ${isClinicOpen(fecha) ? "text-success-600" : "text-danger-600"}`}
                   >
                     {isClinicOpen(fecha)
                       ? `Horario: ${getScheduleLabel(fecha)}`
@@ -390,11 +390,11 @@ export default function NuevaCitaPage() {
                 {!fecha ? (
                   <p className="text-xs text-slate-400">Selecciona una fecha primero.</p>
                 ) : !isClinicOpen(fecha) ? (
-                  <div className="rounded-xl border border-rose-200 bg-rose-50 px-4 py-3 text-xs text-rose-700 dark:border-rose-900 dark:bg-rose-950/30 dark:text-rose-400">
+                  <div className="dark:bg-danger-950/30 rounded-xl border border-danger-200 bg-danger-50 px-4 py-3 text-xs text-danger-700 dark:border-danger-900 dark:text-danger-400">
                     No hay turnos disponibles. La clínica permanece cerrada los domingos.
                   </div>
                 ) : slots.length === 0 ? (
-                  <div className="rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 text-xs text-amber-700 dark:border-amber-900 dark:bg-amber-950/30 dark:text-amber-400">
+                  <div className="dark:bg-warning-950/30 rounded-xl border border-warning-200 bg-warning-50 px-4 py-3 text-xs text-warning-700 dark:border-warning-900 dark:text-warning-400">
                     No quedan turnos disponibles para hoy. Selecciona otra fecha.
                   </div>
                 ) : (
@@ -457,11 +457,11 @@ export default function NuevaCitaPage() {
                             : "border-slate-200 bg-white text-slate-700 hover:border-brand-200 hover:bg-slate-50 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-300"
                         }`}
                       >
-                        <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg bg-emerald-100 text-xs font-bold text-emerald-700 dark:bg-emerald-900/40 dark:text-emerald-300">
+                        <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg bg-success-100 text-xs font-bold text-success-700 dark:bg-success-900/40 dark:text-success-300">
                           {(v.nombre ?? "?")[0].toUpperCase()}
                         </span>
                         <span className="flex-1 font-medium">{v.nombre}</span>
-                        <span className="text-xs text-emerald-600 dark:text-emerald-400">
+                        <span className="text-xs text-success-600 dark:text-success-400">
                           Disponible
                         </span>
                         {vetNombre === v.nombre && (
@@ -481,12 +481,12 @@ export default function NuevaCitaPage() {
                         <span className="flex-1 font-medium text-slate-500 dark:text-slate-400">
                           {v.nombre}
                         </span>
-                        <span className="text-xs text-rose-500">Ocupado a esta hora</span>
+                        <span className="text-xs text-danger-500">Ocupado a esta hora</span>
                       </div>
                     ))}
 
                     {vets.length > 0 && vetsDisponibles.length === 0 && (
-                      <p className="text-xs text-amber-600 dark:text-amber-400">
+                      <p className="text-xs text-warning-600 dark:text-warning-400">
                         Todos los veterinarios tienen cita a esta hora. La clínica asignará uno al
                         confirmar.
                       </p>
@@ -556,7 +556,7 @@ export default function NuevaCitaPage() {
 
         {/* Error */}
         {error && (
-          <div className="mt-4 rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700 dark:border-red-800 dark:bg-red-950/30 dark:text-red-400">
+          <div className="dark:bg-danger-950/30 mt-4 rounded-xl border border-danger-200 bg-danger-50 px-4 py-3 text-sm text-danger-700 dark:border-danger-800 dark:text-danger-400">
             {error}
           </div>
         )}

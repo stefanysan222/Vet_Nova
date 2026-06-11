@@ -7,6 +7,7 @@ import { motion } from "framer-motion";
 import { useAuth } from "@/lib/auth-context";
 import { fetchPropietarioByUsuario } from "../../../lib/api/propietarios";
 import { fetchMascotas } from "../../../lib/api/mascotas";
+import { Plus, Search, X, ChevronDown, ChevronRight } from "lucide-react";
 
 type DocumentoClinicoAdjunto = {
   id: string;
@@ -124,7 +125,7 @@ export default function MascotasPage() {
         </div>
 
         <Link href="/cliente/mascotas/nueva" className="btn-primary whitespace-nowrap">
-          <PlusIcon />
+          <Plus className="h-[18px] w-[18px]" />
           Nueva mascota
         </Link>
       </div>
@@ -132,7 +133,7 @@ export default function MascotasPage() {
       <div className="admin-card mb-6 p-4">
         <div className="flex flex-col items-stretch gap-3 sm:flex-row sm:items-center">
           <div className="flex h-[46px] flex-1 items-center gap-3 rounded-xl border border-slate-200 bg-white px-4 transition-colors focus-within:border-brand-400 focus-within:ring-2 focus-within:ring-brand-400/10 dark:border-slate-700 dark:bg-slate-900">
-            <SearchIcon />
+            <Search className="h-5 w-5 shrink-0 text-slate-400" />
 
             <input
               type="text"
@@ -149,7 +150,7 @@ export default function MascotasPage() {
                 className="text-slate-400 transition-colors hover:text-brand-600"
                 aria-label="Limpiar búsqueda"
               >
-                <CloseIcon />
+                <X className="h-[17px] w-[17px]" />
               </button>
             )}
           </div>
@@ -166,8 +167,8 @@ export default function MascotasPage() {
               <option value="otro">Otros</option>
             </select>
 
-            <div className="pointer-events-none absolute right-4 top-1/2 -translate-y-1/2 text-[#10213A] dark:text-white">
-              <ChevronDownIcon />
+            <div className="pointer-events-none absolute right-4 top-1/2 -translate-y-1/2 text-surface-900 dark:text-white">
+              <ChevronDown className="h-[18px] w-[18px]" />
             </div>
           </div>
         </div>
@@ -186,7 +187,7 @@ export default function MascotasPage() {
               <StatusBadge estado={mascota.estado} />
 
               <div className="flex items-start gap-4 pr-[76px]">
-                <div className="relative flex h-[56px] w-[56px] shrink-0 items-center justify-center overflow-hidden rounded-xl bg-brand-50 text-brand-600 transition-all group-hover:scale-105 dark:bg-brand-900/30 dark:text-brand-400">
+                <div className="relative flex h-14 w-14 shrink-0 items-center justify-center overflow-hidden rounded-xl bg-brand-50 text-brand-600 transition-all group-hover:scale-105 dark:bg-brand-900/30 dark:text-brand-400">
                   {mascota.foto ? (
                     <Image
                       src={mascota.foto}
@@ -238,7 +239,7 @@ export default function MascotasPage() {
                 className="mt-auto inline-flex items-center justify-center gap-1.5 pt-4 text-sm font-medium text-brand-600 transition-colors hover:text-brand-700 dark:text-brand-400"
               >
                 Ver perfil completo
-                <ChevronRightIcon />
+                <ChevronRight className="h-[14px] w-[14px]" />
               </Link>
             </motion.article>
           ))}
@@ -246,7 +247,7 @@ export default function MascotasPage() {
       ) : (
         <div className="flex min-h-[280px] flex-col items-center justify-center rounded-2xl border border-dashed border-slate-300 bg-white px-6 text-center shadow-xs dark:border-slate-700 dark:bg-slate-900">
           <div className="mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-brand-50 text-brand-600 dark:bg-brand-900/30 dark:text-brand-400">
-            <SearchIcon />
+            <Search className="h-5 w-5" />
           </div>
           <h2 className="text-section-title">No se encontraron mascotas</h2>
           <p className="mt-2 text-sm text-slate-500 dark:text-slate-400">
@@ -272,78 +273,21 @@ function StatusBadge({ estado }: { estado: Pet["estado"] }) {
   const { badge, dot } =
     estado === "Activo"
       ? {
-          badge: "bg-emerald-50 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400",
-          dot: "bg-emerald-500",
+          badge: "bg-success-50 text-success-700 dark:bg-success-900/30 dark:text-success-400",
+          dot: "bg-success-500",
         }
       : {
-          badge: "bg-amber-50 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400",
-          dot: "bg-amber-500",
+          badge: "bg-warning-50 text-warning-700 dark:bg-warning-900/30 dark:text-warning-400",
+          dot: "bg-warning-500",
         };
 
   return (
     <span
-      className={`absolute right-4 top-4 inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-xs font-semibold ${badge}`}
+      className={`absolute right-4 top-4 inline-flex items-center gap-1.5 rounded-lg px-2.5 py-1 text-xs font-semibold ${badge}`}
     >
       <span className={`h-1.5 w-1.5 rounded-full ${dot}`} />
       {estado}
     </span>
-  );
-}
-
-function PlusIcon() {
-  return (
-    <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
-      <path d="M12 5v14M5 12h14" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
-    </svg>
-  );
-}
-
-function SearchIcon() {
-  return (
-    <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
-      <path
-        d="m21 21-4.35-4.35M11 18a7 7 0 1 0 0-14 7 7 0 0 0 0 14Z"
-        stroke="currentColor"
-        strokeWidth="2"
-        strokeLinecap="round"
-      />
-    </svg>
-  );
-}
-
-function CloseIcon() {
-  return (
-    <svg width="17" height="17" viewBox="0 0 24 24" fill="none">
-      <path d="M18 6 6 18M6 6l12 12" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
-    </svg>
-  );
-}
-
-function ChevronDownIcon() {
-  return (
-    <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
-      <path
-        d="m6 9 6 6 6-6"
-        stroke="currentColor"
-        strokeWidth="2"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-      />
-    </svg>
-  );
-}
-
-function ChevronRightIcon() {
-  return (
-    <svg width="14" height="14" viewBox="0 0 24 24" fill="none">
-      <path
-        d="m9 18 6-6-6-6"
-        stroke="currentColor"
-        strokeWidth="2"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-      />
-    </svg>
   );
 }
 

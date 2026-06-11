@@ -8,6 +8,19 @@ import { useAuth } from "@/lib/auth-context";
 import { fetchCitas, updateCitaEstado } from "../../../lib/api/citas";
 import type { Appointment } from "../../../lib/recepcionista/types";
 import { getStatusStyle } from "../../../lib/utils/status";
+import {
+  Plus,
+  Search,
+  X,
+  CalendarDays,
+  CalendarCheck,
+  CalendarOff,
+  Clock,
+  ClipboardList,
+  User,
+  CheckCircle,
+  AlertCircle,
+} from "lucide-react";
 
 type EstadoCita = "Confirmada" | "Pendiente" | "Completada" | "Cancelada";
 type FiltroCita = "todas" | "proximas" | "confirmadas" | "canceladas";
@@ -162,25 +175,14 @@ function AgendarContent() {
     <div className="admin-page h-full overflow-y-auto">
       {/* Banner de solicitud enviada */}
       {bannerVisible && (
-        <div className="mb-6 flex items-start justify-between gap-4 rounded-xl border border-emerald-200 bg-emerald-50 px-5 py-4 dark:border-emerald-800 dark:bg-emerald-950/30">
+        <div className="dark:bg-success-950/30 mb-6 flex items-start justify-between gap-4 rounded-xl border border-success-200 bg-success-50 px-5 py-4 dark:border-success-800">
           <div className="flex items-start gap-3">
-            <svg
-              className="mt-0.5 h-5 w-5 shrink-0 text-[#15803D]"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="2"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-            >
-              <circle cx="12" cy="12" r="9" />
-              <path d="m8 12 2.5 2.5L16 9" />
-            </svg>
+            <CheckCircle className="mt-0.5 h-5 w-5 shrink-0 text-success-600" />
             <div>
-              <p className="text-sm font-semibold text-emerald-700 dark:text-emerald-300">
+              <p className="text-sm font-semibold text-success-700 dark:text-success-300">
                 Solicitud enviada correctamente
               </p>
-              <p className="mt-1 text-sm leading-6 text-emerald-700 dark:text-emerald-300">
+              <p className="mt-1 text-sm leading-6 text-success-700 dark:text-success-300">
                 Tu cita quedó registrada como <strong>Pendiente</strong>. La clínica la revisará y
                 te notificará cuando sea confirmada.
               </p>
@@ -189,7 +191,7 @@ function AgendarContent() {
           <button
             type="button"
             onClick={() => setBannerVisible(false)}
-            className="shrink-0 text-lg font-semibold text-emerald-700 dark:text-emerald-300"
+            className="shrink-0 text-lg font-semibold text-success-700 dark:text-success-300"
             aria-label="Cerrar"
           >
             ×
@@ -206,7 +208,7 @@ function AgendarContent() {
           </p>
         </div>
         <Link href="/cliente/agendar/nueva" className="btn-primary whitespace-nowrap">
-          <PlusIcon />
+          <Plus className="h-[18px] w-[18px]" />
           Nueva cita
         </Link>
       </div>
@@ -218,22 +220,22 @@ function AgendarContent() {
             title: "Próximas citas",
             value: totalProximas,
             desc: "Citas por atender",
-            icon: <CalendarIcon />,
+            icon: <CalendarDays className="h-[25px] w-[25px]" />,
             accent: "bg-brand-500",
           },
           {
             title: "Confirmadas",
             value: totalConfirmadas,
             desc: "Horario confirmado",
-            icon: <CalendarCheckIcon />,
-            accent: "bg-emerald-500",
+            icon: <CalendarCheck className="h-[25px] w-[25px]" />,
+            accent: "bg-success-500",
           },
           {
             title: "Pendientes",
             value: totalPendientes,
             desc: "En espera de confirmación",
-            icon: <ClockIcon />,
-            accent: "bg-amber-500",
+            icon: <Clock className="h-[25px] w-[25px]" />,
+            accent: "bg-accent-500",
           },
         ].map((s, i) => (
           <motion.div
@@ -257,7 +259,7 @@ function AgendarContent() {
       <section className="admin-card mb-6 p-4">
         <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
           <div className="flex h-[46px] flex-1 items-center gap-3 rounded-xl border border-slate-200 bg-white px-4 transition-all focus-within:border-brand-400 focus-within:ring-2 focus-within:ring-brand-400/10 dark:border-slate-700 dark:bg-slate-900">
-            <SearchIcon />
+            <Search className="h-[19px] w-[19px] shrink-0 text-slate-400" />
 
             <input
               type="text"
@@ -274,7 +276,7 @@ function AgendarContent() {
                 aria-label="Limpiar búsqueda"
                 className="text-slate-400 transition-colors hover:text-brand-600"
               >
-                <CloseIcon />
+                <X className="h-[18px] w-[18px]" />
               </button>
             )}
           </div>
@@ -321,9 +323,9 @@ function AgendarContent() {
                 <div className="flex flex-col gap-5 xl:flex-row xl:items-center xl:justify-between">
                   <div className="flex flex-col gap-5 sm:flex-row sm:items-center">
                     <div className="flex h-[92px] w-[92px] shrink-0 flex-col items-center justify-center rounded-xl bg-brand-50 text-brand-600 dark:bg-brand-900/30 dark:text-brand-400">
-                      <span className="text-[28px] font-bold leading-none">{cita.fechaCorta}</span>
+                      <span className="text-stat-sm leading-none">{cita.fechaCorta}</span>
 
-                      <span className="mt-2 text-[12px] font-semibold">{cita.dia}</span>
+                      <span className="mt-2 text-xs font-semibold">{cita.dia}</span>
                     </div>
 
                     <div>
@@ -340,11 +342,20 @@ function AgendarContent() {
                       </p>
 
                       <div className="mt-4 flex flex-wrap gap-x-6 gap-y-2 text-sm text-slate-500 dark:text-slate-400">
-                        <DetailItem icon={<MedicalIcon />} text={cita.servicio} />
+                        <DetailItem
+                          icon={<ClipboardList className="h-[18px] w-[18px]" />}
+                          text={cita.servicio}
+                        />
 
-                        <DetailItem icon={<ClockSmallIcon />} text={cita.hora} />
+                        <DetailItem
+                          icon={<Clock className="h-[18px] w-[18px]" />}
+                          text={cita.hora}
+                        />
 
-                        <DetailItem icon={<UserIcon />} text={cita.veterinario} />
+                        <DetailItem
+                          icon={<User className="h-[18px] w-[18px]" />}
+                          text={cita.veterinario}
+                        />
                       </div>
                     </div>
                   </div>
@@ -423,7 +434,7 @@ function DetalleCitaModal({
 
   return (
     <div
-      className="fixed inset-0 z-[120] flex items-center justify-center bg-[#0F172A]/55 px-4 py-8"
+      className="fixed inset-0 z-[120] flex items-center justify-center bg-surface-900/50 px-4 py-8 backdrop-blur-sm"
       onClick={onClose}
     >
       <section
@@ -431,12 +442,12 @@ function DetalleCitaModal({
         aria-modal="true"
         aria-labelledby="titulo-detalle-cita"
         onClick={(event) => event.stopPropagation()}
-        className="max-h-full w-full max-w-[680px] overflow-y-auto rounded-2xl border border-slate-200 bg-white shadow-modal dark:border-slate-700 dark:bg-slate-900"
+        className="max-h-full w-full max-w-[680px] overflow-y-auto rounded-3xl border border-surface-200/60 bg-white shadow-modal dark:border-surface-700 dark:bg-surface-900"
       >
         <div className="flex items-start justify-between border-b border-slate-200 px-7 py-6 dark:border-slate-700">
           <div className="flex items-start gap-4">
             <div className="flex h-[52px] w-[52px] shrink-0 items-center justify-center rounded-xl bg-brand-50 text-brand-600 dark:bg-brand-900/30 dark:text-brand-400">
-              <CalendarIcon />
+              <CalendarDays className="h-[25px] w-[25px]" />
             </div>
 
             <div>
@@ -454,7 +465,7 @@ function DetalleCitaModal({
             aria-label="Cerrar detalle"
             className="flex h-9 w-9 items-center justify-center rounded-lg text-slate-400 transition-colors hover:bg-slate-100 hover:text-slate-700 dark:hover:bg-slate-800 dark:hover:text-white"
           >
-            <CloseIcon />
+            <X className="h-[18px] w-[18px]" />
           </button>
         </div>
 
@@ -472,10 +483,26 @@ function DetalleCitaModal({
           </div>
 
           <div className="mt-5 grid grid-cols-1 gap-3 sm:grid-cols-2">
-            <ModalInfoItem label="Fecha" value={cita.fecha} icon={<CalendarSmallIcon />} />
-            <ModalInfoItem label="Hora" value={cita.hora} icon={<ClockSmallIcon />} />
-            <ModalInfoItem label="Tipo de atención" value={cita.servicio} icon={<MedicalIcon />} />
-            <ModalInfoItem label="Veterinario" value={cita.veterinario} icon={<UserIcon />} />
+            <ModalInfoItem
+              label="Fecha"
+              value={cita.fecha}
+              icon={<CalendarDays className="h-[19px] w-[19px]" />}
+            />
+            <ModalInfoItem
+              label="Hora"
+              value={cita.hora}
+              icon={<Clock className="h-[18px] w-[18px]" />}
+            />
+            <ModalInfoItem
+              label="Tipo de atención"
+              value={cita.servicio}
+              icon={<ClipboardList className="h-[18px] w-[18px]" />}
+            />
+            <ModalInfoItem
+              label="Veterinario"
+              value={cita.veterinario}
+              icon={<User className="h-[18px] w-[18px]" />}
+            />
           </div>
 
           <div className="mt-5 rounded-xl border border-slate-200 bg-slate-50 p-4 dark:border-slate-700 dark:bg-slate-800/50">
@@ -486,19 +513,9 @@ function DetalleCitaModal({
           </div>
 
           {cita.estado === "Pendiente" && (
-            <div className="mt-4 flex items-start gap-3 rounded-xl border border-amber-200 bg-amber-50 px-4 py-4 dark:border-amber-800 dark:bg-amber-950/30">
-              <svg
-                className="mt-0.5 h-5 w-5 shrink-0 text-amber-600"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="1.8"
-                strokeLinecap="round"
-              >
-                <circle cx="12" cy="12" r="9" />
-                <path d="M12 8v4M12 16h.01" />
-              </svg>
-              <p className="text-sm leading-6 text-amber-700 dark:text-amber-300">
+            <div className="dark:bg-warning-950/30 mt-4 flex items-start gap-3 rounded-xl border border-warning-200 bg-warning-50 px-4 py-4 dark:border-warning-800">
+              <AlertCircle className="mt-0.5 h-5 w-5 shrink-0 text-warning-600" />
+              <p className="text-sm leading-6 text-warning-700 dark:text-warning-300">
                 <strong>En revisión:</strong> tu solicitud fue recibida. La clínica la revisará y te
                 confirmará el horario a la brevedad.
               </p>
@@ -506,20 +523,9 @@ function DetalleCitaModal({
           )}
 
           {cita.estado === "Confirmada" && (
-            <div className="mt-4 flex items-start gap-3 rounded-xl border border-emerald-200 bg-emerald-50 px-4 py-4 dark:border-emerald-800 dark:bg-emerald-950/30">
-              <svg
-                className="mt-0.5 h-5 w-5 shrink-0 text-emerald-600"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="2"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-              >
-                <circle cx="12" cy="12" r="9" />
-                <path d="m8 12 2.5 2.5L16 9" />
-              </svg>
-              <p className="text-sm leading-6 text-emerald-700 dark:text-emerald-300">
+            <div className="dark:bg-success-950/30 mt-4 flex items-start gap-3 rounded-xl border border-success-200 bg-success-50 px-4 py-4 dark:border-success-800">
+              <CheckCircle className="mt-0.5 h-5 w-5 shrink-0 text-success-600" />
+              <p className="text-sm leading-6 text-success-700 dark:text-success-300">
                 <strong>Cita confirmada.</strong> Recuerda asistir a tiempo con tu mascota.
               </p>
             </div>
@@ -612,7 +618,7 @@ function StatusBadge({ estado }: { estado: EstadoCita }) {
 function DetailItem({ icon, text }: { icon: ReactNode; text: string }) {
   return (
     <div className="flex items-center gap-2">
-      <span className="text-[#52698A] dark:text-[#94A3B8]">{icon}</span>
+      <span className="text-surface-500 dark:text-surface-400">{icon}</span>
       <span>{text}</span>
     </div>
   );
@@ -636,7 +642,7 @@ function EmptyState({ onReset }: { onReset: () => void }) {
   return (
     <div className="flex min-h-[260px] flex-col items-center justify-center rounded-2xl border border-dashed border-slate-300 bg-white px-6 text-center shadow-xs dark:border-slate-700 dark:bg-slate-900">
       <div className="mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-brand-50 text-brand-600 dark:bg-brand-900/30 dark:text-brand-400">
-        <CalendarEmptyIcon />
+        <CalendarOff className="h-[31px] w-[31px]" />
       </div>
       <h3 className="text-section-title">No se encontraron citas</h3>
       <p className="mt-2 max-w-sm text-sm text-slate-500 dark:text-slate-400">
@@ -654,140 +660,4 @@ function normalizarTexto(texto: string) {
     .toLowerCase()
     .normalize("NFD")
     .replace(/[\u0300-\u036f]/g, "");
-}
-
-function PlusIcon() {
-  return (
-    <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
-      <path d="M12 5v14M5 12h14" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" />
-    </svg>
-  );
-}
-
-function SearchIcon() {
-  return (
-    <svg width="19" height="19" viewBox="0 0 24 24" fill="none">
-      <circle cx="11" cy="11" r="7" stroke="currentColor" strokeWidth="2" />
-      <path d="m20 20-3.5-3.5" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
-    </svg>
-  );
-}
-
-function CloseIcon() {
-  return (
-    <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
-      <path d="M18 6 6 18M6 6l12 12" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
-    </svg>
-  );
-}
-
-function CalendarIcon() {
-  return (
-    <svg width="25" height="25" viewBox="0 0 24 24" fill="none">
-      <path
-        d="M7 3v4M17 3v4M4.5 9.5h15M6.5 5h11a2 2 0 0 1 2 2v11.5a2 2 0 0 1-2 2h-11a2 2 0 0 1-2-2V7a2 2 0 0 1 2-2Z"
-        stroke="currentColor"
-        strokeWidth="1.8"
-        strokeLinecap="round"
-      />
-      <path
-        d="M8 13h3M8 16h3M14 13h2"
-        stroke="currentColor"
-        strokeWidth="1.8"
-        strokeLinecap="round"
-      />
-    </svg>
-  );
-}
-
-function CalendarSmallIcon() {
-  return (
-    <svg width="19" height="19" viewBox="0 0 24 24" fill="none">
-      <path
-        d="M7 3v4M17 3v4M4.5 9.5h15M6.5 5h11a2 2 0 0 1 2 2v11.5a2 2 0 0 1-2 2h-11a2 2 0 0 1-2-2V7a2 2 0 0 1 2-2Z"
-        stroke="currentColor"
-        strokeWidth="1.8"
-        strokeLinecap="round"
-      />
-    </svg>
-  );
-}
-
-function CalendarCheckIcon() {
-  return (
-    <svg width="25" height="25" viewBox="0 0 24 24" fill="none">
-      <path
-        d="M7 3v4M17 3v4M4.5 9.5h15M6.5 5h11a2 2 0 0 1 2 2v11.5a2 2 0 0 1-2 2h-11a2 2 0 0 1-2-2V7a2 2 0 0 1 2-2Z"
-        stroke="currentColor"
-        strokeWidth="1.8"
-        strokeLinecap="round"
-      />
-      <path
-        d="m8.5 15 2.1 2.1 4.7-5"
-        stroke="currentColor"
-        strokeWidth="1.9"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-      />
-    </svg>
-  );
-}
-
-function CalendarEmptyIcon() {
-  return (
-    <svg width="31" height="31" viewBox="0 0 24 24" fill="none">
-      <path
-        d="M7 3v4M17 3v4M4.5 9.5h15M6.5 5h11a2 2 0 0 1 2 2v11.5a2 2 0 0 1-2 2h-11a2 2 0 0 1-2-2V7a2 2 0 0 1 2-2Z"
-        stroke="currentColor"
-        strokeWidth="1.8"
-        strokeLinecap="round"
-      />
-      <path d="M9 14.5h6" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" />
-    </svg>
-  );
-}
-
-function ClockIcon() {
-  return (
-    <svg width="25" height="25" viewBox="0 0 24 24" fill="none">
-      <circle cx="12" cy="12" r="8.5" stroke="currentColor" strokeWidth="1.8" />
-      <path d="M12 7v5l3.5 2" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" />
-    </svg>
-  );
-}
-
-function ClockSmallIcon() {
-  return (
-    <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
-      <circle cx="12" cy="12" r="8.5" stroke="currentColor" strokeWidth="1.8" />
-      <path d="M12 7v5l3.5 2" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" />
-    </svg>
-  );
-}
-
-function MedicalIcon() {
-  return (
-    <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
-      <path
-        d="M9 4h6v5h5v6h-5v5H9v-5H4V9h5V4Z"
-        stroke="currentColor"
-        strokeWidth="1.8"
-        strokeLinejoin="round"
-      />
-    </svg>
-  );
-}
-
-function UserIcon() {
-  return (
-    <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
-      <circle cx="12" cy="8" r="3.5" stroke="currentColor" strokeWidth="1.8" />
-      <path
-        d="M5.5 20c.5-3.7 3-5.5 6.5-5.5s6 1.8 6.5 5.5"
-        stroke="currentColor"
-        strokeWidth="1.8"
-        strokeLinecap="round"
-      />
-    </svg>
-  );
 }

@@ -7,6 +7,7 @@ import { useEffect, useState } from "react";
 import { fetchMascotas } from "../../../../lib/api/mascotas";
 import { useAuth } from "@/lib/auth-context";
 import type { PetRecord } from "../../../../lib/recepcionista/types";
+import { ArrowLeft, Info, FileText, Eye, Download, Lock } from "lucide-react";
 
 type DocumentoClinicoAdjunto = {
   id: string;
@@ -43,8 +44,8 @@ export default function PerfilCompletoMascotaPage() {
 
   if (cargando) {
     return (
-      <div className="flex min-h-[420px] items-center justify-center bg-[#F5F7FB] dark:bg-[#0F172A]">
-        <p className="text-[15px] text-[#64748B] dark:text-[#94A3B8]">
+      <div className="flex min-h-[420px] items-center justify-center bg-surface-50 dark:bg-surface-950">
+        <p className="text-sm text-surface-500 dark:text-surface-400">
           Cargando información de la mascota...
         </p>
       </div>
@@ -53,20 +54,20 @@ export default function PerfilCompletoMascotaPage() {
 
   if (!mascota) {
     return (
-      <div className="h-full overflow-y-auto bg-[#F5F7FB] px-6 py-8 dark:bg-[#0F172A]">
+      <div className="h-full overflow-y-auto bg-surface-50 px-6 py-8 dark:bg-surface-950">
         <Link
           href="/cliente/mascotas"
-          className="inline-flex items-center gap-2 text-[14px] font-medium text-[#64748B] transition-colors hover:text-[#2F6BFF] dark:text-[#94A3B8] dark:hover:text-[#60A5FA]"
+          className="inline-flex items-center gap-2 text-sm font-medium text-surface-500 transition-colors hover:text-brand-600 dark:text-surface-400 dark:hover:text-brand-400"
         >
-          <ArrowLeftIcon />
+          <ArrowLeft className="h-[18px] w-[18px]" />
           Volver a mascotas
         </Link>
 
-        <div className="mt-8 flex min-h-[320px] flex-col items-center justify-center rounded-xl border border-dashed border-[#CBD5E1] bg-white p-8 text-center dark:border-[#334155] dark:bg-[#111827]">
-          <h1 className="text-[21px] font-semibold text-[#10213A] dark:text-white">
+        <div className="mt-8 flex min-h-[320px] flex-col items-center justify-center rounded-xl border border-dashed border-surface-200 bg-white p-8 text-center dark:border-surface-700 dark:bg-surface-900">
+          <h1 className="text-xl font-semibold text-surface-900 dark:text-white">
             Mascota no encontrada
           </h1>
-          <p className="mt-3 text-[15px] text-[#64748B] dark:text-[#94A3B8]">
+          <p className="mt-3 text-sm text-surface-500 dark:text-surface-400">
             {error || "No fue posible cargar la información solicitada."}
           </p>
         </div>
@@ -82,22 +83,20 @@ export default function PerfilCompletoMascotaPage() {
       : "otro";
 
   return (
-    <div className="h-full overflow-y-auto bg-[#F5F7FB] px-6 py-8 dark:bg-[#0F172A]">
+    <div className="h-full overflow-y-auto bg-surface-50 px-6 py-8 dark:bg-surface-950">
       <div className="mb-7">
         <Link
           href="/cliente/mascotas"
-          className="mb-5 inline-flex items-center gap-2 text-[14px] font-medium text-[#64748B] transition-colors hover:text-[#2F6BFF] dark:text-[#94A3B8] dark:hover:text-[#60A5FA]"
+          className="mb-5 inline-flex items-center gap-2 text-sm font-medium text-surface-500 transition-colors hover:text-brand-600 dark:text-surface-400 dark:hover:text-brand-400"
         >
-          <ArrowLeftIcon />
+          <ArrowLeft className="h-[18px] w-[18px]" />
           Volver a mascotas
         </Link>
 
         <div className="flex flex-wrap items-start justify-between gap-4">
           <div>
-            <h1 className="text-[24px] font-semibold text-[#10213A] dark:text-white">
-              Perfil completo de {mascota.nombre}
-            </h1>
-            <p className="mt-3 text-[15px] text-[#64748B] dark:text-[#94A3B8]">
+            <h1 className="text-page-title">Perfil completo de {mascota.nombre}</h1>
+            <p className="text-subtitle mt-3">
               Consulta la información registrada y su historial clínico.
             </p>
           </div>
@@ -105,9 +104,9 @@ export default function PerfilCompletoMascotaPage() {
       </div>
 
       <div className="grid grid-cols-1 items-start gap-6 xl:grid-cols-[335px_1fr]">
-        <aside className="rounded-xl border border-[#CBD5E1] bg-white p-6 shadow-sm dark:border-[#334155] dark:bg-[#111827]">
+        <aside className="rounded-xl border border-surface-200 bg-white p-6 shadow-sm dark:border-surface-700 dark:bg-surface-900">
           <div className="flex flex-col items-center text-center">
-            <div className="relative flex h-[132px] w-[132px] items-center justify-center overflow-hidden rounded-2xl bg-[#DBEAFE] text-[#2563EB] dark:bg-[#1E3A8A] dark:text-[#93C5FD]">
+            <div className="relative flex h-32 w-32 items-center justify-center overflow-hidden rounded-2xl bg-brand-100 text-brand-600 dark:bg-brand-900/40 dark:text-brand-300">
               {mascota.foto ? (
                 <Image
                   src={mascota.foto}
@@ -125,21 +124,21 @@ export default function PerfilCompletoMascotaPage() {
               )}
             </div>
 
-            <h2 className="mt-5 text-[23px] font-semibold text-[#10213A] dark:text-white">
+            <h2 className="mt-5 text-xl font-semibold text-surface-900 dark:text-white">
               {mascota.nombre}
             </h2>
 
-            <p className="mt-2 text-[15px] text-[#64748B] dark:text-[#94A3B8]">
+            <p className="mt-2 text-sm text-surface-500 dark:text-surface-400">
               {mascota.especie} · {mascota.raza}
             </p>
 
-            <p className="mt-2 text-[15px] text-[#64748B] dark:text-[#94A3B8]">{mascota.edad}</p>
+            <p className="mt-2 text-sm text-surface-500 dark:text-surface-400">{mascota.edad}</p>
           </div>
 
           {mascota.propietarioNombre && (
-            <div className="mt-7 border-t border-[#E2E8F0] pt-5 dark:border-[#334155]">
-              <p className="text-[13px] text-[#64748B] dark:text-[#94A3B8]">Propietario</p>
-              <p className="mt-1 text-[15px] font-semibold text-[#10213A] dark:text-white">
+            <div className="mt-7 border-t border-surface-200 pt-5 dark:border-surface-700">
+              <p className="text-label">Propietario</p>
+              <p className="mt-1 text-sm font-semibold text-surface-900 dark:text-white">
                 {mascota.propietarioNombre}
               </p>
             </div>
@@ -147,12 +146,10 @@ export default function PerfilCompletoMascotaPage() {
         </aside>
 
         <main className="space-y-6">
-          <section className="rounded-xl border border-[#CBD5E1] bg-white p-7 shadow-sm dark:border-[#334155] dark:bg-[#111827]">
+          <section className="rounded-xl border border-surface-200 bg-white p-7 shadow-sm dark:border-surface-700 dark:bg-surface-900">
             <div className="mb-6 flex items-center gap-3">
-              <InfoIcon />
-              <h2 className="text-[19px] font-semibold text-[#10213A] dark:text-white">
-                Información de la mascota
-              </h2>
+              <Info className="h-[22px] w-[22px] shrink-0 text-brand-600" />
+              <h2 className="text-section-title">Información de la mascota</h2>
             </div>
 
             <div className="grid grid-cols-1 gap-x-8 gap-y-6 md:grid-cols-2">
@@ -166,16 +163,12 @@ export default function PerfilCompletoMascotaPage() {
             </div>
           </section>
 
-          <section className="rounded-xl border border-[#CBD5E1] bg-white p-7 shadow-sm dark:border-[#334155] dark:bg-[#111827]">
+          <section className="rounded-xl border border-surface-200 bg-white p-7 shadow-sm dark:border-surface-700 dark:bg-surface-900">
             <div className="mb-6 flex items-center gap-3">
-              <FileIcon />
+              <FileText className="h-[22px] w-[22px] shrink-0 text-brand-600" />
               <div>
-                <h2 className="text-[19px] font-semibold text-[#10213A] dark:text-white">
-                  Historial clínico
-                </h2>
-                <p className="mt-1 text-[14px] text-[#64748B] dark:text-[#94A3B8]">
-                  Archivos adjuntados al registrar la mascota.
-                </p>
+                <h2 className="text-section-title">Historial clínico</h2>
+                <p className="text-subtitle mt-1">Archivos adjuntados al registrar la mascota.</p>
               </div>
             </div>
 
@@ -186,23 +179,23 @@ export default function PerfilCompletoMascotaPage() {
                 ))}
               </div>
             ) : (
-              <div className="rounded-xl border border-dashed border-[#CBD5E1] bg-[#F8FAFD] px-6 py-10 text-center dark:border-[#334155] dark:bg-[#0F172A]">
-                <div className="mx-auto flex h-[58px] w-[58px] items-center justify-center rounded-full bg-[#E7EEFF] text-[#2F6BFF] dark:bg-[#1E3A8A] dark:text-[#93C5FD]">
-                  <FileIcon />
+              <div className="rounded-xl border border-dashed border-surface-200 bg-surface-50 px-6 py-10 text-center dark:border-surface-700 dark:bg-surface-950">
+                <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-full bg-brand-100 text-brand-600 dark:bg-brand-900/40 dark:text-brand-300">
+                  <FileText className="h-[22px] w-[22px]" />
                 </div>
-                <p className="mt-4 text-[15px] font-semibold text-[#10213A] dark:text-white">
+                <p className="mt-4 text-sm font-semibold text-surface-900 dark:text-white">
                   Sin historial clínico adjunto
                 </p>
-                <p className="mt-2 text-[14px] text-[#64748B] dark:text-[#94A3B8]">
+                <p className="mt-2 text-sm text-surface-500 dark:text-surface-400">
                   Esta mascota no tiene archivos clínicos registrados.
                 </p>
               </div>
             )}
           </section>
 
-          <div className="flex items-start gap-3 rounded-xl border border-[#D6E1F0] bg-[#F8FAFD] px-5 py-4 dark:border-[#334155] dark:bg-[#111827]">
-            <LockIcon />
-            <p className="text-[13px] leading-6 text-[#64748B] dark:text-[#94A3B8]">
+          <div className="flex items-start gap-3 rounded-xl border border-surface-200 bg-surface-50 px-5 py-4 dark:border-surface-700 dark:bg-surface-900">
+            <Lock className="mt-0.5 h-[19px] w-[19px] shrink-0 text-brand-600" />
+            <p className="text-xs leading-6 text-surface-500 dark:text-surface-400">
               Esta vista es únicamente de consulta. Desde aquí no se pueden editar los datos de la
               mascota ni modificar su historial clínico.
             </p>
@@ -219,19 +212,19 @@ function DocumentoClinicoCard({ documento }: { documento: DocumentoClinicoAdjunt
     documento.nombre.toLowerCase().endsWith(".pdf") || documento.tipo.toLowerCase().includes("pdf");
 
   return (
-    <article className="flex flex-col justify-between gap-4 rounded-xl border border-[#E2E8F0] bg-[#F8FAFD] p-4 dark:border-[#334155] dark:bg-[#0F172A] sm:flex-row sm:items-center">
+    <article className="flex flex-col justify-between gap-4 rounded-xl border border-surface-200 bg-surface-50 p-4 dark:border-surface-700 dark:bg-surface-950 sm:flex-row sm:items-center">
       <div className="flex min-w-0 items-center gap-4">
-        <div className="flex h-[48px] w-[48px] shrink-0 items-center justify-center rounded-xl bg-[#E7EEFF] text-[#2F6BFF] dark:bg-[#1E3A8A] dark:text-[#93C5FD]">
-          <FileIcon />
+        <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-brand-100 text-brand-600 dark:bg-brand-900/40 dark:text-brand-300">
+          <FileText className="h-[22px] w-[22px]" />
         </div>
         <div className="min-w-0">
-          <p className="truncate text-[15px] font-semibold text-[#10213A] dark:text-white">
+          <p className="truncate text-sm font-semibold text-surface-900 dark:text-white">
             {documento.nombre}
           </p>
-          <p className="mt-1 text-[13px] text-[#64748B] dark:text-[#94A3B8]">
+          <p className="mt-1 text-xs text-surface-500 dark:text-surface-400">
             {esPdf ? "Documento PDF" : "Archivo clínico"} · {formatearTamano(documento.tamano)}
           </p>
-          <p className="mt-1 text-[12px] text-[#64748B] dark:text-[#94A3B8]">
+          <p className="mt-1 text-xs text-surface-500 dark:text-surface-400">
             Cargado el {formatearFechaDocumento(documento.fechaCarga)}
           </p>
         </div>
@@ -243,22 +236,22 @@ function DocumentoClinicoCard({ documento }: { documento: DocumentoClinicoAdjunt
             href={documento.dataUrl}
             target="_blank"
             rel="noreferrer"
-            className="inline-flex h-[40px] items-center gap-2 rounded-lg border border-[#CBD5E1] bg-white px-4 text-[13px] font-semibold text-[#10213A] transition-colors hover:border-[#2F6BFF] hover:text-[#2F6BFF] dark:border-[#334155] dark:bg-[#111827] dark:text-white"
+            className="inline-flex h-10 items-center gap-2 rounded-lg border border-surface-200 bg-white px-4 text-xs font-semibold text-surface-900 transition-colors hover:border-brand-400 hover:text-brand-600 dark:border-surface-700 dark:bg-surface-900 dark:text-white"
           >
-            <EyeIcon />
+            <Eye className="h-4 w-4" />
             {esPdf ? "Ver PDF" : "Ver archivo"}
           </a>
           <a
             href={documento.dataUrl}
             download={documento.nombre}
-            className="inline-flex h-[40px] items-center gap-2 rounded-lg bg-[#2F6BFF] px-4 text-[13px] font-semibold text-white transition-colors hover:bg-[#2457D6]"
+            className="inline-flex h-10 items-center gap-2 rounded-lg bg-brand-600 px-4 text-xs font-semibold text-white transition-colors hover:bg-brand-700"
           >
-            <DownloadIcon />
+            <Download className="h-4 w-4" />
             Descargar
           </a>
         </div>
       ) : (
-        <p className="text-[13px] text-[#64748B] dark:text-[#94A3B8]">Archivo no disponible</p>
+        <p className="text-xs text-surface-500 dark:text-surface-400">Archivo no disponible</p>
       )}
     </article>
   );
@@ -267,8 +260,8 @@ function DocumentoClinicoCard({ documento }: { documento: DocumentoClinicoAdjunt
 function Dato({ label, value }: { label: string; value: string }) {
   return (
     <div>
-      <p className="text-[13px] font-medium text-[#64748B] dark:text-[#94A3B8]">{label}</p>
-      <p className="mt-2 text-[15px] font-semibold text-[#10213A] dark:text-white">{value}</p>
+      <p className="text-label">{label}</p>
+      <p className="mt-2 text-sm font-semibold text-surface-900 dark:text-white">{value}</p>
     </div>
   );
 }
@@ -308,20 +301,6 @@ function formatearTamano(bytes: number) {
   if (bytes < 1024) return `${bytes} B`;
   if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(1)} KB`;
   return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
-}
-
-function ArrowLeftIcon() {
-  return (
-    <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
-      <path
-        d="m15 18-6-6 6-6"
-        stroke="currentColor"
-        strokeWidth="2"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-      />
-    </svg>
-  );
 }
 
 function DogIcon() {
@@ -364,76 +343,6 @@ function PetIcon() {
         d="M9 8.5C9 10.4 8 12 6.7 12S4.5 10.4 4.5 8.5 5.5 5 6.7 5 9 6.6 9 8.5Zm10.5 0c0 1.9-1 3.5-2.2 3.5S15 10.4 15 8.5 16 5 17.3 5s2.2 1.6 2.2 3.5ZM14.5 8c0 2-1.1 3.6-2.5 3.6S9.5 10 9.5 8 10.6 4.4 12 4.4 14.5 6 14.5 8Z"
         stroke="currentColor"
         strokeWidth="1.6"
-      />
-    </svg>
-  );
-}
-
-function InfoIcon() {
-  return (
-    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" className="shrink-0 text-[#2F6BFF]">
-      <circle cx="12" cy="12" r="9" stroke="currentColor" strokeWidth="2" />
-      <path d="M12 11v6M12 7.5h.01" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
-    </svg>
-  );
-}
-
-function FileIcon() {
-  return (
-    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" className="shrink-0 text-[#2F6BFF]">
-      <path d="M7 3h7l4 4v14H7V3Z" stroke="currentColor" strokeWidth="1.8" strokeLinejoin="round" />
-      <path
-        d="M14 3v5h4M10 13h5M10 17h5"
-        stroke="currentColor"
-        strokeWidth="1.8"
-        strokeLinecap="round"
-      />
-    </svg>
-  );
-}
-
-function EyeIcon() {
-  return (
-    <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
-      <path
-        d="M2.5 12S6 6 12 6s9.5 6 9.5 6-3.5 6-9.5 6-9.5-6-9.5-6Z"
-        stroke="currentColor"
-        strokeWidth="1.8"
-      />
-      <circle cx="12" cy="12" r="2.7" stroke="currentColor" strokeWidth="1.8" />
-    </svg>
-  );
-}
-
-function DownloadIcon() {
-  return (
-    <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
-      <path
-        d="M12 4v10M8 10l4 4 4-4M4 19h16"
-        stroke="currentColor"
-        strokeWidth="1.8"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-      />
-    </svg>
-  );
-}
-
-function LockIcon() {
-  return (
-    <svg
-      width="19"
-      height="19"
-      viewBox="0 0 24 24"
-      fill="none"
-      className="mt-0.5 shrink-0 text-[#2F6BFF]"
-    >
-      <rect x="5" y="10" width="14" height="10" rx="2" stroke="currentColor" strokeWidth="1.8" />
-      <path
-        d="M8 10V7a4 4 0 0 1 8 0v3"
-        stroke="currentColor"
-        strokeWidth="1.8"
-        strokeLinecap="round"
       />
     </svg>
   );

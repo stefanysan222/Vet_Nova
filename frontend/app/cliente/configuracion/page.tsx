@@ -1,6 +1,7 @@
 "use client";
 
 import { ChangeEvent, FormEvent, useEffect, useState } from "react";
+import { User, Lock } from "lucide-react";
 import { useAuth } from "@/lib/auth-context";
 import { api } from "@/lib/api/client";
 import { updateUsuario } from "@/lib/api/usuarios";
@@ -155,7 +156,7 @@ export default function ConfiguracionPage() {
       <div className="max-w-[1100px] space-y-7">
         <form onSubmit={guardarPerfil} className="admin-card p-7">
           <div className="mb-7 flex items-center gap-3">
-            <UserIcon />
+            <User className="h-[22px] w-[22px] text-slate-800 dark:text-white" />
             <h2 className="text-section-title">Información Personal</h2>
           </div>
 
@@ -163,8 +164,8 @@ export default function ConfiguracionPage() {
             <div
               className={
                 mensajeEsError
-                  ? "mb-7 rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm font-medium text-red-700 dark:border-red-800 dark:bg-red-900/30 dark:text-red-400"
-                  : "mb-7 rounded-xl border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm font-medium text-emerald-700 dark:border-emerald-800 dark:bg-emerald-900/30 dark:text-emerald-400"
+                  ? "mb-7 rounded-xl border border-danger-200 bg-danger-50 px-4 py-3 text-sm font-medium text-danger-700 dark:border-danger-800 dark:bg-danger-900/30 dark:text-danger-400"
+                  : "mb-7 rounded-xl border border-success-200 bg-success-50 px-4 py-3 text-sm font-medium text-success-700 dark:border-success-800 dark:bg-success-900/30 dark:text-success-400"
               }
             >
               {mensaje}
@@ -213,17 +214,17 @@ export default function ConfiguracionPage() {
 
         <form onSubmit={cambiarPassword} className="admin-card p-7">
           <div className="mb-7 flex items-center gap-3">
-            <LockIcon />
+            <Lock className="h-[22px] w-[22px] text-slate-800 dark:text-white" />
             <h2 className="text-section-title">Seguridad</h2>
           </div>
 
           {mensajePwd && (
-            <div className="mb-5 rounded-xl border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm font-medium text-emerald-700 dark:border-emerald-800 dark:bg-emerald-900/30 dark:text-emerald-400">
+            <div className="mb-5 rounded-xl border border-success-200 bg-success-50 px-4 py-3 text-sm font-medium text-success-700 dark:border-success-800 dark:bg-success-900/30 dark:text-success-400">
               {mensajePwd}
             </div>
           )}
           {errorPwd && (
-            <div className="mb-5 rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm font-medium text-red-700 dark:border-red-800 dark:bg-red-900/30 dark:text-red-400">
+            <div className="mb-5 rounded-xl border border-danger-200 bg-danger-50 px-4 py-3 text-sm font-medium text-danger-700 dark:border-danger-800 dark:bg-danger-900/30 dark:text-danger-400">
               {errorPwd}
             </div>
           )}
@@ -299,7 +300,7 @@ function Field({
         type={type}
         value={value}
         onChange={onChange}
-        className="h-[45px] w-full rounded-lg border border-slate-200 bg-white px-4 text-sm text-slate-900 outline-none transition-all focus:border-brand-400 focus:ring-2 focus:ring-brand-400/10 dark:border-slate-700 dark:bg-slate-900 dark:text-white dark:focus:border-brand-400"
+        className="form-input"
       />
     </label>
   );
@@ -328,50 +329,8 @@ function PasswordField({
         value={value}
         onChange={onChange}
         placeholder="••••••••"
-        className="h-[45px] w-full rounded-lg border border-slate-200 bg-white px-4 text-sm text-slate-900 outline-none transition-all placeholder:text-slate-400 focus:border-brand-400 focus:ring-2 focus:ring-brand-400/10 dark:border-slate-700 dark:bg-slate-900 dark:text-white dark:placeholder:text-slate-600 dark:focus:border-brand-400"
+        className="form-input"
       />
     </label>
-  );
-}
-
-function UserIcon() {
-  return (
-    <svg
-      width="22"
-      height="22"
-      viewBox="0 0 24 24"
-      fill="none"
-      className="text-slate-800 dark:text-white"
-    >
-      <path d="M12 12a4 4 0 1 0 0-8 4 4 0 0 0 0 8Z" stroke="currentColor" strokeWidth="2" />
-
-      <path
-        d="M5 20c0-3.5 2.9-6 7-6s7 2.5 7 6"
-        stroke="currentColor"
-        strokeWidth="2"
-        strokeLinecap="round"
-      />
-    </svg>
-  );
-}
-
-function LockIcon() {
-  return (
-    <svg
-      width="22"
-      height="22"
-      viewBox="0 0 24 24"
-      fill="none"
-      className="text-slate-800 dark:text-white"
-    >
-      <rect x="4" y="10" width="16" height="10" rx="2" stroke="currentColor" strokeWidth="2" />
-
-      <path
-        d="M8 10V7a4 4 0 0 1 8 0v3"
-        stroke="currentColor"
-        strokeWidth="2"
-        strokeLinecap="round"
-      />
-    </svg>
   );
 }

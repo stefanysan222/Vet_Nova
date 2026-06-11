@@ -4,6 +4,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { ChangeEvent, FormEvent, useState } from "react";
+import { ArrowLeft } from "lucide-react";
 import { useAuth } from "@/lib/auth-context";
 import { fetchPropietarioByUsuario } from "../../../../lib/api/propietarios";
 import { createMascota } from "../../../../lib/api/mascotas";
@@ -41,10 +42,9 @@ const formularioInicial: FormularioMascota = {
   observaciones: "",
 };
 
-const inputClassName =
-  "mt-2 h-[48px] w-full rounded-xl border border-[#CBD5E1] bg-white px-4 text-[15px] text-[#10213A] outline-none transition-all placeholder:text-[#94A3B8] focus:border-[#2F6BFF] focus:ring-2 focus:ring-[#2F6BFF]/10 dark:border-[#334155] dark:bg-[#0F172A] dark:text-white dark:placeholder:text-[#64748B] dark:focus:border-[#2F6BFF]";
+const inputClassName = "form-input mt-2";
 
-const labelClassName = "text-[14px] font-semibold text-[#10213A] dark:text-white";
+const labelClassName = "form-label";
 
 export default function NuevaMascotaPage() {
   const router = useRouter();
@@ -201,24 +201,20 @@ export default function NuevaMascotaPage() {
   };
 
   return (
-    <div className="h-full overflow-y-auto bg-[#F5F7FB] px-6 py-8 dark:bg-[#0F172A]">
+    <div className="h-full overflow-y-auto bg-surface-50 px-6 py-8 dark:bg-surface-950">
       {/* Encabezado */}
       <div className="mb-8">
         <Link
           href="/cliente/mascotas"
-          className="mb-5 inline-flex items-center gap-2 text-[14px] font-medium text-[#64748B] transition-colors hover:text-[#2F6BFF] dark:text-[#94A3B8] dark:hover:text-[#60A5FA]"
+          className="mb-5 inline-flex items-center gap-2 text-sm font-medium text-surface-500 transition-colors hover:text-brand-600 dark:text-surface-400 dark:hover:text-brand-400"
         >
-          <ArrowLeftIcon />
+          <ArrowLeft className="h-[18px] w-[18px]" />
           Volver a mascotas
         </Link>
 
-        <h1 className="text-[24px] font-semibold leading-none text-[#10213A] dark:text-white">
-          Nueva Mascota
-        </h1>
+        <h1 className="text-page-title">Nueva Mascota</h1>
 
-        <p className="mt-4 text-[16px] text-[#64748B] dark:text-[#94A3B8]">
-          Registra la información de tu mascota
-        </p>
+        <p className="text-subtitle mt-2">Registra la información de tu mascota</p>
       </div>
 
       <form
@@ -226,26 +222,22 @@ export default function NuevaMascotaPage() {
         className="grid grid-cols-1 items-start gap-6 xl:grid-cols-[1fr_360px]"
       >
         {/* Información de la mascota */}
-        <section className="rounded-xl border border-[#CBD5E1] bg-white p-7 shadow-sm dark:border-[#334155] dark:bg-[#111827]">
+        <section className="rounded-xl border border-surface-200 bg-white p-7 shadow-sm dark:border-surface-700 dark:bg-surface-900">
           <div className="mb-7 flex items-center gap-3">
-            <div className="flex h-[46px] w-[46px] items-center justify-center rounded-xl bg-[#DBEAFE] text-[#2563EB] dark:bg-[#1E3A8A] dark:text-[#93C5FD]">
+            <div className="flex h-[46px] w-[46px] items-center justify-center rounded-xl bg-brand-100 text-brand-600 dark:bg-brand-900/40 dark:text-brand-300">
               <PetIcon />
             </div>
 
             <div>
-              <h2 className="text-[20px] font-semibold text-[#10213A] dark:text-white">
-                Información de la mascota
-              </h2>
+              <h2 className="text-section-title">Información de la mascota</h2>
 
-              <p className="mt-1 text-[14px] text-[#64748B] dark:text-[#94A3B8]">
-                Completa los datos básicos del registro
-              </p>
+              <p className="text-subtitle mt-1">Completa los datos básicos del registro</p>
             </div>
           </div>
 
           {/* Foto de la mascota */}
-          <div className="mb-8 flex flex-col gap-5 rounded-xl border border-[#E2E8F0] bg-[#F8FAFD] p-5 dark:border-[#334155] dark:bg-[#0F172A] sm:flex-row sm:items-center">
-            <div className="relative flex h-[104px] w-[104px] shrink-0 items-center justify-center overflow-hidden rounded-xl bg-[#DBEAFE] text-[#2563EB] dark:bg-[#1E3A8A] dark:text-[#93C5FD]">
+          <div className="mb-8 flex flex-col gap-5 rounded-xl border border-surface-200 bg-surface-50 p-5 dark:border-surface-700 dark:bg-surface-950 sm:flex-row sm:items-center">
+            <div className="relative flex h-28 w-28 shrink-0 items-center justify-center overflow-hidden rounded-xl bg-brand-100 text-brand-600 dark:bg-brand-900/40 dark:text-brand-300">
               {foto ? (
                 <Image
                   src={foto}
@@ -260,18 +252,18 @@ export default function NuevaMascotaPage() {
             </div>
 
             <div className="flex-1">
-              <p className="text-[15px] font-semibold text-[#10213A] dark:text-white">
+              <p className="text-sm font-semibold text-surface-900 dark:text-white">
                 Foto de la mascota
               </p>
 
-              <p className="mt-2 text-[14px] text-[#64748B] dark:text-[#94A3B8]">
+              <p className="mt-2 text-sm text-surface-500 dark:text-surface-400">
                 Selecciona una imagen JPG o PNG. Máximo 5 MB.
               </p>
 
               <div className="mt-4 flex flex-wrap gap-3">
                 <label
                   htmlFor="fotoMascota"
-                  className="inline-flex h-[42px] cursor-pointer items-center rounded-xl bg-[#2F6BFF] px-4 text-[14px] font-semibold text-white transition-all hover:bg-[#2457D6]"
+                  className="inline-flex h-10 cursor-pointer items-center rounded-xl bg-brand-600 px-4 text-sm font-semibold text-white transition-all hover:bg-brand-700"
                 >
                   {subiendoFoto ? "Subiendo..." : "Seleccionar foto"}
                 </label>
@@ -280,7 +272,7 @@ export default function NuevaMascotaPage() {
                   <button
                     type="button"
                     onClick={quitarFoto}
-                    className="inline-flex h-[42px] items-center rounded-xl border border-[#CBD5E1] bg-white px-4 text-[14px] font-semibold text-[#10213A] transition-all hover:border-[#EF4444] hover:text-[#EF4444] dark:border-[#334155] dark:bg-[#111827] dark:text-white"
+                    className="inline-flex h-10 items-center rounded-xl border border-surface-200 bg-white px-4 text-sm font-semibold text-surface-900 transition-all hover:border-danger-400 hover:text-danger-600 dark:border-surface-700 dark:bg-surface-900 dark:text-white"
                   >
                     Quitar foto
                   </button>
@@ -295,9 +287,7 @@ export default function NuevaMascotaPage() {
                 className="hidden"
               />
 
-              {errorFoto && (
-                <p className="mt-3 text-[13px] font-medium text-[#DC3545]">{errorFoto}</p>
-              )}
+              {errorFoto && <p className="mt-3 text-xs font-medium text-danger-600">{errorFoto}</p>}
             </div>
           </div>
 
@@ -406,12 +396,12 @@ export default function NuevaMascotaPage() {
               onChange={actualizarCampo}
               rows={4}
               placeholder="Alergias, cuidados especiales o información adicional..."
-              className="mt-2 w-full resize-none rounded-xl border border-[#CBD5E1] bg-white px-4 py-3 text-[15px] text-[#10213A] outline-none transition-all placeholder:text-[#94A3B8] focus:border-[#2F6BFF] focus:ring-2 focus:ring-[#2F6BFF]/10 dark:border-[#334155] dark:bg-[#0F172A] dark:text-white dark:placeholder:text-[#64748B] dark:focus:border-[#2F6BFF]"
+              className="form-input mt-2 resize-none"
             />
           </div>
 
           {errorFormulario && (
-            <p className="mt-5 rounded-xl border border-[#F1CDD1] bg-[#FFF2F3] px-4 py-3 text-[14px] font-medium text-[#DC3545] dark:border-[#67333B] dark:bg-[#28171B]">
+            <p className="dark:bg-danger-950/30 mt-5 rounded-xl border border-danger-200 bg-danger-50 px-4 py-3 text-sm font-medium text-danger-600 dark:border-danger-800 dark:text-danger-400">
               {errorFormulario}
             </p>
           )}
@@ -419,41 +409,36 @@ export default function NuevaMascotaPage() {
 
         {/* Panel lateral */}
         <aside className="space-y-5">
-          <section className="rounded-xl border border-[#CBD5E1] bg-white p-6 shadow-sm dark:border-[#334155] dark:bg-[#111827]">
-            <h2 className="text-[18px] font-semibold text-[#10213A] dark:text-white">
-              Propietario asociado
-            </h2>
+          <section className="rounded-xl border border-surface-200 bg-white p-6 shadow-sm dark:border-surface-700 dark:bg-surface-900">
+            <h2 className="text-section-title">Propietario asociado</h2>
 
-            <div className="mt-5 flex items-center gap-4 rounded-xl bg-[#F5F7FB] p-4 dark:bg-[#0F172A]">
+            <div className="mt-5 flex items-center gap-4 rounded-xl bg-surface-50 p-4 dark:bg-surface-950">
               <AvatarPropietario propietario={propietario} />
 
               <div>
-                <p className="text-[15px] font-semibold text-[#10213A] dark:text-white">
+                <p className="text-sm font-semibold text-surface-900 dark:text-white">
                   {propietario.nombreCompleto}
                 </p>
 
-                <p className="mt-1 text-[13px] text-[#64748B] dark:text-[#94A3B8]">Cliente</p>
+                <p className="mt-1 text-xs text-surface-500 dark:text-surface-400">Cliente</p>
               </div>
             </div>
 
-            <p className="mt-5 text-[14px] leading-6 text-[#64748B] dark:text-[#94A3B8]">
+            <p className="text-body mt-5">
               Esta mascota quedará asociada automáticamente a tu cuenta.
             </p>
           </section>
 
-          <section className="rounded-xl border border-[#CBD5E1] bg-white p-6 shadow-sm dark:border-[#334155] dark:bg-[#111827]">
+          <section className="rounded-xl border border-surface-200 bg-white p-6 shadow-sm dark:border-surface-700 dark:bg-surface-900">
             <button
               type="submit"
               disabled={guardando || subiendoFoto}
-              className="inline-flex h-[48px] w-full items-center justify-center gap-2 rounded-xl bg-[#2F6BFF] px-6 text-[15px] font-semibold text-white shadow-sm transition-all hover:-translate-y-0.5 hover:bg-[#2457D6] hover:shadow-[0_10px_20px_rgba(47,107,255,0.28)] disabled:cursor-not-allowed disabled:opacity-60 disabled:hover:translate-y-0"
+              className="btn-primary w-full"
             >
               {guardando ? "Guardando..." : "Guardar Mascota"}
             </button>
 
-            <Link
-              href="/cliente/mascotas"
-              className="mt-3 inline-flex h-[48px] w-full items-center justify-center rounded-xl border border-[#CBD5E1] bg-white px-6 text-[15px] font-semibold text-[#10213A] transition-all hover:bg-[#F8FAFD] dark:border-[#334155] dark:bg-[#111827] dark:text-white dark:hover:bg-[#0F172A]"
-            >
+            <Link href="/cliente/mascotas" className="btn-secondary mt-3 w-full">
               Cancelar
             </Link>
           </section>
@@ -472,7 +457,7 @@ function AvatarPropietario({ propietario }: { propietario: PropietarioActual }) 
     .join("");
 
   return (
-    <div className="relative flex h-[48px] w-[48px] shrink-0 items-center justify-center overflow-hidden rounded-full bg-[#2F6BFF] text-[17px] font-semibold text-white">
+    <div className="relative flex h-12 w-12 shrink-0 items-center justify-center overflow-hidden rounded-full bg-brand-600 text-base font-semibold text-white">
       {iniciales || "C"}
     </div>
   );
@@ -501,7 +486,7 @@ function InputField({
     <div>
       <label htmlFor={name} className={labelClassName}>
         {label}
-        {required && <span className="ml-1 text-[#2F6BFF]">*</span>}
+        {required && <span className="ml-1 text-brand-600">*</span>}
       </label>
 
       <input
@@ -542,7 +527,7 @@ function SelectField({
     <div>
       <label htmlFor={name} className={labelClassName}>
         {label}
-        {required && <span className="ml-1 text-[#2F6BFF]">*</span>}
+        {required && <span className="ml-1 text-brand-600">*</span>}
       </label>
 
       <select
@@ -592,20 +577,6 @@ function calcularEdad(fechaNacimiento: string) {
 
 function obtenerFechaActual() {
   return new Date().toISOString().split("T")[0];
-}
-
-function ArrowLeftIcon() {
-  return (
-    <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
-      <path
-        d="M15 18l-6-6 6-6"
-        stroke="currentColor"
-        strokeWidth="2"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-      />
-    </svg>
-  );
 }
 
 function PetIcon() {
