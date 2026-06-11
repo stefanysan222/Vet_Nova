@@ -1,10 +1,12 @@
-export type UserRole = "Administrador" | "Veterinario" | "Cliente";
+export type UserRole = "SuperAdministrador" | "Administrador" | "Veterinario" | "Cliente";
 
 export interface AuthUser {
   id: number;
   name: string;
   email: string;
   role: UserRole;
+  clinicaId: number | null;
+  clinicaNombre?: string;
 }
 
 export async function fetchMe(): Promise<AuthUser> {
@@ -43,6 +45,7 @@ export async function registerUser(data: {
   email: string;
   password: string;
   rol?: string;
+  clinicaSlug?: string;
 }): Promise<{ user?: AuthUser; error?: string }> {
   return postAuth("register", data);
 }
@@ -56,6 +59,7 @@ export async function loginUser(
 
 export async function loginOrRegisterGoogle(data: {
   credential: string;
+  clinicaSlug?: string;
 }): Promise<{ user?: AuthUser; error?: string }> {
   return postAuth("google", data);
 }

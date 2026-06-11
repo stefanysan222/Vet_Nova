@@ -70,7 +70,7 @@ export default function AuthLayout({ title, description, children }: AuthLayoutP
   };
 
   return (
-    <section className="relative min-h-screen overflow-hidden bg-gradient-to-br from-blue-50 via-white to-indigo-50 py-6 dark:from-slate-950 dark:via-slate-900 dark:to-slate-950">
+    <section className="relative min-h-screen overflow-hidden bg-gradient-to-br from-brand-50 via-white to-accent-50/30 py-6 dark:from-slate-950 dark:via-slate-900 dark:to-slate-950">
       <PetPattern />
 
       <div className="relative mx-auto flex w-full max-w-md flex-col items-center gap-5 px-4 sm:px-6">
@@ -106,7 +106,7 @@ export default function AuthLayout({ title, description, children }: AuthLayoutP
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.4, ease: [0.25, 0.1, 0.25, 1] }}
-          className="w-full overflow-hidden rounded-2xl border border-white/80 bg-white/90 shadow-xl backdrop-blur-md dark:border-slate-700/60 dark:bg-slate-900/90"
+          className="w-full overflow-hidden rounded-2xl border border-white/80 bg-white/90 shadow-modal backdrop-blur-md dark:border-slate-700/60 dark:bg-slate-900/90"
         >
           {/* Header */}
           <div className="flex items-center justify-between border-b border-slate-100 px-6 py-4 dark:border-slate-800">
@@ -129,7 +129,7 @@ export default function AuthLayout({ title, description, children }: AuthLayoutP
               </div>
               <span className="text-sm font-semibold text-slate-900 dark:text-white">VetNova</span>
             </Link>
-            <div className="flex items-center gap-1.5 rounded-lg bg-blue-50 px-3 py-1.5 text-xs font-medium text-blue-700 dark:bg-blue-900/30 dark:text-blue-400">
+            <div className="flex items-center gap-1.5 rounded-lg bg-brand-100 px-3 py-1.5 text-xs font-medium text-brand-600 dark:bg-brand-900/30 dark:text-brand-400">
               🐾 Clínica veterinaria
             </div>
           </div>

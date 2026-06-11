@@ -1,25 +1,47 @@
 "use client";
 
 import type { FormEvent } from "react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { Eye, EyeOff, Lock, Mail, UserCircle } from "lucide-react";
+import { Building2, Eye, EyeOff, Lock, Mail, UserCircle } from "lucide-react";
 import { motion } from "framer-motion";
 import GoogleAuthButton from "./GoogleAuthButton";
 import { registerUser, loginOrRegisterGoogle } from "../../../lib/auth";
+import { fetchClinicaBySlug } from "../../../lib/api/clinicas";
 import { useAuth } from "@/lib/auth-context";
 
 const initialState = { name: "", email: "", password: "", confirmPassword: "", acceptTerms: false };
 
-export default function RegisterForm() {
+export default function RegisterForm({ clinicaSlug }: { clinicaSlug?: string }) {
   const [formData, setFormData] = useState(initialState);
   const [showPassword, setShowPassword] = useState(false);
   const [focused, setFocused] = useState<string | null>(null);
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [submitError, setSubmitError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
+  const [clinicaState, setClinicaState] = useState<"loading" | "valid" | "invalid">(
+    clinicaSlug ? "loading" : "invalid",
+  );
+  const [clinicaNombre, setClinicaNombre] = useState<string>("");
   const router = useRouter();
   const { refresh } = useAuth();
+
+  useEffect(() => {
+    if (!clinicaSlug) return;
+    let cancelled = false;
+    fetchClinicaBySlug(clinicaSlug).then((clinica) => {
+      if (cancelled) return;
+      if (clinica && clinica.estado === "activa") {
+        setClinicaNombre(clinica.nombre);
+        setClinicaState("valid");
+      } else {
+        setClinicaState("invalid");
+      }
+    });
+    return () => {
+      cancelled = true;
+    };
+  }, [clinicaSlug]);
 
   const handleChange = (field: string, value: string | boolean) => {
     setFormData((c) => ({ ...c, [field]: value }));
@@ -50,7 +72,7 @@ export default function RegisterForm() {
   const handleGoogleSuccess = async (data: { credential: string }) => {
     setLoading(true);
     setSubmitError(null);
-    const result = await loginOrRegisterGoogle(data);
+    const result = await loginOrRegisterGoogle({ ...data, clinicaSlug });
     setLoading(false);
     if (result.error) {
       setSubmitError(result.error);
@@ -76,6 +98,7 @@ export default function RegisterForm() {
       email: formData.email,
       password: formData.password,
       rol: "Cliente",
+      clinicaSlug,
     });
     setLoading(false);
     if (result.error) {
@@ -92,9 +115,9 @@ export default function RegisterForm() {
   const inputBase = (field: string) =>
     `w-full rounded-xl border py-3 text-sm text-slate-900 outline-none transition-all duration-200 placeholder:text-slate-400 dark:text-white dark:placeholder-slate-500 ${
       errors[field]
-        ? "border-red-400 bg-red-50 dark:border-red-500 dark:bg-red-950/30"
+        ? "border-danger-400 bg-danger-50 dark:border-danger-500 dark:bg-danger-950/30"
         : focused === field
-          ? "border-blue-400 bg-blue-50/50 ring-2 ring-blue-100 dark:border-blue-500 dark:bg-blue-950/20 dark:ring-blue-900/40"
+          ? "border-brand-400 bg-brand-50/40 ring-2 ring-brand-100 dark:border-brand-500 dark:bg-brand-950/20 dark:ring-brand-900/40"
           : "border-slate-200 bg-white dark:border-slate-700 dark:bg-slate-800/60"
     }`;
 
@@ -110,27 +133,66 @@ export default function RegisterForm() {
     if (score <= 1)
       return {
         level: "Débil",
-        color: "bg-red-500",
+        color: "bg-danger-500",
         width: "w-1/4",
-        text: "text-red-600 dark:text-red-400",
+        text: "text-danger-600 dark:text-danger-400",
       };
     if (score <= 3)
       return {
         level: "Media",
-        color: "bg-amber-500",
+        color: "bg-warning-500",
         width: "w-2/4",
-        text: "text-amber-600 dark:text-amber-400",
+        text: "text-warning-600 dark:text-warning-400",
       };
     return {
       level: "Fuerte",
-      color: "bg-emerald-500",
+      color: "bg-success-500",
       width: "w-full",
-      text: "text-emerald-600 dark:text-emerald-400",
+      text: "text-success-600 dark:text-success-400",
     };
   })();
 
+  if (clinicaState === "loading") {
+    return (
+      <div className="flex items-center justify-center py-10">
+        <span className="inline-block h-6 w-6 animate-spin rounded-full border-2 border-slate-300 border-t-brand-600" />
+      </div>
+    );
+  }
+
+  if (clinicaState === "invalid") {
+    return (
+      <div className="space-y-4 text-center">
+        <div className="dark:bg-danger-950/30 mx-auto flex h-12 w-12 items-center justify-center rounded-2xl bg-danger-50 text-danger-600 dark:text-danger-400">
+          <Building2 className="h-6 w-6" />
+        </div>
+        <p className="text-sm leading-6 text-slate-600 dark:text-slate-300">
+          Este enlace de registro no es válido o la clínica está inactiva. Contacta a tu veterinaria
+          para obtener el enlace correcto.
+        </p>
+        <a
+          href="/login"
+          className="inline-block text-sm font-semibold text-brand-600 transition hover:text-brand-700 dark:text-brand-400 dark:hover:text-brand-300"
+        >
+          Volver a iniciar sesión
+        </a>
+      </div>
+    );
+  }
+
   return (
     <form onSubmit={handleSubmit} className="space-y-4" noValidate>
+      <motion.div
+        initial={{ opacity: 0, y: -6 }}
+        animate={{ opacity: 1, y: 0 }}
+        className="flex items-center gap-2 rounded-xl border border-brand-100 bg-brand-50 px-4 py-3 text-sm text-brand-700 dark:border-brand-900 dark:bg-brand-950/30 dark:text-brand-300"
+      >
+        <Building2 className="h-4 w-4 shrink-0" />
+        <span>
+          Te estás registrando en <strong>{clinicaNombre}</strong>
+        </span>
+      </motion.div>
+
       <motion.div
         initial={{ opacity: 0, y: 8 }}
         animate={{ opacity: 1, y: 0 }}
@@ -154,7 +216,7 @@ export default function RegisterForm() {
         <motion.div
           initial={{ opacity: 0, y: -6 }}
           animate={{ opacity: 1, y: 0 }}
-          className="rounded-xl border border-red-100 bg-red-50 px-4 py-3 text-sm text-red-700 dark:border-red-900 dark:bg-red-950 dark:text-red-400"
+          className="dark:bg-danger-950 rounded-xl border border-danger-100 bg-danger-50 px-4 py-3 text-sm text-danger-700 dark:border-danger-900 dark:text-danger-400"
         >
           {submitError}
         </motion.div>
@@ -179,7 +241,7 @@ export default function RegisterForm() {
           className="relative"
         >
           <UserCircle
-            className={`pointer-events-none absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 transition-colors ${focused === "name" ? "text-blue-500" : "text-slate-400"}`}
+            className={`pointer-events-none absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 transition-colors ${focused === "name" ? "text-brand-500" : "text-slate-400"}`}
           />
           <input
             id="name"
@@ -196,7 +258,7 @@ export default function RegisterForm() {
           <motion.p
             initial={{ opacity: 0, x: -4 }}
             animate={{ opacity: 1, x: 0 }}
-            className="text-xs text-red-600 dark:text-red-400"
+            className="text-xs text-danger-600 dark:text-danger-400"
           >
             {errors.name}
           </motion.p>
@@ -222,7 +284,7 @@ export default function RegisterForm() {
           className="relative"
         >
           <Mail
-            className={`pointer-events-none absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 transition-colors ${focused === "email" ? "text-blue-500" : "text-slate-400"}`}
+            className={`pointer-events-none absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 transition-colors ${focused === "email" ? "text-brand-500" : "text-slate-400"}`}
           />
           <input
             id="reg-email"
@@ -239,7 +301,7 @@ export default function RegisterForm() {
           <motion.p
             initial={{ opacity: 0, x: -4 }}
             animate={{ opacity: 1, x: 0 }}
-            className="text-xs text-red-600 dark:text-red-400"
+            className="text-xs text-danger-600 dark:text-danger-400"
           >
             {errors.email}
           </motion.p>
@@ -266,7 +328,7 @@ export default function RegisterForm() {
             className="relative"
           >
             <Lock
-              className={`pointer-events-none absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 transition-colors ${focused === "password" ? "text-blue-500" : "text-slate-400"}`}
+              className={`pointer-events-none absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 transition-colors ${focused === "password" ? "text-brand-500" : "text-slate-400"}`}
             />
             <input
               id="reg-password"
@@ -313,7 +375,7 @@ export default function RegisterForm() {
             <motion.p
               initial={{ opacity: 0, x: -4 }}
               animate={{ opacity: 1, x: 0 }}
-              className="text-xs text-red-600 dark:text-red-400"
+              className="text-xs text-danger-600 dark:text-danger-400"
             >
               {errors.password}
             </motion.p>
@@ -347,7 +409,7 @@ export default function RegisterForm() {
             <motion.p
               initial={{ opacity: 0, x: -4 }}
               animate={{ opacity: 1, x: 0 }}
-              className="text-xs text-red-600 dark:text-red-400"
+              className="text-xs text-danger-600 dark:text-danger-400"
             >
               {errors.confirmPassword}
             </motion.p>
@@ -366,7 +428,7 @@ export default function RegisterForm() {
             type="checkbox"
             checked={formData.acceptTerms}
             onChange={(e) => handleChange("acceptTerms", e.target.checked)}
-            className="mt-0.5 h-4 w-4 rounded border-slate-300 text-blue-600 focus:ring-blue-500"
+            className="mt-0.5 h-4 w-4 rounded border-slate-300 text-brand-600 focus:ring-brand-500"
           />
           Acepto los términos y condiciones del servicio
         </label>
@@ -374,7 +436,7 @@ export default function RegisterForm() {
           <motion.p
             initial={{ opacity: 0, x: -4 }}
             animate={{ opacity: 1, x: 0 }}
-            className="mt-1 text-xs text-red-600 dark:text-red-400"
+            className="mt-1 text-xs text-danger-600 dark:text-danger-400"
           >
             {errors.acceptTerms}
           </motion.p>
@@ -391,7 +453,7 @@ export default function RegisterForm() {
           disabled={loading}
           whileHover={{ scale: loading ? 1 : 1.02 }}
           whileTap={{ scale: loading ? 1 : 0.97 }}
-          className="w-full rounded-xl bg-blue-600 py-3 text-sm font-semibold text-white shadow-md transition hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-70 dark:bg-blue-600 dark:hover:bg-blue-500"
+          className="w-full rounded-xl bg-brand-600 py-3 text-sm font-semibold text-white shadow-brand-sm transition hover:bg-brand-700 disabled:cursor-not-allowed disabled:opacity-70 dark:bg-brand-600 dark:hover:bg-brand-500"
         >
           {loading ? (
             <span className="flex items-center justify-center gap-2">
@@ -417,7 +479,7 @@ export default function RegisterForm() {
         ¿Ya tienes cuenta?{" "}
         <a
           href="/login"
-          className="font-semibold text-blue-600 transition hover:text-blue-700 dark:text-blue-400 dark:hover:text-blue-300"
+          className="font-semibold text-brand-600 transition hover:text-brand-700 dark:text-brand-400 dark:hover:text-brand-300"
         >
           Iniciar sesión
         </a>

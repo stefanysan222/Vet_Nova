@@ -2,15 +2,17 @@ import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 import { API_URL } from "./lib/config";
 
-type UserRole = "Administrador" | "Veterinario" | "Cliente";
+type UserRole = "SuperAdministrador" | "Administrador" | "Veterinario" | "Cliente";
 
 const ROLE_REQUIRED: Record<string, UserRole> = {
+  "/super-admin": "SuperAdministrador",
   "/admin": "Administrador",
   "/veterinario": "Veterinario",
   "/cliente": "Cliente",
 };
 
 const ROLE_HOME: Record<UserRole, string> = {
+  SuperAdministrador: "/super-admin",
   Administrador: "/admin",
   Veterinario: "/veterinario",
   Cliente: "/cliente",

@@ -20,14 +20,12 @@ export async function apiFetch<T>(path: string, options?: RequestInit): Promise<
       }
       throw new Error("Sesión expirada. Por favor inicia sesión nuevamente.");
     }
-    if (res.status === 403) {
-      throw new Error("No tienes permiso para realizar esta acción.");
-    }
     if (res.status === 429) {
       throw new Error("Demasiados intentos. Intenta de nuevo en unos minutos.");
     }
     const text = await res.text().catch(() => "");
-    let message = `Error ${res.status}`;
+    let message =
+      res.status === 403 ? "No tienes permiso para realizar esta acción." : `Error ${res.status}`;
     try {
       const json = JSON.parse(text);
       message = Array.isArray(json.message) ? json.message[0] : (json.message ?? message);

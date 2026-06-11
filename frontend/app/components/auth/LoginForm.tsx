@@ -87,9 +87,9 @@ export default function LoginForm() {
   const inputBase = (field: string) =>
     `w-full rounded-xl border py-3 text-sm text-slate-900 outline-none transition-all duration-200 placeholder:text-slate-400 dark:text-white dark:placeholder-slate-500 ${
       errors[field]
-        ? "border-red-400 bg-red-50 dark:border-red-500 dark:bg-red-950/30"
+        ? "border-danger-400 bg-danger-50 dark:border-danger-500 dark:bg-danger-950/30"
         : focused === field
-          ? "border-blue-400 bg-blue-50/50 ring-2 ring-blue-100 dark:border-blue-500 dark:bg-blue-950/20 dark:ring-blue-900/40"
+          ? "border-brand-400 bg-brand-50/40 ring-2 ring-brand-100 dark:border-brand-500 dark:bg-brand-950/20 dark:ring-brand-900/40"
           : "border-slate-200 bg-white dark:border-slate-700 dark:bg-slate-800/60"
     }`;
 
@@ -118,7 +118,7 @@ export default function LoginForm() {
         <motion.div
           initial={{ opacity: 0, y: -6 }}
           animate={{ opacity: 1, y: 0 }}
-          className="rounded-xl border border-red-100 bg-red-50 px-4 py-3 text-sm text-red-700 dark:border-red-900 dark:bg-red-950 dark:text-red-400"
+          className="dark:bg-danger-950 rounded-xl border border-danger-100 bg-danger-50 px-4 py-3 text-sm text-danger-700 dark:border-danger-900 dark:text-danger-400"
         >
           {submitError}
         </motion.div>
@@ -143,7 +143,7 @@ export default function LoginForm() {
           className="relative"
         >
           <Mail
-            className={`pointer-events-none absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 transition-colors ${focused === "email" ? "text-blue-500" : "text-slate-400"}`}
+            className={`pointer-events-none absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 transition-colors ${focused === "email" ? "text-brand-500" : "text-slate-400"}`}
           />
           <input
             id="email"
@@ -160,7 +160,7 @@ export default function LoginForm() {
           <motion.p
             initial={{ opacity: 0, x: -4 }}
             animate={{ opacity: 1, x: 0 }}
-            className="text-xs text-red-600 dark:text-red-400"
+            className="text-xs text-danger-600 dark:text-danger-400"
           >
             {errors.email}
           </motion.p>
@@ -186,7 +186,7 @@ export default function LoginForm() {
           className="relative"
         >
           <Lock
-            className={`pointer-events-none absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 transition-colors ${focused === "password" ? "text-blue-500" : "text-slate-400"}`}
+            className={`pointer-events-none absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 transition-colors ${focused === "password" ? "text-brand-500" : "text-slate-400"}`}
           />
           <input
             id="password"
@@ -211,7 +211,7 @@ export default function LoginForm() {
           <motion.p
             initial={{ opacity: 0, x: -4 }}
             animate={{ opacity: 1, x: 0 }}
-            className="text-xs text-red-600 dark:text-red-400"
+            className="text-xs text-danger-600 dark:text-danger-400"
           >
             {errors.password}
           </motion.p>
@@ -226,7 +226,7 @@ export default function LoginForm() {
       >
         <a
           href="/forgot-password"
-          className="text-sm font-semibold text-blue-600 transition hover:text-blue-700 dark:text-blue-400 dark:hover:text-blue-300"
+          className="text-sm font-semibold text-brand-600 transition hover:text-brand-700 dark:text-brand-400 dark:hover:text-brand-300"
         >
           ¿Olvidaste tu contraseña?
         </a>
@@ -242,7 +242,7 @@ export default function LoginForm() {
           disabled={loading}
           whileHover={{ scale: loading ? 1 : 1.02 }}
           whileTap={{ scale: loading ? 1 : 0.97 }}
-          className="relative w-full overflow-hidden rounded-xl bg-blue-600 py-3 text-sm font-semibold text-white shadow-md transition hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-70 dark:bg-blue-600 dark:hover:bg-blue-500"
+          className="relative w-full overflow-hidden rounded-xl bg-brand-600 py-3 text-sm font-semibold text-white shadow-brand-sm transition hover:bg-brand-700 disabled:cursor-not-allowed disabled:opacity-70 dark:bg-brand-600 dark:hover:bg-brand-500"
         >
           {loading ? (
             <span className="flex items-center justify-center gap-2">
@@ -268,7 +268,7 @@ export default function LoginForm() {
         ¿Aún no tienes cuenta?{" "}
         <a
           href="/register"
-          className="font-semibold text-blue-600 transition hover:text-blue-700 dark:text-blue-400 dark:hover:text-blue-300"
+          className="font-semibold text-brand-600 transition hover:text-brand-700 dark:text-brand-400 dark:hover:text-brand-300"
         >
           Crear cuenta
         </a>
