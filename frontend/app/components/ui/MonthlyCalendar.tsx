@@ -2,6 +2,7 @@
 
 import { useMemo, useState } from "react";
 import { ChevronLeft, ChevronRight } from "lucide-react";
+import { useIsDarkMode } from "@/lib/hooks/useDarkMode";
 
 const DAY_LABELS = ["L", "M", "M", "J", "V", "S", "D"];
 const MONTH_LABELS = [
@@ -34,6 +35,7 @@ export default function MonthlyCalendar({
   accentColor = "#7C3AED",
   legendLabel = "Con citas",
 }: MonthlyCalendarProps) {
+  const isDark = useIsDarkMode();
   const today = new Date();
   const todayKey = today.toISOString().slice(0, 10);
   const [cursor, setCursor] = useState(new Date(today.getFullYear(), today.getMonth(), 1));
@@ -56,16 +58,16 @@ export default function MonthlyCalendar({
   }, [year, month]);
 
   return (
-    <div className="rounded-[13px] border-[0.5px] border-[#E4DFF0] bg-white px-4 py-3.5">
+    <div className="rounded-[13px] border-[0.5px] border-[#E4DFF0] bg-white px-4 py-3.5 dark:border-slate-700/60 dark:bg-slate-900">
       <div className="mb-3 flex items-center justify-between">
-        <h3 className="text-[12px] font-semibold capitalize text-slate-900">
+        <h3 className="text-[12px] font-semibold capitalize text-slate-900 dark:text-white">
           {MONTH_LABELS[month]} {year}
         </h3>
         <div className="flex items-center gap-1">
           <button
             type="button"
             onClick={() => setCursor(new Date(year, month - 1, 1))}
-            className="flex h-6 w-6 items-center justify-center rounded-md text-[#555068] transition hover:bg-[#F7F6FA]"
+            className="flex h-6 w-6 items-center justify-center rounded-md text-[#555068] transition hover:bg-[#F7F6FA] dark:text-slate-400 dark:hover:bg-slate-800"
             aria-label="Mes anterior"
           >
             <ChevronLeft className="h-3.5 w-3.5" />
@@ -73,7 +75,7 @@ export default function MonthlyCalendar({
           <button
             type="button"
             onClick={() => setCursor(new Date(year, month + 1, 1))}
-            className="flex h-6 w-6 items-center justify-center rounded-md text-[#555068] transition hover:bg-[#F7F6FA]"
+            className="flex h-6 w-6 items-center justify-center rounded-md text-[#555068] transition hover:bg-[#F7F6FA] dark:text-slate-400 dark:hover:bg-slate-800"
             aria-label="Mes siguiente"
           >
             <ChevronRight className="h-3.5 w-3.5" />
@@ -83,7 +85,7 @@ export default function MonthlyCalendar({
 
       <div className="grid grid-cols-7 gap-y-1.5 text-center">
         {DAY_LABELS.map((d, i) => (
-          <span key={i} className="text-[11px] font-semibold text-[#555068]">
+          <span key={i} className="text-[11px] font-semibold text-[#555068] dark:text-slate-400">
             {d}
           </span>
         ))}
@@ -99,7 +101,7 @@ export default function MonthlyCalendar({
                 style={
                   isToday
                     ? { background: accentColor, color: "#fff", fontWeight: 600 }
-                    : { color: "#334155" }
+                    : { color: isDark ? "#CBD5E1" : "#334155" }
                 }
               >
                 {cell.day}
@@ -113,13 +115,13 @@ export default function MonthlyCalendar({
         })}
       </div>
 
-      <div className="mt-3 flex items-center gap-4 border-t border-[#E4DFF0] pt-3">
-        <span className="flex items-center gap-1.5 text-[11px] text-[#555068]">
+      <div className="mt-3 flex items-center gap-4 border-t border-[#E4DFF0] pt-3 dark:border-slate-700/60">
+        <span className="flex items-center gap-1.5 text-[11px] text-[#555068] dark:text-slate-400">
           <span className="h-1.5 w-1.5 rounded-full" style={{ background: accentColor }} />
           {legendLabel}
         </span>
-        <span className="flex items-center gap-1.5 text-[11px] text-[#555068]">
-          <span className="h-1.5 w-1.5 rounded-full bg-slate-300" />
+        <span className="flex items-center gap-1.5 text-[11px] text-[#555068] dark:text-slate-400">
+          <span className="h-1.5 w-1.5 rounded-full bg-slate-300 dark:bg-slate-600" />
           Libre
         </span>
       </div>
