@@ -9,20 +9,34 @@ interface RegisterUserModalProps {
   isOpen: boolean;
   onClose: () => void;
   onCreated?: () => void;
+  initialRole?: "Veterinario" | "Cliente";
 }
 
 const inputClass = "form-input";
 
-export default function RegisterUserModal({ isOpen, onClose, onCreated }: RegisterUserModalProps) {
+export default function RegisterUserModal({
+  isOpen,
+  onClose,
+  onCreated,
+  initialRole = "Veterinario",
+}: RegisterUserModalProps) {
   const [formData, setFormData] = useState({
     name: "",
     email: "",
-    role: "Veterinario",
+    role: initialRole,
     password: "",
     confirmPassword: "",
   });
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
+  const [wasOpen, setWasOpen] = useState(isOpen);
+
+  if (isOpen !== wasOpen) {
+    setWasOpen(isOpen);
+    if (isOpen) {
+      setFormData((prev) => ({ ...prev, role: initialRole }));
+    }
+  }
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
@@ -31,7 +45,7 @@ export default function RegisterUserModal({ isOpen, onClose, onCreated }: Regist
   };
 
   const handleClose = () => {
-    setFormData({ name: "", email: "", role: "Veterinario", password: "", confirmPassword: "" });
+    setFormData({ name: "", email: "", role: initialRole, password: "", confirmPassword: "" });
     setError("");
     onClose();
   };

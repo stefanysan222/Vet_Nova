@@ -8,37 +8,12 @@ import { fetchMascotas } from "../../../lib/api/mascotas";
 import { fetchCitas } from "../../../lib/api/citas";
 import { StatusBadge } from "../../../lib/utils/status-badge";
 import type { Appointment } from "../../../lib/recepcionista/types";
-import {
-  Chart as ChartJS,
-  CategoryScale,
-  LinearScale,
-  BarElement,
-  Tooltip,
-  Legend,
-} from "chart.js";
-import { Bar } from "react-chartjs-2";
-import { CHART_COLORS } from "../../../lib/chart-colors";
+import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from "recharts";
 
-ChartJS.register(CategoryScale, LinearScale, BarElement, Tooltip, Legend);
-
-const valueLabelsPlugin = {
-  id: "valueLabels",
-  afterDatasetsDraw(chart: ChartJS) {
-    const { ctx } = chart;
-    const meta = chart.getDatasetMeta(0);
-    meta.data.forEach((bar, i) => {
-      const value = chart.data.datasets[0].data[i] as number;
-      if (value > 0) {
-        ctx.save();
-        ctx.fillStyle = "#475569";
-        ctx.font = "bold 11px system-ui, sans-serif";
-        ctx.textAlign = "center";
-        ctx.textBaseline = "bottom";
-        ctx.fillText(String(value), bar.x, bar.y - 4);
-        ctx.restore();
-      }
-    });
-  },
+const CHART_BAR_COLORS = {
+  hoy: "#7C3AED",
+  pasado: "#C4B5FD",
+  proximo: "#EDE9FE",
 };
 
 interface AllStats {
@@ -76,41 +51,36 @@ export default function ReportesPage() {
       title: "Total clientes",
       value: stats?.clientes,
       icon: Users,
-      accent: "bg-brand-50 text-brand-600 dark:bg-brand-950/40 dark:text-brand-400",
-      accentBar: "bg-brand-500",
-      border: "border-brand-100 dark:border-brand-900/40",
+      iconBg: "bg-blue-50 dark:bg-blue-500/10",
+      valueCls: "text-blue-600 dark:text-blue-400",
     },
     {
       title: "Total veterinarios",
       value: stats?.veterinarios,
       icon: Stethoscope,
-      accent: "bg-success-50 text-success-600 dark:bg-success-950/40 dark:text-success-400",
-      accentBar: "bg-success-500",
-      border: "border-success-100 dark:border-success-900/40",
+      iconBg: "bg-emerald-50 dark:bg-emerald-500/10",
+      valueCls: "text-emerald-600 dark:text-emerald-400",
     },
     {
       title: "Total mascotas",
       value: stats?.mascotas,
       icon: PawPrint,
-      accent: "bg-warning-50 text-warning-600 dark:bg-warning-950/40 dark:text-warning-400",
-      accentBar: "bg-warning-500",
-      border: "border-warning-100 dark:border-warning-900/40",
+      iconBg: "bg-orange-50 dark:bg-orange-500/10",
+      valueCls: "text-orange-600 dark:text-orange-400",
     },
     {
       title: "Citas hoy",
       value: stats?.citasHoy,
       icon: CalendarDays,
-      accent: "bg-brand-50 text-brand-500 dark:bg-brand-950/40 dark:text-brand-300",
-      accentBar: "bg-brand-400",
-      border: "border-brand-100 dark:border-brand-900/40",
+      iconBg: "bg-purple-50 dark:bg-purple-500/10",
+      valueCls: "text-purple-600 dark:text-purple-400",
     },
     {
       title: "Citas pendientes",
       value: stats?.citasPendientes,
       icon: Clock,
-      accent: "bg-accent-50 text-accent-600 dark:bg-accent-950/40 dark:text-accent-400",
-      accentBar: "bg-accent-500",
-      border: "border-accent-100 dark:border-accent-900/40",
+      iconBg: "bg-rose-50 dark:bg-rose-500/10",
+      valueCls: "text-rose-600 dark:text-rose-400",
     },
   ];
 
@@ -138,33 +108,19 @@ export default function ReportesPage() {
         if (c.date) conteo[c.date] = (conteo[c.date] ?? 0) + 1;
       });
 
-    // Filtrar solo fechas que tienen citas o son hoy
     const todayStr = hoy.toISOString().slice(0, 10);
     const fechasConDatos = fechas.filter((f) => conteo[f] || f === todayStr);
 
-    const labels = fechasConDatos.map((f) => {
+    return fechasConDatos.map((f) => {
       const [, m, d] = f.split("-");
-      return `${d}/${m}`;
+      const valor = conteo[f] ?? 0;
+      return {
+        date: `${d}/${m}`,
+        hoy: f === todayStr ? valor : 0,
+        pasado: f < todayStr ? valor : 0,
+        proximo: f > todayStr ? valor : 0,
+      };
     });
-
-    const todayIndex = fechasConDatos.indexOf(todayStr);
-    const backgroundColors = fechasConDatos.map((f) =>
-      f === todayStr ? CHART_COLORS.today : f < todayStr ? CHART_COLORS.past : CHART_COLORS.future,
-    );
-
-    return {
-      labels,
-      todayIndex,
-      datasets: [
-        {
-          label: "Citas",
-          data: fechasConDatos.map((f) => conteo[f] ?? 0),
-          backgroundColor: backgroundColors,
-          borderRadius: 6,
-          borderSkipped: false,
-        },
-      ],
-    };
   }, [citas]);
 
   // Distribución de citas por estado
@@ -209,8 +165,8 @@ export default function ReportesPage() {
   ].filter((d) => d.valor > 0);
 
   return (
-    <div className="px-5 pb-12 pt-6 sm:px-6 lg:px-10">
-      <section className="rounded-2xl border border-slate-200/60 bg-white p-6 shadow-card dark:border-slate-700 dark:bg-slate-900">
+    <div className="admin-page">
+      <section className="admin-card-padded">
         {/* Header */}
         <div>
           <p className="text-eyebrow">Reportes</p>
@@ -221,7 +177,7 @@ export default function ReportesPage() {
         </div>
 
         {/* Indicadores */}
-        <div className="mt-6 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-5">
+        <div className="mt-6 grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-5">
           {indicators.map((ind, i) => {
             const Icon = ind.icon;
             return (
@@ -230,26 +186,23 @@ export default function ReportesPage() {
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.4, delay: i * 0.07, ease: "easeOut" }}
-                className={`relative overflow-hidden rounded-2xl border ${ind.border} bg-white shadow-sm transition-all duration-200 hover:-translate-y-1 hover:shadow-md dark:bg-slate-800/50`}
+                className="admin-card px-5 py-4 transition-all duration-200 hover:-translate-y-1 hover:shadow-card-hover"
               >
-                <div className={`absolute inset-y-0 left-0 w-1 rounded-l-2xl ${ind.accentBar}`} />
-                <div className="px-5 py-4 pl-6">
-                  <div
-                    className={`mb-3 inline-flex h-9 w-9 items-center justify-center rounded-xl ${ind.accent}`}
-                  >
-                    <Icon className="h-4 w-4" />
-                  </div>
-                  <p className="mt-1 text-3xl font-bold tracking-tight text-slate-900 dark:text-white">
-                    {loading ? (
-                      <span className="inline-block h-8 w-10 animate-pulse rounded-lg bg-slate-100 dark:bg-slate-800" />
-                    ) : (
-                      (ind.value ?? 0)
-                    )}
-                  </p>
-                  <p className="mt-1 text-xs font-medium text-slate-500 dark:text-slate-400">
-                    {ind.title}
-                  </p>
+                <div
+                  className={`mb-3 flex h-9 w-9 shrink-0 items-center justify-center rounded-xl ${ind.iconBg}`}
+                >
+                  <Icon className={`h-4 w-4 ${ind.valueCls}`} />
                 </div>
+                <p className={`text-3xl font-bold leading-none tracking-tight ${ind.valueCls}`}>
+                  {loading ? (
+                    <span className="inline-block h-8 w-10 animate-pulse rounded-lg bg-slate-100 dark:bg-slate-800" />
+                  ) : (
+                    (ind.value ?? 0)
+                  )}
+                </p>
+                <p className="mt-1.5 text-xs font-medium text-slate-500 dark:text-slate-400">
+                  {ind.title}
+                </p>
               </motion.article>
             );
           })}
@@ -258,65 +211,80 @@ export default function ReportesPage() {
         {/* Gráfica de barras — citas programadas */}
         {!loading && citas.length > 0 && (
           <div className="mt-8">
-            <div className="mb-4">
-              <h2 className="text-base font-semibold text-slate-900 dark:text-white">
-                Citas programadas por día
-              </h2>
-              <p className="mt-0.5 text-xs text-slate-400 dark:text-slate-500">
-                Últimos 30 días y próximos 14 ·{" "}
-                <span className="inline-flex items-center gap-1">
-                  <span className="inline-block h-2 w-2 rounded-sm bg-brand-600" /> Hoy
-                </span>{" "}
-                <span className="ml-3 inline-flex items-center gap-1">
-                  <span className="inline-block h-2 w-2 rounded-sm bg-brand-300" /> Pasado
-                </span>{" "}
-                <span className="ml-3 inline-flex items-center gap-1">
-                  <span className="inline-block h-2 w-2 rounded-sm bg-brand-100" /> Próximo
-                </span>
-              </p>
+            <div className="mb-1">
+              <h2 className="text-section-title">Citas programadas por día</h2>
+              <p className="mt-0.5 text-xs text-slate-400">Últimos 30 días y próximos 14</p>
             </div>
-            <div className="rounded-2xl border border-slate-100 bg-slate-50 p-4 dark:border-slate-800 dark:bg-slate-800/50">
-              <div className="h-60 w-full">
-                <Bar
-                  data={chartData}
-                  plugins={[valueLabelsPlugin]}
-                  options={{
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    plugins: {
-                      legend: { display: false },
-                      tooltip: {
-                        backgroundColor: CHART_COLORS.tooltipBg,
-                        padding: 12,
-                        cornerRadius: 10,
-                        titleColor: CHART_COLORS.tooltipTitle,
-                        bodyColor: CHART_COLORS.tooltipBody,
-                        callbacks: {
-                          title: (items) => {
-                            const idx = items[0]?.dataIndex ?? 0;
-                            return `Fecha: ${chartData.labels[idx] ?? ""}`;
-                          },
-                          label: (item) => `  ${item.raw} cita${Number(item.raw) !== 1 ? "s" : ""}`,
-                        },
-                      },
-                    },
-                    scales: {
-                      y: {
-                        beginAtZero: true,
-                        suggestedMax: 5,
-                        ticks: { stepSize: 1, color: "#94a3b8", font: { size: 11 } },
-                        grid: { color: "rgba(226,232,240,0.6)" },
-                        border: { display: false },
-                      },
-                      x: {
-                        ticks: { color: "#94a3b8", font: { size: 10 }, maxRotation: 40 },
-                        grid: { display: false },
-                        border: { display: false },
-                      },
-                    },
-                  }}
+            <div className="mb-3 mt-3 flex items-center gap-4">
+              <span className="flex items-center gap-1.5 text-[11px] text-slate-500 dark:text-slate-400">
+                <span
+                  className="inline-block h-2 w-2 rounded-full"
+                  style={{ background: CHART_BAR_COLORS.hoy }}
                 />
-              </div>
+                Hoy
+              </span>
+              <span className="flex items-center gap-1.5 text-[11px] text-slate-500 dark:text-slate-400">
+                <span
+                  className="inline-block h-2 w-2 rounded-full"
+                  style={{ background: CHART_BAR_COLORS.pasado }}
+                />
+                Pasado
+              </span>
+              <span className="flex items-center gap-1.5 text-[11px] text-slate-500 dark:text-slate-400">
+                <span
+                  className="inline-block h-2 w-2 rounded-full"
+                  style={{ background: CHART_BAR_COLORS.proximo }}
+                />
+                Próximo
+              </span>
+            </div>
+            <div className="h-60 w-full">
+              <ResponsiveContainer width="100%" height="100%">
+                <BarChart data={chartData} barSize={22} barGap={4}>
+                  <CartesianGrid vertical={false} stroke="var(--color-border)" />
+                  <XAxis
+                    dataKey="date"
+                    tick={{ fontSize: 10, fill: "var(--color-muted)" }}
+                    axisLine={false}
+                    tickLine={false}
+                  />
+                  <YAxis
+                    tick={{ fontSize: 10, fill: "var(--color-muted)" }}
+                    axisLine={false}
+                    tickLine={false}
+                    allowDecimals={false}
+                  />
+                  <Tooltip
+                    cursor={{ fill: "transparent" }}
+                    contentStyle={{
+                      background: "var(--color-surface)",
+                      border: "1px solid var(--color-border)",
+                      borderRadius: 10,
+                      fontSize: 12,
+                      color: "var(--color-text)",
+                    }}
+                    formatter={(value) => [`${value} cita${Number(value) !== 1 ? "s" : ""}`, ""]}
+                  />
+                  <Bar
+                    dataKey="hoy"
+                    stackId="citas"
+                    fill={CHART_BAR_COLORS.hoy}
+                    radius={[6, 6, 6, 6]}
+                  />
+                  <Bar
+                    dataKey="pasado"
+                    stackId="citas"
+                    fill={CHART_BAR_COLORS.pasado}
+                    radius={[6, 6, 6, 6]}
+                  />
+                  <Bar
+                    dataKey="proximo"
+                    stackId="citas"
+                    fill={CHART_BAR_COLORS.proximo}
+                    radius={[6, 6, 6, 6]}
+                  />
+                </BarChart>
+              </ResponsiveContainer>
             </div>
           </div>
         )}

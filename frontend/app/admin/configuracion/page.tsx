@@ -1,13 +1,31 @@
-﻿"use client";
+"use client";
 
 import { useEffect, useState } from "react";
-import { User, Mail, Lock, Eye, EyeOff } from "lucide-react";
+import { Eye, EyeOff } from "lucide-react";
 import { useAuth } from "@/lib/auth-context";
 import { updateUsuario } from "../../../lib/api/usuarios";
 import { useToast } from "../../components/ui/Toast";
 
+const cardClass = "rounded-[14px] border-[0.5px] border-[#E4DFF0] bg-white";
+
 const inputClass =
-  "w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-2.5 text-sm text-slate-900 outline-none transition focus:border-brand-500 focus:ring-2 focus:ring-brand-100 dark:border-slate-700 dark:bg-slate-800 dark:text-white dark:placeholder-slate-500";
+  "w-full rounded-[9px] border-[0.5px] border-[#E4DFF0] bg-[#F7F6FA] px-3 py-[9px] text-sm text-slate-900 outline-none transition focus:border-[#7C3AED] focus:bg-white";
+
+const labelClass =
+  "mb-1.5 block text-[10px] font-semibold uppercase tracking-[0.05em] text-[#555068]";
+
+const btnPrimaryClass =
+  "inline-flex items-center justify-center rounded-[9px] bg-[#7C3AED] px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-[#6D28D9] disabled:opacity-50";
+
+const btnSecondaryClass =
+  "inline-flex items-center justify-center rounded-[9px] border-[0.5px] border-[#E4DFF0] bg-transparent px-5 py-2.5 text-sm font-semibold text-[#555068] transition hover:bg-[#F7F6FA]";
+
+function getInitials(name: string): string {
+  const parts = name.trim().split(/\s+/).filter(Boolean);
+  if (parts.length === 0) return "?";
+  if (parts.length === 1) return parts[0][0]?.toUpperCase() ?? "?";
+  return (parts[0][0] + parts[1][0]).toUpperCase();
+}
 
 export default function ConfiguracionPage() {
   const { user } = useAuth();
@@ -15,6 +33,8 @@ export default function ConfiguracionPage() {
 
   const [nombre, setNombre] = useState("");
   const [email, setEmail] = useState("");
+  const [savedNombre, setSavedNombre] = useState("");
+  const [savedEmail, setSavedEmail] = useState("");
 
   useEffect(() => {
     if (!user) return;
@@ -22,57 +42,45 @@ export default function ConfiguracionPage() {
     // eslint-disable-next-line react-hooks/set-state-in-effect
     setNombre(user.name);
     setEmail(user.email);
+    setSavedNombre(user.name);
+    setSavedEmail(user.email);
   }, [user]);
+
   const [currentPassword, setCurrentPassword] = useState("");
   const [newPassword, setNewPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
+  const [showCurrent, setShowCurrent] = useState(false);
   const [showNew, setShowNew] = useState(false);
   const [showConfirm, setShowConfirm] = useState(false);
 
-  const [savingNombre, setSavingNombre] = useState(false);
-  const [savingEmail, setSavingEmail] = useState(false);
+  const [savingProfile, setSavingProfile] = useState(false);
   const [savingPassword, setSavingPassword] = useState(false);
 
-  const handleSaveNombre = async (e: React.FormEvent) => {
+  const handleSaveProfile = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!nombre.trim()) return;
-    if (!user) return;
-    setSavingNombre(true);
+    if (!nombre.trim() || !email.trim() || !user) return;
+    setSavingProfile(true);
     try {
-      await updateUsuario(user.id, { nombre: nombre.trim() });
+      await updateUsuario(user.id, { nombre: nombre.trim(), email: email.trim() });
+      setSavedNombre(nombre.trim());
+      setSavedEmail(email.trim());
       success(
-        "Nombre actualizado",
-        "El nombre de usuario se actualizó correctamente. Vuelve a iniciar sesión para ver los cambios reflejados.",
+        "Perfil actualizado",
+        "Tus datos se actualizaron correctamente. Vuelve a iniciar sesión para ver los cambios reflejados.",
       );
     } catch (err) {
       error(
         "Error al actualizar",
-        err instanceof Error ? err.message : "No se pudo actualizar el nombre.",
+        err instanceof Error ? err.message : "No se pudo actualizar el perfil.",
       );
     } finally {
-      setSavingNombre(false);
+      setSavingProfile(false);
     }
   };
 
-  const handleSaveEmail = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!email.trim()) return;
-    if (!user) return;
-    setSavingEmail(true);
-    try {
-      await updateUsuario(user.id, { email: email.trim() });
-      success(
-        "Correo actualizado",
-        "El correo electrónico se actualizó correctamente. Vuelve a iniciar sesión para aplicar el cambio.",
-      );
-    } catch (err) {
-      error(
-        "Error al actualizar",
-        err instanceof Error ? err.message : "No se pudo actualizar el correo.",
-      );
-    } finally {
-      setSavingEmail(false);
-    }
+  const handleCancelProfile = () => {
+    setNombre(savedNombre);
+    setEmail(savedEmail);
   };
 
   const handleSavePassword = async (e: React.FormEvent) => {
@@ -114,30 +122,63 @@ export default function ConfiguracionPage() {
     }
   };
 
+  const handleCancelPassword = () => {
+    setCurrentPassword("");
+    setNewPassword("");
+    setConfirmPassword("");
+  };
+
+  const profileUnchanged = nombre.trim() === savedNombre && email.trim() === savedEmail;
+
   return (
-    <div className="admin-page">
-      <section className="admin-card-padded">
-        {/* Header */}
-        <div>
-          <p className="text-eyebrow">Configuración</p>
-          <h1 className="text-page-title mt-2">Perfil de cuenta</h1>
-          <p className="text-subtitle mt-1">
-            Actualiza tu nombre de usuario, correo electrónico y contraseña.
-          </p>
+    <div className="admin-page bg-[#F7F6FA] dark:bg-transparent">
+      <div className="mb-6">
+        <p className="text-eyebrow">Configuración</p>
+        <h1 className="text-page-title mt-2">Perfil de cuenta</h1>
+        <p className="text-subtitle mt-1">
+          Actualiza tu nombre de usuario, correo electrónico y contraseña.
+        </p>
+      </div>
+
+      <div className="grid grid-cols-1 gap-2 lg:grid-cols-4 lg:grid-rows-5">
+        {/* Vista previa del perfil */}
+        <div className={`${cardClass} p-6 lg:col-span-2 lg:row-span-5`}>
+          <div className="flex flex-col items-center text-center">
+            <div className="flex h-16 w-16 items-center justify-center rounded-full bg-[#7C3AED] text-xl font-semibold text-white">
+              {getInitials(savedNombre || "?")}
+            </div>
+            <h2 className="mt-4 text-base font-semibold text-slate-900">{savedNombre}</h2>
+            <p className="mt-1 text-sm text-[#555068]">{user?.role ?? "—"}</p>
+            <p className="mt-0.5 text-xs text-[#555068]">{user?.clinicaNombre ?? "—"}</p>
+          </div>
+
+          <div className="mt-6 space-y-3 border-t border-[#E4DFF0] pt-5">
+            <div className="flex items-center justify-between gap-4">
+              <span className={labelClass + " mb-0"}>Nombre</span>
+              <span className="text-sm font-medium text-slate-900">{savedNombre}</span>
+            </div>
+            <div className="flex items-center justify-between gap-4">
+              <span className={labelClass + " mb-0"}>Correo</span>
+              <span className="text-sm font-medium text-slate-900">{savedEmail}</span>
+            </div>
+            <div className="flex items-center justify-between gap-4">
+              <span className={labelClass + " mb-0"}>Clínica</span>
+              <span className="text-sm font-medium text-slate-900">
+                {user?.clinicaNombre ?? "—"}
+              </span>
+            </div>
+          </div>
         </div>
 
-        <div className="mt-8 max-w-lg space-y-6">
-          {/* Nombre de usuario */}
-          <form
-            onSubmit={handleSaveNombre}
-            className="rounded-2xl border border-slate-200/70 bg-white p-5 shadow-xs dark:border-slate-700 dark:bg-slate-800/50"
-          >
-            <div className="mb-4 flex items-center gap-2">
-              <User className="h-4 w-4 text-brand-600 dark:text-brand-400" />
-              <h2 className="text-sm font-semibold text-slate-900 dark:text-white">
-                Nombre de usuario
-              </h2>
-            </div>
+        {/* Formulario de actualización de datos */}
+        <form
+          onSubmit={handleSaveProfile}
+          className={`${cardClass} p-6 lg:col-span-2 lg:col-start-3 lg:row-span-3`}
+        >
+          <h2 className="mb-5 text-sm font-semibold text-slate-900">Información personal</h2>
+
+          <div>
+            <label className={labelClass}>Nombre completo</label>
             <input
               type="text"
               value={nombre}
@@ -146,28 +187,10 @@ export default function ConfiguracionPage() {
               required
               className={inputClass}
             />
-            <div className="mt-4 flex justify-end">
-              <button
-                type="submit"
-                disabled={savingNombre || !nombre.trim() || nombre.trim() === user?.name}
-                className="btn-primary disabled:opacity-50 disabled:hover:translate-y-0"
-              >
-                {savingNombre ? "Guardando..." : "Guardar nombre"}
-              </button>
-            </div>
-          </form>
+          </div>
 
-          {/* Correo electrónico */}
-          <form
-            onSubmit={handleSaveEmail}
-            className="rounded-2xl border border-slate-200/70 bg-white p-5 shadow-xs dark:border-slate-700 dark:bg-slate-800/50"
-          >
-            <div className="mb-4 flex items-center gap-2">
-              <Mail className="h-4 w-4 text-brand-600 dark:text-brand-400" />
-              <h2 className="text-sm font-semibold text-slate-900 dark:text-white">
-                Correo electrónico
-              </h2>
-            </div>
+          <div className="mt-4">
+            <label className={labelClass}>Correo electrónico</label>
             <input
               type="email"
               value={email}
@@ -176,111 +199,118 @@ export default function ConfiguracionPage() {
               required
               className={inputClass}
             />
-            <div className="mt-4 flex justify-end">
-              <button
-                type="submit"
-                disabled={savingEmail || !email.trim() || email.trim() === user?.email}
-                className="btn-primary disabled:opacity-50 disabled:hover:translate-y-0"
-              >
-                {savingEmail ? "Guardando..." : "Guardar correo"}
-              </button>
-            </div>
-          </form>
+          </div>
 
-          {/* Contraseña */}
-          <form
-            onSubmit={handleSavePassword}
-            className="rounded-2xl border border-slate-200/70 bg-white p-5 shadow-xs dark:border-slate-700 dark:bg-slate-800/50"
-          >
-            <div className="mb-4 flex items-center gap-2">
-              <Lock className="h-4 w-4 text-brand-600 dark:text-brand-400" />
-              <h2 className="text-sm font-semibold text-slate-900 dark:text-white">Contraseña</h2>
-            </div>
-            <div className="space-y-3">
-              <div>
-                <label className="mb-1 block text-xs font-medium text-slate-500 dark:text-slate-400">
-                  Contraseña actual
-                </label>
+          <div className="mt-6 flex justify-end gap-3">
+            <button type="button" onClick={handleCancelProfile} className={btnSecondaryClass}>
+              Cancelar
+            </button>
+            <button
+              type="submit"
+              disabled={savingProfile || !nombre.trim() || !email.trim() || profileUnchanged}
+              className={btnPrimaryClass}
+            >
+              {savingProfile ? "Guardando..." : "Guardar cambios"}
+            </button>
+          </div>
+        </form>
+
+        {/* Formulario de cambio de contraseña */}
+        <form
+          onSubmit={handleSavePassword}
+          className={`${cardClass} p-6 lg:col-span-2 lg:col-start-3 lg:row-span-2 lg:row-start-4`}
+        >
+          <h2 className="mb-5 text-sm font-semibold text-slate-900">Cambiar contraseña</h2>
+
+          <div className="grid gap-4 sm:grid-cols-3">
+            <div>
+              <label className={labelClass}>Contraseña actual</label>
+              <div className="relative">
                 <input
-                  type="password"
+                  type={showCurrent ? "text" : "password"}
                   value={currentPassword}
                   onChange={(e) => setCurrentPassword(e.target.value)}
                   placeholder="••••••••"
                   autoComplete="current-password"
-                  className={inputClass}
+                  className={inputClass + " pr-10"}
                 />
-              </div>
-              <div>
-                <label className="mb-1 block text-xs font-medium text-slate-500 dark:text-slate-400">
-                  Nueva contraseña
-                </label>
-                <div className="relative">
-                  <input
-                    type={showNew ? "text" : "password"}
-                    value={newPassword}
-                    onChange={(e) => setNewPassword(e.target.value)}
-                    placeholder="Mínimo 8 caracteres"
-                    className={inputClass + " pr-10"}
-                  />
-                  <button
-                    type="button"
-                    onClick={() => setShowNew(!showNew)}
-                    className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200"
-                  >
-                    {showNew ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
-                  </button>
-                </div>
-              </div>
-              <div>
-                <label className="mb-1 block text-xs font-medium text-slate-500 dark:text-slate-400">
-                  Confirmar contraseña
-                </label>
-                <div className="relative">
-                  <input
-                    type={showConfirm ? "text" : "password"}
-                    value={confirmPassword}
-                    onChange={(e) => setConfirmPassword(e.target.value)}
-                    placeholder="Repite la nueva contraseña"
-                    className={inputClass + " pr-10"}
-                  />
-                  <button
-                    type="button"
-                    onClick={() => setShowConfirm(!showConfirm)}
-                    className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200"
-                  >
-                    {showConfirm ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
-                  </button>
-                </div>
-              </div>
-
-              {/* Indicador de coincidencia */}
-              {newPassword && confirmPassword && (
-                <p
-                  className={`text-xs font-medium ${newPassword === confirmPassword ? "text-success-600 dark:text-success-400" : "text-danger-600 dark:text-danger-400"}`}
+                <button
+                  type="button"
+                  onClick={() => setShowCurrent(!showCurrent)}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-[#555068] hover:text-slate-700"
                 >
-                  {newPassword === confirmPassword
-                    ? "✓ Las contraseñas coinciden"
-                    : "✗ Las contraseñas no coinciden"}
-                </p>
-              )}
+                  {showCurrent ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                </button>
+              </div>
             </div>
-            <div className="mt-4 flex justify-end">
-              <button
-                type="submit"
-                disabled={savingPassword || !newPassword || !confirmPassword}
-                className="btn-primary disabled:opacity-50 disabled:hover:translate-y-0"
-              >
-                {savingPassword ? "Guardando..." : "Cambiar contraseña"}
-              </button>
-            </div>
-          </form>
 
-          {/* Aviso re-login */}
-          <p className="text-xs text-slate-400 dark:text-slate-500">
-            Los cambios de nombre y correo se aplican en la próxima sesión iniciada.
-          </p>
-        </div>
-      </section>
+            <div>
+              <label className={labelClass}>Nueva contraseña</label>
+              <div className="relative">
+                <input
+                  type={showNew ? "text" : "password"}
+                  value={newPassword}
+                  onChange={(e) => setNewPassword(e.target.value)}
+                  placeholder="Mín. 8 caracteres"
+                  autoComplete="new-password"
+                  className={inputClass + " pr-10"}
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowNew(!showNew)}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-[#555068] hover:text-slate-700"
+                >
+                  {showNew ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                </button>
+              </div>
+            </div>
+
+            <div>
+              <label className={labelClass}>Confirmar contraseña</label>
+              <div className="relative">
+                <input
+                  type={showConfirm ? "text" : "password"}
+                  value={confirmPassword}
+                  onChange={(e) => setConfirmPassword(e.target.value)}
+                  placeholder="Repite la contraseña"
+                  autoComplete="new-password"
+                  className={inputClass + " pr-10"}
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowConfirm(!showConfirm)}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-[#555068] hover:text-slate-700"
+                >
+                  {showConfirm ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                </button>
+              </div>
+            </div>
+          </div>
+
+          {newPassword && confirmPassword && (
+            <p
+              className={`mt-3 text-xs font-medium ${newPassword === confirmPassword ? "text-success-600" : "text-danger-600"}`}
+            >
+              {newPassword === confirmPassword
+                ? "✓ Las contraseñas coinciden"
+                : "✗ Las contraseñas no coinciden"}
+            </p>
+          )}
+
+          <div className="mt-6 flex justify-end gap-3">
+            <button type="button" onClick={handleCancelPassword} className={btnSecondaryClass}>
+              Cancelar
+            </button>
+            <button
+              type="submit"
+              disabled={savingPassword || !newPassword || !confirmPassword}
+              className={btnPrimaryClass}
+            >
+              {savingPassword ? "Actualizando..." : "Actualizar contraseña"}
+            </button>
+          </div>
+        </form>
+      </div>
     </div>
   );
 }

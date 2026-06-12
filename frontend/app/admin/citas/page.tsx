@@ -11,7 +11,7 @@ import { useToast } from "../../components/ui/Toast";
 import ConfirmDialog from "../../components/ui/ConfirmDialog";
 import { StatusBadge } from "../../../lib/utils/status-badge";
 import { AnimatePresence, motion } from "framer-motion";
-import { CalendarDays, Clock, User, X } from "lucide-react";
+import { CalendarDays, CheckCircle2, Clock, User, X } from "lucide-react";
 
 type AppointmentStatus = Appointment["status"];
 
@@ -368,26 +368,38 @@ export default function CitasPage() {
           </div>
 
           {/* Estadísticas */}
-          <div className="mt-7 grid gap-4 lg:grid-cols-3">
-            <article className="relative overflow-hidden rounded-2xl border border-slate-200/70 bg-white p-5 shadow-xs dark:border-slate-700 dark:bg-slate-800/50">
-              <div className="absolute inset-y-0 left-0 w-1 rounded-l-2xl bg-slate-400" />
-              <p className="text-label pl-1">Total citas</p>
-              <p className="text-stat mt-1 pl-1 text-slate-900 dark:text-white">
+          <div className="mt-7 grid gap-4 sm:grid-cols-3">
+            <article className="admin-card px-5 py-4">
+              <div className="mb-3 flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-slate-100 dark:bg-slate-800">
+                <CalendarDays className="h-4 w-4 text-slate-500 dark:text-slate-400" />
+              </div>
+              <p className="text-3xl font-bold leading-none tracking-tight text-slate-900 dark:text-white">
                 {loading ? "—" : appointments.length}
               </p>
-            </article>
-            <article className="relative overflow-hidden rounded-2xl border border-accent-200/70 bg-accent-50 p-5 shadow-xs dark:border-accent-900 dark:bg-accent-950/30">
-              <div className="absolute inset-y-0 left-0 w-1 rounded-l-2xl bg-accent-500" />
-              <p className="text-label pl-1 text-accent-600 dark:text-accent-400">Pendientes</p>
-              <p className="text-stat mt-1 pl-1 text-accent-800 dark:text-accent-300">
-                {loading ? "—" : pendientes}
+              <p className="mt-1.5 text-xs font-medium text-slate-500 dark:text-slate-400">
+                Total citas
               </p>
             </article>
-            <article className="dark:bg-success-950/30 relative overflow-hidden rounded-2xl border border-success-200/70 bg-success-50 p-5 shadow-xs dark:border-success-900">
-              <div className="absolute inset-y-0 left-0 w-1 rounded-l-2xl bg-success-500" />
-              <p className="text-label pl-1 text-success-600 dark:text-success-400">Confirmadas</p>
-              <p className="text-stat mt-1 pl-1 text-success-800 dark:text-success-300">
+            <article className="admin-card px-5 py-4">
+              <div className="mb-3 flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-amber-50 dark:bg-amber-500/10">
+                <Clock className="h-4 w-4 text-amber-600 dark:text-amber-400" />
+              </div>
+              <p className="text-3xl font-bold leading-none tracking-tight text-amber-600 dark:text-amber-400">
+                {loading ? "—" : pendientes}
+              </p>
+              <p className="mt-1.5 text-xs font-medium text-slate-500 dark:text-slate-400">
+                Pendientes
+              </p>
+            </article>
+            <article className="admin-card px-5 py-4">
+              <div className="mb-3 flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-emerald-50 dark:bg-emerald-500/10">
+                <CheckCircle2 className="h-4 w-4 text-emerald-600 dark:text-emerald-400" />
+              </div>
+              <p className="text-3xl font-bold leading-none tracking-tight text-emerald-600 dark:text-emerald-400">
                 {loading ? "—" : confirmadas}
+              </p>
+              <p className="mt-1.5 text-xs font-medium text-slate-500 dark:text-slate-400">
+                Confirmadas
               </p>
             </article>
           </div>
