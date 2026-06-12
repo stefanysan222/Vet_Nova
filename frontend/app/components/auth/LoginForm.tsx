@@ -3,10 +3,10 @@
 import type { FormEvent } from "react";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { Eye, EyeOff, Lock, Mail } from "lucide-react";
+import { Building2, Eye, EyeOff, Lock, Mail } from "lucide-react";
 import { motion } from "framer-motion";
 import GoogleAuthButton from "./GoogleAuthButton";
-import { loginUser, loginOrRegisterGoogle } from "../../../lib/auth";
+import { loginUser, loginOrRegisterGoogle, type ClinicaOpcion } from "../../../lib/auth";
 import { useAuth } from "@/lib/auth-context";
 
 const initialState = { email: "", password: "" };
@@ -23,6 +23,8 @@ export default function LoginForm() {
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [submitError, setSubmitError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
+  const [clinicOptions, setClinicOptions] = useState<ClinicaOpcion[] | null>(null);
+  const [pendingGoogleCredential, setPendingGoogleCredential] = useState<string | null>(null);
   const router = useRouter();
   const { refresh } = useAuth();
 
@@ -56,6 +58,11 @@ export default function LoginForm() {
       setSubmitError(result.error);
       return;
     }
+    if (result.requiresClinicSelection) {
+      setPendingGoogleCredential(data.credential);
+      setClinicOptions(result.clinicas ?? []);
+      return;
+    }
     if (result.user) {
       await refresh();
       router.push(getDashboardRoute(result.user.role));
@@ -77,8 +84,34 @@ export default function LoginForm() {
       setSubmitError(result.error);
       return;
     }
+    if (result.requiresClinicSelection) {
+      setClinicOptions(result.clinicas ?? []);
+      return;
+    }
     setErrors({});
     if (result.user) {
+      await refresh();
+      router.push(getDashboardRoute(result.user.role));
+    }
+  };
+
+  const handleSelectClinica = async (clinica: ClinicaOpcion) => {
+    setLoading(true);
+    setSubmitError(null);
+    const result = pendingGoogleCredential
+      ? await loginOrRegisterGoogle({
+          credential: pendingGoogleCredential,
+          clinicaSlug: clinica.slug,
+        })
+      : await loginUser(formData.email, formData.password, clinica.slug);
+    setLoading(false);
+    if (result.error) {
+      setSubmitError(result.error);
+      return;
+    }
+    if (result.user) {
+      setClinicOptions(null);
+      setPendingGoogleCredential(null);
       await refresh();
       router.push(getDashboardRoute(result.user.role));
     }
@@ -92,6 +125,54 @@ export default function LoginForm() {
           ? "border-brand-400 bg-brand-50/40 ring-2 ring-brand-100 dark:border-brand-500 dark:bg-brand-950/20 dark:ring-brand-900/40"
           : "border-slate-200 bg-white dark:border-slate-700 dark:bg-slate-800/60"
     }`;
+
+  if (clinicOptions) {
+    return (
+      <div className="space-y-4">
+        <div className="text-center">
+          <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-2xl bg-brand-50 text-brand-600 dark:bg-brand-950/30 dark:text-brand-400">
+            <Building2 className="h-6 w-6" />
+          </div>
+          <p className="mt-3 text-sm leading-6 text-slate-600 dark:text-slate-300">
+            Tienes una cuenta en varias clínicas. Selecciona con cuál deseas iniciar sesión.
+          </p>
+        </div>
+
+        {submitError && (
+          <div className="dark:bg-danger-950 rounded-xl border border-danger-100 bg-danger-50 px-4 py-3 text-sm text-danger-700 dark:border-danger-900 dark:text-danger-400">
+            {submitError}
+          </div>
+        )}
+
+        <div className="max-h-72 space-y-2 overflow-y-auto pr-1">
+          {clinicOptions.map((clinica) => (
+            <button
+              key={clinica.slug}
+              type="button"
+              disabled={loading}
+              onClick={() => handleSelectClinica(clinica)}
+              className="flex w-full items-center gap-3 rounded-xl border border-slate-200 px-4 py-3 text-left text-sm font-medium text-slate-700 transition hover:border-brand-300 hover:bg-brand-50 disabled:opacity-60 dark:border-slate-700 dark:text-slate-200 dark:hover:border-brand-700 dark:hover:bg-brand-950/20"
+            >
+              <Building2 className="h-4 w-4 shrink-0 text-brand-500" />
+              {clinica.nombre}
+            </button>
+          ))}
+        </div>
+
+        <button
+          type="button"
+          onClick={() => {
+            setClinicOptions(null);
+            setPendingGoogleCredential(null);
+            setSubmitError(null);
+          }}
+          className="block w-full text-center text-sm font-semibold text-brand-600 transition hover:text-brand-700 dark:text-brand-400 dark:hover:text-brand-300"
+        >
+          Volver
+        </button>
+      </div>
+    );
+  }
 
   return (
     <form onSubmit={handleSubmit} className="space-y-5" noValidate>

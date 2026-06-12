@@ -30,6 +30,11 @@ export async function POST(req: Request) {
 
   if (json.token) {
     await setAuthCookie(json.token);
+    return NextResponse.json({ user: json.user });
+  }
+
+  if (json.requiresClinicSelection) {
+    return NextResponse.json({ requiresClinicSelection: true, clinicas: json.clinicas });
   }
 
   return NextResponse.json({ user: json.user });

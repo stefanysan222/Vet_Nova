@@ -19,7 +19,19 @@ export async function logout(): Promise<void> {
   await fetch("/api/auth/logout", { method: "POST", credentials: "include" });
 }
 
-async function postAuth(path: string, data: unknown): Promise<{ user?: AuthUser; error?: string }> {
+export interface ClinicaOpcion {
+  nombre: string;
+  slug: string;
+}
+
+interface AuthResult {
+  user?: AuthUser;
+  error?: string;
+  requiresClinicSelection?: boolean;
+  clinicas?: ClinicaOpcion[];
+}
+
+async function postAuth(path: string, data: unknown): Promise<AuthResult> {
   try {
     const res = await fetch(`/api/auth/${path}`, {
       method: "POST",
@@ -33,6 +45,9 @@ async function postAuth(path: string, data: unknown): Promise<{ user?: AuthUser;
     if (!res.ok) {
       const msg = Array.isArray(json.message) ? json.message[0] : json.message;
       return { error: msg ?? "No se pudo completar la solicitud." };
+    }
+    if (json.requiresClinicSelection) {
+      return { requiresClinicSelection: true, clinicas: json.clinicas };
     }
     return { user: json.user };
   } catch {
@@ -53,14 +68,15 @@ export async function registerUser(data: {
 export async function loginUser(
   email: string,
   password: string,
-): Promise<{ user?: AuthUser; error?: string }> {
-  return postAuth("login", { email, password });
+  clinicaSlug?: string,
+): Promise<AuthResult> {
+  return postAuth("login", { email, password, clinicaSlug });
 }
 
 export async function loginOrRegisterGoogle(data: {
   credential: string;
   clinicaSlug?: string;
-}): Promise<{ user?: AuthUser; error?: string }> {
+}): Promise<AuthResult> {
   return postAuth("google", data);
 }
 
