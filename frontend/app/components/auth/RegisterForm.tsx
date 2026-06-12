@@ -7,7 +7,11 @@ import { Building2, Eye, EyeOff, Lock, Mail, UserCircle } from "lucide-react";
 import { motion } from "framer-motion";
 import GoogleAuthButton from "./GoogleAuthButton";
 import { registerUser, loginOrRegisterGoogle } from "../../../lib/auth";
-import { fetchClinicaBySlug } from "../../../lib/api/clinicas";
+import {
+  fetchClinicaBySlug,
+  fetchClinicasActivas,
+  type ClinicaActiva,
+} from "../../../lib/api/clinicas";
 import { useAuth } from "@/lib/auth-context";
 
 const initialState = { name: "", email: "", password: "", confirmPassword: "", acceptTerms: false };
@@ -19,10 +23,13 @@ export default function RegisterForm({ clinicaSlug }: { clinicaSlug?: string }) 
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [submitError, setSubmitError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
-  const [clinicaState, setClinicaState] = useState<"loading" | "valid" | "invalid">(
-    clinicaSlug ? "loading" : "invalid",
+  const [clinicaState, setClinicaState] = useState<"loading" | "valid" | "invalid" | "select">(
+    clinicaSlug ? "loading" : "select",
   );
   const [clinicaNombre, setClinicaNombre] = useState<string>("");
+  const [resolvedSlug, setResolvedSlug] = useState<string | undefined>(clinicaSlug);
+  const [clinicasActivas, setClinicasActivas] = useState<ClinicaActiva[]>([]);
+  const [loadingClinicas, setLoadingClinicas] = useState(!clinicaSlug);
   const router = useRouter();
   const { refresh } = useAuth();
 
@@ -42,6 +49,27 @@ export default function RegisterForm({ clinicaSlug }: { clinicaSlug?: string }) 
       cancelled = true;
     };
   }, [clinicaSlug]);
+
+  useEffect(() => {
+    if (clinicaSlug) return;
+    let cancelled = false;
+    fetchClinicasActivas()
+      .then((data) => {
+        if (!cancelled) setClinicasActivas(data);
+      })
+      .finally(() => {
+        if (!cancelled) setLoadingClinicas(false);
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, [clinicaSlug]);
+
+  const handleSelectClinica = (clinica: ClinicaActiva) => {
+    setResolvedSlug(clinica.slug);
+    setClinicaNombre(clinica.nombre);
+    setClinicaState("valid");
+  };
 
   const handleChange = (field: string, value: string | boolean) => {
     setFormData((c) => ({ ...c, [field]: value }));
@@ -72,7 +100,7 @@ export default function RegisterForm({ clinicaSlug }: { clinicaSlug?: string }) 
   const handleGoogleSuccess = async (data: { credential: string }) => {
     setLoading(true);
     setSubmitError(null);
-    const result = await loginOrRegisterGoogle({ ...data, clinicaSlug });
+    const result = await loginOrRegisterGoogle({ ...data, clinicaSlug: resolvedSlug });
     setLoading(false);
     if (result.error) {
       setSubmitError(result.error);
@@ -98,7 +126,7 @@ export default function RegisterForm({ clinicaSlug }: { clinicaSlug?: string }) 
       email: formData.email,
       password: formData.password,
       rol: "Cliente",
-      clinicaSlug,
+      clinicaSlug: resolvedSlug,
     });
     setLoading(false);
     if (result.error) {
@@ -156,6 +184,56 @@ export default function RegisterForm({ clinicaSlug }: { clinicaSlug?: string }) 
     return (
       <div className="flex items-center justify-center py-10">
         <span className="inline-block h-6 w-6 animate-spin rounded-full border-2 border-slate-300 border-t-brand-600" />
+      </div>
+    );
+  }
+
+  if (clinicaState === "select") {
+    return (
+      <div className="space-y-4">
+        <div className="text-center">
+          <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-2xl bg-brand-50 text-brand-600 dark:bg-brand-950/30 dark:text-brand-400">
+            <Building2 className="h-6 w-6" />
+          </div>
+          <p className="mt-3 text-sm leading-6 text-slate-600 dark:text-slate-300">
+            Selecciona la clínica veterinaria en la que deseas registrarte.
+          </p>
+        </div>
+
+        {loadingClinicas ? (
+          <div className="flex items-center justify-center py-6">
+            <span className="inline-block h-6 w-6 animate-spin rounded-full border-2 border-slate-300 border-t-brand-600" />
+          </div>
+        ) : clinicasActivas.length === 0 ? (
+          <p className="text-center text-sm text-slate-500 dark:text-slate-400">
+            No hay clínicas disponibles por el momento. Contacta a tu veterinaria para obtener tu
+            enlace de registro.
+          </p>
+        ) : (
+          <div className="max-h-72 space-y-2 overflow-y-auto pr-1">
+            {clinicasActivas.map((clinica) => (
+              <button
+                key={clinica.slug}
+                type="button"
+                onClick={() => handleSelectClinica(clinica)}
+                className="flex w-full items-center gap-3 rounded-xl border border-slate-200 px-4 py-3 text-left text-sm font-medium text-slate-700 transition hover:border-brand-300 hover:bg-brand-50 dark:border-slate-700 dark:text-slate-200 dark:hover:border-brand-700 dark:hover:bg-brand-950/20"
+              >
+                <Building2 className="h-4 w-4 shrink-0 text-brand-500" />
+                {clinica.nombre}
+              </button>
+            ))}
+          </div>
+        )}
+
+        <p className="text-center text-sm text-slate-500 dark:text-slate-400">
+          ¿Ya tienes cuenta?{" "}
+          <a
+            href="/login"
+            className="font-semibold text-brand-600 transition hover:text-brand-700 dark:text-brand-400 dark:hover:text-brand-300"
+          >
+            Iniciar sesión
+          </a>
+        </p>
       </div>
     );
   }

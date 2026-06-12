@@ -19,6 +19,7 @@ export interface Clinica {
   telefono: string;
   email: string;
   estado: string;
+  createdAt: string;
 }
 
 function mapClinica(c: ClinicaAPI): Clinica {
@@ -30,6 +31,7 @@ function mapClinica(c: ClinicaAPI): Clinica {
     telefono: c.telefono ?? "",
     email: c.email ?? "",
     estado: c.estado,
+    createdAt: c.created_at,
   };
 }
 
@@ -78,5 +80,16 @@ export async function fetchClinicaBySlug(slug: string): Promise<ClinicaPublica |
     credentials: "include",
   });
   if (!res.ok) return null;
+  return res.json();
+}
+
+export interface ClinicaActiva {
+  nombre: string;
+  slug: string;
+}
+
+export async function fetchClinicasActivas(): Promise<ClinicaActiva[]> {
+  const res = await fetch(`/api/backend/clinicas/activas`, { credentials: "include" });
+  if (!res.ok) return [];
   return res.json();
 }
