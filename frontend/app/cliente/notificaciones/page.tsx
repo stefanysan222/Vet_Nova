@@ -1,114 +1,95 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
-import { useAuth } from "@/lib/auth-context";
-import { fetchCitas } from "../../../lib/api/citas";
-import { fetchPropietarioByUsuario } from "../../../lib/api/propietarios";
 import {
-  Check,
-  Bell,
-  BellRing,
-  CalendarDays,
-  Clock,
-  Syringe,
-  CreditCard,
-  Settings,
-} from "lucide-react";
+  fetchNotificaciones,
+  marcarLeida,
+  marcarTodasLeidas,
+  type NotificacionAPI,
+} from "../../../lib/api/notificaciones";
+import { Check, Bell, BellRing, CalendarDays, UserRound, Settings } from "lucide-react";
 
-type Notification = {
-  title: string;
-  description: string;
-  time: string;
-  category: string;
-  unread: boolean;
-  icon: "calendar" | "vaccine" | "payment" | "system";
-  color: string;
+type IconKey = "calendar" | "account" | "system";
+
+const TIPO_INFO: Record<string, { category: string; icon: IconKey; color: string }> = {
+  cita_actualizada: {
+    category: "Citas",
+    icon: "calendar",
+    color: "bg-brand-100 text-brand-600 dark:bg-brand-900/40 dark:text-brand-300",
+  },
+  nueva_cita: {
+    category: "Citas",
+    icon: "calendar",
+    color: "bg-brand-100 text-brand-600 dark:bg-brand-900/40 dark:text-brand-300",
+  },
+  bienvenida: {
+    category: "Cuenta",
+    icon: "account",
+    color: "bg-success-100 text-success-700 dark:bg-success-900/30 dark:text-success-400",
+  },
+  perfil_actualizado: {
+    category: "Cuenta",
+    icon: "account",
+    color: "bg-success-100 text-success-700 dark:bg-success-900/30 dark:text-success-400",
+  },
 };
 
-function citaHaciaNotificacion(a: {
-  id: string;
-  petName: string;
-  service: string;
-  date: string;
-  time: string;
-  status: string;
-  veterinarian?: string;
-}): Notification {
-  const esVacuna = /vacun/i.test(a.service);
-  const icon: Notification["icon"] = esVacuna ? "vaccine" : "calendar";
-  const color = esVacuna
-    ? "bg-success-100 text-success-700 dark:bg-success-900/30 dark:text-success-400"
-    : "bg-brand-100 text-brand-600 dark:bg-brand-900/40 dark:text-brand-300";
+const DEFAULT_TIPO_INFO = {
+  category: "General",
+  icon: "system" as IconKey,
+  color: "bg-slate-100 text-slate-600 dark:bg-slate-800 dark:text-slate-300",
+};
 
-  const titulos: Record<string, string> = {
-    Confirmada: "Cita confirmada",
-    Pendiente: "Solicitud de cita pendiente",
-    "En atención": "Tu mascota está en atención",
-    "En espera": "Tu mascota está en espera",
-    Finalizada: "Consulta finalizada",
-    Cancelada: "Cita cancelada",
-    "No asistió": "Cita sin asistencia",
-    Reprogramada: "Cita reprogramada",
-  };
+function tipoInfo(tipo?: string) {
+  return (tipo && TIPO_INFO[tipo]) || DEFAULT_TIPO_INFO;
+}
 
-  const descripciones: Record<string, string> = {
-    Confirmada: `Tu cita para ${a.petName} (${a.service}) fue confirmada para el ${a.date} a las ${a.time}.`,
-    Pendiente: `Se registró una solicitud de cita para ${a.petName} (${a.service}). Espera confirmación.`,
-    "En atención": `${a.petName} está siendo atendido/a en este momento.`,
-    "En espera": `${a.petName} se encuentra en sala de espera para su cita de ${a.service}.`,
-    Finalizada: `La consulta de ${a.petName} (${a.service}) fue finalizada exitosamente.`,
-    Cancelada: `La cita de ${a.petName} para ${a.service} fue cancelada.`,
-    "No asistió": `${a.petName} no asistió a la cita de ${a.service} del ${a.date}.`,
-    Reprogramada: `La cita de ${a.petName} para ${a.service} fue reprogramada.`,
-  };
-
-  return {
-    title: titulos[a.status] ?? "Notificación de cita",
-    description: descripciones[a.status] ?? `Cita de ${a.petName} · ${a.service}`,
-    time: a.date,
-    category: esVacuna ? "Vacunas" : "Citas",
-    unread: ["Confirmada", "Pendiente", "En espera", "En atención"].includes(a.status),
-    icon,
-    color,
-  };
+function formatFecha(dateStr: string): string {
+  const fecha = new Date(dateStr);
+  if (Number.isNaN(fecha.getTime())) return dateStr;
+  return fecha.toLocaleString("es-CO", {
+    day: "numeric",
+    month: "short",
+    hour: "2-digit",
+    minute: "2-digit",
+  });
 }
 
 export default function NotificacionesPage() {
-  const [notifications, setNotifications] = useState<Notification[]>([]);
-  const [selectedNotification, setSelectedNotification] = useState<Notification | null>(null);
+  const [notifications, setNotifications] = useState<NotificacionAPI[]>([]);
+  const [selectedId, setSelectedId] = useState<number | null>(null);
   const [filter, setFilter] = useState<"all" | "unread" | "read">("all");
-  const { user } = useAuth();
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    if (!user) return;
-    const uid = Number(user.id);
-    fetchPropietarioByUsuario(uid)
-      .then((prop) => {
-        if (!prop) return fetchCitas(uid);
-        return fetchCitas(uid);
-      })
-      .then((appts) => {
-        const limiteFecha = new Date(Date.now() - 30 * 86400000).toISOString().slice(0, 10);
-        const recientes = appts
-          .filter((a) => a.date >= limiteFecha)
-          .sort((a, b) => b.date.localeCompare(a.date));
-        setNotifications(recientes.map(citaHaciaNotificacion));
-      })
-      .catch(() => {});
-  }, [user]);
+    fetchNotificaciones()
+      .then(setNotifications)
+      .catch(() => setNotifications([]))
+      .finally(() => setLoading(false));
+  }, []);
 
-  const unreadCount = notifications.filter((item) => item.unread).length;
+  const unreadCount = notifications.filter((n) => !n.leida).length;
   const filteredNotifications = useMemo(() => {
-    if (filter === "unread") return notifications.filter((item) => item.unread);
-    if (filter === "read") return notifications.filter((item) => !item.unread);
+    if (filter === "unread") return notifications.filter((n) => !n.leida);
+    if (filter === "read") return notifications.filter((n) => n.leida);
     return notifications;
   }, [filter, notifications]);
 
-  const selected = selectedNotification || null;
+  const selected = notifications.find((n) => n.id === selectedId) ?? null;
 
   const handleViewAll = () => {
     setFilter("all");
-    setSelectedNotification(null);
+    setSelectedId(null);
+  };
+
+  const handleMarcarLeida = async (id: number) => {
+    await marcarLeida(id).catch(() => {});
+    setNotifications((prev) => prev.map((n) => (n.id === id ? { ...n, leida: true } : n)));
+  };
+
+  const handleMarcarTodas = async () => {
+    await marcarTodasLeidas().catch(() => {});
+    setNotifications((prev) => prev.map((n) => ({ ...n, leida: true })));
   };
 
   return (
@@ -120,9 +101,13 @@ export default function NotificacionesPage() {
           <p className="text-subtitle mt-2">Centro de alertas y recordatorios</p>
         </div>
 
-        <button type="button" onClick={handleViewAll} className="btn-primary whitespace-nowrap">
+        <button
+          type="button"
+          onClick={unreadCount > 0 ? handleMarcarTodas : handleViewAll}
+          className="btn-primary whitespace-nowrap"
+        >
           <Check className="h-[18px] w-[18px]" />
-          Ver todas
+          {unreadCount > 0 ? "Marcar todas como leídas" : "Ver todas"}
         </button>
       </div>
 
@@ -142,14 +127,18 @@ export default function NotificacionesPage() {
 
         <SummaryCard
           title="Citas"
-          value={notifications.filter((n) => n.category === "Citas").length.toString()}
+          value={notifications
+            .filter((n) => tipoInfo(n.tipo).category === "Citas")
+            .length.toString()}
           icon={<CalendarDays className="h-[22px] w-[22px]" />}
         />
 
         <SummaryCard
-          title="Recordatorios"
-          value={notifications.filter((n) => n.category === "Vacunas").length.toString()}
-          icon={<Clock className="h-[22px] w-[22px]" />}
+          title="Cuenta"
+          value={notifications
+            .filter((n) => tipoInfo(n.tipo).category === "Cuenta")
+            .length.toString()}
+          icon={<UserRound className="h-[22px] w-[22px]" />}
         />
       </div>
 
@@ -161,7 +150,7 @@ export default function NotificacionesPage() {
             <div>
               <h2 className="text-section-title">Notificaciones recientes</h2>
               <p className="text-subtitle mt-1">
-                Revisa las novedades relacionadas con tus mascotas y citas.
+                Revisa las novedades relacionadas con tu cuenta y tus citas.
               </p>
             </div>
 
@@ -183,7 +172,16 @@ export default function NotificacionesPage() {
             </div>
           </div>
 
-          {filteredNotifications.length === 0 ? (
+          {loading ? (
+            <div className="space-y-3">
+              {[1, 2, 3].map((i) => (
+                <div
+                  key={i}
+                  className="h-20 animate-pulse rounded-2xl bg-slate-100 dark:bg-slate-800"
+                />
+              ))}
+            </div>
+          ) : filteredNotifications.length === 0 ? (
             <div className="rounded-2xl border border-dashed border-slate-300 bg-slate-50 p-10 text-center dark:border-slate-700 dark:bg-slate-800/50">
               <p className="text-section-title">No hay notificaciones con este filtro.</p>
               <p className="text-subtitle mt-2">
@@ -195,49 +193,64 @@ export default function NotificacionesPage() {
             </div>
           ) : (
             <div className="divide-y divide-slate-200 dark:divide-slate-700">
-              {filteredNotifications.map((item) => (
-                <article
-                  key={`${item.title}-${item.time}`}
-                  className="flex items-start justify-between gap-5 py-5 first:pt-0 last:pb-0"
-                >
-                  <div className="flex min-w-0 gap-4">
-                    <div
-                      className={`flex h-12 w-12 shrink-0 items-center justify-center rounded-xl ${item.color}`}
-                    >
-                      {item.icon === "calendar" && <CalendarDays className="h-[22px] w-[22px]" />}
-                      {item.icon === "vaccine" && <Syringe className="h-[22px] w-[22px]" />}
-                      {item.icon === "payment" && <CreditCard className="h-[22px] w-[22px]" />}
-                      {item.icon === "system" && <Settings className="h-[22px] w-[22px]" />}
-                    </div>
-
-                    <div className="min-w-0">
-                      <div className="flex items-center gap-2">
-                        <h3 className="text-sm font-semibold text-slate-900 dark:text-white">
-                          {item.title}
-                        </h3>
-                        {item.unread && <span className="h-2 w-2 rounded-full bg-accent-500" />}
-                      </div>
-                      <p className="mt-1 max-w-[720px] text-sm leading-6 text-slate-500 dark:text-slate-400">
-                        {item.description}
-                      </p>
-                      <div className="mt-2 flex items-center gap-3">
-                        <span className="rounded-lg bg-slate-100 px-2.5 py-0.5 text-xs font-semibold text-slate-600 dark:bg-slate-800 dark:text-slate-300">
-                          {item.category}
-                        </span>
-                        <span className="text-xs text-slate-400">{item.time}</span>
-                      </div>
-                    </div>
-                  </div>
-
-                  <button
-                    type="button"
-                    onClick={() => setSelectedNotification(item)}
-                    className="shrink-0 rounded-lg px-3 py-1.5 text-xs font-semibold text-brand-600 hover:bg-brand-50 dark:text-brand-400 dark:hover:bg-brand-900/30"
+              {filteredNotifications.map((item) => {
+                const info = tipoInfo(item.tipo);
+                return (
+                  <article
+                    key={item.id}
+                    className="flex items-start justify-between gap-5 py-5 first:pt-0 last:pb-0"
                   >
-                    Ver
-                  </button>
-                </article>
-              ))}
+                    <div className="flex min-w-0 gap-4">
+                      <div
+                        className={`flex h-12 w-12 shrink-0 items-center justify-center rounded-xl ${info.color}`}
+                      >
+                        {info.icon === "calendar" && <CalendarDays className="h-[22px] w-[22px]" />}
+                        {info.icon === "account" && <UserRound className="h-[22px] w-[22px]" />}
+                        {info.icon === "system" && <Settings className="h-[22px] w-[22px]" />}
+                      </div>
+
+                      <div className="min-w-0">
+                        <div className="flex items-center gap-2">
+                          <h3 className="text-sm font-semibold text-slate-900 dark:text-white">
+                            {item.titulo}
+                          </h3>
+                          {!item.leida && <span className="h-2 w-2 rounded-full bg-accent-500" />}
+                        </div>
+                        <p className="mt-1 max-w-[720px] text-sm leading-6 text-slate-500 dark:text-slate-400">
+                          {item.mensaje}
+                        </p>
+                        <div className="mt-2 flex items-center gap-3">
+                          <span className="rounded-lg bg-slate-100 px-2.5 py-0.5 text-xs font-semibold text-slate-600 dark:bg-slate-800 dark:text-slate-300">
+                            {info.category}
+                          </span>
+                          <span className="text-xs text-slate-400">
+                            {formatFecha(item.creadaEn)}
+                          </span>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className="flex shrink-0 flex-col items-end gap-2">
+                      <button
+                        type="button"
+                        onClick={() => setSelectedId(item.id)}
+                        className="rounded-lg px-3 py-1.5 text-xs font-semibold text-brand-600 hover:bg-brand-50 dark:text-brand-400 dark:hover:bg-brand-900/30"
+                      >
+                        Ver
+                      </button>
+                      {!item.leida && (
+                        <button
+                          type="button"
+                          onClick={() => handleMarcarLeida(item.id)}
+                          className="rounded-lg px-3 py-1.5 text-xs font-semibold text-slate-500 hover:bg-slate-100 dark:text-slate-400 dark:hover:bg-slate-800"
+                        >
+                          Marcar leída
+                        </button>
+                      )}
+                    </div>
+                  </article>
+                );
+              })}
             </div>
           )}
         </section>
@@ -251,19 +264,19 @@ export default function NotificacionesPage() {
                 <div className="mb-4 flex items-center justify-between gap-4">
                   <div>
                     <p className="text-eyebrow">Detalle</p>
-                    <h2 className="text-section-title mt-1">{selected.title}</h2>
+                    <h2 className="text-section-title mt-1">{selected.titulo}</h2>
                   </div>
                   <span
-                    className={`rounded-lg px-2.5 py-1 text-xs font-semibold ${selected.unread ? "bg-warning-100 text-warning-700 dark:bg-warning-900/30 dark:text-warning-400" : "bg-slate-100 text-slate-600 dark:bg-slate-800 dark:text-slate-300"}`}
+                    className={`rounded-lg px-2.5 py-1 text-xs font-semibold ${selected.leida ? "bg-slate-100 text-slate-600 dark:bg-slate-800 dark:text-slate-300" : "bg-warning-100 text-warning-700 dark:bg-warning-900/30 dark:text-warning-400"}`}
                   >
-                    {selected.unread ? "No leída" : "Leída"}
+                    {selected.leida ? "Leída" : "No leída"}
                   </span>
                 </div>
 
                 <div className="rounded-xl border border-slate-200 bg-slate-50 p-4 dark:border-slate-700 dark:bg-slate-800/50">
                   <p className="text-label">Categoría</p>
                   <p className="mt-1 text-sm font-semibold text-slate-900 dark:text-white">
-                    {selected.category}
+                    {tipoInfo(selected.tipo).category}
                   </p>
                 </div>
 
@@ -271,21 +284,30 @@ export default function NotificacionesPage() {
                   <div>
                     <p className="text-label">Descripción</p>
                     <p className="mt-1 text-sm leading-6 text-slate-600 dark:text-slate-300">
-                      {selected.description}
+                      {selected.mensaje}
                     </p>
                   </div>
                   <div>
                     <p className="text-label">Fecha</p>
                     <p className="mt-1 text-sm text-slate-600 dark:text-slate-300">
-                      {selected.time}
+                      {formatFecha(selected.creadaEn)}
                     </p>
                   </div>
                 </div>
 
+                {!selected.leida && (
+                  <button
+                    type="button"
+                    onClick={() => handleMarcarLeida(selected.id)}
+                    className="btn-secondary mt-5 w-full justify-center"
+                  >
+                    Marcar como leída
+                  </button>
+                )}
                 <button
                   type="button"
                   onClick={handleViewAll}
-                  className="btn-primary mt-5 w-full justify-center"
+                  className="btn-primary mt-3 w-full justify-center"
                 >
                   Ver todas las notificaciones
                 </button>
@@ -303,28 +325,12 @@ export default function NotificacionesPage() {
             )}
           </aside>
 
-          {/* Preferencias */}
-          <section className="admin-card-padded">
-            <h2 className="text-section-title">Preferencias</h2>
-            <div className="mt-4 space-y-4">
-              <PreferenceRow title="Citas" enabled />
-              <PreferenceRow title="Vacunas" enabled />
-              <PreferenceRow title="Pagos" enabled={false} />
-              <PreferenceRow title="Sistema" enabled />
-            </div>
-          </section>
-
+          {/* Resumen */}
           <section className="admin-card-padded">
             <h2 className="text-section-title">Resumen</h2>
             <div className="mt-4 space-y-3">
               <SummaryLine label="Notificaciones nuevas" value={unreadCount.toString()} />
-              <SummaryLine label="Este mes" value={notifications.length.toString()} />
-              <SummaryLine
-                label="Recordatorios activos"
-                value={notifications
-                  .filter((n) => n.unread && n.category === "Vacunas")
-                  .length.toString()}
-              />
+              <SummaryLine label="Total" value={notifications.length.toString()} />
             </div>
           </section>
         </div>
@@ -352,21 +358,6 @@ function SummaryCard({
         {icon}
       </div>
     </article>
-  );
-}
-
-function PreferenceRow({ title, enabled }: { title: string; enabled: boolean }) {
-  return (
-    <div className="flex items-center justify-between gap-4">
-      <p className="text-sm font-semibold text-slate-900 dark:text-white">{title}</p>
-      <button
-        className={`relative h-6 w-11 rounded-full transition ${enabled ? "bg-brand-600" : "bg-slate-300 dark:bg-slate-600"}`}
-      >
-        <span
-          className={`absolute top-[2px] h-5 w-5 rounded-full bg-white shadow-xs transition ${enabled ? "left-[22px]" : "left-[2px]"}`}
-        />
-      </button>
-    </div>
   );
 }
 

@@ -12,6 +12,7 @@ import {
   Settings,
   LogOut,
   Bell,
+  Check,
   User,
   Moon,
   Sun,
@@ -23,15 +24,31 @@ import BuscadorCliente from "./BuscadorCliente";
 import { logout } from "../../lib/auth";
 import { useAuth } from "@/lib/auth-context";
 import { useClienteProfile } from "./ClienteProfileContext";
+import {
+  fetchNotificaciones,
+  fetchNotificacionesCount,
+  marcarLeida,
+  marcarTodasLeidas,
+  type NotificacionAPI,
+} from "../../lib/api/notificaciones";
 
-const notificationPreview: { title: string; description: string; time: string; unread: boolean }[] =
-  [];
+function timeAgo(dateStr: string): string {
+  const diff = Date.now() - new Date(dateStr).getTime();
+  const m = Math.floor(diff / 60000);
+  if (m < 1) return "Ahora";
+  if (m < 60) return `Hace ${m} min`;
+  const h = Math.floor(m / 60);
+  if (h < 24) return `Hace ${h}h`;
+  return `Hace ${Math.floor(h / 24)}d`;
+}
 
 export default function ClientLayoutShell({ children }: { children: ReactNode }) {
   const pathname = usePathname();
   const router = useRouter();
 
   const [showNotifications, setShowNotifications] = useState(false);
+  const [notifCount, setNotifCount] = useState(0);
+  const [notifItems, setNotifItems] = useState<NotificacionAPI[] | null>(null);
   const [showUserMenu, setShowUserMenu] = useState(false);
   const [darkMode, setDarkMode] = useState(() => {
     if (typeof window === "undefined") return false;
@@ -67,6 +84,48 @@ export default function ClientLayoutShell({ children }: { children: ReactNode })
     setShowNotifications(false);
     setShowUserMenu(false);
   }, [pathname]);
+
+  // Badge: contar no leídas al montar y cada 30s
+  useEffect(() => {
+    if (!user) return;
+    const load = () =>
+      fetchNotificacionesCount()
+        .then(setNotifCount)
+        .catch(() => {});
+    load();
+    const interval = setInterval(load, 30000);
+    return () => clearInterval(interval);
+  }, [user]);
+
+  // Cargar lista al abrir el dropdown
+  useEffect(() => {
+    if (!showNotifications) return;
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    setNotifItems(null);
+    let cancelled = false;
+    fetchNotificaciones(true)
+      .then((data) => {
+        if (!cancelled) setNotifItems(data);
+      })
+      .catch(() => {
+        if (!cancelled) setNotifItems([]);
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, [showNotifications]);
+
+  const handleMarcarLeida = async (id: number) => {
+    await marcarLeida(id).catch(() => {});
+    setNotifItems((prev) => prev?.filter((n) => n.id !== id) ?? prev);
+    setNotifCount((c) => Math.max(0, c - 1));
+  };
+
+  const handleMarcarTodas = async () => {
+    await marcarTodasLeidas().catch(() => {});
+    setNotifItems([]);
+    setNotifCount(0);
+  };
 
   function toggleDarkMode() {
     const nextValue = !darkMode;
@@ -175,6 +234,11 @@ export default function ClientLayoutShell({ children }: { children: ReactNode })
                 aria-label="Abrir notificaciones"
               >
                 <Bell className="h-[19px] w-[19px]" />
+                {notifCount > 0 && (
+                  <span className="absolute right-0.5 top-0.5 flex h-4 w-4 items-center justify-center rounded-full bg-danger-500 text-[9px] font-bold text-white ring-2 ring-white dark:ring-surface-900">
+                    {notifCount > 9 ? "9+" : notifCount}
+                  </span>
+                )}
               </button>
 
               {/* Ventana de notificaciones */}
@@ -186,38 +250,72 @@ export default function ClientLayoutShell({ children }: { children: ReactNode })
                         Notificaciones
                       </h3>
                       <p className="mt-1 text-xs text-surface-500 dark:text-surface-400">
-                        No tienes notificaciones nuevas
+                        {notifItems && notifItems.length > 0
+                          ? `${notifItems.length} sin leer`
+                          : "No tienes notificaciones nuevas"}
                       </p>
                     </div>
+                    {notifItems && notifItems.length > 0 && (
+                      <button
+                        onClick={handleMarcarTodas}
+                        className="text-xs font-semibold text-brand-600 hover:text-brand-700 dark:text-brand-400"
+                      >
+                        Marcar todas leídas
+                      </button>
+                    )}
                   </div>
 
                   <div className="max-h-[290px] divide-y divide-surface-200 overflow-y-auto dark:divide-surface-700">
-                    {notificationPreview.map((item) => (
-                      <div
-                        key={item.title}
-                        className="flex gap-3 px-5 py-4 transition-colors hover:bg-surface-50 dark:hover:bg-surface-800"
-                      >
-                        <div className="mt-1 flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-brand-100 text-brand-600 dark:bg-brand-900/40 dark:text-brand-300">
-                          <Bell className="h-[18px] w-[18px]" />
-                        </div>
-
-                        <div className="min-w-0 flex-1">
-                          <div className="flex items-center gap-2">
-                            <h4 className="text-sm font-semibold text-surface-900 dark:text-white">
-                              {item.title}
-                            </h4>
-
-                            {item.unread && <span className="h-2 w-2 rounded-full bg-danger-500" />}
+                    {notifItems === null ? (
+                      <div className="space-y-2 p-3">
+                        {[1, 2, 3].map((i) => (
+                          <div
+                            key={i}
+                            className="h-12 animate-pulse rounded-xl bg-surface-100 dark:bg-surface-800"
+                          />
+                        ))}
+                      </div>
+                    ) : notifItems.length === 0 ? (
+                      <p className="px-5 py-6 text-center text-sm text-surface-500 dark:text-surface-400">
+                        No tienes notificaciones nuevas.
+                      </p>
+                    ) : (
+                      notifItems.map((item) => (
+                        <div
+                          key={item.id}
+                          className="flex gap-3 px-5 py-4 transition-colors hover:bg-surface-50 dark:hover:bg-surface-800"
+                        >
+                          <div className="mt-1 flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-brand-100 text-brand-600 dark:bg-brand-900/40 dark:text-brand-300">
+                            <Bell className="h-[18px] w-[18px]" />
                           </div>
 
-                          <p className="mt-1 text-xs leading-5 text-surface-500 dark:text-surface-400">
-                            {item.description}
-                          </p>
+                          <div className="min-w-0 flex-1">
+                            <div className="flex items-center gap-2">
+                              <h4 className="text-sm font-semibold text-surface-900 dark:text-white">
+                                {item.titulo}
+                              </h4>
+                              <span className="h-2 w-2 rounded-full bg-danger-500" />
+                            </div>
 
-                          <p className="text-caption mt-2">{item.time}</p>
+                            <p className="mt-1 text-xs leading-5 text-surface-500 dark:text-surface-400">
+                              {item.mensaje}
+                            </p>
+
+                            <p className="text-caption mt-2">{timeAgo(item.creadaEn)}</p>
+                          </div>
+
+                          <button
+                            type="button"
+                            onClick={() => handleMarcarLeida(item.id)}
+                            className="mt-0.5 shrink-0 self-start rounded-lg p-1 text-surface-400 hover:bg-surface-100 hover:text-surface-600 dark:hover:bg-surface-700"
+                            title="Marcar como leída"
+                            aria-label="Marcar como leída"
+                          >
+                            <Check className="h-3.5 w-3.5" />
+                          </button>
                         </div>
-                      </div>
-                    ))}
+                      ))
+                    )}
                   </div>
 
                   <div className="border-t border-surface-200 p-4 dark:border-surface-700">
