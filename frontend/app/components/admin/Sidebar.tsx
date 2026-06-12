@@ -41,7 +41,7 @@ function NavLinks({ onItemClick, pathname }: { onItemClick?: () => void; pathnam
             onClick={onItemClick}
             className={`flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium transition ${
               isActive
-                ? "bg-brand-600 text-white shadow-sm"
+                ? "bg-[#7C3AED]/10 text-[#7C3AED] dark:bg-[#A78BFA]/10 dark:text-[#A78BFA]"
                 : "text-slate-600 hover:bg-slate-100 hover:text-slate-900 dark:text-slate-300 dark:hover:bg-slate-800 dark:hover:text-white"
             }`}
           >

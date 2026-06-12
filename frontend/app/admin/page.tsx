@@ -1,51 +1,114 @@
-﻿"use client";
+"use client";
 
 import React, { useState, useEffect, useMemo } from "react";
-import StatsCards from "../components/admin/StatsCards";
-import NotificationsPanel from "../components/admin/NotificationsPanel";
-import RegisterUserModal from "../components/admin/RegisterUserModal";
+import Link from "next/link";
 import { motion } from "framer-motion";
+import {
+  Plus,
+  Users,
+  Stethoscope,
+  PawPrint,
+  CalendarDays,
+  Clock,
+  Activity,
+  Zap,
+  CalendarPlus,
+  UserPlus,
+  ClipboardList,
+} from "lucide-react";
+import RegisterUserModal from "../components/admin/RegisterUserModal";
+import MonthlyCalendar from "../components/ui/MonthlyCalendar";
 import { useAuth } from "@/lib/auth-context";
 import { fetchCitas } from "../../lib/api/citas";
+import { fetchStatsAdmin } from "../../lib/api/usuarios";
+import { fetchMascotas } from "../../lib/api/mascotas";
 import type { Appointment } from "../../lib/recepcionista/types";
-import { Chart as ChartJS, CategoryScale, LinearScale, BarElement, Tooltip } from "chart.js";
-import { Bar } from "react-chartjs-2";
-import { CHART_COLORS } from "../../lib/chart-colors";
+import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from "recharts";
 
-ChartJS.register(CategoryScale, LinearScale, BarElement, Tooltip);
-
-// Plugin inline: dibuja el valor encima de cada barra
-const valueLabelsPlugin = {
-  id: "valueLabels",
-  afterDatasetsDraw(chart: ChartJS) {
-    const { ctx } = chart;
-    const meta = chart.getDatasetMeta(0);
-    meta.data.forEach((bar, i) => {
-      const value = chart.data.datasets[0].data[i] as number;
-      if (value > 0) {
-        ctx.save();
-        ctx.fillStyle = "#475569";
-        ctx.font = "bold 11px system-ui, sans-serif";
-        ctx.textAlign = "center";
-        ctx.textBaseline = "bottom";
-        ctx.fillText(String(value), bar.x, bar.y - 4);
-        ctx.restore();
-      }
-    });
-  },
+const CHART_BAR_COLORS = {
+  hoy: "#8B5CF6",
+  pasado: "#C4B5FD",
+  proximo: "#EDE9FE",
 };
+
+const ACTIVITY_ITEMS = [
+  {
+    icon: PawPrint,
+    color: "#16A34A",
+    bg: "#F0FDF4",
+    text: "Carlos registró una mascota nueva",
+    time: "hace 5 min",
+  },
+  {
+    icon: CalendarDays,
+    color: "#2563EB",
+    bg: "#EFF6FF",
+    text: "María creó una cita para mañana",
+    time: "hace 18 min",
+  },
+  {
+    icon: Stethoscope,
+    color: "#7C3AED",
+    bg: "#FAF5FF",
+    text: "Nuevo veterinario agregado al sistema",
+    time: "hace 1 hora",
+  },
+  {
+    icon: ClipboardList,
+    color: "#D97706",
+    bg: "#FFF7ED",
+    text: "Historial médico de Max actualizado",
+    time: "hace 2 horas",
+  },
+];
+
+const cardClass = "rounded-[13px] border-[0.5px] border-[#E4DFF0] bg-white px-4 py-3.5";
+
+function colorForService(service: string): string {
+  const s = service.toLowerCase();
+  if (s.includes("vacun")) return "#16A34A";
+  if (s.includes("control")) return "#7C3AED";
+  return "#F59E0B";
+}
 
 const AdminDashboardPage: React.FC = () => {
   const [isRegisterModalOpen, setIsRegisterModalOpen] = useState(false);
+  const [registerRole, setRegisterRole] = useState<"Veterinario" | "Cliente">("Veterinario");
   const [citas, setCitas] = useState<Appointment[]>([]);
+  const [stats, setStats] = useState({
+    clientes: 0,
+    veterinarios: 0,
+    mascotas: 0,
+    citasHoy: 0,
+    pendientes: 0,
+  });
   const { user } = useAuth();
   const userName = user?.name ?? "Administrador";
 
   useEffect(() => {
+    const hoy = new Date().toISOString().slice(0, 10);
     fetchCitas()
-      .then(setCitas)
+      .then((data) => {
+        setCitas(data);
+        return fetchStatsAdmin().then((usuarios) =>
+          fetchMascotas().then((mascotas) => {
+            setStats({
+              clientes: usuarios.clientes,
+              veterinarios: usuarios.veterinarios,
+              mascotas: mascotas.length,
+              citasHoy: data.filter((c) => c.date === hoy && c.status !== "Cancelada").length,
+              pendientes: data.filter((c) => c.status === "Pendiente").length,
+            });
+          }),
+        );
+      })
       .catch(() => setCitas([]));
   }, []);
+
+  const openRegisterModal = (role: "Veterinario" | "Cliente") => {
+    setRegisterRole(role);
+    setIsRegisterModalOpen(true);
+  };
 
   const chartData = useMemo(() => {
     const hoy = new Date();
@@ -71,142 +134,320 @@ const AdminDashboardPage: React.FC = () => {
 
     const fechasConDatos = fechas.filter((f) => conteo[f] || f === todayStr);
 
-    return {
-      labels: fechasConDatos.map((f) => {
-        const [, m, d] = f.split("-");
-        return `${d}/${m}`;
-      }),
-      datasets: [
-        {
-          label: "Citas",
-          data: fechasConDatos.map((f) => conteo[f] ?? 0),
-          backgroundColor: fechasConDatos.map((f) =>
-            f === todayStr
-              ? CHART_COLORS.today
-              : f < todayStr
-                ? CHART_COLORS.past
-                : CHART_COLORS.future,
-          ),
-          borderRadius: 6,
-          borderSkipped: false,
-        },
-      ],
-    };
+    return fechasConDatos.map((f) => {
+      const [, m, d] = f.split("-");
+      const valor = conteo[f] ?? 0;
+      return {
+        date: `${d}/${m}`,
+        hoy: f === todayStr ? valor : 0,
+        pasado: f < todayStr ? valor : 0,
+        proximo: f > todayStr ? valor : 0,
+      };
+    });
   }, [citas]);
 
+  const todayStr = new Date().toISOString().slice(0, 10);
+  const agendaHoy = useMemo(
+    () =>
+      citas
+        .filter((c) => c.date === todayStr && c.status !== "Cancelada")
+        .sort((a, b) => a.time.localeCompare(b.time))
+        .slice(0, 3),
+    [citas, todayStr],
+  );
+
+  const datesWithCitas = useMemo(() => {
+    const set = new Set<string>();
+    citas.filter((c) => c.status !== "Cancelada").forEach((c) => c.date && set.add(c.date));
+    return set;
+  }, [citas]);
+
+  const metrics = [
+    {
+      label: "Clientes",
+      value: stats.clientes,
+      icon: Users,
+      color: "#1D4ED8",
+      bg: "#EFF6FF",
+    },
+    {
+      label: "Veterinarios",
+      value: stats.veterinarios,
+      icon: Stethoscope,
+      color: "#15803D",
+      bg: "#F0FDF4",
+    },
+    {
+      label: "Mascotas",
+      value: stats.mascotas,
+      icon: PawPrint,
+      color: "#C2410C",
+      bg: "#FFF7ED",
+    },
+    {
+      label: "Citas hoy",
+      value: stats.citasHoy,
+      icon: CalendarDays,
+      color: "#7E22CE",
+      bg: "#FAF5FF",
+    },
+    {
+      label: "Pendientes",
+      value: stats.pendientes,
+      icon: Clock,
+      color: "#BE123C",
+      bg: "#FFF1F2",
+    },
+  ];
+
   return (
-    <div className="admin-page">
-      {/* Banner de bienvenida */}
-      <motion.div
-        className="admin-header-banner mb-8"
-        initial={{ opacity: 0, y: 16 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.4 }}
-      >
-        <div className="flex flex-col gap-6 xl:flex-row xl:items-center xl:justify-between">
-          <div className="space-y-2">
-            <p className="text-xs font-semibold uppercase tracking-[0.3em] text-brand-200">
+    <div className="admin-page bg-[#F7F6FA] dark:bg-transparent">
+      <div className="flex flex-col gap-3">
+        {/* FILA 1 — Hero + Agenda de hoy */}
+        <div className="grid grid-cols-1 gap-3 lg:grid-cols-[1fr_240px]">
+          <motion.div
+            className="rounded-[13px] bg-gradient-to-br from-[#EDE8FA] via-[#E4DCF5] to-[#EAE3F8] p-6 dark:from-[#1A1030] dark:via-[#20153A] dark:to-[#1C1232]"
+            initial={{ opacity: 0, y: 16 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.4 }}
+          >
+            <p className="text-[11px] font-semibold uppercase tracking-[0.25em] text-[#5A4880] dark:text-[#9D88CC]">
               Panel administrativo
             </p>
-            <h1 className="text-3xl font-bold tracking-tight">Hola, {userName}</h1>
-            <p className="max-w-xl text-sm leading-6 text-brand-100">
-              Desde aquí puedes gestionar usuarios, revisar citas pendientes, consultar el registro
-              de mascotas y monitorear la actividad del sistema.
+            <h1 className="mt-2 text-2xl font-bold tracking-tight text-[#1A0F35] dark:text-[#E8DCFF] sm:text-3xl">
+              Hola, {userName} 👋
+            </h1>
+            <p className="mt-2 max-w-md text-sm leading-6 text-[#5A4880] dark:text-[#9D88CC]">
+              Gestiona usuarios, citas y mascotas desde aquí.
             </p>
-          </div>
-          <button
-            onClick={() => setIsRegisterModalOpen(true)}
-            className="inline-flex items-center justify-center whitespace-nowrap rounded-xl bg-white px-6 py-2.5 text-sm font-semibold text-brand-700 shadow-sm transition hover:bg-brand-50 active:scale-[0.98]"
-          >
-            + Nuevo usuario
-          </button>
-        </div>
-      </motion.div>
+            <div className="mt-5 flex flex-wrap gap-3">
+              <button
+                onClick={() => openRegisterModal("Veterinario")}
+                className="inline-flex items-center gap-2 rounded-[9px] bg-[#7C3AED] px-4 py-2 text-[12px] font-semibold text-white transition hover:bg-[#6D28D9]"
+              >
+                <Plus className="h-3.5 w-3.5" />
+                Nuevo usuario
+              </button>
+              <Link
+                href="/admin/citas"
+                className="inline-flex items-center gap-2 rounded-[9px] border-[0.5px] border-[#7C3AED]/30 bg-white/60 px-4 py-2 text-[12px] font-semibold text-[#7C3AED] transition hover:bg-white"
+              >
+                <Plus className="h-3.5 w-3.5" />
+                Nueva cita
+              </Link>
+            </div>
+          </motion.div>
 
-      {/* Indicadores */}
-      <motion.div
-        className="mb-8"
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.5, delay: 0.1 }}
-      >
-        <StatsCards />
-      </motion.div>
-
-      {/* Gráfica + Notificaciones */}
-      <motion.div
-        className="grid gap-8 xl:grid-cols-[1fr_360px]"
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.5, delay: 0.2 }}
-      >
-        {/* Gráfica de barras */}
-        <div className="admin-card p-6">
-          <div className="mb-1">
-            <h2 className="text-section-title">Citas programadas por día</h2>
-            <p className="mt-0.5 text-xs text-slate-400">
-              Últimos 30 días y próximos 14 ·{" "}
-              <span className="inline-flex items-center gap-1">
-                <span className="inline-block h-2 w-2 rounded-sm bg-brand-600" /> Hoy
-              </span>
-              <span className="ml-3 inline-flex items-center gap-1">
-                <span className="inline-block h-2 w-2 rounded-sm bg-brand-300" /> Pasado
-              </span>
-              <span className="ml-3 inline-flex items-center gap-1">
-                <span className="inline-block h-2 w-2 rounded-sm bg-brand-100" /> Próximo
-              </span>
-            </p>
-          </div>
-          <div className="mt-4 h-60 w-full">
-            <Bar
-              data={chartData}
-              plugins={[valueLabelsPlugin]}
-              options={{
-                responsive: true,
-                maintainAspectRatio: false,
-                plugins: {
-                  legend: { display: false },
-                  tooltip: {
-                    backgroundColor: CHART_COLORS.tooltipBg,
-                    padding: 12,
-                    cornerRadius: 10,
-                    titleColor: CHART_COLORS.tooltipTitle,
-                    bodyColor: CHART_COLORS.tooltipBody,
-                    callbacks: {
-                      title: (items) => {
-                        const idx = items[0]?.dataIndex ?? 0;
-                        return `Fecha: ${chartData.labels[idx] ?? ""}`;
-                      },
-                      label: (item) => `  ${item.raw} cita${Number(item.raw) !== 1 ? "s" : ""}`,
-                    },
-                  },
-                },
-                scales: {
-                  y: {
-                    beginAtZero: true,
-                    suggestedMax: 5,
-                    ticks: { stepSize: 1, color: "#94a3b8", font: { size: 11 } },
-                    grid: { color: "rgba(226,232,240,0.6)" },
-                    border: { display: false },
-                  },
-                  x: {
-                    ticks: { color: "#94a3b8", font: { size: 10 }, maxRotation: 40 },
-                    grid: { display: false },
-                    border: { display: false },
-                  },
-                },
-              }}
-            />
+          {/* Agenda de hoy */}
+          <div className={cardClass}>
+            <div className="mb-3 flex items-center gap-2">
+              <CalendarDays className="h-4 w-4 text-[#7C3AED]" />
+              <h3 className="text-[12px] font-semibold text-slate-900">Agenda de hoy</h3>
+            </div>
+            {agendaHoy.length === 0 ? (
+              <p className="text-[11px] text-[#555068]">Sin citas programadas para hoy.</p>
+            ) : (
+              <div className="space-y-3">
+                {agendaHoy.map((c) => (
+                  <div key={c.id} className="flex items-start gap-2">
+                    <span
+                      className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full"
+                      style={{ background: colorForService(c.service) }}
+                    />
+                    <p className="text-[11px] leading-5 text-slate-700">
+                      <span className="font-semibold text-slate-900">{c.time}</span> {c.petName} ·{" "}
+                      {c.service}
+                    </p>
+                  </div>
+                ))}
+              </div>
+            )}
           </div>
         </div>
 
-        {/* Notificaciones */}
-        <NotificationsPanel />
-      </motion.div>
+        {/* FILA 2 — Métricas */}
+        <div className="grid grid-cols-2 gap-3 sm:grid-cols-5">
+          {metrics.map((m, i) => {
+            const Icon = m.icon;
+            return (
+              <motion.div
+                key={m.label}
+                className={cardClass}
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.4, delay: i * 0.06 }}
+              >
+                <div
+                  className="mb-3 flex h-8 w-8 items-center justify-center rounded-lg"
+                  style={{ background: m.bg }}
+                >
+                  <Icon className="h-4 w-4" style={{ color: m.color }} />
+                </div>
+                <p className="text-[22px] font-bold leading-none" style={{ color: m.color }}>
+                  {m.value}
+                </p>
+                <p className="mt-1.5 text-[11px] text-[#555068]">{m.label}</p>
+              </motion.div>
+            );
+          })}
+        </div>
+
+        {/* FILA 3 — Gráfica + Calendario */}
+        <div className="grid grid-cols-1 gap-3 lg:grid-cols-[1fr_240px]">
+          <div className={cardClass}>
+            <h2 className="text-[12px] font-semibold text-slate-900">Citas programadas por día</h2>
+            <p className="mt-0.5 text-[11px] text-[#555068]">Últimos 30 días y próximos 14</p>
+
+            <div className="mb-1 mt-3 flex items-center gap-4">
+              <span className="flex items-center gap-1.5 text-[11px] text-[#555068]">
+                <span
+                  className="inline-block h-2 w-2 rounded-full"
+                  style={{ background: CHART_BAR_COLORS.hoy }}
+                />
+                Hoy
+              </span>
+              <span className="flex items-center gap-1.5 text-[11px] text-[#555068]">
+                <span
+                  className="inline-block h-2 w-2 rounded-full"
+                  style={{ background: CHART_BAR_COLORS.pasado }}
+                />
+                Pasado
+              </span>
+              <span className="flex items-center gap-1.5 text-[11px] text-[#555068]">
+                <span
+                  className="inline-block h-2 w-2 rounded-full"
+                  style={{ background: CHART_BAR_COLORS.proximo }}
+                />
+                Próximo
+              </span>
+            </div>
+
+            <div className="h-60 w-full">
+              <ResponsiveContainer width="100%" height="100%">
+                <BarChart data={chartData} barSize={22} barGap={4}>
+                  <CartesianGrid vertical={false} stroke="#E4DFF0" />
+                  <XAxis
+                    dataKey="date"
+                    tick={{ fontSize: 10, fill: "#555068" }}
+                    axisLine={false}
+                    tickLine={false}
+                  />
+                  <YAxis
+                    tick={{ fontSize: 10, fill: "#555068" }}
+                    axisLine={false}
+                    tickLine={false}
+                    allowDecimals={false}
+                  />
+                  <Tooltip
+                    cursor={{ fill: "transparent" }}
+                    contentStyle={{
+                      background: "#FFFFFF",
+                      border: "0.5px solid #E4DFF0",
+                      borderRadius: 10,
+                      fontSize: 12,
+                    }}
+                    formatter={(value) => [`${value} cita${Number(value) !== 1 ? "s" : ""}`, ""]}
+                  />
+                  <Bar
+                    dataKey="hoy"
+                    stackId="citas"
+                    fill={CHART_BAR_COLORS.hoy}
+                    radius={[6, 6, 6, 6]}
+                  />
+                  <Bar
+                    dataKey="pasado"
+                    stackId="citas"
+                    fill={CHART_BAR_COLORS.pasado}
+                    radius={[6, 6, 6, 6]}
+                  />
+                  <Bar
+                    dataKey="proximo"
+                    stackId="citas"
+                    fill={CHART_BAR_COLORS.proximo}
+                    radius={[6, 6, 6, 6]}
+                  />
+                </BarChart>
+              </ResponsiveContainer>
+            </div>
+          </div>
+
+          <MonthlyCalendar datesWithCitas={datesWithCitas} />
+        </div>
+
+        {/* FILA 4 — Actividad reciente + Acciones rápidas */}
+        <div className="grid grid-cols-1 gap-3 lg:grid-cols-[1fr_240px]">
+          <div className={cardClass}>
+            <div className="mb-3 flex items-center gap-2">
+              <Activity className="h-4 w-4 text-[#7C3AED]" />
+              <h3 className="text-[12px] font-semibold text-slate-900">Actividad reciente</h3>
+            </div>
+            <div className="space-y-3">
+              {ACTIVITY_ITEMS.map((item, i) => {
+                const Icon = item.icon;
+                return (
+                  <div key={i} className="flex items-start gap-3">
+                    <div
+                      className="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg"
+                      style={{ background: item.bg }}
+                    >
+                      <Icon className="h-3.5 w-3.5" style={{ color: item.color }} />
+                    </div>
+                    <div className="min-w-0">
+                      <p className="text-[11px] leading-5 text-slate-700">{item.text}</p>
+                      <p className="mt-0.5 text-[11px] text-[#555068]">{item.time}</p>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+
+          {/* Acciones rápidas */}
+          <div className={cardClass}>
+            <div className="mb-3 flex items-center gap-2">
+              <Zap className="h-4 w-4 text-[#7C3AED]" />
+              <h3 className="text-[12px] font-semibold text-slate-900">Acciones rápidas</h3>
+            </div>
+            <div className="space-y-2">
+              <Link
+                href="/admin/citas"
+                className="flex w-full items-center gap-2 rounded-[9px] border-[0.5px] border-[#E4DFF0] bg-[#F7F6FA] px-3 py-2 text-[11px] font-semibold text-slate-700 transition hover:border-[#7C3AED]/30 hover:bg-[#EDE8FA]"
+              >
+                <CalendarPlus className="h-3.5 w-3.5 text-[#7C3AED]" />
+                Nueva cita
+              </Link>
+              <Link
+                href="/admin/mascotas"
+                className="flex w-full items-center gap-2 rounded-[9px] border-[0.5px] border-[#E4DFF0] bg-[#F7F6FA] px-3 py-2 text-[11px] font-semibold text-slate-700 transition hover:border-[#7C3AED]/30 hover:bg-[#EDE8FA]"
+              >
+                <PawPrint className="h-3.5 w-3.5 text-[#7C3AED]" />
+                Nueva mascota
+              </Link>
+              <button
+                type="button"
+                onClick={() => openRegisterModal("Cliente")}
+                className="flex w-full items-center gap-2 rounded-[9px] border-[0.5px] border-[#E4DFF0] bg-[#F7F6FA] px-3 py-2 text-[11px] font-semibold text-slate-700 transition hover:border-[#7C3AED]/30 hover:bg-[#EDE8FA]"
+              >
+                <UserPlus className="h-3.5 w-3.5 text-[#7C3AED]" />
+                Nuevo cliente
+              </button>
+              <button
+                type="button"
+                onClick={() => openRegisterModal("Veterinario")}
+                className="flex w-full items-center gap-2 rounded-[9px] border-[0.5px] border-[#E4DFF0] bg-[#F7F6FA] px-3 py-2 text-[11px] font-semibold text-slate-700 transition hover:border-[#7C3AED]/30 hover:bg-[#EDE8FA]"
+              >
+                <Stethoscope className="h-3.5 w-3.5 text-[#7C3AED]" />
+                Nuevo veterinario
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
 
       <RegisterUserModal
         isOpen={isRegisterModalOpen}
         onClose={() => setIsRegisterModalOpen(false)}
+        initialRole={registerRole}
       />
     </div>
   );

@@ -334,7 +334,7 @@ export default function Navbar() {
 
   return (
     <header className="sticky top-0 z-40 border-b border-slate-200/70 bg-white/95 backdrop-blur-xl dark:border-slate-800 dark:bg-slate-950/95">
-      <div className="mx-auto flex max-w-7xl items-center justify-between gap-4 px-5 py-3 sm:px-6 lg:px-8">
+      <div className="flex items-center justify-between gap-4 px-5 py-3 sm:px-6 lg:px-8">
         {/* Buscador */}
         <div ref={searchRef} className="relative hidden w-full max-w-sm sm:block">
           <Search className="pointer-events-none absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />

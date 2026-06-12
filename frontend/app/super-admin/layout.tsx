@@ -4,6 +4,7 @@ import { useEffect, type ReactNode } from "react";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/lib/auth-context";
 import SuperAdminSidebar from "../components/super-admin/Sidebar";
+import SuperAdminTopbar from "../components/super-admin/Topbar";
 
 export default function SuperAdminLayout({ children }: { children: ReactNode }) {
   const router = useRouter();
@@ -26,9 +27,10 @@ export default function SuperAdminLayout({ children }: { children: ReactNode }) 
   }, [user, loading, router]);
 
   return (
-    <div className="flex h-screen overflow-hidden bg-slate-50 text-slate-900 dark:bg-slate-950 dark:text-slate-100">
+    <div className="super-admin-shell flex h-screen overflow-hidden bg-slate-50 text-slate-900 dark:bg-slate-950 dark:text-slate-100">
       <SuperAdminSidebar />
       <div className="flex min-w-0 flex-1 flex-col overflow-hidden">
+        <SuperAdminTopbar />
         <main className="flex-1 overflow-y-auto">{children}</main>
       </div>
     </div>

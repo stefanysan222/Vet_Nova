@@ -40,41 +40,36 @@ const StatsCards: React.FC<{ refreshTrigger?: number }> = ({ refreshTrigger = 0 
       title: "Total clientes",
       value: stats?.clientes,
       icon: Users,
-      accentBar: "bg-brand-500",
-      iconBg: "bg-brand-50 text-brand-600 dark:bg-brand-950/50 dark:text-brand-400",
-      valueCls: "text-brand-700 dark:text-brand-300",
+      iconBg: "bg-blue-50 dark:bg-blue-500/10",
+      valueCls: "text-blue-600 dark:text-blue-400",
     },
     {
       title: "Veterinarios",
       value: stats?.veterinarios,
       icon: Stethoscope,
-      accentBar: "bg-success-500",
-      iconBg: "bg-success-50 text-success-600 dark:bg-success-950/50 dark:text-success-400",
-      valueCls: "text-success-700 dark:text-success-300",
+      iconBg: "bg-emerald-50 dark:bg-emerald-500/10",
+      valueCls: "text-emerald-600 dark:text-emerald-400",
     },
     {
       title: "Mascotas",
       value: stats?.mascotas,
       icon: PawPrint,
-      accentBar: "bg-warning-500",
-      iconBg: "bg-warning-50 text-warning-600 dark:bg-warning-950/50 dark:text-warning-400",
-      valueCls: "text-warning-700 dark:text-warning-300",
+      iconBg: "bg-orange-50 dark:bg-orange-500/10",
+      valueCls: "text-orange-600 dark:text-orange-400",
     },
     {
       title: "Citas hoy",
       value: stats?.citasHoy,
       icon: CalendarDays,
-      accentBar: "bg-brand-400",
-      iconBg: "bg-brand-50 text-brand-500 dark:bg-brand-950/50 dark:text-brand-300",
-      valueCls: "text-brand-600 dark:text-brand-200",
+      iconBg: "bg-purple-50 dark:bg-purple-500/10",
+      valueCls: "text-purple-600 dark:text-purple-400",
     },
     {
       title: "Pendientes",
       value: stats?.citasPendientes,
       icon: Clock,
-      accentBar: "bg-accent-500",
-      iconBg: "bg-accent-50 text-accent-600 dark:bg-accent-950/50 dark:text-accent-400",
-      valueCls: "text-accent-700 dark:text-accent-300",
+      iconBg: "bg-rose-50 dark:bg-rose-500/10",
+      valueCls: "text-rose-600 dark:text-rose-400",
     },
   ];
 
@@ -89,35 +84,28 @@ const StatsCards: React.FC<{ refreshTrigger?: number }> = ({ refreshTrigger = 0 
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.4, delay: i * 0.07 }}
-            className="group relative overflow-hidden rounded-2xl border border-slate-200/70 bg-white shadow-sm transition-all duration-200 hover:-translate-y-1 hover:shadow-md dark:border-slate-700 dark:bg-slate-900"
+            className="admin-card px-5 py-4 transition-all duration-200 hover:-translate-y-1 hover:shadow-card-hover"
           >
-            {/* Borde de acento izquierdo */}
-            <div className={`absolute inset-y-0 left-0 w-1 rounded-l-2xl ${card.accentBar}`} />
-
-            <div className="px-5 py-4 pl-6">
-              {/* Icono + valor en la misma fila */}
-              <div className="flex items-start justify-between gap-2">
-                <div
-                  className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-xl ${card.iconBg}`}
-                >
-                  <Icon className="h-4 w-4" />
-                </div>
-              </div>
-
-              {/* Número */}
-              <p className={`mt-3 text-3xl font-bold tracking-tight ${card.valueCls}`}>
-                {isLoading ? (
-                  <span className="inline-block h-8 w-10 animate-pulse rounded-lg bg-slate-100 dark:bg-slate-800" />
-                ) : (
-                  (card.value ?? 0)
-                )}
-              </p>
-
-              {/* Label */}
-              <p className="mt-1 text-xs font-medium text-slate-500 dark:text-slate-400">
-                {card.title}
-              </p>
+            {/* Icono */}
+            <div
+              className={`mb-3 flex h-9 w-9 shrink-0 items-center justify-center rounded-xl ${card.iconBg}`}
+            >
+              <Icon className={`h-4 w-4 ${card.valueCls}`} />
             </div>
+
+            {/* Número */}
+            <p className={`text-3xl font-bold leading-none tracking-tight ${card.valueCls}`}>
+              {isLoading ? (
+                <span className="inline-block h-8 w-10 animate-pulse rounded-lg bg-slate-100 dark:bg-slate-800" />
+              ) : (
+                (card.value ?? 0)
+              )}
+            </p>
+
+            {/* Label */}
+            <p className="mt-1.5 text-xs font-medium text-slate-500 dark:text-slate-400">
+              {card.title}
+            </p>
           </motion.article>
         );
       })}

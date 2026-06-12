@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { motion } from "framer-motion";
 import NombreCliente from "./NombreCliente";
 import { useAuth } from "@/lib/auth-context";
@@ -12,7 +12,29 @@ import type { Appointment } from "../../lib/recepcionista/types";
 import type { PetRecord } from "../../lib/recepcionista/types";
 import { StatusBadge } from "../../lib/utils/status-badge";
 import type { AppointmentStatus } from "../../lib/utils/status";
-import { CalendarDays, PawPrint, Clock, Plus, ChevronRight } from "lucide-react";
+import {
+  CalendarDays,
+  PawPrint,
+  Clock,
+  Plus,
+  ChevronRight,
+  CheckCircle2,
+  XCircle,
+  Activity,
+  Zap,
+  Settings,
+  CalendarPlus,
+} from "lucide-react";
+import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from "recharts";
+import MonthlyCalendar from "../components/ui/MonthlyCalendar";
+
+const CHART_BAR_COLORS = {
+  hoy: "#6366F1",
+  pasado: "#A5B4FC",
+  proximo: "#E0E7FF",
+};
+
+const cardClass = "rounded-[13px] border-[0.5px] border-[#E4DFF0] bg-white px-4 py-3.5";
 
 export default function ClientePage() {
   const [citas, setCitas] = useState<Appointment[]>([]);
@@ -51,258 +73,354 @@ export default function ClientePage() {
     .sort((a, b) => a.date.localeCompare(b.date) || a.time.localeCompare(b.time));
 
   const proximaCita = proximas[0] ?? null;
-  const restoCitas = proximas.slice(1, 4);
   const citasHoy = citas.filter((c) => c.date === today).length;
+  const completadas = citas.filter((c) => c.status === "Finalizada").length;
+  const canceladas = citas.filter((c) => c.status === "Cancelada").length;
 
   const formatDate = (iso: string) => {
     const d = new Date(iso + "T00:00:00");
     return d.toLocaleDateString("es-CO", { weekday: "long", day: "numeric", month: "long" });
   };
 
-  const statsData = [
+  const chartData = useMemo(() => {
+    const now = new Date();
+    const desde = new Date(now);
+    desde.setDate(now.getDate() - 29);
+    const hasta = new Date(now);
+    hasta.setDate(now.getDate() + 14);
+
+    const fechas: string[] = [];
+    const cur = new Date(desde);
+    while (cur <= hasta) {
+      fechas.push(cur.toISOString().slice(0, 10));
+      cur.setDate(cur.getDate() + 1);
+    }
+
+    const todayStr = now.toISOString().slice(0, 10);
+    const conteo: Record<string, number> = {};
+    citas
+      .filter((c) => c.status !== "Cancelada")
+      .forEach((c) => {
+        if (c.date) conteo[c.date] = (conteo[c.date] ?? 0) + 1;
+      });
+
+    const fechasConDatos = fechas.filter((f) => conteo[f] || f === todayStr);
+
+    return fechasConDatos.map((f) => {
+      const [, m, d] = f.split("-");
+      const valor = conteo[f] ?? 0;
+      return {
+        date: `${d}/${m}`,
+        hoy: f === todayStr ? valor : 0,
+        pasado: f < todayStr ? valor : 0,
+        proximo: f > todayStr ? valor : 0,
+      };
+    });
+  }, [citas]);
+
+  const datesWithCitas = useMemo(() => {
+    const set = new Set<string>();
+    citas.filter((c) => c.status !== "Cancelada").forEach((c) => c.date && set.add(c.date));
+    return set;
+  }, [citas]);
+
+  const metrics = [
     {
-      icon: CalendarDays,
       label: "Citas hoy",
-      value: String(citasHoy),
-      accentBar: "bg-brand-500",
-      iconBg: "bg-brand-50 text-brand-600 dark:bg-brand-900/30 dark:text-brand-400",
+      value: citasHoy,
+      icon: CalendarDays,
+      color: "#1D4ED8",
+      bg: "#EFF6FF",
     },
     {
-      icon: PawPrint,
       label: "Mascotas",
-      value: String(mascotas.length),
-      accentBar: "bg-success-500",
-      iconBg: "bg-success-50 text-success-600 dark:bg-success-950/40 dark:text-success-400",
+      value: mascotas.length,
+      icon: PawPrint,
+      color: "#15803D",
+      bg: "#F0FDF4",
     },
     {
-      icon: Clock,
       label: "Próximas",
-      value: String(proximas.length),
-      accentBar: "bg-warning-500",
-      iconBg: "bg-warning-50 text-warning-600 dark:bg-warning-950/40 dark:text-warning-400",
-      extra: "col-span-2 sm:col-span-1",
+      value: proximas.length,
+      icon: Clock,
+      color: "#C2410C",
+      bg: "#FFF7ED",
+    },
+    {
+      label: "Completadas",
+      value: completadas,
+      icon: CheckCircle2,
+      color: "#4338CA",
+      bg: "#EEF2FF",
+    },
+    {
+      label: "Canceladas",
+      value: canceladas,
+      icon: XCircle,
+      color: "#BE123C",
+      bg: "#FFF1F2",
     },
   ];
 
   return (
-    <div className="admin-page h-full overflow-y-auto">
-      {/* Encabezado */}
-      <motion.div
-        className="mb-6"
-        initial={{ opacity: 0, y: 14 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.35 }}
-      >
-        <h1 className="text-page-title">
-          Hola, <NombreCliente /> 🐾
-        </h1>
-        <p className="text-subtitle mt-1">
-          {loading
-            ? "Cargando tu información..."
-            : proximas.length > 0
-              ? `Tienes ${proximas.length} cita${proximas.length > 1 ? "s" : ""} próxima${proximas.length > 1 ? "s" : ""}.`
-              : "No tienes citas próximas. ¿Agendamos una?"}
-        </p>
-      </motion.div>
-
-      {/* Stats compactos */}
-      <div className="mb-6 grid grid-cols-2 gap-3 sm:grid-cols-3">
-        {statsData.map((s, i) => (
+    <div className="bg-[#F7F6FA] dark:bg-transparent">
+      <div className="flex flex-col gap-3">
+        {/* FILA 1 — Hero + Próxima cita */}
+        <div className="grid grid-cols-1 gap-3 lg:grid-cols-[1fr_240px]">
           <motion.div
-            key={s.label}
+            className="rounded-[13px] bg-gradient-to-br from-[#E9EAFB] via-[#E1E4F9] to-[#E7E9FB] p-6 dark:from-[#15173A] dark:via-[#191D45] dark:to-[#171A3E]"
             initial={{ opacity: 0, y: 16 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.35, delay: 0.1 + i * 0.07 }}
-            className={s.extra}
+            transition={{ duration: 0.4 }}
           >
-            <StatCard
-              icon={s.icon}
-              label={s.label}
-              value={loading ? "—" : s.value}
-              accentBar={s.accentBar}
-              iconBg={s.iconBg}
-            />
-          </motion.div>
-        ))}
-      </div>
-
-      <div className="grid gap-5 lg:grid-cols-[1fr_320px]">
-        {/* Columna izquierda: citas */}
-        <div className="space-y-4">
-          {/* Próxima cita */}
-          {loading ? (
-            <div className="h-40 animate-pulse rounded-2xl bg-slate-200 dark:bg-slate-800" />
-          ) : proximaCita ? (
-            <section className="admin-header-banner">
-              <p className="text-xs font-semibold uppercase tracking-[0.3em] text-brand-200">
-                Próxima cita
-              </p>
-              <div className="mt-3 flex items-start justify-between gap-4">
-                <div>
-                  <h2 className="text-2xl font-bold">{proximaCita.petName}</h2>
-                  <p className="mt-1 text-sm text-brand-100">{proximaCita.service || "Consulta"}</p>
-                  <p className="mt-3 text-sm text-brand-100">
-                    {formatDate(proximaCita.date)} · {proximaCita.time}
-                  </p>
-                  {proximaCita.veterinarian && (
-                    <p className="mt-1 text-xs text-brand-200">{proximaCita.veterinarian}</p>
-                  )}
-                </div>
-                <StatusBadge status={proximaCita.status as AppointmentStatus} />
-              </div>
+            <p className="text-[11px] font-semibold uppercase tracking-[0.25em] text-[#4C4A8A] dark:text-[#A5A9F0]">
+              Panel cliente
+            </p>
+            <h1 className="mt-2 text-2xl font-bold tracking-tight text-[#1E1B4B] dark:text-[#E0E3FF] sm:text-3xl">
+              Hola, <NombreCliente soloNombre /> 🐾
+            </h1>
+            <p className="mt-2 max-w-md text-sm leading-6 text-[#4C4A8A] dark:text-[#A5A9F0]">
+              {loading
+                ? "Cargando tu información..."
+                : proximas.length > 0
+                  ? `Tienes ${proximas.length} cita${proximas.length > 1 ? "s" : ""} próxima${proximas.length > 1 ? "s" : ""}.`
+                  : "No tienes citas próximas. ¿Agendamos una?"}
+            </p>
+            <div className="mt-5 flex flex-wrap gap-3">
               <Link
-                href="/cliente/agendar"
-                className="mt-5 inline-flex items-center gap-1.5 rounded-xl bg-white/15 px-4 py-2 text-sm font-semibold text-white transition hover:bg-white/25"
+                href="/cliente/agendar/nueva"
+                className="inline-flex items-center gap-2 rounded-[9px] bg-[#6366F1] px-4 py-2 text-[12px] font-semibold text-white transition hover:bg-[#4F46E5]"
               >
-                Ver detalle
-                <ChevronRight className="h-4 w-4" />
-              </Link>
-            </section>
-          ) : (
-            <section className="flex flex-col items-center justify-center rounded-2xl border border-dashed border-slate-300 bg-white py-12 text-center shadow-xs dark:border-slate-700 dark:bg-slate-900">
-              <div className="flex h-14 w-14 items-center justify-center rounded-full bg-brand-50 text-brand-600 dark:bg-brand-900/30 dark:text-brand-400">
-                <CalendarDays className="h-6 w-6" />
-              </div>
-              <p className="mt-4 text-base font-semibold text-slate-900 dark:text-white">
-                Sin citas próximas
-              </p>
-              <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">
-                Agenda una cita para comenzar.
-              </p>
-              <Link href="/cliente/agendar/nueva" className="btn-primary mt-5">
-                <Plus className="h-4 w-4" />
+                <Plus className="h-3.5 w-3.5" />
                 Agendar cita
               </Link>
-            </section>
-          )}
-
-          {/* Resto de citas próximas */}
-          {restoCitas.length > 0 && (
-            <section className="admin-card">
-              <div className="flex items-center justify-between border-b border-slate-200/80 px-5 py-4 dark:border-slate-700">
-                <h3 className="text-section-title">Otras citas próximas</h3>
-                <Link
-                  href="/cliente/agendar"
-                  className="text-xs font-semibold text-brand-600 hover:underline dark:text-brand-400"
-                >
-                  Ver todas
-                </Link>
-              </div>
-              <div className="divide-y divide-slate-200/80 dark:divide-slate-700">
-                {restoCitas.map((cita) => (
-                  <div key={cita.id} className="flex items-center justify-between gap-4 px-5 py-3">
-                    <div>
-                      <p className="text-sm font-semibold text-slate-900 dark:text-white">
-                        {cita.petName}
-                      </p>
-                      <p className="mt-0.5 text-xs text-slate-500 dark:text-slate-400">
-                        {formatDate(cita.date)} · {cita.time}
-                      </p>
-                    </div>
-                    <StatusBadge status={cita.status as AppointmentStatus} />
-                  </div>
-                ))}
-              </div>
-            </section>
-          )}
-
-          {/* Botón agendar */}
-          <Link
-            href="/cliente/agendar/nueva"
-            className="btn-primary flex w-full items-center justify-center gap-2"
-          >
-            <Plus className="h-4 w-4" />
-            Agendar nueva cita
-          </Link>
-        </div>
-
-        {/* Columna derecha: mascotas */}
-        <aside className="space-y-4">
-          <section className="admin-card">
-            <div className="flex items-center justify-between border-b border-slate-200/80 px-5 py-4 dark:border-slate-700">
-              <h3 className="text-section-title">Mis mascotas</h3>
               <Link
                 href="/cliente/mascotas"
-                className="text-xs font-semibold text-brand-600 hover:underline dark:text-brand-400"
+                className="inline-flex items-center gap-2 rounded-[9px] border-[0.5px] border-[#6366F1]/30 bg-white/60 px-4 py-2 text-[12px] font-semibold text-[#6366F1] transition hover:bg-white"
               >
-                Ver todas
+                <PawPrint className="h-3.5 w-3.5" />
+                Mis mascotas
               </Link>
             </div>
+          </motion.div>
 
+          {/* Próxima cita */}
+          <div className={cardClass}>
+            <div className="mb-3 flex items-center gap-2">
+              <CalendarDays className="h-4 w-4 text-[#6366F1]" />
+              <h3 className="text-[12px] font-semibold text-slate-900">Próxima cita</h3>
+            </div>
             {loading ? (
-              <div className="space-y-3 p-4">
-                {[1, 2].map((i) => (
-                  <div
-                    key={i}
-                    className="h-14 animate-pulse rounded-xl bg-slate-100 dark:bg-slate-800"
-                  />
-                ))}
-              </div>
-            ) : mascotas.length === 0 ? (
-              <div className="flex flex-col items-center py-8 text-center">
-                <PawPrint className="h-8 w-8 text-slate-300 dark:text-slate-600" />
-                <p className="mt-3 text-sm text-slate-500 dark:text-slate-400">
-                  No tienes mascotas registradas.
+              <p className="text-[11px] text-[#555068]">Cargando...</p>
+            ) : proximaCita ? (
+              <div className="space-y-1.5">
+                <p className="text-[11px] font-semibold text-slate-900">{proximaCita.petName}</p>
+                <p className="text-[11px] text-[#555068]">{proximaCita.service || "Consulta"}</p>
+                <p className="text-[11px] text-[#555068]">
+                  {formatDate(proximaCita.date)} · {proximaCita.time}
                 </p>
+                <div className="pt-1">
+                  <StatusBadge status={proximaCita.status as AppointmentStatus} />
+                </div>
+                <Link
+                  href="/cliente/agendar"
+                  className="mt-2 inline-flex items-center gap-1 text-[11px] font-semibold text-[#6366F1]"
+                >
+                  Ver detalle
+                  <ChevronRight className="h-3 w-3" />
+                </Link>
               </div>
             ) : (
-              <div className="divide-y divide-slate-200/80 dark:divide-slate-700">
+              <p className="text-[11px] text-[#555068]">Sin citas próximas.</p>
+            )}
+          </div>
+        </div>
+
+        {/* FILA 2 — Métricas */}
+        <div className="grid grid-cols-2 gap-3 sm:grid-cols-5">
+          {metrics.map((m, i) => {
+            const Icon = m.icon;
+            return (
+              <motion.div
+                key={m.label}
+                className={cardClass}
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.4, delay: i * 0.06 }}
+              >
+                <div
+                  className="mb-3 flex h-8 w-8 items-center justify-center rounded-lg"
+                  style={{ background: m.bg }}
+                >
+                  <Icon className="h-4 w-4" style={{ color: m.color }} />
+                </div>
+                <p className="text-[22px] font-bold leading-none" style={{ color: m.color }}>
+                  {loading ? "—" : m.value}
+                </p>
+                <p className="mt-1.5 text-[11px] text-[#555068]">{m.label}</p>
+              </motion.div>
+            );
+          })}
+        </div>
+
+        {/* FILA 3 — Gráfica + Calendario */}
+        <div className="grid grid-cols-1 gap-3 lg:grid-cols-[1fr_240px]">
+          <div className={cardClass}>
+            <h2 className="text-[12px] font-semibold text-slate-900">Mis citas por día</h2>
+            <p className="mt-0.5 text-[11px] text-[#555068]">Últimos 30 días y próximos 14</p>
+
+            <div className="mb-1 mt-3 flex items-center gap-4">
+              <span className="flex items-center gap-1.5 text-[11px] text-[#555068]">
+                <span
+                  className="inline-block h-2 w-2 rounded-full"
+                  style={{ background: CHART_BAR_COLORS.hoy }}
+                />
+                Hoy
+              </span>
+              <span className="flex items-center gap-1.5 text-[11px] text-[#555068]">
+                <span
+                  className="inline-block h-2 w-2 rounded-full"
+                  style={{ background: CHART_BAR_COLORS.pasado }}
+                />
+                Pasado
+              </span>
+              <span className="flex items-center gap-1.5 text-[11px] text-[#555068]">
+                <span
+                  className="inline-block h-2 w-2 rounded-full"
+                  style={{ background: CHART_BAR_COLORS.proximo }}
+                />
+                Próximo
+              </span>
+            </div>
+
+            <div className="h-60 w-full">
+              <ResponsiveContainer width="100%" height="100%">
+                <BarChart data={chartData} barSize={22} barGap={4}>
+                  <CartesianGrid vertical={false} stroke="#E4DFF0" />
+                  <XAxis
+                    dataKey="date"
+                    tick={{ fontSize: 10, fill: "#555068" }}
+                    axisLine={false}
+                    tickLine={false}
+                  />
+                  <YAxis
+                    tick={{ fontSize: 10, fill: "#555068" }}
+                    axisLine={false}
+                    tickLine={false}
+                    allowDecimals={false}
+                  />
+                  <Tooltip
+                    cursor={{ fill: "transparent" }}
+                    contentStyle={{
+                      background: "#FFFFFF",
+                      border: "0.5px solid #E4DFF0",
+                      borderRadius: 10,
+                      fontSize: 12,
+                    }}
+                    formatter={(value) => [`${value} cita${Number(value) !== 1 ? "s" : ""}`, ""]}
+                  />
+                  <Bar
+                    dataKey="hoy"
+                    stackId="citas"
+                    fill={CHART_BAR_COLORS.hoy}
+                    radius={[6, 6, 6, 6]}
+                  />
+                  <Bar
+                    dataKey="pasado"
+                    stackId="citas"
+                    fill={CHART_BAR_COLORS.pasado}
+                    radius={[6, 6, 6, 6]}
+                  />
+                  <Bar
+                    dataKey="proximo"
+                    stackId="citas"
+                    fill={CHART_BAR_COLORS.proximo}
+                    radius={[6, 6, 6, 6]}
+                  />
+                </BarChart>
+              </ResponsiveContainer>
+            </div>
+          </div>
+
+          <MonthlyCalendar datesWithCitas={datesWithCitas} accentColor="#6366F1" />
+        </div>
+
+        {/* FILA 4 — Mis mascotas + Acciones rápidas */}
+        <div className="grid grid-cols-1 gap-3 lg:grid-cols-[1fr_240px]">
+          <div className={cardClass}>
+            <div className="mb-3 flex items-center gap-2">
+              <Activity className="h-4 w-4 text-[#6366F1]" />
+              <h3 className="text-[12px] font-semibold text-slate-900">Mis mascotas</h3>
+            </div>
+            {loading ? (
+              <p className="text-[11px] text-[#555068]">Cargando...</p>
+            ) : mascotas.length === 0 ? (
+              <p className="text-[11px] text-[#555068]">No tienes mascotas registradas.</p>
+            ) : (
+              <div className="space-y-3">
                 {mascotas.slice(0, 5).map((mascota) => (
                   <Link
                     key={mascota.id}
                     href="/cliente/mascotas"
-                    className="flex items-center gap-3 px-5 py-3 transition hover:bg-slate-50 dark:hover:bg-slate-800/50"
+                    className="flex items-center gap-3"
                   >
-                    <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-brand-50 text-lg font-bold text-brand-600 dark:bg-brand-900/30 dark:text-brand-400">
+                    <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg bg-[#EEF2FF] text-[11px] font-bold text-[#6366F1]">
                       {mascota.nombre.charAt(0)}
                     </div>
-                    <div className="min-w-0">
-                      <p className="truncate text-sm font-semibold text-slate-900 dark:text-white">
+                    <div className="min-w-0 flex-1">
+                      <p className="truncate text-[11px] font-semibold text-slate-900">
                         {mascota.nombre}
                       </p>
-                      <p className="text-xs text-slate-500 dark:text-slate-400">
+                      <p className="text-[11px] text-[#555068]">
                         {mascota.especie}
                         {mascota.raza ? ` · ${mascota.raza}` : ""}
                       </p>
                     </div>
-                    <ChevronRight className="ml-auto h-4 w-4 shrink-0 text-slate-300 dark:text-slate-600" />
+                    <ChevronRight className="h-3.5 w-3.5 shrink-0 text-slate-300" />
                   </Link>
                 ))}
               </div>
             )}
-          </section>
-        </aside>
-      </div>
-    </div>
-  );
-}
+          </div>
 
-function StatCard({
-  icon: Icon,
-  label,
-  value,
-  accentBar,
-  iconBg,
-  className = "",
-}: {
-  icon: React.ElementType;
-  label: string;
-  value: string;
-  accentBar: string;
-  iconBg: string;
-  className?: string;
-}) {
-  return (
-    <div
-      className={`admin-card relative flex items-center gap-3 overflow-hidden px-4 py-3.5 transition-all duration-200 hover:-translate-y-0.5 hover:shadow-card-hover ${className}`}
-    >
-      <div className={`absolute inset-y-0 left-0 w-1 rounded-l-2xl ${accentBar}`} />
-      <div className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-lg ${iconBg}`}>
-        <Icon className="h-4 w-4" />
-      </div>
-      <div>
-        <p className="text-label">{label}</p>
-        <p className="mt-0.5 text-lg font-bold text-slate-900 dark:text-white">{value}</p>
+          {/* Acciones rápidas */}
+          <div className={cardClass}>
+            <div className="mb-3 flex items-center gap-2">
+              <Zap className="h-4 w-4 text-[#6366F1]" />
+              <h3 className="text-[12px] font-semibold text-slate-900">Acciones rápidas</h3>
+            </div>
+            <div className="space-y-2">
+              <Link
+                href="/cliente/agendar/nueva"
+                className="flex w-full items-center gap-2 rounded-[9px] border-[0.5px] border-[#E4DFF0] bg-[#F7F6FA] px-3 py-2 text-[11px] font-semibold text-slate-700 transition hover:border-[#6366F1]/30 hover:bg-[#EEF2FF]"
+              >
+                <CalendarPlus className="h-3.5 w-3.5 text-[#6366F1]" />
+                Agendar cita
+              </Link>
+              <Link
+                href="/cliente/mascotas"
+                className="flex w-full items-center gap-2 rounded-[9px] border-[0.5px] border-[#E4DFF0] bg-[#F7F6FA] px-3 py-2 text-[11px] font-semibold text-slate-700 transition hover:border-[#6366F1]/30 hover:bg-[#EEF2FF]"
+              >
+                <PawPrint className="h-3.5 w-3.5 text-[#6366F1]" />
+                Mis mascotas
+              </Link>
+              <Link
+                href="/cliente/citas"
+                className="flex w-full items-center gap-2 rounded-[9px] border-[0.5px] border-[#E4DFF0] bg-[#F7F6FA] px-3 py-2 text-[11px] font-semibold text-slate-700 transition hover:border-[#6366F1]/30 hover:bg-[#EEF2FF]"
+              >
+                <CalendarDays className="h-3.5 w-3.5 text-[#6366F1]" />
+                Ver citas
+              </Link>
+              <Link
+                href="/cliente/configuracion"
+                className="flex w-full items-center gap-2 rounded-[9px] border-[0.5px] border-[#E4DFF0] bg-[#F7F6FA] px-3 py-2 text-[11px] font-semibold text-slate-700 transition hover:border-[#6366F1]/30 hover:bg-[#EEF2FF]"
+              >
+                <Settings className="h-3.5 w-3.5 text-[#6366F1]" />
+                Mi perfil
+              </Link>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   );

@@ -196,3 +196,208 @@ body {
     @apply mb-1.5 block text-xs font-medium text-surface-500 dark:text-surface-400;
   }
 }
+
+/* ─── Identidad visual del panel Super-Admin: acento violeta ──────── */
+.super-admin-shell .bg-brand-600 {
+  background-color: #7c3aed;
+}
+.super-admin-shell .text-brand-600 {
+  color: #7c3aed;
+}
+.super-admin-shell .btn-primary {
+  background-color: #7c3aed;
+  box-shadow: 0 2px 10px rgba(124, 58, 237, 0.3);
+}
+.super-admin-shell .btn-primary:hover {
+  background-color: #6d28d9;
+  box-shadow: 0 10px 28px rgba(124, 58, 237, 0.3);
+}
+.dark .super-admin-shell .bg-brand-600 {
+  background-color: #a78bfa;
+  color: #1a0f35;
+}
+.dark .super-admin-shell .text-brand-600 {
+  color: #a78bfa;
+}
+.dark .super-admin-shell .btn-primary {
+  background-color: #a78bfa;
+  color: #1a0f35;
+  box-shadow: 0 2px 10px rgba(167, 139, 250, 0.25);
+}
+.dark .super-admin-shell .btn-primary:hover {
+  background-color: #8b5cf6;
+  color: #1a0f35;
+  box-shadow: 0 10px 28px rgba(167, 139, 250, 0.25);
+}
+
+/* ─── Identidad visual del panel Admin: acento púrpura minimalista ── */
+.admin-shell .bg-brand-600 {
+  background-color: #7c3aed;
+}
+.admin-shell .text-brand-600 {
+  color: #7c3aed;
+}
+.admin-shell .btn-primary {
+  background-color: #7c3aed;
+  box-shadow: 0 2px 10px rgba(124, 58, 237, 0.3);
+}
+.admin-shell .btn-primary:hover {
+  background-color: #6d28d9;
+  box-shadow: 0 10px 28px rgba(124, 58, 237, 0.3);
+}
+.dark .admin-shell {
+  background-color: #0e0b16;
+}
+.dark .admin-shell .bg-brand-600 {
+  background-color: #a78bfa;
+  color: #1a0f35;
+}
+.dark .admin-shell .text-brand-600 {
+  color: #a78bfa;
+}
+.dark .admin-shell .btn-primary {
+  background-color: #a78bfa;
+  color: #1a0f35;
+  box-shadow: 0 2px 10px rgba(167, 139, 250, 0.25);
+}
+.dark .admin-shell .btn-primary:hover {
+  background-color: #8b5cf6;
+  color: #1a0f35;
+  box-shadow: 0 10px 28px rgba(167, 139, 250, 0.25);
+}
+.dark .admin-shell aside,
+.dark .admin-shell header,
+.dark .admin-shell .admin-card {
+  background-color: #160f25;
+  border-color: #2a1f42;
+}
+
+/* ─── Admin: paleta extendida brand-* remapeada a violeta ─────────── */
+.admin-shell .bg-brand-50 {
+  background-color: #f5f3ff;
+}
+.admin-shell .bg-brand-100 {
+  background-color: #ede9fe;
+}
+.admin-shell .bg-brand-300 {
+  background-color: #c4b5fd;
+}
+.admin-shell .bg-brand-400 {
+  background-color: #a78bfa;
+}
+.admin-shell .bg-brand-500 {
+  background-color: #8b5cf6;
+}
+
+.admin-shell .border-brand-100 {
+  border-color: #ede9fe;
+}
+.admin-shell .border-brand-200 {
+  border-color: #ddd6fe;
+}
+.admin-shell .border-brand-400 {
+  border-color: #a78bfa;
+}
+.admin-shell .border-brand-500 {
+  border-color: #8b5cf6;
+}
+.admin-shell .border-brand-600 {
+  border-color: #7c3aed;
+}
+
+.admin-shell .text-brand-400 {
+  color: #a78bfa;
+}
+.admin-shell .text-brand-500 {
+  color: #8b5cf6;
+}
+.admin-shell .text-brand-700 {
+  color: #6d28d9;
+}
+.admin-shell .text-brand-800 {
+  color: #5b21b6;
+}
+
+.admin-shell .ring-brand-100 {
+  --tw-ring-color: rgb(237 233 254 / 1);
+}
+.admin-shell .shadow-brand-600\/10 {
+  --tw-shadow-color: rgb(124 58 237 / 0.1);
+}
+
+.admin-shell .hover\:bg-brand-50:hover {
+  background-color: #f5f3ff;
+}
+.admin-shell .hover\:bg-brand-50\/40:hover {
+  background-color: rgb(245 243 255 / 0.4);
+}
+.admin-shell .hover\:bg-brand-100:hover {
+  background-color: #ede9fe;
+}
+.admin-shell .hover\:bg-brand-500:hover {
+  background-color: #8b5cf6;
+}
+.admin-shell .hover\:bg-brand-700:hover {
+  background-color: #6d28d9;
+}
+.admin-shell .hover\:border-brand-200:hover {
+  border-color: #ddd6fe;
+}
+.admin-shell .hover\:border-brand-300:hover {
+  border-color: #c4b5fd;
+}
+.admin-shell .hover\:border-brand-400:hover {
+  border-color: #a78bfa;
+}
+.admin-shell .hover\:text-brand-700:hover {
+  color: #6d28d9;
+}
+
+/* Variantes oscuras (desplazadas para mejor contraste sobre #0E0B16) */
+.dark .admin-shell .dark\:bg-brand-900\/40 {
+  background-color: rgb(109 40 217 / 0.4);
+}
+.dark .admin-shell .dark\:bg-brand-950\/30 {
+  background-color: rgb(91 33 182 / 0.3);
+}
+.dark .admin-shell .dark\:bg-brand-950\/40 {
+  background-color: rgb(91 33 182 / 0.4);
+}
+.dark .admin-shell .dark\:hover\:bg-brand-900\/40:hover {
+  background-color: rgb(109 40 217 / 0.4);
+}
+.dark .admin-shell .dark\:hover\:bg-brand-950\/20:hover {
+  background-color: rgb(91 33 182 / 0.2);
+}
+
+.dark .admin-shell .dark\:border-brand-400 {
+  border-color: #ddd6fe;
+}
+.dark .admin-shell .dark\:border-brand-500 {
+  border-color: #c4b5fd;
+}
+.dark .admin-shell .dark\:border-brand-600 {
+  border-color: #a78bfa;
+}
+.dark .admin-shell .dark\:border-brand-800 {
+  border-color: #7c3aed;
+}
+.dark .admin-shell .dark\:border-brand-900\/40 {
+  border-color: rgb(109 40 217 / 0.4);
+}
+.dark .admin-shell .dark\:hover\:border-brand-500:hover {
+  border-color: #c4b5fd;
+}
+.dark .admin-shell .dark\:hover\:border-brand-700:hover {
+  border-color: #8b5cf6;
+}
+
+.dark .admin-shell .dark\:text-brand-200 {
+  color: #ddd6fe;
+}
+.dark .admin-shell .dark\:text-brand-300 {
+  color: #c4b5fd;
+}
+.dark .admin-shell .dark\:text-brand-400 {
+  color: #a78bfa;
+}
