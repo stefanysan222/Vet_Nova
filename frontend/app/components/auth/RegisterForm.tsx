@@ -1,9 +1,9 @@
 "use client";
 
 import type { FormEvent } from "react";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
-import { Building2, Eye, EyeOff, Lock, Mail, UserCircle } from "lucide-react";
+import { Building2, Eye, EyeOff, Lock, Mail, MapPin, UserCircle } from "lucide-react";
 import { motion } from "framer-motion";
 import GoogleAuthButton from "./GoogleAuthButton";
 import { registerUser, loginOrRegisterGoogle } from "../../../lib/auth";
@@ -30,6 +30,7 @@ export default function RegisterForm({ clinicaSlug }: { clinicaSlug?: string }) 
   const [resolvedSlug, setResolvedSlug] = useState<string | undefined>(clinicaSlug);
   const [clinicasActivas, setClinicasActivas] = useState<ClinicaActiva[]>([]);
   const [loadingClinicas, setLoadingClinicas] = useState(!clinicaSlug);
+  const [userLocation, setUserLocation] = useState<{ lat: number; lng: number } | null>(null);
   const router = useRouter();
   const { refresh } = useAuth();
 
@@ -65,11 +66,59 @@ export default function RegisterForm({ clinicaSlug }: { clinicaSlug?: string }) 
     };
   }, [clinicaSlug]);
 
+  useEffect(() => {
+    if (clinicaSlug) return;
+    if (!("geolocation" in navigator)) return;
+    navigator.geolocation.getCurrentPosition(
+      (pos) => setUserLocation({ lat: pos.coords.latitude, lng: pos.coords.longitude }),
+      () => setUserLocation(null),
+      { enableHighAccuracy: true, timeout: 8000 },
+    );
+  }, [clinicaSlug]);
+
   const handleSelectClinica = (clinica: ClinicaActiva) => {
     setResolvedSlug(clinica.slug);
     setClinicaNombre(clinica.nombre);
     setClinicaState("valid");
   };
+
+  const distanceToClinica = (clinica: ClinicaActiva): number | null => {
+    if (!userLocation || clinica.latitud == null || clinica.longitud == null) return null;
+    const R = 6371;
+    const dLat = ((clinica.latitud - userLocation.lat) * Math.PI) / 180;
+    const dLng = ((clinica.longitud - userLocation.lng) * Math.PI) / 180;
+    const a =
+      Math.sin(dLat / 2) ** 2 +
+      Math.cos((userLocation.lat * Math.PI) / 180) *
+        Math.cos((clinica.latitud * Math.PI) / 180) *
+        Math.sin(dLng / 2) ** 2;
+    return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+  };
+
+  const sortedClinicas = useMemo(() => {
+    if (!userLocation) return clinicasActivas;
+    return [...clinicasActivas].sort((a, b) => {
+      const da = distanceToClinica(a) ?? Infinity;
+      const db = distanceToClinica(b) ?? Infinity;
+      return da - db;
+    });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [clinicasActivas, userLocation]);
+
+  const locationQueryFor = (clinica: ClinicaActiva) => {
+    if (clinica.latitud != null && clinica.longitud != null) {
+      return `${clinica.latitud},${clinica.longitud}`;
+    }
+    return encodeURIComponent(`${clinica.nombre} ${clinica.direccion ?? ""}`.trim());
+  };
+
+  const mapsUrlFor = (clinica: ClinicaActiva) =>
+    `https://www.google.com/maps/search/?api=1&query=${locationQueryFor(clinica)}`;
+
+  const embedUrlFor = (clinica: ClinicaActiva) =>
+    `https://maps.google.com/maps?q=${locationQueryFor(clinica)}&z=12&output=embed`;
+
+  const mapTarget = sortedClinicas[0];
 
   const handleChange = (field: string, value: string | boolean) => {
     setFormData((c) => ({ ...c, [field]: value }));
@@ -210,19 +259,65 @@ export default function RegisterForm({ clinicaSlug }: { clinicaSlug?: string }) 
             enlace de registro.
           </p>
         ) : (
-          <div className="max-h-72 space-y-2 overflow-y-auto pr-1">
-            {clinicasActivas.map((clinica) => (
-              <button
-                key={clinica.slug}
-                type="button"
-                onClick={() => handleSelectClinica(clinica)}
-                className="flex w-full items-center gap-3 rounded-xl border border-slate-200 px-4 py-3 text-left text-sm font-medium text-slate-700 transition hover:border-brand-300 hover:bg-brand-50 dark:border-slate-700 dark:text-slate-200 dark:hover:border-brand-700 dark:hover:bg-brand-950/20"
-              >
-                <Building2 className="h-4 w-4 shrink-0 text-brand-500" />
-                {clinica.nombre}
-              </button>
-            ))}
-          </div>
+          <>
+            {mapTarget && (
+              <div className="overflow-hidden rounded-xl border border-slate-200 dark:border-slate-700">
+                <iframe
+                  title="Mapa de clínicas cercanas"
+                  src={embedUrlFor(mapTarget)}
+                  className="h-40 w-full border-0"
+                  loading="lazy"
+                  referrerPolicy="no-referrer-when-downgrade"
+                />
+              </div>
+            )}
+
+            {!userLocation && (
+              <p className="text-center text-xs text-slate-400 dark:text-slate-500">
+                Activa tu ubicación en el navegador para ver las clínicas más cercanas a ti.
+              </p>
+            )}
+
+            <div className="max-h-72 space-y-2 overflow-y-auto pr-1">
+              {sortedClinicas.map((clinica) => {
+                const distancia = distanceToClinica(clinica);
+                return (
+                  <div
+                    key={clinica.slug}
+                    className="flex items-center gap-2 rounded-xl border border-slate-200 px-4 py-3 transition hover:border-brand-300 hover:bg-brand-50 dark:border-slate-700 dark:hover:border-brand-700 dark:hover:bg-brand-950/20"
+                  >
+                    <button
+                      type="button"
+                      onClick={() => handleSelectClinica(clinica)}
+                      className="flex flex-1 items-center gap-3 text-left text-sm font-medium text-slate-700 dark:text-slate-200"
+                    >
+                      <Building2 className="h-4 w-4 shrink-0 text-brand-500" />
+                      <span className="flex-1">
+                        {clinica.nombre}
+                        {distancia !== null && (
+                          <span className="ml-2 text-xs font-normal text-slate-400 dark:text-slate-500">
+                            ·{" "}
+                            {distancia < 1
+                              ? `${Math.round(distancia * 1000)} m`
+                              : `${distancia.toFixed(1)} km`}
+                          </span>
+                        )}
+                      </span>
+                    </button>
+                    <a
+                      href={mapsUrlFor(clinica)}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      title="Ver ubicación en Google Maps"
+                      className="shrink-0 rounded-lg p-2 text-slate-400 transition hover:bg-brand-100 hover:text-brand-600 dark:hover:bg-brand-950/40 dark:hover:text-brand-400"
+                    >
+                      <MapPin className="h-4 w-4" />
+                    </a>
+                  </div>
+                );
+              })}
+            </div>
+          </>
         )}
 
         <p className="text-center text-sm text-slate-500 dark:text-slate-400">

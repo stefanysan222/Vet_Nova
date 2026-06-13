@@ -41,6 +41,8 @@ const emptyForm = {
   direccion: "",
   telefono: "",
   email: "",
+  latitud: "",
+  longitud: "",
   adminNombre: "",
   adminEmail: "",
   adminPassword: "",
@@ -80,6 +82,10 @@ export default function SuperAdminPage() {
   const [slugEdited, setSlugEdited] = useState(false);
   const [toggleTarget, setToggleTarget] = useState<Clinica | null>(null);
   const [toggling, setToggling] = useState(false);
+  const [coordsTarget, setCoordsTarget] = useState<Clinica | null>(null);
+  const [coordsForm, setCoordsForm] = useState({ latitud: "", longitud: "" });
+  const [coordsError, setCoordsError] = useState("");
+  const [savingCoords, setSavingCoords] = useState(false);
 
   const cargar = () => {
     setLoading(true);
@@ -113,6 +119,23 @@ export default function SuperAdminPage() {
     setForm((prev) => ({ ...prev, [name]: value }));
   };
 
+  const handleUseMyLocation = () => {
+    if (!("geolocation" in navigator)) {
+      notifyError("No disponible", "Tu navegador no soporta geolocalización.");
+      return;
+    }
+    navigator.geolocation.getCurrentPosition(
+      (pos) => {
+        setForm((prev) => ({
+          ...prev,
+          latitud: pos.coords.latitude.toFixed(6),
+          longitud: pos.coords.longitude.toFixed(6),
+        }));
+      },
+      () => notifyError("No se pudo obtener tu ubicación", "Revisa los permisos del navegador."),
+    );
+  };
+
   const closeForm = () => {
     setShowForm(false);
     setForm(emptyForm);
@@ -143,6 +166,8 @@ export default function SuperAdminPage() {
         direccion: form.direccion.trim() || undefined,
         telefono: form.telefono.trim() || undefined,
         email: form.email.trim() || undefined,
+        latitud: form.latitud.trim() ? Number(form.latitud) : undefined,
+        longitud: form.longitud.trim() ? Number(form.longitud) : undefined,
         adminNombre: form.adminNombre.trim(),
         adminEmail: form.adminEmail.trim(),
         adminPassword: form.adminPassword,
@@ -176,6 +201,72 @@ export default function SuperAdminPage() {
       );
     } finally {
       setToggling(false);
+    }
+  };
+
+  const openCoordsModal = (c: Clinica) => {
+    setCoordsTarget(c);
+    setCoordsForm({
+      latitud: c.latitud != null ? String(c.latitud) : "",
+      longitud: c.longitud != null ? String(c.longitud) : "",
+    });
+    setCoordsError("");
+  };
+
+  const closeCoordsModal = () => {
+    setCoordsTarget(null);
+    setCoordsForm({ latitud: "", longitud: "" });
+    setCoordsError("");
+  };
+
+  const handleCoordsUseMyLocation = () => {
+    if (!("geolocation" in navigator)) {
+      notifyError("No disponible", "Tu navegador no soporta geolocalización.");
+      return;
+    }
+    navigator.geolocation.getCurrentPosition(
+      (pos) => {
+        setCoordsForm({
+          latitud: pos.coords.latitude.toFixed(6),
+          longitud: pos.coords.longitude.toFixed(6),
+        });
+      },
+      () => notifyError("No se pudo obtener tu ubicación", "Revisa los permisos del navegador."),
+    );
+  };
+
+  const handleSaveCoords = async () => {
+    if (!coordsTarget) return;
+    const latStr = coordsForm.latitud.trim();
+    const lngStr = coordsForm.longitud.trim();
+    if ((latStr && !lngStr) || (!latStr && lngStr)) {
+      setCoordsError("Completa tanto la latitud como la longitud.");
+      return;
+    }
+    const latitud = latStr ? Number(latStr) : undefined;
+    const longitud = lngStr ? Number(lngStr) : undefined;
+    if (latStr && (Number.isNaN(latitud) || latitud! < -90 || latitud! > 90)) {
+      setCoordsError("La latitud debe estar entre -90 y 90.");
+      return;
+    }
+    if (lngStr && (Number.isNaN(longitud) || longitud! < -180 || longitud! > 180)) {
+      setCoordsError("La longitud debe estar entre -180 y 180.");
+      return;
+    }
+    setSavingCoords(true);
+    setCoordsError("");
+    try {
+      await updateClinica(coordsTarget.id, { latitud, longitud });
+      success(
+        "Ubicación actualizada",
+        `La ubicación de ${coordsTarget.nombre} se guardó correctamente.`,
+      );
+      closeCoordsModal();
+      cargar();
+    } catch (err) {
+      setCoordsError(err instanceof Error ? err.message : "No se pudo actualizar la ubicación.");
+    } finally {
+      setSavingCoords(false);
     }
   };
 
@@ -619,16 +710,29 @@ export default function SuperAdminPage() {
                           <StatusBadge status={c.estado === "activa" ? "Activa" : "Inactiva"} />
                         </td>
                         <td className="px-4 py-3 text-right">
-                          <button
-                            onClick={() => setToggleTarget(c)}
-                            className={
-                              c.estado === "activa"
-                                ? "btn-danger px-3.5 py-2 text-xs"
-                                : "btn-secondary px-3.5 py-2 text-xs"
-                            }
-                          >
-                            {c.estado === "activa" ? "Desactivar" : "Activar"}
-                          </button>
+                          <div className="flex items-center justify-end gap-2">
+                            <button
+                              onClick={() => openCoordsModal(c)}
+                              className="btn-secondary px-3.5 py-2 text-xs"
+                              title={
+                                c.latitud != null && c.longitud != null
+                                  ? "Editar coordenadas"
+                                  : "Agregar coordenadas"
+                              }
+                            >
+                              <MapPin className="h-3.5 w-3.5" />
+                            </button>
+                            <button
+                              onClick={() => setToggleTarget(c)}
+                              className={
+                                c.estado === "activa"
+                                  ? "btn-danger px-3.5 py-2 text-xs"
+                                  : "btn-secondary px-3.5 py-2 text-xs"
+                              }
+                            >
+                              {c.estado === "activa" ? "Desactivar" : "Activar"}
+                            </button>
+                          </div>
                         </td>
                       </tr>
                     ))}
@@ -732,6 +836,44 @@ export default function SuperAdminPage() {
                           className={inputClass}
                         />
                       </div>
+                      <div>
+                        <label className="mb-1 block text-sm font-semibold text-slate-700 dark:text-slate-300">
+                          Latitud
+                        </label>
+                        <input
+                          type="number"
+                          step="any"
+                          name="latitud"
+                          value={form.latitud}
+                          onChange={handleChange}
+                          placeholder="-2.170998"
+                          className={inputClass}
+                        />
+                      </div>
+                      <div>
+                        <label className="mb-1 block text-sm font-semibold text-slate-700 dark:text-slate-300">
+                          Longitud
+                        </label>
+                        <input
+                          type="number"
+                          step="any"
+                          name="longitud"
+                          value={form.longitud}
+                          onChange={handleChange}
+                          placeholder="-79.922359"
+                          className={inputClass}
+                        />
+                      </div>
+                      <div className="sm:col-span-2">
+                        <button
+                          type="button"
+                          onClick={handleUseMyLocation}
+                          className="inline-flex items-center gap-1.5 text-xs font-semibold text-brand-600 transition hover:text-brand-700 dark:text-brand-400 dark:hover:text-brand-300"
+                        >
+                          <MapPin className="h-3.5 w-3.5" />
+                          Usar mi ubicación actual
+                        </button>
+                      </div>
                     </div>
                   </div>
 
@@ -793,6 +935,104 @@ export default function SuperAdminPage() {
                 </button>
                 <button form="form-clinica" type="submit" disabled={saving} className="btn-primary">
                   {saving ? "Guardando..." : "Registrar clínica"}
+                </button>
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* Modal editar ubicación */}
+      <AnimatePresence>
+        {coordsTarget && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-50 flex items-center justify-center bg-surface-900/50 px-4 backdrop-blur-sm"
+            onClick={closeCoordsModal}
+          >
+            <motion.div
+              initial={{ scale: 0.96, opacity: 0, y: 12 }}
+              animate={{ scale: 1, opacity: 1, y: 0 }}
+              exit={{ scale: 0.96, opacity: 0, y: 12 }}
+              transition={{ type: "spring", bounce: 0.18, duration: 0.38 }}
+              className="w-full max-w-md overflow-hidden rounded-3xl border border-surface-200/60 bg-white shadow-modal dark:border-surface-700 dark:bg-surface-900"
+              onClick={(e) => e.stopPropagation()}
+            >
+              <div className="flex items-center justify-between border-b border-slate-100 px-6 py-4 dark:border-slate-800">
+                <h2 className="text-lg font-bold text-slate-900 dark:text-white">
+                  Ubicación de {coordsTarget.nombre}
+                </h2>
+                <button
+                  onClick={closeCoordsModal}
+                  className="flex h-8 w-8 items-center justify-center rounded-xl text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800"
+                >
+                  <X className="h-4 w-4" />
+                </button>
+              </div>
+              <div className="space-y-4 p-6">
+                <p className="text-sm text-slate-500 dark:text-slate-400">
+                  Estas coordenadas se usan para mostrar la clínica en el mapa y calcular la
+                  distancia con los usuarios al registrarse.
+                </p>
+                <div className="grid gap-4 sm:grid-cols-2">
+                  <div>
+                    <label className="mb-1 block text-sm font-semibold text-slate-700 dark:text-slate-300">
+                      Latitud
+                    </label>
+                    <input
+                      type="number"
+                      step="any"
+                      value={coordsForm.latitud}
+                      onChange={(e) =>
+                        setCoordsForm((prev) => ({ ...prev, latitud: e.target.value }))
+                      }
+                      placeholder="-2.170998"
+                      className={inputClass}
+                    />
+                  </div>
+                  <div>
+                    <label className="mb-1 block text-sm font-semibold text-slate-700 dark:text-slate-300">
+                      Longitud
+                    </label>
+                    <input
+                      type="number"
+                      step="any"
+                      value={coordsForm.longitud}
+                      onChange={(e) =>
+                        setCoordsForm((prev) => ({ ...prev, longitud: e.target.value }))
+                      }
+                      placeholder="-79.922359"
+                      className={inputClass}
+                    />
+                  </div>
+                </div>
+                <button
+                  type="button"
+                  onClick={handleCoordsUseMyLocation}
+                  className="inline-flex items-center gap-1.5 text-xs font-semibold text-brand-600 transition hover:text-brand-700 dark:text-brand-400 dark:hover:text-brand-300"
+                >
+                  <MapPin className="h-3.5 w-3.5" />
+                  Usar mi ubicación actual
+                </button>
+                {coordsError && (
+                  <div className="dark:bg-danger-950/30 rounded-xl border border-danger-200 bg-danger-50 px-4 py-3 text-sm text-danger-700 dark:border-danger-800 dark:text-danger-300">
+                    {coordsError}
+                  </div>
+                )}
+              </div>
+              <div className="flex justify-end gap-3 border-t border-slate-100 px-6 py-4 dark:border-slate-800">
+                <button type="button" onClick={closeCoordsModal} className="btn-secondary">
+                  Cancelar
+                </button>
+                <button
+                  type="button"
+                  onClick={handleSaveCoords}
+                  disabled={savingCoords}
+                  className="btn-primary"
+                >
+                  {savingCoords ? "Guardando..." : "Guardar"}
                 </button>
               </div>
             </motion.div>

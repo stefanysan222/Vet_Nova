@@ -7,6 +7,8 @@ export interface ClinicaAPI {
   direccion: string | null;
   telefono: string | null;
   email: string | null;
+  latitud: number | null;
+  longitud: number | null;
   estado: string;
   created_at: string;
 }
@@ -18,6 +20,8 @@ export interface Clinica {
   direccion: string;
   telefono: string;
   email: string;
+  latitud: number | null;
+  longitud: number | null;
   estado: string;
   createdAt: string;
 }
@@ -30,6 +34,8 @@ function mapClinica(c: ClinicaAPI): Clinica {
     direccion: c.direccion ?? "",
     telefono: c.telefono ?? "",
     email: c.email ?? "",
+    latitud: c.latitud ?? null,
+    longitud: c.longitud ?? null,
     estado: c.estado,
     createdAt: c.created_at,
   };
@@ -46,6 +52,8 @@ export interface CreateClinicaPayload {
   direccion?: string;
   telefono?: string;
   email?: string;
+  latitud?: number;
+  longitud?: number;
   adminNombre: string;
   adminEmail: string;
   adminPassword: string;
@@ -61,6 +69,8 @@ export interface UpdateClinicaPayload {
   direccion?: string;
   telefono?: string;
   email?: string;
+  latitud?: number;
+  longitud?: number;
   estado?: "activa" | "inactiva";
 }
 
@@ -86,6 +96,9 @@ export async function fetchClinicaBySlug(slug: string): Promise<ClinicaPublica |
 export interface ClinicaActiva {
   nombre: string;
   slug: string;
+  direccion: string | null;
+  latitud: number | null;
+  longitud: number | null;
 }
 
 export async function fetchClinicasActivas(): Promise<ClinicaActiva[]> {
