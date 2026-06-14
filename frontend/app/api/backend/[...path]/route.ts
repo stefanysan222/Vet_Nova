@@ -1,6 +1,5 @@
 import { NextResponse } from "next/server";
 import { API_URL } from "@/lib/config";
-import { getAuthToken } from "@/lib/server-auth";
 
 export const runtime = "nodejs";
 
@@ -11,10 +10,10 @@ const HOP_BY_HOP_HEADERS = new Set([
   "transfer-encoding",
   "keep-alive",
   "host",
+  "set-cookie",
 ]);
 
 async function forward(req: Request, segments: string[]): Promise<Response> {
-  const token = await getAuthToken();
   const path = segments.join("/");
   const search = new URL(req.url).search;
   const target = `${API_URL}/${path}${search}`;
@@ -22,7 +21,10 @@ async function forward(req: Request, segments: string[]): Promise<Response> {
   const headers = new Headers();
   const contentType = req.headers.get("content-type");
   if (contentType) headers.set("Content-Type", contentType);
-  if (token) headers.set("Authorization", `Bearer ${token}`);
+  const cookie = req.headers.get("cookie");
+  if (cookie) headers.set("cookie", cookie);
+  const csrfToken = req.headers.get("x-csrf-token");
+  if (csrfToken) headers.set("x-csrf-token", csrfToken);
 
   const hasBody = req.method !== "GET" && req.method !== "HEAD";
 
@@ -39,10 +41,14 @@ async function forward(req: Request, segments: string[]): Promise<Response> {
     }
   });
 
-  return new NextResponse(respuesta.body, {
+  const response = new NextResponse(respuesta.body, {
     status: respuesta.status,
     headers: responseHeaders,
   });
+  for (const setCookie of respuesta.headers.getSetCookie()) {
+    response.headers.append("set-cookie", setCookie);
+  }
+  return response;
 }
 
 type RouteContext = { params: Promise<{ path: string[] }> };

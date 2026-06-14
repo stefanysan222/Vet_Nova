@@ -103,4 +103,22 @@ describe("POST /api/email/contact", () => {
     expect(res.status).toBe(502);
     expect(json.error).toBe("Error al enviar el mensaje.");
   });
+
+  it("escapa HTML en los campos del usuario para evitar inyección en el correo", async () => {
+    const { POST } = await import("../route");
+    await POST(
+      buildRequest({
+        ...CAMPOS_VALIDOS,
+        nombre: "<script>alert(1)</script>",
+        mensaje: "Línea 1\n<img src=x onerror=alert(2)>",
+      }),
+    );
+
+    const [supportMail] = mockSendMail.mock.calls.map(([arg]) => arg);
+    expect(supportMail.html).not.toContain("<script>");
+    expect(supportMail.html).toContain("&lt;script&gt;");
+    expect(supportMail.html).not.toContain("<img src=x");
+    expect(supportMail.html).toContain("&lt;img src=x onerror=alert(2)&gt;");
+    expect(supportMail.html).toContain("Línea 1<br/>");
+  });
 });

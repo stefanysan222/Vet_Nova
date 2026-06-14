@@ -19,6 +19,7 @@ beforeEach(() => {
   localStorage.clear();
   vi.unstubAllGlobals();
   vi.unstubAllEnvs();
+  document.cookie = "vetnova-csrf=test-csrf-token; path=/";
 });
 
 describe("apiFetch — success", () => {
@@ -91,6 +92,43 @@ describe("apiFetch — error handling", () => {
       }),
     );
     await expect(apiFetch("/crash")).rejects.toThrow("Error 500");
+  });
+});
+
+describe("apiFetch — CSRF protection", () => {
+  beforeEach(() => {
+    document.cookie = "vetnova-csrf=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
+  });
+
+  it("does not attach x-csrf-token for GET requests", async () => {
+    mockFetch(200, {});
+    await apiFetch("/test");
+    const headers = (fetch as ReturnType<typeof vi.fn>).mock.calls[0][1].headers;
+    expect(headers["x-csrf-token"]).toBeUndefined();
+  });
+
+  it("attaches x-csrf-token from the vetnova-csrf cookie on mutating requests", async () => {
+    document.cookie = "vetnova-csrf=abc123; path=/";
+    mockFetch(200, {});
+    await apiFetch("/items", { method: "POST", body: "{}" });
+    const headers = (fetch as ReturnType<typeof vi.fn>).mock.calls[0][1].headers;
+    expect(headers["x-csrf-token"]).toBe("abc123");
+  });
+
+  it("fetches /auth/csrf first when no csrf cookie exists yet", async () => {
+    const fetchMock = vi.fn().mockResolvedValue({
+      ok: true,
+      status: 200,
+      json: () => Promise.resolve({ csrfToken: "fresh-token" }),
+      text: () => Promise.resolve("{}"),
+    });
+    vi.stubGlobal("fetch", fetchMock);
+
+    await apiFetch("/items", { method: "POST", body: "{}" });
+
+    expect(fetchMock.mock.calls[0][0]).toBe("/api/backend/auth/csrf");
+    const headers = fetchMock.mock.calls[1][1].headers;
+    expect(headers["x-csrf-token"]).toBe("fresh-token");
   });
 });
 

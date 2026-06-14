@@ -6,7 +6,7 @@ export const runtime = "nodejs";
 
 export async function POST(req: Request) {
   const ip = req.headers.get("x-forwarded-for")?.split(",")[0].trim() ?? "unknown";
-  if (!(await rateLimit(`auth-login:${ip}`, 5, 60_000))) {
+  if (!(await rateLimit(`auth-forgot-password:${ip}`, 3, 900_000))) {
     return NextResponse.json(
       { error: "Demasiados intentos. Intenta de nuevo en unos minutos." },
       { status: 429 },
@@ -15,7 +15,7 @@ export async function POST(req: Request) {
 
   const body = await req.text();
 
-  const respuesta = await fetch(`${API_URL}/auth/login`, {
+  const respuesta = await fetch(`${API_URL}/auth/forgot-password`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body,
@@ -23,9 +23,5 @@ export async function POST(req: Request) {
 
   const json = await respuesta.json().catch(() => ({}));
 
-  const response = NextResponse.json(json, { status: respuesta.status });
-  for (const cookie of respuesta.headers.getSetCookie()) {
-    response.headers.append("set-cookie", cookie);
-  }
-  return response;
+  return NextResponse.json(json, { status: respuesta.status });
 }

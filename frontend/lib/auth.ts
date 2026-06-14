@@ -84,7 +84,7 @@ export type ForgotPasswordOutcome = "sent" | "rate-limited" | "error";
 
 export async function forgotPassword(email: string): Promise<ForgotPasswordOutcome> {
   try {
-    const res = await fetch("/api/backend/auth/forgot-password", {
+    const res = await fetch("/api/auth/forgot-password", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       credentials: "include",
@@ -104,7 +104,7 @@ export async function resetPassword(
   password: string,
 ): Promise<{ ok: boolean; message?: string }> {
   try {
-    const res = await fetch("/api/backend/auth/reset-password", {
+    const res = await fetch("/api/auth/reset-password", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       credentials: "include",

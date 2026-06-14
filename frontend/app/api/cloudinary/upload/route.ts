@@ -1,13 +1,15 @@
 import { NextResponse } from "next/server";
 import { rateLimit } from "@/lib/rate-limit";
 import { API_URL } from "@/lib/config";
-import { getAuthToken } from "@/lib/server-auth";
 
 export const runtime = "nodejs";
 
+const ALLOWED_TYPES = new Set(["image/jpeg", "image/png", "image/webp"]);
+const MAX_SIZE_BYTES = 5 * 1024 * 1024; // 5MB
+
 export async function POST(req: Request) {
-  const token = await getAuthToken();
-  if (!token) {
+  const cookie = req.headers.get("cookie");
+  if (!cookie) {
     return NextResponse.json(
       { error: "Debes iniciar sesión para subir archivos." },
       { status: 401 },
@@ -15,7 +17,7 @@ export async function POST(req: Request) {
   }
 
   const meRes = await fetch(`${API_URL}/auth/me`, {
-    headers: { Authorization: `Bearer ${token}` },
+    headers: { cookie },
   });
   if (!meRes.ok) {
     return NextResponse.json(
@@ -48,6 +50,20 @@ export async function POST(req: Request) {
 
   if (!archivo || !(archivo instanceof File)) {
     return NextResponse.json({ error: "No se recibió un archivo válido." }, { status: 400 });
+  }
+
+  if (!ALLOWED_TYPES.has(archivo.type)) {
+    return NextResponse.json(
+      { error: "Tipo de archivo no permitido. Usa JPG, PNG o WEBP." },
+      { status: 400 },
+    );
+  }
+
+  if (archivo.size > MAX_SIZE_BYTES) {
+    return NextResponse.json(
+      { error: "El archivo supera el tamaño máximo de 5MB." },
+      { status: 400 },
+    );
   }
 
   const uploadForm = new FormData();

@@ -1,10 +1,37 @@
 const PROXY_BASE = "/api/backend";
+const CSRF_COOKIE = "vetnova-csrf";
+const MUTATING_METHODS = new Set(["POST", "PUT", "PATCH", "DELETE"]);
+
+function readCookie(name: string): string | null {
+  if (typeof document === "undefined") return null;
+  const match = document.cookie.match(new RegExp(`(?:^|; )${name}=([^;]*)`));
+  return match ? decodeURIComponent(match[1]) : null;
+}
+
+async function getCsrfToken(): Promise<string | null> {
+  const existing = readCookie(CSRF_COOKIE);
+  if (existing) return existing;
+
+  try {
+    const res = await fetch(`${PROXY_BASE}/auth/csrf`, { credentials: "include" });
+    const json = await res.json().catch(() => null);
+    return readCookie(CSRF_COOKIE) ?? json?.csrfToken ?? null;
+  } catch {
+    return null;
+  }
+}
 
 export async function apiFetch<T>(path: string, options?: RequestInit): Promise<T> {
+  const method = (options?.method ?? "GET").toUpperCase();
   const headers: Record<string, string> = {
     "Content-Type": "application/json",
     ...(options?.headers as Record<string, string> | undefined),
   };
+
+  if (MUTATING_METHODS.has(method)) {
+    const csrfToken = await getCsrfToken();
+    if (csrfToken) headers["x-csrf-token"] = csrfToken;
+  }
 
   const { headers: _headers, ...restOptions } = options ?? {};
   const res = await fetch(`${PROXY_BASE}${path}`, {
