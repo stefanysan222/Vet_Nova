@@ -158,7 +158,7 @@ export default function UsersTable({ refreshTrigger = 0 }: { refreshTrigger?: nu
             ? {
                 id: selectedUser.id,
                 name: selectedUser.nombre ?? "",
-                email: selectedUser.email,
+                email: selectedUser.email ?? "",
                 role: selectedUser.rol,
               }
             : null

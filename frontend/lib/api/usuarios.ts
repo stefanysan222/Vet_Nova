@@ -3,7 +3,7 @@ import { api } from "./client";
 export interface UsuarioAPI {
   id: number;
   nombre: string | null;
-  email: string;
+  email?: string;
   rol: string;
 }
 

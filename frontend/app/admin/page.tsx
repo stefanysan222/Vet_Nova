@@ -23,6 +23,7 @@ import { useIsDarkMode } from "@/lib/hooks/useDarkMode";
 import { fetchCitas } from "../../lib/api/citas";
 import { fetchStatsAdmin } from "../../lib/api/usuarios";
 import { fetchMascotas } from "../../lib/api/mascotas";
+import { fetchNotificaciones, type NotificacionAPI } from "../../lib/api/notificaciones";
 import type { Appointment } from "../../lib/recepcionista/types";
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from "recharts";
 
@@ -32,36 +33,24 @@ const CHART_BAR_COLORS = {
   proximo: "#EDE9FE",
 };
 
-const ACTIVITY_ITEMS = [
-  {
-    icon: PawPrint,
-    color: "#16A34A",
-    bg: "#F0FDF4",
-    text: "Carlos registró una mascota nueva",
-    time: "hace 5 min",
-  },
-  {
-    icon: CalendarDays,
-    color: "#2563EB",
-    bg: "#EFF6FF",
-    text: "María creó una cita para mañana",
-    time: "hace 18 min",
-  },
-  {
-    icon: Stethoscope,
-    color: "#7C3AED",
-    bg: "#FAF5FF",
-    text: "Nuevo veterinario agregado al sistema",
-    time: "hace 1 hora",
-  },
-  {
-    icon: ClipboardList,
-    color: "#D97706",
-    bg: "#FFF7ED",
-    text: "Historial médico de Max actualizado",
-    time: "hace 2 horas",
-  },
-];
+const ACTIVITY_ICONS: Record<string, { icon: typeof PawPrint; color: string; bg: string }> = {
+  nueva_mascota: { icon: PawPrint, color: "#16A34A", bg: "#F0FDF4" },
+  nueva_cita: { icon: CalendarDays, color: "#2563EB", bg: "#EFF6FF" },
+  nuevo_cliente: { icon: Stethoscope, color: "#7C3AED", bg: "#FAF5FF" },
+  cita_actualizada: { icon: ClipboardList, color: "#D97706", bg: "#FFF7ED" },
+};
+
+const DEFAULT_ACTIVITY_ICON = { icon: ClipboardList, color: "#D97706", bg: "#FFF7ED" };
+
+function timeAgo(dateStr: string): string {
+  const diff = Date.now() - new Date(dateStr).getTime();
+  const m = Math.floor(diff / 60000);
+  if (m < 1) return "Ahora";
+  if (m < 60) return `Hace ${m} min`;
+  const h = Math.floor(m / 60);
+  if (h < 24) return `Hace ${h}h`;
+  return `Hace ${Math.floor(h / 24)}d`;
+}
 
 const cardClass =
   "rounded-[13px] border-[0.5px] border-[#E4DFF0] bg-white px-4 py-3.5 dark:border-slate-700/60 dark:bg-slate-900";
@@ -77,6 +66,7 @@ const AdminDashboardPage: React.FC = () => {
   const [isRegisterModalOpen, setIsRegisterModalOpen] = useState(false);
   const [registerRole, setRegisterRole] = useState<"Veterinario" | "Cliente">("Veterinario");
   const [citas, setCitas] = useState<Appointment[]>([]);
+  const [actividad, setActividad] = useState<NotificacionAPI[]>([]);
   const [stats, setStats] = useState({
     clientes: 0,
     veterinarios: 0,
@@ -107,6 +97,10 @@ const AdminDashboardPage: React.FC = () => {
         );
       })
       .catch(() => setCitas([]));
+
+    fetchNotificaciones()
+      .then((data) => setActividad(data.slice(0, 4)))
+      .catch(() => setActividad([]));
   }, []);
 
   const openRegisterModal = (role: "Veterinario" | "Cliente") => {
@@ -397,27 +391,37 @@ const AdminDashboardPage: React.FC = () => {
               </h3>
             </div>
             <div className="space-y-3">
-              {ACTIVITY_ITEMS.map((item, i) => {
-                const Icon = item.icon;
-                return (
-                  <div key={i} className="flex items-start gap-3">
-                    <div
-                      className="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg"
-                      style={{ background: iconBg(item.color, item.bg) }}
-                    >
-                      <Icon className="h-3.5 w-3.5" style={{ color: item.color }} />
+              {actividad.length === 0 ? (
+                <p className="text-[11px] text-[#555068] dark:text-slate-400">
+                  No hay actividad reciente.
+                </p>
+              ) : (
+                actividad.map((item) => {
+                  const {
+                    icon: Icon,
+                    color,
+                    bg,
+                  } = ACTIVITY_ICONS[item.tipo ?? ""] ?? DEFAULT_ACTIVITY_ICON;
+                  return (
+                    <div key={item.id} className="flex items-start gap-3">
+                      <div
+                        className="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg"
+                        style={{ background: iconBg(color, bg) }}
+                      >
+                        <Icon className="h-3.5 w-3.5" style={{ color }} />
+                      </div>
+                      <div className="min-w-0">
+                        <p className="text-[11px] leading-5 text-slate-700 dark:text-slate-300">
+                          {item.mensaje}
+                        </p>
+                        <p className="mt-0.5 text-[11px] text-[#555068] dark:text-slate-400">
+                          {timeAgo(item.creadaEn)}
+                        </p>
+                      </div>
                     </div>
-                    <div className="min-w-0">
-                      <p className="text-[11px] leading-5 text-slate-700 dark:text-slate-300">
-                        {item.text}
-                      </p>
-                      <p className="mt-0.5 text-[11px] text-[#555068] dark:text-slate-400">
-                        {item.time}
-                      </p>
-                    </div>
-                  </div>
-                );
-              })}
+                  );
+                })
+              )}
             </div>
           </div>
 

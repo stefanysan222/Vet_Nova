@@ -230,13 +230,14 @@ export default function Navbar() {
       const userResults: SearchResult[] = usuarios
         .filter(
           (u) =>
-            (u.nombre ?? "").toLowerCase().includes(term) || u.email.toLowerCase().includes(term),
+            (u.nombre ?? "").toLowerCase().includes(term) ||
+            (u.email ?? "").toLowerCase().includes(term),
         )
         .slice(0, 4)
         .map((u) => ({
           id: `u-${u.id}`,
-          label: u.nombre ?? u.email,
-          sublabel: `${u.rol} · ${u.email}`,
+          label: u.nombre ?? u.email ?? "",
+          sublabel: `${u.rol} · ${u.email ?? ""}`,
           category: "Usuarios",
           href: "/admin/usuarios",
         }));
