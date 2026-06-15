@@ -46,14 +46,14 @@ const NotificationsPanel: React.FC = () => {
       <div className="mb-5 flex items-center justify-between">
         <div className="flex items-center gap-3">
           <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-brand-50 dark:bg-brand-950/40">
-            <Bell className="h-4 w-4 text-brand-600 dark:text-brand-400" />
+            <Bell className="h-4 w-4 text-brand-600 dark:text-brand-300" />
           </div>
           <h3 className="text-section-title">Notificaciones</h3>
         </div>
         {!loading && items.length > 0 && (
           <button
             onClick={handleTodas}
-            className="text-xs font-semibold text-brand-600 hover:text-brand-700 dark:text-brand-400"
+            className="text-xs font-semibold text-brand-600 hover:text-brand-700 dark:text-brand-300"
           >
             Marcar todas leídas
           </button>
@@ -86,7 +86,7 @@ const NotificationsPanel: React.FC = () => {
               key={n.id}
               className="flex items-start gap-3 rounded-2xl border border-slate-200/70 bg-slate-50 p-4 dark:border-slate-700 dark:bg-slate-800/50"
             >
-              <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-xl bg-brand-100 text-brand-600 dark:bg-brand-900/40 dark:text-brand-400">
+              <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-xl bg-brand-100 text-brand-600 dark:bg-brand-900/40 dark:text-brand-300">
                 <Bell className="h-4 w-4" />
               </div>
               <div className="min-w-0 flex-1">

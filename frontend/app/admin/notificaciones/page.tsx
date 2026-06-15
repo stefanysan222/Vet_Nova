@@ -174,7 +174,7 @@ export default function AdminNotificationsPage() {
             {selected ? (
               <div>
                 <div className="mb-4">
-                  <p className="text-sm font-semibold uppercase tracking-[0.2em] text-brand-600 dark:text-brand-400">
+                  <p className="text-sm font-semibold uppercase tracking-[0.2em] text-brand-600 dark:text-brand-300">
                     Detalle
                   </p>
                   <h2 className="mt-3 text-xl font-semibold text-slate-900 dark:text-white">

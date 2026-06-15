@@ -183,7 +183,7 @@ export default function ConfiguracionVeterinarioPage() {
   return (
     <div className="space-y-6">
       {/* ENCABEZADO */}
-      <header className="overflow-hidden rounded-3xl border border-brand-200 bg-gradient-to-br from-brand-600 to-brand-700 p-7 text-white shadow-brand">
+      <header className="overflow-hidden rounded-3xl border border-brand-200 bg-gradient-to-br from-brand-600 to-brand-700 p-7 text-white shadow-brand dark:border-brand-900/40 dark:from-brand-800 dark:to-brand-950 dark:shadow-brand-sm">
         <div className="flex flex-col justify-between gap-6 lg:flex-row lg:items-center">
           <div>
             <p className="text-xs font-semibold uppercase tracking-[0.24em] text-brand-200">

@@ -22,6 +22,7 @@ import { fetchCitas } from "../../lib/api/citas";
 import type { Appointment } from "../../lib/recepcionista/types";
 import MonthlyCalendar from "../components/ui/MonthlyCalendar";
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from "recharts";
+import { useIsDarkMode } from "@/lib/hooks/useDarkMode";
 
 const CHART_BAR_COLORS = {
   hoy: "#6366F1",
@@ -29,7 +30,8 @@ const CHART_BAR_COLORS = {
   proximo: "#E0E7FF",
 };
 
-const cardClass = "rounded-[13px] border-[0.5px] border-[#E4DFF0] bg-white px-4 py-3.5";
+const cardClass =
+  "rounded-[13px] border-[0.5px] border-[#E4DFF0] bg-white px-4 py-3.5 dark:border-slate-700/60 dark:bg-slate-900";
 
 function fechaHoy(): string {
   return new Date().toISOString().slice(0, 10);
@@ -64,6 +66,7 @@ export default function VeterinarioPage() {
   const [loading, setLoading] = useState(true);
   const { user } = useAuth();
   const userName = user?.name ?? "Veterinario";
+  const isDark = useIsDarkMode();
 
   useEffect(() => {
     fetchCitas()
@@ -144,6 +147,8 @@ export default function VeterinarioPage() {
     () => citas.filter((c) => c.status === "Finalizada").slice(0, 3),
     [citas],
   );
+
+  const iconBg = (color: string, lightBg: string) => (isDark ? `${color}26` : lightBg);
 
   const metrics = [
     {
@@ -236,10 +241,14 @@ export default function VeterinarioPage() {
           <div className={cardClass}>
             <div className="mb-3 flex items-center gap-2">
               <CalendarDays className="h-4 w-4 text-[#6366F1]" />
-              <h3 className="text-[12px] font-semibold text-slate-900">Agenda de hoy</h3>
+              <h3 className="text-[12px] font-semibold text-slate-900 dark:text-white">
+                Agenda de hoy
+              </h3>
             </div>
             {agendaHoy.length === 0 ? (
-              <p className="text-[11px] text-[#555068]">Sin citas programadas para hoy.</p>
+              <p className="text-[11px] text-[#555068] dark:text-slate-400">
+                Sin citas programadas para hoy.
+              </p>
             ) : (
               <div className="space-y-3">
                 {agendaHoy.map((c) => (
@@ -248,9 +257,9 @@ export default function VeterinarioPage() {
                       className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full"
                       style={{ background: colorForService(c.service) }}
                     />
-                    <p className="text-[11px] leading-5 text-slate-700">
-                      <span className="font-semibold text-slate-900">{c.time}</span> {c.petName} ·{" "}
-                      {c.service}
+                    <p className="text-[11px] leading-5 text-slate-700 dark:text-slate-300">
+                      <span className="font-semibold text-slate-900 dark:text-white">{c.time}</span>{" "}
+                      {c.petName} · {c.service}
                     </p>
                   </div>
                 ))}
@@ -273,14 +282,14 @@ export default function VeterinarioPage() {
               >
                 <div
                   className="mb-3 flex h-8 w-8 items-center justify-center rounded-lg"
-                  style={{ background: m.bg }}
+                  style={{ background: iconBg(m.color, m.bg) }}
                 >
                   <Icon className="h-4 w-4" style={{ color: m.color }} />
                 </div>
                 <p className="text-[22px] font-bold leading-none" style={{ color: m.color }}>
                   {m.value}
                 </p>
-                <p className="mt-1.5 text-[11px] text-[#555068]">{m.label}</p>
+                <p className="mt-1.5 text-[11px] text-[#555068] dark:text-slate-400">{m.label}</p>
               </motion.div>
             );
           })}
@@ -289,25 +298,29 @@ export default function VeterinarioPage() {
         {/* FILA 3 — Gráfica + Calendario */}
         <div className="grid grid-cols-1 gap-3 lg:grid-cols-[1fr_240px]">
           <div className={cardClass}>
-            <h2 className="text-[12px] font-semibold text-slate-900">Citas programadas por día</h2>
-            <p className="mt-0.5 text-[11px] text-[#555068]">Últimos 30 días y próximos 14</p>
+            <h2 className="text-[12px] font-semibold text-slate-900 dark:text-white">
+              Citas programadas por día
+            </h2>
+            <p className="mt-0.5 text-[11px] text-[#555068] dark:text-slate-400">
+              Últimos 30 días y próximos 14
+            </p>
 
             <div className="mb-1 mt-3 flex items-center gap-4">
-              <span className="flex items-center gap-1.5 text-[11px] text-[#555068]">
+              <span className="flex items-center gap-1.5 text-[11px] text-[#555068] dark:text-slate-400">
                 <span
                   className="inline-block h-2 w-2 rounded-full"
                   style={{ background: CHART_BAR_COLORS.hoy }}
                 />
                 Hoy
               </span>
-              <span className="flex items-center gap-1.5 text-[11px] text-[#555068]">
+              <span className="flex items-center gap-1.5 text-[11px] text-[#555068] dark:text-slate-400">
                 <span
                   className="inline-block h-2 w-2 rounded-full"
                   style={{ background: CHART_BAR_COLORS.pasado }}
                 />
                 Pasado
               </span>
-              <span className="flex items-center gap-1.5 text-[11px] text-[#555068]">
+              <span className="flex items-center gap-1.5 text-[11px] text-[#555068] dark:text-slate-400">
                 <span
                   className="inline-block h-2 w-2 rounded-full"
                   style={{ background: CHART_BAR_COLORS.proximo }}
@@ -319,15 +332,15 @@ export default function VeterinarioPage() {
             <div className="h-60 w-full">
               <ResponsiveContainer width="100%" height="100%">
                 <BarChart data={chartData} barSize={22} barGap={4}>
-                  <CartesianGrid vertical={false} stroke="#E4DFF0" />
+                  <CartesianGrid vertical={false} stroke={isDark ? "#334155" : "#E4DFF0"} />
                   <XAxis
                     dataKey="date"
-                    tick={{ fontSize: 10, fill: "#555068" }}
+                    tick={{ fontSize: 10, fill: isDark ? "#94A3B8" : "#555068" }}
                     axisLine={false}
                     tickLine={false}
                   />
                   <YAxis
-                    tick={{ fontSize: 10, fill: "#555068" }}
+                    tick={{ fontSize: 10, fill: isDark ? "#94A3B8" : "#555068" }}
                     axisLine={false}
                     tickLine={false}
                     allowDecimals={false}
@@ -335,10 +348,11 @@ export default function VeterinarioPage() {
                   <Tooltip
                     cursor={{ fill: "transparent" }}
                     contentStyle={{
-                      background: "#FFFFFF",
-                      border: "0.5px solid #E4DFF0",
+                      background: isDark ? "#1E293B" : "#FFFFFF",
+                      border: isDark ? "0.5px solid #334155" : "0.5px solid #E4DFF0",
                       borderRadius: 10,
                       fontSize: 12,
+                      color: isDark ? "#E2E8F0" : "#1A0F35",
                     }}
                     formatter={(value) => [`${value} cita${Number(value) !== 1 ? "s" : ""}`, ""]}
                   />
@@ -373,12 +387,12 @@ export default function VeterinarioPage() {
           <div className={cardClass}>
             <div className="mb-3 flex items-center gap-2">
               <Activity className="h-4 w-4 text-[#6366F1]" />
-              <h3 className="text-[12px] font-semibold text-slate-900">
+              <h3 className="text-[12px] font-semibold text-slate-900 dark:text-white">
                 Pacientes atendidos recientemente
               </h3>
             </div>
             {pacientesAtendidos.length === 0 ? (
-              <p className="text-[11px] text-[#555068]">
+              <p className="text-[11px] text-[#555068] dark:text-slate-400">
                 No hay pacientes atendidos recientemente.
               </p>
             ) : (
@@ -387,15 +401,17 @@ export default function VeterinarioPage() {
                   const notas = parseNotas(cita.notes);
                   return (
                     <div key={cita.id} className="flex items-start gap-3">
-                      <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg bg-[#EEF2FF]">
+                      <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg bg-[#EEF2FF] dark:bg-[#6366F1]/20">
                         <PawPrint className="h-3.5 w-3.5 text-[#6366F1]" />
                       </div>
                       <div className="min-w-0 flex-1">
-                        <p className="text-[11px] font-semibold leading-5 text-slate-900">
+                        <p className="text-[11px] font-semibold leading-5 text-slate-900 dark:text-white">
                           {cita.petName}{" "}
-                          <span className="font-normal text-[#555068]">· {cita.ownerName}</span>
+                          <span className="font-normal text-[#555068] dark:text-slate-400">
+                            · {cita.ownerName}
+                          </span>
                         </p>
-                        <p className="mt-0.5 text-[11px] leading-5 text-slate-700">
+                        <p className="mt-0.5 text-[11px] leading-5 text-slate-700 dark:text-slate-300">
                           {notas.diagnostico ?? cita.service}
                           {notas.tratamiento ? ` · ${notas.tratamiento}` : ""}
                         </p>
@@ -417,33 +433,35 @@ export default function VeterinarioPage() {
           <div className={cardClass}>
             <div className="mb-3 flex items-center gap-2">
               <Zap className="h-4 w-4 text-[#6366F1]" />
-              <h3 className="text-[12px] font-semibold text-slate-900">Acciones rápidas</h3>
+              <h3 className="text-[12px] font-semibold text-slate-900 dark:text-white">
+                Acciones rápidas
+              </h3>
             </div>
             <div className="space-y-2">
               <Link
                 href="/veterinario/consulta"
-                className="flex w-full items-center gap-2 rounded-[9px] border-[0.5px] border-[#E4DFF0] bg-[#F7F6FA] px-3 py-2 text-[11px] font-semibold text-slate-700 transition hover:border-[#6366F1]/30 hover:bg-[#EEF2FF]"
+                className="flex w-full items-center gap-2 rounded-[9px] border-[0.5px] border-[#E4DFF0] bg-[#F7F6FA] px-3 py-2 text-[11px] font-semibold text-slate-700 transition hover:border-[#6366F1]/30 hover:bg-[#EEF2FF] dark:border-slate-700/60 dark:bg-slate-800/60 dark:text-slate-300 dark:hover:border-[#6366F1]/40 dark:hover:bg-[#6366F1]/10"
               >
                 <Stethoscope className="h-3.5 w-3.5 text-[#6366F1]" />
                 Registrar consulta
               </Link>
               <Link
                 href="/veterinario/citas"
-                className="flex w-full items-center gap-2 rounded-[9px] border-[0.5px] border-[#E4DFF0] bg-[#F7F6FA] px-3 py-2 text-[11px] font-semibold text-slate-700 transition hover:border-[#6366F1]/30 hover:bg-[#EEF2FF]"
+                className="flex w-full items-center gap-2 rounded-[9px] border-[0.5px] border-[#E4DFF0] bg-[#F7F6FA] px-3 py-2 text-[11px] font-semibold text-slate-700 transition hover:border-[#6366F1]/30 hover:bg-[#EEF2FF] dark:border-slate-700/60 dark:bg-slate-800/60 dark:text-slate-300 dark:hover:border-[#6366F1]/40 dark:hover:bg-[#6366F1]/10"
               >
                 <CalendarDays className="h-3.5 w-3.5 text-[#6366F1]" />
                 Ver agenda completa
               </Link>
               <Link
                 href="/veterinario/mascotas"
-                className="flex w-full items-center gap-2 rounded-[9px] border-[0.5px] border-[#E4DFF0] bg-[#F7F6FA] px-3 py-2 text-[11px] font-semibold text-slate-700 transition hover:border-[#6366F1]/30 hover:bg-[#EEF2FF]"
+                className="flex w-full items-center gap-2 rounded-[9px] border-[0.5px] border-[#E4DFF0] bg-[#F7F6FA] px-3 py-2 text-[11px] font-semibold text-slate-700 transition hover:border-[#6366F1]/30 hover:bg-[#EEF2FF] dark:border-slate-700/60 dark:bg-slate-800/60 dark:text-slate-300 dark:hover:border-[#6366F1]/40 dark:hover:bg-[#6366F1]/10"
               >
                 <PawPrint className="h-3.5 w-3.5 text-[#6366F1]" />
                 Pacientes
               </Link>
               <Link
                 href="/veterinario/historial"
-                className="flex w-full items-center gap-2 rounded-[9px] border-[0.5px] border-[#E4DFF0] bg-[#F7F6FA] px-3 py-2 text-[11px] font-semibold text-slate-700 transition hover:border-[#6366F1]/30 hover:bg-[#EEF2FF]"
+                className="flex w-full items-center gap-2 rounded-[9px] border-[0.5px] border-[#E4DFF0] bg-[#F7F6FA] px-3 py-2 text-[11px] font-semibold text-slate-700 transition hover:border-[#6366F1]/30 hover:bg-[#EEF2FF] dark:border-slate-700/60 dark:bg-slate-800/60 dark:text-slate-300 dark:hover:border-[#6366F1]/40 dark:hover:bg-[#6366F1]/10"
               >
                 <FileText className="h-3.5 w-3.5 text-[#6366F1]" />
                 Historial clínico

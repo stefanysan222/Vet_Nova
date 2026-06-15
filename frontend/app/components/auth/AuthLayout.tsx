@@ -70,7 +70,7 @@ export default function AuthLayout({ title, description, children }: AuthLayoutP
   };
 
   return (
-    <section className="relative min-h-screen overflow-hidden bg-gradient-to-br from-brand-50 via-white to-accent-50/30 py-6 dark:from-slate-950 dark:via-slate-900 dark:to-slate-950">
+    <section className="relative min-h-screen overflow-hidden bg-gradient-to-br from-brand-50 via-surface-50 to-accent-50/30 py-6 dark:from-slate-950 dark:via-slate-900 dark:to-slate-950">
       <PetPattern />
 
       <div className="relative mx-auto flex w-full max-w-md flex-col items-center gap-5 px-4 sm:px-6">
@@ -129,7 +129,7 @@ export default function AuthLayout({ title, description, children }: AuthLayoutP
               </div>
               <span className="text-sm font-semibold text-slate-900 dark:text-white">VetNova</span>
             </Link>
-            <div className="flex items-center gap-1.5 rounded-lg bg-brand-100 px-3 py-1.5 text-xs font-medium text-brand-600 dark:bg-brand-900/30 dark:text-brand-400">
+            <div className="flex items-center gap-1.5 rounded-lg bg-brand-100 px-3 py-1.5 text-xs font-medium text-brand-600 dark:bg-brand-900/30 dark:text-brand-300">
               🐾 Clínica veterinaria
             </div>
           </div>

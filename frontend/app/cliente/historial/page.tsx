@@ -109,7 +109,7 @@ export default function ClientHistorialPage() {
         </div>
       ) : grupos.length === 0 ? (
         <div className="flex flex-col items-center justify-center rounded-2xl border border-dashed border-surface-300 bg-white py-20 text-center dark:border-surface-700 dark:bg-surface-900">
-          <div className="mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-brand-50 text-brand-600 dark:bg-brand-900/30 dark:text-brand-400">
+          <div className="mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-brand-50 text-brand-600 dark:bg-brand-900/30 dark:text-brand-300">
             <History className="h-7 w-7" />
           </div>
           <p className="text-sm font-semibold text-surface-900 dark:text-white">
@@ -141,7 +141,7 @@ export default function ClientHistorialPage() {
                   >
                     <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
                       <div className="flex min-w-0 gap-4">
-                        <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-brand-50 text-brand-600 dark:bg-brand-900/30 dark:text-brand-400">
+                        <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-brand-50 text-brand-600 dark:bg-brand-900/30 dark:text-brand-300">
                           <PawPrint className="h-[22px] w-[22px]" />
                         </div>
                         <div className="min-w-0">

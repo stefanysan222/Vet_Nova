@@ -98,7 +98,7 @@ body {
 @layer components {
   /* — Eyebrow: etiqueta pequeña sobre el título — */
   .text-eyebrow {
-    @apply text-xs font-semibold uppercase tracking-[0.3em] text-brand-600 dark:text-brand-400;
+    @apply text-xs font-semibold uppercase tracking-[0.3em] text-brand-600 dark:text-brand-300;
   }
 
   /* — Título destacado / hero — */
@@ -165,7 +165,7 @@ body {
 
   /* Header de página — banner azul */
   .admin-header-banner {
-    @apply overflow-hidden rounded-2xl border border-brand-200/60 bg-gradient-to-br from-brand-600 to-brand-700 p-7 text-white shadow-brand;
+    @apply overflow-hidden rounded-2xl border border-brand-200/60 bg-gradient-to-br from-brand-600 to-brand-700 p-7 text-white shadow-brand dark:border-brand-900/40 dark:from-brand-800 dark:to-brand-950 dark:shadow-brand-sm;
   }
 
   /* ─── Botones ─────────────────────────────────────────────────── */

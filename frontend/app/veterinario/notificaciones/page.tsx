@@ -176,7 +176,7 @@ export default function VeterinarioNotificacionesPage() {
   return (
     <div className="space-y-6">
       {/* ENCABEZADO */}
-      <header className="overflow-hidden rounded-3xl border border-brand-200 bg-gradient-to-br from-brand-600 to-brand-700 p-7 text-white shadow-brand">
+      <header className="overflow-hidden rounded-3xl border border-brand-200 bg-gradient-to-br from-brand-600 to-brand-700 p-7 text-white shadow-brand dark:border-brand-900/40 dark:from-brand-800 dark:to-brand-950 dark:shadow-brand-sm">
         <div className="flex flex-col justify-between gap-6 xl:flex-row xl:items-center">
           <div>
             <p className="mb-2 text-xs font-semibold uppercase tracking-[0.24em] text-brand-200">
@@ -214,7 +214,7 @@ export default function VeterinarioNotificacionesPage() {
             type="button"
             onClick={marcarTodasComoLeidas}
             disabled={noLeidas === 0}
-            className="flex h-11 items-center justify-center gap-2 rounded-xl border border-brand-200 bg-white px-5 text-sm font-semibold text-brand-600 transition hover:bg-brand-50 disabled:cursor-not-allowed disabled:opacity-45 disabled:hover:bg-white dark:border-surface-700 dark:bg-surface-900 dark:text-brand-400 dark:hover:bg-brand-950/30"
+            className="flex h-11 items-center justify-center gap-2 rounded-xl border border-brand-200 bg-white px-5 text-sm font-semibold text-brand-600 transition hover:bg-brand-50 disabled:cursor-not-allowed disabled:opacity-45 disabled:hover:bg-white dark:border-surface-700 dark:bg-surface-900 dark:text-brand-300 dark:hover:bg-brand-950/30"
           >
             <CheckCircle2 className="h-[17px] w-[17px]" />
             Marcar todas como leídas
@@ -379,7 +379,7 @@ function TarjetaNotificacion({
                   className={`flex h-10 items-center justify-center rounded-xl px-4 text-xs font-semibold transition ${
                     accion.principal
                       ? "bg-brand-600 text-white hover:bg-brand-700"
-                      : "border border-brand-200 bg-white text-brand-600 hover:bg-brand-50 dark:border-surface-700 dark:bg-surface-900 dark:text-brand-400 dark:hover:bg-brand-950/30"
+                      : "border border-brand-200 bg-white text-brand-600 hover:bg-brand-50 dark:border-surface-700 dark:bg-surface-900 dark:text-brand-300 dark:hover:bg-brand-950/30"
                   }`}
                 >
                   {accion.label}

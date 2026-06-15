@@ -187,7 +187,7 @@ export default function MascotasPage() {
               <StatusBadge estado={mascota.estado} />
 
               <div className="flex items-start gap-4 pr-[76px]">
-                <div className="relative flex h-14 w-14 shrink-0 items-center justify-center overflow-hidden rounded-xl bg-brand-50 text-brand-600 transition-all group-hover:scale-105 dark:bg-brand-900/30 dark:text-brand-400">
+                <div className="relative flex h-14 w-14 shrink-0 items-center justify-center overflow-hidden rounded-xl bg-brand-50 text-brand-600 transition-all group-hover:scale-105 dark:bg-brand-900/30 dark:text-brand-300">
                   {mascota.foto ? (
                     <Image
                       src={mascota.foto}
@@ -236,7 +236,7 @@ export default function MascotasPage() {
 
               <Link
                 href={`/cliente/mascotas/${encodeURIComponent(mascota.id)}`}
-                className="mt-auto inline-flex items-center justify-center gap-1.5 pt-4 text-sm font-medium text-brand-600 transition-colors hover:text-brand-700 dark:text-brand-400"
+                className="mt-auto inline-flex items-center justify-center gap-1.5 pt-4 text-sm font-medium text-brand-600 transition-colors hover:text-brand-700 dark:text-brand-300"
               >
                 Ver perfil completo
                 <ChevronRight className="h-[14px] w-[14px]" />
@@ -246,7 +246,7 @@ export default function MascotasPage() {
         </div>
       ) : (
         <div className="flex min-h-[280px] flex-col items-center justify-center rounded-2xl border border-dashed border-slate-300 bg-white px-6 text-center shadow-xs dark:border-slate-700 dark:bg-slate-900">
-          <div className="mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-brand-50 text-brand-600 dark:bg-brand-900/30 dark:text-brand-400">
+          <div className="mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-brand-50 text-brand-600 dark:bg-brand-900/30 dark:text-brand-300">
             <Search className="h-5 w-5" />
           </div>
           <h2 className="text-section-title">No se encontraron mascotas</h2>

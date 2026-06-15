@@ -469,7 +469,7 @@ export default function Navbar() {
                       {notifItems && notifItems.length > 0 && (
                         <button
                           onClick={handleMarcarTodas}
-                          className="text-xs font-semibold text-brand-600 hover:text-brand-700 dark:text-brand-400"
+                          className="text-xs font-semibold text-brand-600 hover:text-brand-700 dark:text-brand-300"
                         >
                           Marcar todas leídas
                         </button>
@@ -525,7 +525,7 @@ export default function Navbar() {
                       <Link
                         href="/admin/notificaciones"
                         onClick={() => setNotifOpen(false)}
-                        className="text-xs font-semibold text-brand-600 hover:text-brand-700 dark:text-brand-400"
+                        className="text-xs font-semibold text-brand-600 hover:text-brand-700 dark:text-brand-300"
                       >
                         Ver todas →
                       </Link>

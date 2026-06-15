@@ -87,7 +87,7 @@ function RescheduleModal({
           {/* Header */}
           <div className="mb-6 flex items-start justify-between gap-3">
             <div>
-              <p className="text-xs font-semibold uppercase tracking-widest text-brand-600 dark:text-brand-400">
+              <p className="text-xs font-semibold uppercase tracking-widest text-brand-600 dark:text-brand-300">
                 Reprogramar cita
               </p>
               <h2 className="mt-1 text-xl font-semibold text-slate-900 dark:text-white">

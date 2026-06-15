@@ -323,7 +323,7 @@ function HistorialContent() {
   return (
     <div className="space-y-6">
       {/* ENCABEZADO */}
-      <header className="overflow-hidden rounded-3xl border border-brand-200 bg-gradient-to-br from-brand-600 to-brand-700 p-7 text-white shadow-brand">
+      <header className="overflow-hidden rounded-3xl border border-brand-200 bg-gradient-to-br from-brand-600 to-brand-700 p-7 text-white shadow-brand dark:border-brand-900/40 dark:from-brand-800 dark:to-brand-950 dark:shadow-brand-sm">
         <div className="flex flex-col justify-between gap-5 lg:flex-row lg:items-center">
           <div>
             <p className="text-xs font-semibold uppercase tracking-[0.24em] text-brand-200">
@@ -455,7 +455,7 @@ function HistorialContent() {
 
                 <Link
                   href={`/veterinario/consulta?paciente=${paciente.id}`}
-                  className="flex h-11 items-center justify-center rounded-xl border border-brand-200 bg-white px-4 text-sm font-semibold text-brand-600 transition hover:bg-brand-50 dark:border-surface-700 dark:bg-surface-900 dark:text-brand-400 dark:hover:bg-brand-950/30"
+                  className="flex h-11 items-center justify-center rounded-xl border border-brand-200 bg-white px-4 text-sm font-semibold text-brand-600 transition hover:bg-brand-50 dark:border-surface-700 dark:bg-surface-900 dark:text-brand-300 dark:hover:bg-brand-950/30"
                 >
                   Registrar nueva consulta
                 </Link>
@@ -590,7 +590,7 @@ function HistorialContent() {
           <section className="max-h-[95vh] w-full max-w-[760px] overflow-y-auto rounded-3xl border border-surface-200/60 bg-white shadow-modal dark:border-surface-700 dark:bg-surface-900">
             <div className="flex items-start justify-between border-b border-surface-100 px-6 py-5 dark:border-surface-800">
               <div>
-                <p className="text-xs font-semibold uppercase tracking-[0.2em] text-brand-600 dark:text-brand-400">
+                <p className="text-xs font-semibold uppercase tracking-[0.2em] text-brand-600 dark:text-brand-300">
                   Seguimiento clínico
                 </p>
                 <h2 className="text-page-title mt-2">Agregar evolución de {paciente.nombre}</h2>

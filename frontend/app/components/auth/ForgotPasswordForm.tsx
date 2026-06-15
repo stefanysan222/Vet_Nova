@@ -73,7 +73,7 @@ export default function ForgotPasswordForm() {
         </p>
         <a
           href="/login"
-          className="inline-block text-sm font-semibold text-brand-600 transition hover:text-brand-700 dark:text-brand-400 dark:hover:text-brand-300"
+          className="inline-block text-sm font-semibold text-brand-600 transition hover:text-brand-700 dark:text-brand-300 dark:hover:text-brand-200"
         >
           Volver al inicio de sesión
         </a>
@@ -174,7 +174,7 @@ export default function ForgotPasswordForm() {
         ¿Recordaste tu contraseña?{" "}
         <a
           href="/login"
-          className="font-semibold text-brand-600 transition hover:text-brand-700 dark:text-brand-400 dark:hover:text-brand-300"
+          className="font-semibold text-brand-600 transition hover:text-brand-700 dark:text-brand-300 dark:hover:text-brand-200"
         >
           Iniciar sesión
         </a>

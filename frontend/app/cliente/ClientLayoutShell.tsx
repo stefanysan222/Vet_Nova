@@ -258,7 +258,7 @@ export default function ClientLayoutShell({ children }: { children: ReactNode })
                     {notifItems && notifItems.length > 0 && (
                       <button
                         onClick={handleMarcarTodas}
-                        className="text-xs font-semibold text-brand-600 hover:text-brand-700 dark:text-brand-400"
+                        className="text-xs font-semibold text-brand-600 hover:text-brand-700 dark:text-brand-300"
                       >
                         Marcar todas leídas
                       </button>

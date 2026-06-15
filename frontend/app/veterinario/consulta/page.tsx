@@ -210,7 +210,7 @@ function RegistrarConsultaContent() {
   return (
     <div className="space-y-6">
       {/* ENCABEZADO */}
-      <header className="overflow-hidden rounded-3xl border border-brand-200 bg-gradient-to-br from-brand-600 to-brand-700 p-7 text-white shadow-brand">
+      <header className="overflow-hidden rounded-3xl border border-brand-200 bg-gradient-to-br from-brand-600 to-brand-700 p-7 text-white shadow-brand dark:border-brand-900/40 dark:from-brand-800 dark:to-brand-950 dark:shadow-brand-sm">
         <div className="flex flex-col justify-between gap-5 lg:flex-row lg:items-center">
           <div>
             <p className="text-xs font-semibold uppercase tracking-[0.24em] text-brand-200">
@@ -511,7 +511,7 @@ function RegistrarConsultaContent() {
 
             <div className="rounded-2xl border border-surface-200 bg-surface-50 p-4 dark:border-surface-700 dark:bg-surface-950">
               <div className="mb-4 flex items-center gap-2">
-                <History className="h-[18px] w-[18px] text-brand-600 dark:text-brand-400" />
+                <History className="h-[18px] w-[18px] text-brand-600 dark:text-brand-300" />
                 <h3 className="text-sm font-semibold text-surface-900 dark:text-white">
                   Seguimiento posterior
                 </h3>

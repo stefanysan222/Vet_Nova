@@ -25,6 +25,7 @@ import ConfirmDialog from "../components/ui/ConfirmDialog";
 import StatusBadge from "../components/ui/StatusBadge";
 import MonthlyCalendar from "../components/ui/MonthlyCalendar";
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from "recharts";
+import { useIsDarkMode } from "@/lib/hooks/useDarkMode";
 
 const inputClass = "form-input";
 
@@ -33,7 +34,8 @@ const CHART_BAR_COLORS = {
   anterior: "#C4B5FD",
 };
 
-const cardClass = "rounded-[13px] border-[0.5px] border-[#E4DFF0] bg-white px-4 py-3.5";
+const cardClass =
+  "rounded-[13px] border-[0.5px] border-[#E4DFF0] bg-white px-4 py-3.5 dark:border-slate-700/60 dark:bg-slate-900";
 
 const emptyForm = {
   nombre: "",
@@ -86,6 +88,7 @@ export default function SuperAdminPage() {
   const [coordsForm, setCoordsForm] = useState({ latitud: "", longitud: "" });
   const [coordsError, setCoordsError] = useState("");
   const [savingCoords, setSavingCoords] = useState(false);
+  const isDark = useIsDarkMode();
 
   const cargar = () => {
     setLoading(true);
@@ -330,6 +333,8 @@ export default function SuperAdminPage() {
   }).length;
   const contactoCompleto = clinicas.filter((c) => c.direccion && c.telefono && c.email).length;
 
+  const iconBg = (color: string, lightBg: string) => (isDark ? `${color}26` : lightBg);
+
   const metrics = [
     {
       label: "Total clínicas",
@@ -412,10 +417,14 @@ export default function SuperAdminPage() {
             <div className={cardClass}>
               <div className="mb-3 flex items-center gap-2">
                 <Building2 className="h-4 w-4 text-[#7C3AED]" />
-                <h3 className="text-[12px] font-semibold text-slate-900">Últimas clínicas</h3>
+                <h3 className="text-[12px] font-semibold text-slate-900 dark:text-white">
+                  Últimas clínicas
+                </h3>
               </div>
               {ultimasClinicas.length === 0 ? (
-                <p className="text-[11px] text-[#555068]">Sin clínicas registradas todavía.</p>
+                <p className="text-[11px] text-[#555068] dark:text-slate-400">
+                  Sin clínicas registradas todavía.
+                </p>
               ) : (
                 <div className="space-y-3">
                   {ultimasClinicas.map((c) => (
@@ -424,8 +433,10 @@ export default function SuperAdminPage() {
                         className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full"
                         style={{ background: c.estado === "activa" ? "#16A34A" : "#94A3B8" }}
                       />
-                      <p className="text-[11px] leading-5 text-slate-700">
-                        <span className="font-semibold text-slate-900">{c.nombre}</span>
+                      <p className="text-[11px] leading-5 text-slate-700 dark:text-slate-300">
+                        <span className="font-semibold text-slate-900 dark:text-white">
+                          {c.nombre}
+                        </span>
                         <br />
                         {c.createdAt ? timeAgo(c.createdAt) : "—"}
                       </p>
@@ -450,14 +461,14 @@ export default function SuperAdminPage() {
                 >
                   <div
                     className="mb-3 flex h-8 w-8 items-center justify-center rounded-lg"
-                    style={{ background: m.bg }}
+                    style={{ background: iconBg(m.color, m.bg) }}
                   >
                     <Icon className="h-4 w-4" style={{ color: m.color }} />
                   </div>
                   <p className="text-[22px] font-bold leading-none" style={{ color: m.color }}>
                     {loading ? "—" : m.value}
                   </p>
-                  <p className="mt-1.5 text-[11px] text-[#555068]">{m.label}</p>
+                  <p className="mt-1.5 text-[11px] text-[#555068] dark:text-slate-400">{m.label}</p>
                 </motion.div>
               );
             })}
@@ -466,20 +477,22 @@ export default function SuperAdminPage() {
           {/* FILA 3 — Gráfica + Calendario */}
           <div className="grid grid-cols-1 gap-3 lg:grid-cols-[1fr_240px]">
             <div className={cardClass}>
-              <h2 className="text-[12px] font-semibold text-slate-900">
+              <h2 className="text-[12px] font-semibold text-slate-900 dark:text-white">
                 Clínicas registradas por mes
               </h2>
-              <p className="mt-0.5 text-[11px] text-[#555068]">Últimos 6 meses</p>
+              <p className="mt-0.5 text-[11px] text-[#555068] dark:text-slate-400">
+                Últimos 6 meses
+              </p>
 
               <div className="mb-1 mt-3 flex items-center gap-4">
-                <span className="flex items-center gap-1.5 text-[11px] text-[#555068]">
+                <span className="flex items-center gap-1.5 text-[11px] text-[#555068] dark:text-slate-400">
                   <span
                     className="inline-block h-2 w-2 rounded-full"
                     style={{ background: CHART_BAR_COLORS.actual }}
                   />
                   Mes actual
                 </span>
-                <span className="flex items-center gap-1.5 text-[11px] text-[#555068]">
+                <span className="flex items-center gap-1.5 text-[11px] text-[#555068] dark:text-slate-400">
                   <span
                     className="inline-block h-2 w-2 rounded-full"
                     style={{ background: CHART_BAR_COLORS.anterior }}
@@ -491,15 +504,15 @@ export default function SuperAdminPage() {
               <div className="h-60 w-full">
                 <ResponsiveContainer width="100%" height="100%">
                   <BarChart data={chartData} barSize={28} barGap={4}>
-                    <CartesianGrid vertical={false} stroke="#E4DFF0" />
+                    <CartesianGrid vertical={false} stroke={isDark ? "#334155" : "#E4DFF0"} />
                     <XAxis
                       dataKey="date"
-                      tick={{ fontSize: 10, fill: "#555068" }}
+                      tick={{ fontSize: 10, fill: isDark ? "#94A3B8" : "#555068" }}
                       axisLine={false}
                       tickLine={false}
                     />
                     <YAxis
-                      tick={{ fontSize: 10, fill: "#555068" }}
+                      tick={{ fontSize: 10, fill: isDark ? "#94A3B8" : "#555068" }}
                       axisLine={false}
                       tickLine={false}
                       allowDecimals={false}
@@ -507,10 +520,11 @@ export default function SuperAdminPage() {
                     <Tooltip
                       cursor={{ fill: "transparent" }}
                       contentStyle={{
-                        background: "#FFFFFF",
-                        border: "0.5px solid #E4DFF0",
+                        background: isDark ? "#1E293B" : "#FFFFFF",
+                        border: isDark ? "0.5px solid #334155" : "0.5px solid #E4DFF0",
                         borderRadius: 10,
                         fontSize: 12,
+                        color: isDark ? "#E2E8F0" : "#1A0F35",
                       }}
                       formatter={(value) => [
                         `${value} clínica${Number(value) !== 1 ? "s" : ""}`,
@@ -546,17 +560,29 @@ export default function SuperAdminPage() {
             <div className={cardClass}>
               <div className="mb-3 flex items-center gap-2">
                 <Activity className="h-4 w-4 text-[#7C3AED]" />
-                <h3 className="text-[12px] font-semibold text-slate-900">Actividad reciente</h3>
+                <h3 className="text-[12px] font-semibold text-slate-900 dark:text-white">
+                  Actividad reciente
+                </h3>
               </div>
               {actividadReciente.length === 0 ? (
-                <p className="text-[11px] text-[#555068]">Sin actividad reciente.</p>
+                <p className="text-[11px] text-[#555068] dark:text-slate-400">
+                  Sin actividad reciente.
+                </p>
               ) : (
                 <div className="space-y-3">
                   {actividadReciente.map((c) => (
                     <div key={c.id} className="flex items-start gap-3">
                       <div
                         className="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg"
-                        style={{ background: c.estado === "activa" ? "#F0FDF4" : "#F1F5F9" }}
+                        style={{
+                          background: isDark
+                            ? c.estado === "activa"
+                              ? "#16A34A26"
+                              : "#64748B26"
+                            : c.estado === "activa"
+                              ? "#F0FDF4"
+                              : "#F1F5F9",
+                        }}
                       >
                         <Building2
                           className="h-3.5 w-3.5"
@@ -564,10 +590,10 @@ export default function SuperAdminPage() {
                         />
                       </div>
                       <div className="min-w-0">
-                        <p className="text-[11px] leading-5 text-slate-700">
+                        <p className="text-[11px] leading-5 text-slate-700 dark:text-slate-300">
                           Se registró la clínica «{c.nombre}»
                         </p>
-                        <p className="mt-0.5 text-[11px] text-[#555068]">
+                        <p className="mt-0.5 text-[11px] text-[#555068] dark:text-slate-400">
                           {c.createdAt ? timeAgo(c.createdAt) : "—"}
                         </p>
                       </div>
@@ -581,20 +607,22 @@ export default function SuperAdminPage() {
             <div className={cardClass}>
               <div className="mb-3 flex items-center gap-2">
                 <Zap className="h-4 w-4 text-[#7C3AED]" />
-                <h3 className="text-[12px] font-semibold text-slate-900">Acciones rápidas</h3>
+                <h3 className="text-[12px] font-semibold text-slate-900 dark:text-white">
+                  Acciones rápidas
+                </h3>
               </div>
               <div className="space-y-2">
                 <button
                   type="button"
                   onClick={() => setShowForm(true)}
-                  className="flex w-full items-center gap-2 rounded-[9px] border-[0.5px] border-[#E4DFF0] bg-[#F7F6FA] px-3 py-2 text-[11px] font-semibold text-slate-700 transition hover:border-[#7C3AED]/30 hover:bg-[#EDE8FA]"
+                  className="flex w-full items-center gap-2 rounded-[9px] border-[0.5px] border-[#E4DFF0] bg-[#F7F6FA] px-3 py-2 text-[11px] font-semibold text-slate-700 transition hover:border-[#7C3AED]/30 hover:bg-[#EDE8FA] dark:border-slate-700/60 dark:bg-slate-800/60 dark:text-slate-300 dark:hover:border-[#7C3AED]/40 dark:hover:bg-[#7C3AED]/10"
                 >
                   <Plus className="h-3.5 w-3.5 text-[#7C3AED]" />
                   Nueva clínica
                 </button>
                 <a
                   href="#tabla-clinicas"
-                  className="flex w-full items-center gap-2 rounded-[9px] border-[0.5px] border-[#E4DFF0] bg-[#F7F6FA] px-3 py-2 text-[11px] font-semibold text-slate-700 transition hover:border-[#7C3AED]/30 hover:bg-[#EDE8FA]"
+                  className="flex w-full items-center gap-2 rounded-[9px] border-[0.5px] border-[#E4DFF0] bg-[#F7F6FA] px-3 py-2 text-[11px] font-semibold text-slate-700 transition hover:border-[#7C3AED]/30 hover:bg-[#EDE8FA] dark:border-slate-700/60 dark:bg-slate-800/60 dark:text-slate-300 dark:hover:border-[#7C3AED]/40 dark:hover:bg-[#7C3AED]/10"
                 >
                   <ClipboardList className="h-3.5 w-3.5 text-[#7C3AED]" />
                   Ver listado completo
@@ -607,8 +635,10 @@ export default function SuperAdminPage() {
         {/* Lista de clínicas */}
         <section id="tabla-clinicas" className={`${cardClass} mt-3`}>
           <div>
-            <h2 className="text-[12px] font-semibold text-slate-900">Veterinarias registradas</h2>
-            <p className="mt-0.5 text-[11px] text-[#555068]">
+            <h2 className="text-[12px] font-semibold text-slate-900 dark:text-white">
+              Veterinarias registradas
+            </h2>
+            <p className="mt-0.5 text-[11px] text-[#555068] dark:text-slate-400">
               Gestiona las clínicas que usan VetNova y su administrador inicial.
             </p>
           </div>
@@ -868,7 +898,7 @@ export default function SuperAdminPage() {
                         <button
                           type="button"
                           onClick={handleUseMyLocation}
-                          className="inline-flex items-center gap-1.5 text-xs font-semibold text-brand-600 transition hover:text-brand-700 dark:text-brand-400 dark:hover:text-brand-300"
+                          className="inline-flex items-center gap-1.5 text-xs font-semibold text-brand-600 transition hover:text-brand-700 dark:text-brand-300 dark:hover:text-brand-200"
                         >
                           <MapPin className="h-3.5 w-3.5" />
                           Usar mi ubicación actual
@@ -1011,7 +1041,7 @@ export default function SuperAdminPage() {
                 <button
                   type="button"
                   onClick={handleCoordsUseMyLocation}
-                  className="inline-flex items-center gap-1.5 text-xs font-semibold text-brand-600 transition hover:text-brand-700 dark:text-brand-400 dark:hover:text-brand-300"
+                  className="inline-flex items-center gap-1.5 text-xs font-semibold text-brand-600 transition hover:text-brand-700 dark:text-brand-300 dark:hover:text-brand-200"
                 >
                   <MapPin className="h-3.5 w-3.5" />
                   Usar mi ubicación actual

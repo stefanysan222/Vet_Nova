@@ -105,7 +105,7 @@ function DetailModal({
         <div className="flex items-start gap-4 border-b border-slate-100 p-6 dark:border-slate-800">
           <PetAvatar pet={pet} size="lg" />
           <div className="min-w-0 flex-1">
-            <p className="text-xs font-semibold uppercase tracking-widest text-brand-600 dark:text-brand-400">
+            <p className="text-xs font-semibold uppercase tracking-widest text-brand-600 dark:text-brand-300">
               {pet.especie}
             </p>
             <h2 className="mt-0.5 text-2xl font-bold text-slate-900 dark:text-white">
@@ -152,7 +152,7 @@ function DetailModal({
               onClick={() => setTab(id)}
               className={`flex items-center gap-2 border-b-2 px-4 py-3 text-sm font-semibold transition ${
                 tab === id
-                  ? "border-brand-600 text-brand-600 dark:border-brand-400 dark:text-brand-400"
+                  ? "border-brand-600 text-brand-600 dark:border-brand-300 dark:text-brand-300"
                   : "border-transparent text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-200"
               }`}
             >

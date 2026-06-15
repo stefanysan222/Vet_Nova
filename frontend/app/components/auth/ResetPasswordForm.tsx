@@ -73,7 +73,7 @@ export default function ResetPasswordForm() {
         </p>
         <a
           href="/forgot-password"
-          className="inline-block text-sm font-semibold text-brand-600 hover:text-brand-700 dark:text-brand-400"
+          className="inline-block text-sm font-semibold text-brand-600 hover:text-brand-700 dark:text-brand-300"
         >
           Solicitar uno nuevo
         </a>

@@ -223,7 +223,7 @@ export default function VeterinarioCitasPage() {
   return (
     <div className="space-y-6">
       {/* ENCABEZADO */}
-      <header className="overflow-hidden rounded-3xl border border-brand-200 bg-gradient-to-br from-brand-600 to-brand-700 p-7 text-white shadow-brand">
+      <header className="overflow-hidden rounded-3xl border border-brand-200 bg-gradient-to-br from-brand-600 to-brand-700 p-7 text-white shadow-brand dark:border-brand-900/40 dark:from-brand-800 dark:to-brand-950 dark:shadow-brand-sm">
         <div className="flex flex-col justify-between gap-5 lg:flex-row lg:items-center">
           <div>
             <p className="text-xs font-semibold uppercase tracking-[0.24em] text-brand-200">
@@ -360,7 +360,7 @@ export default function VeterinarioCitasPage() {
                     <button
                       type="button"
                       onClick={() => setCitaDetalle(cita)}
-                      className="flex h-10 items-center justify-center rounded-xl border border-brand-200 bg-white px-4 text-xs font-semibold text-brand-600 transition hover:-translate-y-0.5 hover:bg-brand-50 dark:border-surface-700 dark:bg-surface-900 dark:text-brand-400 dark:hover:bg-brand-950/30"
+                      className="flex h-10 items-center justify-center rounded-xl border border-brand-200 bg-white px-4 text-xs font-semibold text-brand-600 transition hover:-translate-y-0.5 hover:bg-brand-50 dark:border-surface-700 dark:bg-surface-900 dark:text-brand-300 dark:hover:bg-brand-950/30"
                     >
                       Ver detalles
                     </button>
@@ -386,7 +386,7 @@ export default function VeterinarioCitasPage() {
             <div className="border-b border-surface-100 px-6 py-6 dark:border-surface-800">
               <div className="flex items-start justify-between gap-5">
                 <div>
-                  <p className="text-xs font-semibold uppercase tracking-[0.2em] text-brand-600 dark:text-brand-400">
+                  <p className="text-xs font-semibold uppercase tracking-[0.2em] text-brand-600 dark:text-brand-300">
                     Detalle de la cita
                   </p>
 
@@ -501,7 +501,7 @@ export default function VeterinarioCitasPage() {
           >
             <div className="flex items-start justify-between border-b border-surface-100 px-6 py-5 dark:border-surface-800">
               <div>
-                <p className="text-xs font-semibold uppercase tracking-[0.18em] text-brand-600 dark:text-brand-400">
+                <p className="text-xs font-semibold uppercase tracking-[0.18em] text-brand-600 dark:text-brand-300">
                   Nueva solicitud
                 </p>
 
@@ -686,7 +686,7 @@ export default function VeterinarioCitasPage() {
                           </span>
                           <span className="flex-1 font-medium">{v.nombre}</span>
                           {formulario.veterinarioNombre === v.nombre && (
-                            <span className="text-xs font-semibold text-brand-600 dark:text-brand-400">
+                            <span className="text-xs font-semibold text-brand-600 dark:text-brand-300">
                               Seleccionado
                             </span>
                           )}

@@ -7,7 +7,7 @@ import ReportSection from "./components/ReportSection";
 
 export default function Home() {
   return (
-    <div className="min-h-screen bg-white text-surface-900">
+    <div className="min-h-screen bg-surface-50 text-surface-900 transition-colors dark:bg-surface-950 dark:text-white">
       <Navbar />
       <main className="px-0 pb-20 pt-20">
         <Hero />

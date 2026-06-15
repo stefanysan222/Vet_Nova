@@ -228,7 +228,7 @@ export default function NuevaCitaPage() {
                     {completo ? <CheckCircle className="h-4 w-4" /> : num}
                   </div>
                   <p
-                    className={`mt-1.5 text-[11px] font-semibold ${activo || completo ? "text-brand-600 dark:text-brand-400" : "text-slate-400"}`}
+                    className={`mt-1.5 text-[11px] font-semibold ${activo || completo ? "text-brand-600 dark:text-brand-300" : "text-slate-400"}`}
                   >
                     {nombre}
                   </p>
@@ -281,7 +281,7 @@ export default function NuevaCitaPage() {
                       className={`flex h-12 w-12 shrink-0 items-center justify-center rounded-xl text-xl font-bold ${
                         mascotaId === m.id
                           ? "bg-brand-600 text-white"
-                          : "bg-brand-50 text-brand-600 dark:bg-brand-900/30 dark:text-brand-400"
+                          : "bg-brand-50 text-brand-600 dark:bg-brand-900/30 dark:text-brand-300"
                       }`}
                     >
                       {m.nombre.charAt(0)}
@@ -297,7 +297,7 @@ export default function NuevaCitaPage() {
                       {m.edad && <p className="text-xs text-slate-400">{m.edad}</p>}
                     </div>
                     {mascotaId === m.id && (
-                      <CheckCircle className="ml-auto h-5 w-5 shrink-0 text-brand-600 dark:text-brand-400" />
+                      <CheckCircle className="ml-auto h-5 w-5 shrink-0 text-brand-600 dark:text-brand-300" />
                     )}
                   </button>
                 ))}
@@ -335,7 +335,7 @@ export default function NuevaCitaPage() {
                     <p className="text-xs text-slate-500 dark:text-slate-400">{s.desc}</p>
                   </div>
                   {servicio === s.id && (
-                    <CheckCircle className="ml-auto h-5 w-5 shrink-0 text-brand-600 dark:text-brand-400" />
+                    <CheckCircle className="ml-auto h-5 w-5 shrink-0 text-brand-600 dark:text-brand-300" />
                   )}
                 </button>
               ))}

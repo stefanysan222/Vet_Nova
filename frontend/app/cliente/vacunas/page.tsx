@@ -192,7 +192,7 @@ function StatCard({
     color === "green"
       ? "text-success-600 dark:text-success-400"
       : color === "blue"
-        ? "text-brand-600 dark:text-brand-400"
+        ? "text-brand-600 dark:text-brand-300"
         : "text-surface-900 dark:text-white";
   return (
     <article className="rounded-2xl border border-surface-200 bg-white px-5 py-4 shadow-card dark:border-surface-700 dark:bg-surface-900">

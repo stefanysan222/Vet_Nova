@@ -185,7 +185,7 @@ function PacientesContent() {
   return (
     <div className="space-y-6">
       {/* ENCABEZADO */}
-      <header className="overflow-hidden rounded-3xl border border-brand-200 bg-gradient-to-br from-brand-600 to-brand-700 p-7 text-white shadow-brand">
+      <header className="overflow-hidden rounded-3xl border border-brand-200 bg-gradient-to-br from-brand-600 to-brand-700 p-7 text-white shadow-brand dark:border-brand-900/40 dark:from-brand-800 dark:to-brand-950 dark:shadow-brand-sm">
         <div className="flex flex-col justify-between gap-6 xl:flex-row xl:items-center">
           <div>
             <p className="mb-2 text-xs font-semibold uppercase tracking-[0.24em] text-brand-200">
@@ -316,7 +316,7 @@ function PacientesContent() {
               <button
                 type="button"
                 onClick={limpiarFiltros}
-                className="text-sm font-semibold text-brand-600 transition hover:text-brand-700 dark:text-brand-400 dark:hover:text-brand-300"
+                className="text-sm font-semibold text-brand-600 transition hover:text-brand-700 dark:text-brand-300 dark:hover:text-brand-200"
               >
                 Limpiar filtros
               </button>
@@ -387,7 +387,7 @@ function PacientesContent() {
 
                   <Link
                     href={`/veterinario/historial?paciente=${paciente.id}`}
-                    className="flex h-11 items-center justify-center gap-2 rounded-xl border border-brand-200 bg-white px-4 text-xs font-semibold text-brand-600 transition hover:bg-brand-50 dark:border-surface-700 dark:bg-surface-900 dark:text-brand-400 dark:hover:bg-brand-950/30"
+                    className="flex h-11 items-center justify-center gap-2 rounded-xl border border-brand-200 bg-white px-4 text-xs font-semibold text-brand-600 transition hover:bg-brand-50 dark:border-surface-700 dark:bg-surface-900 dark:text-brand-300 dark:hover:bg-brand-950/30"
                   >
                     <History className="h-4 w-4" />
                     Historial
@@ -457,7 +457,7 @@ function PacientesContent() {
                   </div>
 
                   <div>
-                    <p className="text-xs font-semibold uppercase tracking-[0.2em] text-brand-600 dark:text-brand-400">
+                    <p className="text-xs font-semibold uppercase tracking-[0.2em] text-brand-600 dark:text-brand-300">
                       Perfil clínico
                     </p>
 
@@ -511,7 +511,7 @@ function PacientesContent() {
               <div className="flex flex-col gap-3 pt-2 sm:flex-row sm:justify-end">
                 <Link
                   href={`/veterinario/historial?paciente=${pacientePerfil.id}`}
-                  className="flex h-11 items-center justify-center gap-2 rounded-xl border border-brand-200 px-5 text-sm font-semibold text-brand-600 transition hover:bg-brand-50 dark:border-surface-700 dark:text-brand-400 dark:hover:bg-brand-950/30"
+                  className="flex h-11 items-center justify-center gap-2 rounded-xl border border-brand-200 px-5 text-sm font-semibold text-brand-600 transition hover:bg-brand-50 dark:border-surface-700 dark:text-brand-300 dark:hover:bg-brand-950/30"
                 >
                   <History className="h-4 w-4" />
                   Ver historial clínico

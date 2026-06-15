@@ -322,7 +322,7 @@ function AgendarContent() {
               >
                 <div className="flex flex-col gap-5 xl:flex-row xl:items-center xl:justify-between">
                   <div className="flex flex-col gap-5 sm:flex-row sm:items-center">
-                    <div className="flex h-[92px] w-[92px] shrink-0 flex-col items-center justify-center rounded-xl bg-brand-50 text-brand-600 dark:bg-brand-900/30 dark:text-brand-400">
+                    <div className="flex h-[92px] w-[92px] shrink-0 flex-col items-center justify-center rounded-xl bg-brand-50 text-brand-600 dark:bg-brand-900/30 dark:text-brand-300">
                       <span className="text-stat-sm leading-none">{cita.fechaCorta}</span>
 
                       <span className="mt-2 text-xs font-semibold">{cita.dia}</span>
@@ -446,7 +446,7 @@ function DetalleCitaModal({
       >
         <div className="flex items-start justify-between border-b border-slate-200 px-7 py-6 dark:border-slate-700">
           <div className="flex items-start gap-4">
-            <div className="flex h-[52px] w-[52px] shrink-0 items-center justify-center rounded-xl bg-brand-50 text-brand-600 dark:bg-brand-900/30 dark:text-brand-400">
+            <div className="flex h-[52px] w-[52px] shrink-0 items-center justify-center rounded-xl bg-brand-50 text-brand-600 dark:bg-brand-900/30 dark:text-brand-300">
               <CalendarDays className="h-[25px] w-[25px]" />
             </div>
 
@@ -570,7 +570,7 @@ function SummaryCard({
           <p className="text-stat mt-2 text-slate-900 dark:text-white">{value}</p>
           <p className="mt-2 text-xs text-slate-500 dark:text-slate-400">{description}</p>
         </div>
-        <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-brand-50 text-brand-600 dark:bg-brand-900/30 dark:text-brand-400">
+        <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-brand-50 text-brand-600 dark:bg-brand-900/30 dark:text-brand-300">
           {icon}
         </div>
       </div>
@@ -627,7 +627,7 @@ function DetailItem({ icon, text }: { icon: ReactNode; text: string }) {
 function ModalInfoItem({ label, value, icon }: { label: string; value: string; icon: ReactNode }) {
   return (
     <div className="flex items-start gap-3 rounded-xl border border-slate-200 p-4 dark:border-slate-700">
-      <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-brand-50 text-brand-600 dark:bg-brand-900/30 dark:text-brand-400">
+      <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-brand-50 text-brand-600 dark:bg-brand-900/30 dark:text-brand-300">
         {icon}
       </div>
       <div>
@@ -641,7 +641,7 @@ function ModalInfoItem({ label, value, icon }: { label: string; value: string; i
 function EmptyState({ onReset }: { onReset: () => void }) {
   return (
     <div className="flex min-h-[260px] flex-col items-center justify-center rounded-2xl border border-dashed border-slate-300 bg-white px-6 text-center shadow-xs dark:border-slate-700 dark:bg-slate-900">
-      <div className="mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-brand-50 text-brand-600 dark:bg-brand-900/30 dark:text-brand-400">
+      <div className="mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-brand-50 text-brand-600 dark:bg-brand-900/30 dark:text-brand-300">
         <CalendarOff className="h-[31px] w-[31px]" />
       </div>
       <h3 className="text-section-title">No se encontraron citas</h3>

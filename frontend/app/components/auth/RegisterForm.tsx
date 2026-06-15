@@ -241,7 +241,7 @@ export default function RegisterForm({ clinicaSlug }: { clinicaSlug?: string }) 
     return (
       <div className="space-y-4">
         <div className="text-center">
-          <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-2xl bg-brand-50 text-brand-600 dark:bg-brand-950/30 dark:text-brand-400">
+          <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-2xl bg-brand-50 text-brand-600 dark:bg-brand-950/30 dark:text-brand-300">
             <Building2 className="h-6 w-6" />
           </div>
           <p className="mt-3 text-sm leading-6 text-slate-600 dark:text-slate-300">
@@ -324,7 +324,7 @@ export default function RegisterForm({ clinicaSlug }: { clinicaSlug?: string }) 
           ¿Ya tienes cuenta?{" "}
           <a
             href="/login"
-            className="font-semibold text-brand-600 transition hover:text-brand-700 dark:text-brand-400 dark:hover:text-brand-300"
+            className="font-semibold text-brand-600 transition hover:text-brand-700 dark:text-brand-300 dark:hover:text-brand-200"
           >
             Iniciar sesión
           </a>
@@ -345,7 +345,7 @@ export default function RegisterForm({ clinicaSlug }: { clinicaSlug?: string }) 
         </p>
         <a
           href="/login"
-          className="inline-block text-sm font-semibold text-brand-600 transition hover:text-brand-700 dark:text-brand-400 dark:hover:text-brand-300"
+          className="inline-block text-sm font-semibold text-brand-600 transition hover:text-brand-700 dark:text-brand-300 dark:hover:text-brand-200"
         >
           Volver a iniciar sesión
         </a>
@@ -652,7 +652,7 @@ export default function RegisterForm({ clinicaSlug }: { clinicaSlug?: string }) 
         ¿Ya tienes cuenta?{" "}
         <a
           href="/login"
-          className="font-semibold text-brand-600 transition hover:text-brand-700 dark:text-brand-400 dark:hover:text-brand-300"
+          className="font-semibold text-brand-600 transition hover:text-brand-700 dark:text-brand-300 dark:hover:text-brand-200"
         >
           Iniciar sesión
         </a>

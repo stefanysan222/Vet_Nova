@@ -234,7 +234,7 @@ export default function NotificacionesPage() {
                       <button
                         type="button"
                         onClick={() => setSelectedId(item.id)}
-                        className="rounded-lg px-3 py-1.5 text-xs font-semibold text-brand-600 hover:bg-brand-50 dark:text-brand-400 dark:hover:bg-brand-900/30"
+                        className="rounded-lg px-3 py-1.5 text-xs font-semibold text-brand-600 hover:bg-brand-50 dark:text-brand-300 dark:hover:bg-brand-900/30"
                       >
                         Ver
                       </button>
@@ -354,7 +354,7 @@ function SummaryCard({
         <p className="text-label">{title}</p>
         <h3 className="mt-2 text-2xl font-bold text-slate-900 dark:text-white">{value}</h3>
       </div>
-      <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-brand-50 text-brand-600 dark:bg-brand-900/30 dark:text-brand-400">
+      <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-brand-50 text-brand-600 dark:bg-brand-900/30 dark:text-brand-300">
         {icon}
       </div>
     </article>
