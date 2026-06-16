@@ -25,12 +25,15 @@ function RescheduleModal({
   appointment: Appointment;
   allAppointments: Appointment[];
   onClose: () => void;
-  onSave: (date: string, time: string, veterinarian: string) => void;
+  onSave: (date: string, time: string, veterinarian: string, veterinarianId?: number) => void;
   saving: boolean;
 }) {
   const [date, setDate] = useState(appointment.date);
   const [time, setTime] = useState(appointment.time || "09:00");
   const [selectedVet, setSelectedVet] = useState(appointment.veterinarian ?? "");
+  const [selectedVetId, setSelectedVetId] = useState<number | undefined>(
+    appointment.veterinarianId,
+  );
   const [vets, setVets] = useState<UsuarioAPI[]>([]);
   const [loadingVets, setLoadingVets] = useState(true);
   const [vetsError, setVetsError] = useState(false);
@@ -128,6 +131,7 @@ function RescheduleModal({
                   setDate(e.target.value);
                   setTime("");
                   setSelectedVet("");
+                  setSelectedVetId(undefined);
                 }}
                 className="w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-2.5 text-sm text-slate-900 outline-none transition focus:border-brand-500 focus:ring-2 focus:ring-brand-100 dark:border-slate-700 dark:bg-slate-800 dark:text-white"
               />
@@ -163,6 +167,7 @@ function RescheduleModal({
                       onClick={() => {
                         setTime(slot);
                         setSelectedVet("");
+                        setSelectedVetId(undefined);
                       }}
                       className={`rounded-xl py-2 text-xs font-medium transition ${
                         time === slot
@@ -203,7 +208,10 @@ function RescheduleModal({
                     <button
                       key={v.id}
                       type="button"
-                      onClick={() => setSelectedVet(v.nombre ?? "")}
+                      onClick={() => {
+                        setSelectedVet(v.nombre ?? "");
+                        setSelectedVetId(v.id);
+                      }}
                       className={`flex w-full items-center gap-3 rounded-xl border px-4 py-2.5 text-left text-sm transition ${
                         selectedVet === v.nombre
                           ? "border-brand-400 bg-brand-50 text-brand-800 dark:border-brand-600 dark:bg-brand-950/40 dark:text-brand-200"
@@ -250,7 +258,7 @@ function RescheduleModal({
               Cancelar
             </button>
             <button
-              onClick={() => onSave(date, time, selectedVet)}
+              onClick={() => onSave(date, time, selectedVet, selectedVetId)}
               disabled={saving || !date || !time || clinicaCerrada}
               className="flex-1 rounded-2xl bg-brand-600 py-2.5 text-sm font-semibold text-white transition hover:bg-brand-700 disabled:opacity-50"
             >
@@ -317,7 +325,12 @@ export default function CitasPage() {
     success("Cita cancelada", `La cita de ${cita.petName} fue cancelada.`);
   };
 
-  const handleReschedule = async (date: string, time: string, veterinarian: string) => {
+  const handleReschedule = async (
+    date: string,
+    time: string,
+    veterinarian: string,
+    veterinarianId?: number,
+  ) => {
     if (!rescheduleTarget) return;
     const cita = rescheduleTarget;
     setSavingReschedule(true);
@@ -328,6 +341,7 @@ export default function CitasPage() {
         time,
         status: "Pendiente",
         veterinarian: veterinarian || cita.veterinarian,
+        veterinarianId: veterinarianId ?? cita.veterinarianId,
       });
       setAppointments((prev) => prev.map((a) => (a.id === cita.id ? updated : a)));
       setRescheduleTarget(null);

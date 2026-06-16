@@ -9,6 +9,7 @@ export interface CitaAPI {
   servicio: string | null;
   notas: string | null;
   veterinario: string | null;
+  id_usuario_veterinario?: number | null;
   id_mascota: number | null;
   id_usuario: number | null;
   mascotas?: {
@@ -59,6 +60,7 @@ export function mapCitaToAppointment(c: CitaAPI): Appointment {
     ownerName: c.mascotas?.propietario?.nombre ?? "",
     service: c.servicio ?? "",
     status: STATUS_MAP[estado] ?? "Pendiente",
+    veterinarianId: c.id_usuario_veterinario ?? undefined,
     veterinarian: c.veterinario ?? undefined,
     notes: c.notas ?? undefined,
     petEspecie: c.mascotas?.especie ?? undefined,
@@ -97,6 +99,7 @@ export async function createCita(
     servicio: appointment.service || undefined,
     notas: appointment.notes || undefined,
     veterinario: appointment.veterinarian || undefined,
+    id_usuario_veterinario: appointment.veterinarianId || undefined,
     id_mascota: parseInt(appointment.petId, 10),
     id_usuario: id_usuario || undefined,
   });
@@ -123,6 +126,7 @@ export async function updateCita(appointment: Appointment): Promise<Appointment>
     servicio: appointment.service || undefined,
     notas: appointment.notes || undefined,
     veterinario: appointment.veterinarian || undefined,
+    id_usuario_veterinario: appointment.veterinarianId || undefined,
   });
   return mapCitaToAppointment(data);
 }

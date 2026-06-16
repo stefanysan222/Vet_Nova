@@ -62,6 +62,7 @@ export default function NuevaCitaPage() {
   const [hora, setHora] = useState("");
   const [motivo, setMotivo] = useState("");
   const [vetNombre, setVetNombre] = useState("");
+  const [vetId, setVetId] = useState<number | undefined>(undefined);
   const [vets, setVets] = useState<UsuarioAPI[]>([]);
   const [vetsLoaded, setVetsLoaded] = useState(false);
   const [citasExistentes, setCitasExistentes] = useState<Appointment[]>([]);
@@ -179,6 +180,7 @@ export default function NuevaCitaPage() {
         service: servicio,
         status: "Pendiente",
         veterinarian: vetNombre || undefined,
+        veterinarianId: vetId,
         notes: motivo.trim() || undefined,
       });
       router.push("/cliente/agendar?solicitud=enviada");
@@ -366,6 +368,7 @@ export default function NuevaCitaPage() {
                     setFecha(e.target.value);
                     setHora("");
                     setVetNombre("");
+                    setVetId(undefined);
                     setError("");
                   }}
                   className="w-full rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-900 outline-none transition focus:border-brand-400 focus:ring-2 focus:ring-brand-400/10 dark:border-slate-700 dark:bg-slate-900 dark:text-white"
@@ -406,6 +409,7 @@ export default function NuevaCitaPage() {
                         onClick={() => {
                           setHora(s);
                           setVetNombre("");
+                          setVetId(undefined);
                           setError("");
                         }}
                         className={`rounded-lg border py-2 text-xs font-semibold transition ${
@@ -448,9 +452,16 @@ export default function NuevaCitaPage() {
                       <button
                         key={v.id}
                         type="button"
-                        onClick={() =>
-                          setVetNombre(vetNombre === (v.nombre ?? "") ? "" : (v.nombre ?? ""))
-                        }
+                        onClick={() => {
+                          const nombre = v.nombre ?? "";
+                          if (vetNombre === nombre) {
+                            setVetNombre("");
+                            setVetId(undefined);
+                          } else {
+                            setVetNombre(nombre);
+                            setVetId(v.id);
+                          }
+                        }}
                         className={`flex w-full items-center gap-3 rounded-xl border px-4 py-2.5 text-left text-sm transition ${
                           vetNombre === v.nombre
                             ? "border-brand-400 bg-brand-50 text-brand-800 dark:border-brand-600 dark:bg-brand-950/40 dark:text-brand-200"
