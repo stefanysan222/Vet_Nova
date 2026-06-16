@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>VetNova — Panel Cliente — Historial médico</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<script>
+  tailwind.config = {
+    darkMode: 'class',
+    theme: {
+      extend: {
+        fontFamily: { sans: ['Inter', 'system-ui', 'sans-serif'] },
+        colors: {
+          brand: { 50:"#EEF0FE",100:"#E0E7FF",200:"#C7D2FE",300:"#A5B4FC",400:"#818CF8",500:"#6366F1",600:"#5457E5",700:"#4347C9",800:"#3739A3",900:"#2D2F82",950:"#1B1C50" },
+          surface: { 50:"#F8F8FC",100:"#F1F1F8",200:"#E4E4F0",300:"#CBCBE0",400:"#9D9DBE",500:"#71719C",600:"#54547A",700:"#3D3D5C",800:"#25253D",900:"#15152B",950:"#0F172A" },
+          success: { 50:"#ECFDF5",100:"#D1FAE5",400:"#34D399",600:"#059669",700:"#047857",900:"#064E3B" },
+          danger: { 50:"#FEF2F2",100:"#FEE2E2",200:"#FECACA",400:"#F87171",500:"#EF4444",600:"#DC2626",700:"#B91C1C",800:"#991B1B",900:"#7F1D1D" },
+          warning: { 50:"#FFFBEB",100:"#FEF3C7",400:"#FBBF24",600:"#D97706",700:"#B45309",900:"#78350F" },
+        },
+        borderRadius: { '2xl':'1rem', '3xl':'1.25rem', '4xl':'1.5rem' },
+        boxShadow: {
+          card: "0 1px 2px rgba(15,23,42,0.04), 0 8px 24px rgba(99,102,241,0.06)",
+          'card-hover': "0 4px 12px rgba(15,23,42,0.06), 0 12px 32px rgba(99,102,241,0.10)",
+          'brand-sm': "0 2px 10px rgba(99,102,241,0.18)",
+          brand: "0 8px 24px rgba(99,102,241,0.25)",
+          xs: "0 1px 2px rgba(15,23,42,0.04)",
+        },
+      },
+    },
+  };
+</script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
+<style type="text/tailwindcss">
+  @layer components {
+    .text-page-title { @apply text-2xl font-bold tracking-tight text-slate-900 sm:text-3xl; }
+    .text-subtitle { @apply text-sm leading-6 text-slate-500; }
+    .text-label { @apply text-xs font-medium text-slate-500; }
+    .text-caption { @apply text-[11px] font-medium uppercase tracking-wide text-surface-400; }
+    .text-stat-sm { @apply text-2xl font-bold tracking-tight; }
+  }
+</style>
+<style>body{font-family:'Inter',system-ui,sans-serif;}</style>
+</head>
+<body class="bg-surface-50 text-surface-900">
+
+  <div class="flex h-screen overflow-hidden">
+
+    <!-- Sidebar -->
+    <aside class="hidden h-screen w-[260px] shrink-0 border-r border-surface-200 bg-white lg:flex lg:flex-col">
+      <div class="flex h-[78px] items-center gap-3 border-b border-surface-200 px-5">
+        <div class="flex h-10 w-10 items-center justify-center rounded-xl bg-brand-600 text-base font-bold text-white">V</div>
+        <div>
+          <h1 class="text-xl font-semibold leading-none text-surface-900">VetNova</h1>
+          <p class="mt-1.5 text-[11px] font-medium uppercase tracking-wide text-surface-400">Sistema Veterinario</p>
+        </div>
+      </div>
+
+      <nav class="flex-1 px-4 py-4 space-y-2">
+        <a href="#" class="flex h-11 items-center gap-3 rounded-xl px-4 text-sm font-semibold text-slate-700 hover:bg-slate-100">
+          <i data-lucide="home" class="h-5 w-5"></i> Dashboard
+        </a>
+        <a href="#" class="flex h-11 items-center gap-3 rounded-xl bg-brand-600 px-4 text-sm font-semibold text-white shadow-brand-sm">
+          <i data-lucide="calendar-days" class="h-5 w-5"></i> Citas
+        </a>
+        <a href="#" class="flex h-11 items-center gap-3 rounded-xl px-4 text-sm font-semibold text-slate-700 hover:bg-slate-100">
+          <i data-lucide="paw-print" class="h-5 w-5"></i> Mascotas
+        </a>
+        <a href="#" class="flex h-11 items-center gap-3 rounded-xl px-4 text-sm font-semibold text-slate-700 hover:bg-slate-100">
+          <i data-lucide="settings" class="h-5 w-5"></i> Configuración
+        </a>
+      </nav>
+
+      <div class="border-t border-surface-200 px-5 py-5">
+        <button class="flex items-center gap-3 text-sm font-semibold text-surface-900 hover:text-brand-600">
+          <i data-lucide="log-out" class="h-[19px] w-[19px]"></i> Cerrar Sesión
+        </button>
+      </div>
+    </aside>
+
+    <!-- Main -->
+    <section class="min-w-0 flex-1 overflow-y-auto">
+
+      <!-- Header -->
+      <header class="flex h-[64px] items-center justify-between border-b border-surface-200 bg-white px-5">
+        <div class="relative w-full max-w-sm">
+          <i data-lucide="search" class="pointer-events-none absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400"></i>
+          <input type="search" placeholder="Buscar citas o mascotas..." class="w-full rounded-xl border border-slate-200 bg-slate-50 py-2.5 pl-10 pr-4 text-sm text-slate-900 outline-none" />
+        </div>
+        <div class="ml-5 flex items-center gap-4">
+          <button class="relative flex h-8 w-8 items-center justify-center rounded-lg text-surface-900 hover:bg-surface-100">
+            <i data-lucide="bell" class="h-[19px] w-[19px]"></i>
+            <span class="absolute right-0.5 top-0.5 flex h-4 w-4 items-center justify-center rounded-full bg-danger-500 text-[9px] font-bold text-white ring-2 ring-white">2</span>
+          </button>
+          <div class="h-8 w-px bg-surface-200"></div>
+          <div class="flex items-center gap-3">
+            <div class="text-right">
+              <p class="text-sm font-semibold leading-none text-surface-900">María González</p>
+              <p class="mt-1.5 text-[11px] font-medium uppercase tracking-wide text-surface-400">Cliente</p>
+            </div>
+            <div class="flex h-9 w-9 items-center justify-center rounded-full bg-brand-100 text-sm font-bold text-brand-600">MG</div>
+          </div>
+        </div>
+      </header>
+
+      <!-- Content -->
+      <div class="bg-surface-50 px-6 py-8">
+
+        <div class="mb-8">
+          <h1 class="text-page-title">Historial Médico</h1>
+          <p class="text-subtitle mt-2">Revisa el historial de consultas y tratamientos de tus mascotas.</p>
+        </div>
+
+        <!-- Stats -->
+        <div class="mb-8 grid grid-cols-2 gap-5 md:grid-cols-3">
+          <article class="rounded-2xl border border-surface-200 bg-white px-5 py-4 shadow-card">
+            <p class="text-label">Total consultas</p>
+            <h3 class="text-stat-sm mt-2 text-slate-900">12</h3>
+          </article>
+          <article class="rounded-2xl border border-surface-200 bg-white px-5 py-4 shadow-card">
+            <p class="text-label">Finalizadas</p>
+            <h3 class="text-stat-sm mt-2 text-success-600">9</h3>
+          </article>
+          <article class="rounded-2xl border border-surface-200 bg-white px-5 py-4 shadow-card">
+            <p class="text-label">Canceladas</p>
+            <h3 class="text-stat-sm mt-2 text-danger-600">1</h3>
+          </article>
+        </div>
+
+        <!-- Search -->
+        <div class="mb-6">
+          <div class="flex h-11 max-w-md items-center gap-3 rounded-xl border border-surface-200 bg-white px-4">
+            <i data-lucide="search" class="h-[18px] w-[18px] shrink-0 text-surface-400"></i>
+            <input type="text" placeholder="Buscar por mascota, servicio, veterinario..." class="w-full bg-transparent text-sm text-surface-900 outline-none placeholder:text-surface-400" />
+          </div>
+        </div>
+
+        <!-- Grouped list -->
+        <div class="space-y-8">
+
+          <!-- Junio 2026 -->
+          <div>
+            <div class="mb-4 flex items-center gap-3">
+              <h2 class="text-caption">Junio 2026</h2>
+              <span class="h-px flex-1 bg-surface-200"></span>
+              <span class="rounded-lg bg-surface-100 px-2.5 py-0.5 text-xs font-semibold text-surface-500">2</span>
+            </div>
+            <div class="space-y-3">
+              <article class="rounded-2xl border border-surface-200 bg-white p-5 shadow-card transition-all duration-200 hover:-translate-y-0.5 hover:shadow-card-hover">
+                <div class="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+                  <div class="flex min-w-0 gap-4">
+                    <div class="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-brand-50 text-brand-600">
+                      <i data-lucide="paw-print" class="h-[22px] w-[22px]"></i>
+                    </div>
+                    <div class="min-w-0">
+                      <div class="flex flex-wrap items-center gap-2">
+                        <p class="text-sm font-semibold text-slate-900">Luna</p>
+                        <span class="inline-flex items-center gap-1.5 rounded-full border border-emerald-200 bg-emerald-50 px-2.5 py-0.5 text-xs font-semibold text-emerald-700">
+                          <span class="h-1.5 w-1.5 rounded-full bg-emerald-500"></span> Confirmada
+                        </span>
+                      </div>
+                      <p class="mt-1 text-sm text-slate-600">Vacunación anual</p>
+                      <p class="mt-1 text-xs text-slate-500">Dra. Camila Restrepo</p>
+                    </div>
+                  </div>
+                  <div class="flex shrink-0 items-center gap-2 text-xs text-slate-500">
+                    <i data-lucide="calendar-days" class="h-[15px] w-[15px]"></i>
+                    <span>18 jun 2026 · 3:00 PM</span>
+                  </div>
+                </div>
+              </article>
+              <article class="rounded-2xl border border-surface-200 bg-white p-5 shadow-card transition-all duration-200 hover:-translate-y-0.5 hover:shadow-card-hover">
+                <div class="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+                  <div class="flex min-w-0 gap-4">
+                    <div class="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-brand-50 text-brand-600">
+                      <i data-lucide="paw-print" class="h-[22px] w-[22px]"></i>
+                    </div>
+                    <div class="min-w-0">
+                      <div class="flex flex-wrap items-center gap-2">
+                        <p class="text-sm font-semibold text-slate-900">Rocky</p>
+                        <span class="inline-flex items-center gap-1.5 rounded-full border border-amber-200 bg-amber-50 px-2.5 py-0.5 text-xs font-semibold text-amber-700">
+                          <span class="h-1.5 w-1.5 rounded-full bg-amber-500"></span> Pendiente
+                        </span>
+                      </div>
+                      <p class="mt-1 text-sm text-slate-600">Consulta general</p>
+                      <p class="mt-1 text-xs text-slate-500">Dr. Andrés Pineda</p>
+                    </div>
+                  </div>
+                  <div class="flex shrink-0 items-center gap-2 text-xs text-slate-500">
+                    <i data-lucide="calendar-days" class="h-[15px] w-[15px]"></i>
+                    <span>12 jun 2026 · 10:30 AM</span>
+                  </div>
+                </div>
+              </article>
+            </div>
+          </div>
+
+          <!-- Mayo 2026 -->
+          <div>
+            <div class="mb-4 flex items-center gap-3">
+              <h2 class="text-caption">Mayo 2026</h2>
+              <span class="h-px flex-1 bg-surface-200"></span>
+              <span class="rounded-lg bg-surface-100 px-2.5 py-0.5 text-xs font-semibold text-surface-500">2</span>
+            </div>
+            <div class="space-y-3">
+              <article class="rounded-2xl border border-surface-200 bg-white p-5 shadow-card transition-all duration-200 hover:-translate-y-0.5 hover:shadow-card-hover">
+                <div class="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+                  <div class="flex min-w-0 gap-4">
+                    <div class="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-brand-50 text-brand-600">
+                      <i data-lucide="paw-print" class="h-[22px] w-[22px]"></i>
+                    </div>
+                    <div class="min-w-0">
+                      <div class="flex flex-wrap items-center gap-2">
+                        <p class="text-sm font-semibold text-slate-900">Rocky</p>
+                        <span class="inline-flex items-center gap-1.5 rounded-full border border-slate-200 bg-slate-100 px-2.5 py-0.5 text-xs font-semibold text-slate-600">
+                          <span class="h-1.5 w-1.5 rounded-full bg-slate-400"></span> Finalizada
+                        </span>
+                      </div>
+                      <p class="mt-1 text-sm text-slate-600">Revisión general</p>
+                      <p class="mt-1 text-xs text-slate-500">Dr. Andrés Pineda</p>
+                      <p class="mt-2 rounded-lg bg-surface-50 px-3 py-2 text-xs text-surface-500">Mascota en buen estado de salud, sin novedades.</p>
+                    </div>
+                  </div>
+                  <div class="flex shrink-0 items-center gap-2 text-xs text-slate-500">
+                    <i data-lucide="calendar-days" class="h-[15px] w-[15px]"></i>
+                    <span>28 may 2026 · 9:00 AM</span>
+                  </div>
+                </div>
+              </article>
+              <article class="rounded-2xl border border-surface-200 bg-white p-5 shadow-card transition-all duration-200 hover:-translate-y-0.5 hover:shadow-card-hover">
+                <div class="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+                  <div class="flex min-w-0 gap-4">
+                    <div class="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-brand-50 text-brand-600">
+                      <i data-lucide="paw-print" class="h-[22px] w-[22px]"></i>
+                    </div>
+                    <div class="min-w-0">
+                      <div class="flex flex-wrap items-center gap-2">
+                        <p class="text-sm font-semibold text-slate-900">Pancho</p>
+                        <span class="inline-flex items-center gap-1.5 rounded-full border border-red-200 bg-red-50 px-2.5 py-0.5 text-xs font-semibold text-red-700">
+                          <span class="h-1.5 w-1.5 rounded-full bg-red-500"></span> Cancelada
+                        </span>
+                      </div>
+                      <p class="mt-1 text-sm text-slate-600">Control de peso</p>
+                      <p class="mt-1 text-xs text-slate-500">Dra. Camila Restrepo</p>
+                    </div>
+                  </div>
+                  <div class="flex shrink-0 items-center gap-2 text-xs text-slate-500">
+                    <i data-lucide="calendar-days" class="h-[15px] w-[15px]"></i>
+                    <span>14 may 2026 · 11:00 AM</span>
+                  </div>
+                </div>
+              </article>
+            </div>
+          </div>
+
+        </div>
+
+      </div>
+    </section>
+  </div>
+
+  <script>lucide.createIcons();</script>
+</body>
+</html>

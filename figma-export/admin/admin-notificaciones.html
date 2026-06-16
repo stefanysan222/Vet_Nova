@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>VetNova — Panel Admin — Notificaciones</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<script>
+  tailwind.config = {
+    darkMode: 'class',
+    theme: {
+      extend: {
+        fontFamily: { sans: ['Inter', 'system-ui', 'sans-serif'] },
+        colors: {
+          brand: { 50:"#F5F3FE",100:"#EDE8FA",200:"#DDD6F7",300:"#C4B5FD",400:"#A78BFA",500:"#8B5CF6",600:"#7C3AED",700:"#6D28D9",800:"#5B21B6",900:"#4C1D95" },
+          surface: { 50:"#F8F8FC",100:"#F1F1F8",200:"#E4E4F0",300:"#CBCBE0",400:"#9D9DBE",500:"#71719C",600:"#54547A",700:"#3D3D5C",800:"#25253D",900:"#15152B",950:"#0F172A" },
+          accent: { 50:"#FFF1F2",100:"#FFE4E6",200:"#FECDD3",400:"#FB8FA0",500:"#FB7185",600:"#F43F5E",700:"#E11D48",800:"#BE123C" },
+          success: { 50:"#ECFDF5",100:"#D1FAE5",200:"#A7F3D0",400:"#34D399",500:"#10B981",600:"#059669",700:"#047857" },
+          warning: { 50:"#FFFBEB",100:"#FEF3C7",200:"#FDE68A",400:"#FBBF24",600:"#D97706",700:"#B45309" },
+          danger: { 50:"#FEF2F2",100:"#FEE2E2",200:"#FECACA",400:"#F87171",500:"#EF4444",600:"#DC2626",700:"#B91C1C" },
+        },
+        borderRadius: { '2xl':'1rem', '3xl':'1.25rem', '4xl':'1.5rem' },
+        boxShadow: {
+          xs: "0 1px 2px rgba(15,23,42,0.04)",
+          sm: "0 1px 3px rgba(15,23,42,0.05), 0 2px 6px rgba(15,23,42,0.04)",
+          card: "0 1px 2px rgba(15,23,42,0.04), 0 8px 24px rgba(124,58,237,0.06)",
+          'card-hover': "0 4px 16px rgba(124,58,237,0.10), 0 1px 4px rgba(15,23,42,0.05)",
+          'brand-sm': "0 2px 10px rgba(124,58,237,0.18)",
+          brand: "0 10px 28px rgba(124,58,237,0.25)",
+        },
+      },
+    },
+  };
+</script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
+<style type="text/tailwindcss">
+  @layer components {
+    .text-eyebrow { @apply text-xs font-semibold uppercase tracking-[0.24em]; }
+    .text-page-title { @apply text-2xl font-bold tracking-tight text-slate-900 sm:text-3xl; }
+    .text-subtitle { @apply text-sm leading-6 text-slate-500; }
+    .text-label { @apply text-xs font-medium text-slate-500; }
+    .text-stat { @apply text-3xl font-bold tracking-tight; }
+    .admin-page { @apply px-5 pb-12 pt-6 sm:px-6 lg:px-10; }
+    .admin-card { @apply rounded-2xl border border-slate-200/60 bg-white shadow-card; }
+    .admin-card-padded { @apply admin-card p-6; }
+  }
+</style>
+<style>body{font-family:'Inter',system-ui,sans-serif;}</style>
+</head>
+<body class="bg-surface-50 text-surface-900">
+
+  <div class="flex h-screen overflow-hidden">
+
+    <!-- Sidebar -->
+    <aside class="hidden h-screen w-[260px] shrink-0 border-r border-surface-200 bg-white lg:flex lg:flex-col">
+      <div class="border-b border-surface-200 px-5 py-5">
+        <div class="flex items-center gap-3">
+          <div class="flex h-11 w-11 items-center justify-center rounded-xl bg-[#7C3AED] text-base font-bold text-white">CV</div>
+          <div class="min-w-0">
+            <p class="truncate text-sm font-semibold text-surface-900">Carla Vásquez</p>
+            <p class="truncate text-[11px] text-surface-400">Clínica VetNova Centro</p>
+          </div>
+        </div>
+      </div>
+
+      <nav class="flex-1 px-4 py-4 space-y-1.5">
+        <a href="#" class="flex h-11 items-center gap-3 rounded-xl px-4 text-sm font-semibold text-slate-700 hover:bg-slate-100">
+          <i data-lucide="home" class="h-5 w-5"></i> Dashboard
+        </a>
+        <a href="#" class="flex h-11 items-center gap-3 rounded-xl px-4 text-sm font-semibold text-slate-700 hover:bg-slate-100">
+          <i data-lucide="users" class="h-5 w-5"></i> Usuarios
+        </a>
+        <a href="#" class="flex h-11 items-center gap-3 rounded-xl px-4 text-sm font-semibold text-slate-700 hover:bg-slate-100">
+          <i data-lucide="calendar-days" class="h-5 w-5"></i> Citas
+        </a>
+        <a href="#" class="flex h-11 items-center gap-3 rounded-xl px-4 text-sm font-semibold text-slate-700 hover:bg-slate-100">
+          <i data-lucide="paw-print" class="h-5 w-5"></i> Mascotas
+        </a>
+        <a href="#" class="flex h-11 items-center gap-3 rounded-xl px-4 text-sm font-semibold text-slate-700 hover:bg-slate-100">
+          <i data-lucide="bar-chart-3" class="h-5 w-5"></i> Reportes
+        </a>
+        <a href="#" class="flex h-11 items-center gap-3 rounded-xl px-4 text-sm font-semibold" style="background:rgba(124,58,237,0.1); color:#7C3AED;">
+          <i data-lucide="bell" class="h-5 w-5"></i> Notificaciones
+        </a>
+        <a href="#" class="flex h-11 items-center gap-3 rounded-xl px-4 text-sm font-semibold text-slate-700 hover:bg-slate-100">
+          <i data-lucide="settings" class="h-5 w-5"></i> Configuración
+        </a>
+      </nav>
+
+      <div class="space-y-3 border-t border-surface-200 px-5 py-5">
+        <div class="flex items-center gap-2 rounded-xl px-3 py-2 text-[11px] font-semibold" style="background:rgba(124,58,237,0.08); color:#7C3AED;">
+          <i data-lucide="headphones" class="h-3.5 w-3.5"></i> Soporte 24/7
+        </div>
+        <button class="flex items-center gap-3 text-sm font-semibold text-surface-900 hover:text-[#7C3AED]">
+          <i data-lucide="log-out" class="h-[19px] w-[19px]"></i> Cerrar sesión
+        </button>
+      </div>
+    </aside>
+
+    <!-- Main -->
+    <section class="min-w-0 flex-1 overflow-y-auto">
+
+      <!-- Navbar -->
+      <header class="flex h-[64px] items-center justify-between border-b border-surface-200 bg-white px-5">
+        <div class="relative w-full max-w-sm">
+          <i data-lucide="search" class="pointer-events-none absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400"></i>
+          <input type="search" placeholder="Buscar usuarios, citas, mascotas..." class="w-full rounded-xl border border-slate-200 bg-slate-50 py-2.5 pl-10 pr-4 text-sm text-slate-900 outline-none" />
+        </div>
+        <div class="ml-5 flex items-center gap-4">
+          <button class="flex h-8 w-8 items-center justify-center rounded-lg text-surface-900 hover:bg-surface-100">
+            <i data-lucide="moon" class="h-[18px] w-[18px]"></i>
+          </button>
+          <button class="relative flex h-8 w-8 items-center justify-center rounded-lg text-surface-900 hover:bg-surface-100">
+            <i data-lucide="bell" class="h-[19px] w-[19px]"></i>
+            <span class="absolute right-0.5 top-0.5 flex h-4 w-4 items-center justify-center rounded-full bg-danger-500 text-[9px] font-bold text-white ring-2 ring-white">3</span>
+          </button>
+          <div class="h-8 w-px bg-surface-200"></div>
+          <div class="flex items-center gap-3">
+            <div class="text-right">
+              <p class="text-sm font-semibold leading-none text-surface-900">Carla Vásquez</p>
+              <p class="mt-1.5 text-[11px] font-medium uppercase tracking-wide text-surface-400">Administrador</p>
+            </div>
+            <div class="flex h-9 w-9 items-center justify-center rounded-full text-sm font-bold text-white" style="background:#7C3AED;">CV</div>
+          </div>
+        </div>
+      </header>
+
+      <!-- Content -->
+      <div class="admin-page">
+        <div class="space-y-6">
+
+          <!-- Header -->
+          <div class="admin-card-padded flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
+            <div>
+              <p class="text-eyebrow text-brand-600">Notificaciones</p>
+              <h1 class="text-page-title mt-2">Alertas del sistema</h1>
+              <p class="text-subtitle mt-2 max-w-xl">Notificaciones generadas cuando los clientes agendan citas.</p>
+            </div>
+            <div class="flex gap-3">
+              <div class="rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-center">
+                <p class="text-stat text-slate-900">4</p>
+                <p class="text-label mt-1">Total</p>
+              </div>
+              <div class="rounded-xl border border-danger-200 bg-danger-50 px-4 py-3 text-center">
+                <p class="text-stat text-danger-600">2</p>
+                <p class="text-label mt-1 text-danger-600">No leídas</p>
+              </div>
+            </div>
+          </div>
+
+          <!-- Tabs + acción -->
+          <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+            <div class="inline-flex rounded-xl border border-slate-200 bg-slate-50 p-1">
+              <button class="rounded-lg bg-white px-4 py-1.5 text-sm font-semibold text-slate-900 shadow-sm">No leídas (2)</button>
+              <button class="rounded-lg px-4 py-1.5 text-sm font-semibold text-slate-500">Todas</button>
+            </div>
+            <button class="rounded-xl border border-slate-200 bg-white px-4 py-2 text-sm font-semibold text-slate-700">Marcar todas como leídas</button>
+          </div>
+
+          <!-- Grid principal -->
+          <div class="grid grid-cols-1 gap-6 xl:grid-cols-[1fr_360px]">
+
+            <!-- Lista de notificaciones -->
+            <div class="space-y-3">
+
+              <!-- No leída -->
+              <article class="flex items-start gap-4 rounded-2xl border border-brand-400 bg-brand-50 p-5 shadow-sm">
+                <div class="flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl bg-brand-600 text-white">
+                  <i data-lucide="bell" class="h-4 w-4"></i>
+                </div>
+                <div class="min-w-0 flex-1">
+                  <div class="flex items-center gap-2">
+                    <p class="font-semibold text-slate-900">Nueva cita agendada</p>
+                    <span class="h-2 w-2 rounded-full bg-brand-500"></span>
+                  </div>
+                  <p class="mt-1 text-sm text-slate-600">Ana Torres agendó una cita para Rocky el 12 jun a las 09:00.</p>
+                  <p class="mt-1 text-xs text-slate-400">Hace 12 min</p>
+                </div>
+                <button class="shrink-0 rounded-lg p-1.5 text-slate-400 hover:bg-slate-100 hover:text-slate-600" title="Marcar como leída">
+                  <i data-lucide="check" class="h-4 w-4"></i>
+                </button>
+              </article>
+
+              <!-- No leída -->
+              <article class="flex items-start gap-4 rounded-2xl border border-brand-400 bg-brand-50 p-5 shadow-sm">
+                <div class="flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl bg-brand-600 text-white">
+                  <i data-lucide="bell" class="h-4 w-4"></i>
+                </div>
+                <div class="min-w-0 flex-1">
+                  <div class="flex items-center gap-2">
+                    <p class="font-semibold text-slate-900">Cita cancelada</p>
+                    <span class="h-2 w-2 rounded-full bg-brand-500"></span>
+                  </div>
+                  <p class="mt-1 text-sm text-slate-600">Carlos Ramírez canceló la cita de Max.</p>
+                  <p class="mt-1 text-xs text-slate-400">Hace 30 min</p>
+                </div>
+                <button class="shrink-0 rounded-lg p-1.5 text-slate-400 hover:bg-slate-100 hover:text-slate-600" title="Marcar como leída">
+                  <i data-lucide="check" class="h-4 w-4"></i>
+                </button>
+              </article>
+
+              <!-- Leída -->
+              <article class="flex items-start gap-4 rounded-2xl border border-slate-200 bg-white p-5 opacity-60 shadow-sm">
+                <div class="flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl bg-brand-600 text-white">
+                  <i data-lucide="bell" class="h-4 w-4"></i>
+                </div>
+                <div class="min-w-0 flex-1">
+                  <p class="font-semibold text-slate-900">Cita confirmada por veterinario</p>
+                  <p class="mt-1 text-sm text-slate-600">Dra. Valeria Pérez confirmó la cita de Luna.</p>
+                  <p class="mt-1 text-xs text-slate-400">Hace 1 h</p>
+                </div>
+              </article>
+
+              <!-- Leída -->
+              <article class="flex items-start gap-4 rounded-2xl border border-slate-200 bg-white p-5 opacity-60 shadow-sm">
+                <div class="flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl bg-brand-600 text-white">
+                  <i data-lucide="bell" class="h-4 w-4"></i>
+                </div>
+                <div class="min-w-0 flex-1">
+                  <p class="font-semibold text-slate-900">Nuevo cliente registrado</p>
+                  <p class="mt-1 text-sm text-slate-600">Laura Gómez se registró en VetNova.</p>
+                  <p class="mt-1 text-xs text-slate-400">Hace 2 h</p>
+                </div>
+              </article>
+
+            </div>
+
+            <!-- Resumen lateral -->
+            <aside class="rounded-2xl border border-slate-200 bg-white p-6">
+              <h2 class="text-lg font-semibold tracking-tight text-slate-900">Resumen</h2>
+              <p class="text-subtitle mt-1">Actividad de notificaciones</p>
+
+              <div class="mt-4 space-y-3">
+                <div class="rounded-xl border border-slate-200 bg-slate-50 px-4 py-3">
+                  <p class="text-stat text-slate-900">4</p>
+                  <p class="text-label mt-1">Total de notificaciones</p>
+                </div>
+                <div class="rounded-xl border border-danger-200 bg-danger-50 px-4 py-3">
+                  <p class="text-stat text-danger-600">2</p>
+                  <p class="text-label mt-1 text-danger-600">Sin leer</p>
+                </div>
+              </div>
+            </aside>
+
+          </div>
+
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <script>lucide.createIcons();</script>
+</body>
+</html>

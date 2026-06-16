@@ -1,0 +1,289 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>VetNova — Panel Veterinario — Notificaciones</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<script>
+  tailwind.config = {
+    darkMode: 'class',
+    theme: {
+      extend: {
+        fontFamily: { sans: ['Inter', 'system-ui', 'sans-serif'] },
+        colors: {
+          brand: { 50:"#EEF0FE",100:"#E0E7FF",200:"#C7D2FE",300:"#A5B4FC",400:"#818CF8",500:"#6366F1",600:"#5457E5",700:"#4347C9",800:"#3739A3",900:"#2D2F82",950:"#1B1C50" },
+          surface: { 50:"#F8F8FC",100:"#F1F1F8",200:"#E4E4F0",300:"#CBCBE0",400:"#9D9DBE",500:"#71719C",600:"#54547A",700:"#3D3D5C",800:"#25253D",900:"#15152B",950:"#0F172A" },
+          success: { 50:"#ECFDF5",100:"#D1FAE5",400:"#34D399",600:"#059669",700:"#047857",900:"#064E3B" },
+          danger: { 50:"#FEF2F2",100:"#FEE2E2",200:"#FECACA",400:"#F87171",500:"#EF4444",600:"#DC2626",700:"#B91C1C",800:"#991B1B",900:"#7F1D1D" },
+          warning: { 50:"#FFFBEB",100:"#FEF3C7",400:"#FBBF24",600:"#D97706",700:"#B45309",900:"#78350F" },
+        },
+        borderRadius: { '2xl':'1rem', '3xl':'1.25rem', '4xl':'1.5rem' },
+        boxShadow: {
+          card: "0 1px 2px rgba(15,23,42,0.04), 0 8px 24px rgba(99,102,241,0.06)",
+          'card-hover': "0 4px 12px rgba(15,23,42,0.06), 0 12px 32px rgba(99,102,241,0.10)",
+          'brand-sm': "0 2px 10px rgba(99,102,241,0.18)",
+          brand: "0 8px 24px rgba(99,102,241,0.25)",
+          xs: "0 1px 2px rgba(15,23,42,0.04)",
+          modal: "0 24px 64px rgba(15,23,42,0.18)",
+        },
+      },
+    },
+  };
+</script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
+<style type="text/tailwindcss">
+  @layer components {
+    .text-display { @apply text-3xl font-bold tracking-tight sm:text-4xl; }
+    .text-eyebrow { @apply text-xs font-semibold uppercase tracking-[0.24em]; }
+    .text-page-title { @apply text-2xl font-bold tracking-tight text-slate-900 sm:text-3xl; }
+    .text-section-title { @apply text-lg font-semibold tracking-tight text-slate-900; }
+    .text-subtitle { @apply text-sm leading-6 text-slate-500; }
+    .text-label { @apply text-xs font-medium text-slate-500; }
+    .text-caption { @apply text-[11px] font-medium uppercase tracking-wide text-surface-400; }
+    .admin-page { @apply px-5 pb-12 pt-6 sm:px-6 lg:px-10; }
+    .admin-card { @apply rounded-2xl border border-slate-200/60 bg-white shadow-card; }
+    .admin-card-padded { @apply admin-card p-6; }
+    .btn-secondary { @apply inline-flex items-center justify-center gap-2 rounded-xl border border-slate-200 bg-white px-5 py-2.5 text-sm font-semibold text-slate-700 shadow-xs transition-all duration-150 hover:-translate-y-0.5 hover:border-slate-300 hover:shadow-sm active:translate-y-0 active:scale-[0.98]; }
+  }
+</style>
+<style>body{font-family:'Inter',system-ui,sans-serif;}</style>
+</head>
+<body class="bg-surface-50 text-surface-900">
+
+  <div class="flex h-screen overflow-hidden">
+
+    <!-- Sidebar -->
+    <aside class="hidden h-screen w-[260px] shrink-0 border-r border-surface-200 bg-white lg:flex lg:flex-col">
+      <div class="flex h-[78px] items-center gap-3 border-b border-surface-200 px-5">
+        <div class="flex h-10 w-10 items-center justify-center rounded-xl bg-brand-600 text-base font-bold text-white">V</div>
+        <div>
+          <h1 class="text-xl font-semibold leading-none text-surface-900">VetNova</h1>
+          <p class="mt-1.5 text-[11px] font-medium uppercase tracking-wide text-surface-400">Módulo veterinario</p>
+        </div>
+      </div>
+
+      <nav class="flex-1 px-4 py-4 space-y-2">
+        <a href="#" class="flex h-11 items-center gap-3 rounded-xl px-4 text-sm font-semibold text-slate-700 hover:bg-slate-100">
+          <i data-lucide="home" class="h-5 w-5"></i> Dashboard
+        </a>
+        <a href="#" class="flex h-11 items-center gap-3 rounded-xl px-4 text-sm font-semibold text-slate-700 hover:bg-slate-100">
+          <i data-lucide="calendar-days" class="h-5 w-5"></i> Citas
+        </a>
+        <a href="#" class="flex h-11 items-center gap-3 rounded-xl px-4 text-sm font-semibold text-slate-700 hover:bg-slate-100">
+          <i data-lucide="paw-print" class="h-5 w-5"></i> Pacientes
+        </a>
+        <a href="#" class="flex h-11 items-center gap-3 rounded-xl px-4 text-sm font-semibold text-slate-700 hover:bg-slate-100">
+          <i data-lucide="clipboard-list" class="h-5 w-5"></i> Historial Clínico
+        </a>
+        <a href="#" class="flex h-11 items-center gap-3 rounded-xl px-4 text-sm font-semibold text-slate-700 hover:bg-slate-100">
+          <i data-lucide="user-cog" class="h-5 w-5"></i> Mi perfil
+        </a>
+      </nav>
+
+      <div class="border-t border-surface-200 px-5 py-5">
+        <button class="flex items-center gap-3 text-sm font-semibold text-surface-900 hover:text-brand-600">
+          <i data-lucide="log-out" class="h-[19px] w-[19px]"></i> Cerrar Sesión
+        </button>
+      </div>
+    </aside>
+
+    <!-- Main -->
+    <section class="min-w-0 flex-1 overflow-y-auto">
+
+      <!-- Header -->
+      <header class="flex h-[64px] items-center justify-between border-b border-surface-200 bg-white px-5">
+        <div class="relative w-full max-w-sm">
+          <i data-lucide="search" class="pointer-events-none absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400"></i>
+          <input type="search" placeholder="Buscar pacientes, citas o historiales..." class="w-full rounded-xl border border-slate-200 bg-slate-50 py-2.5 pl-10 pr-4 text-sm text-slate-900 outline-none" />
+        </div>
+        <div class="ml-5 flex items-center gap-4">
+          <button class="flex h-8 w-8 items-center justify-center rounded-lg text-surface-900 hover:bg-surface-100">
+            <i data-lucide="moon" class="h-[18px] w-[18px]"></i>
+          </button>
+          <button class="relative flex h-8 w-8 items-center justify-center rounded-lg text-surface-900 hover:bg-surface-100">
+            <i data-lucide="bell" class="h-[19px] w-[19px]"></i>
+            <span class="absolute right-0.5 top-0.5 flex h-4 w-4 items-center justify-center rounded-full bg-danger-500 text-[9px] font-bold text-white ring-2 ring-white">2</span>
+          </button>
+          <div class="h-8 w-px bg-surface-200"></div>
+          <div class="flex items-center gap-3">
+            <div class="text-right">
+              <p class="text-sm font-semibold leading-none text-surface-900">Dr. Diego Martínez</p>
+              <p class="mt-1.5 text-[11px] font-medium uppercase tracking-wide text-surface-400">Veterinario</p>
+            </div>
+            <div class="flex h-9 w-9 items-center justify-center rounded-full bg-brand-600 text-sm font-semibold text-white">DM</div>
+          </div>
+        </div>
+      </header>
+
+      <!-- Content -->
+      <div class="admin-page bg-surface-50">
+        <div class="space-y-6">
+
+          <!-- ENCABEZADO -->
+          <header class="overflow-hidden rounded-3xl border border-brand-200 bg-gradient-to-br from-brand-600 to-brand-700 p-7 text-white shadow-brand">
+            <div class="flex flex-col justify-between gap-6 xl:flex-row xl:items-center">
+              <div>
+                <p class="mb-2 text-eyebrow text-brand-200">Notificaciones clínicas</p>
+                <h1 class="text-display">Alertas y seguimiento</h1>
+                <p class="mt-3 max-w-3xl text-sm leading-6 text-brand-100">
+                  Mantente al día con las citas confirmadas, solicitudes pendientes y seguimientos clínicos de tus pacientes.
+                </p>
+              </div>
+              <div class="flex flex-wrap gap-3">
+                <div class="flex min-w-[180px] items-center gap-4 rounded-2xl border border-white/20 bg-white/10 px-5 py-4 backdrop-blur-sm">
+                  <div class="flex h-12 w-12 items-center justify-center rounded-xl bg-white/15 text-white">
+                    <i data-lucide="bell" class="h-5 w-5"></i>
+                  </div>
+                  <div>
+                    <p class="text-xs font-medium text-brand-100">No leídas</p>
+                    <p class="mt-1 text-sm font-semibold text-white">2 notificaciones</p>
+                  </div>
+                </div>
+                <div class="flex min-w-[180px] items-center gap-4 rounded-2xl border border-white/20 bg-white/10 px-5 py-4 backdrop-blur-sm">
+                  <div class="flex h-12 w-12 items-center justify-center rounded-xl bg-white/15 text-white">
+                    <i data-lucide="alert-triangle" class="h-5 w-5"></i>
+                  </div>
+                  <div>
+                    <p class="text-xs font-medium text-brand-100">Requieren acción</p>
+                    <p class="mt-1 text-sm font-semibold text-white">1 notificación</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </header>
+
+          <!-- CENTRO DE NOTIFICACIONES -->
+          <section class="admin-card-padded">
+            <div class="flex flex-col justify-between gap-4 sm:flex-row sm:items-center">
+              <div>
+                <h2 class="text-section-title">Centro de notificaciones</h2>
+                <p class="text-subtitle mt-1">Revisa y gestiona las alertas relacionadas con tus pacientes.</p>
+              </div>
+              <button type="button" class="btn-secondary">
+                <i data-lucide="check-check" class="h-4 w-4"></i> Marcar todas como leídas
+              </button>
+            </div>
+
+            <!-- Tabs de filtro -->
+            <div class="mt-5 flex flex-wrap gap-2">
+              <button type="button" class="rounded-xl bg-brand-600 px-4 py-2 text-sm font-semibold text-white shadow-brand-sm">Todas</button>
+              <button type="button" class="rounded-xl border border-surface-200 bg-white px-4 py-2 text-sm font-semibold text-surface-600 hover:bg-surface-50">No leídas</button>
+              <button type="button" class="rounded-xl border border-surface-200 bg-white px-4 py-2 text-sm font-semibold text-surface-600 hover:bg-surface-50">Citas</button>
+              <button type="button" class="rounded-xl border border-surface-200 bg-white px-4 py-2 text-sm font-semibold text-surface-600 hover:bg-surface-50">Seguimiento</button>
+              <button type="button" class="rounded-xl border border-surface-200 bg-white px-4 py-2 text-sm font-semibold text-surface-600 hover:bg-surface-50">Historial</button>
+            </div>
+
+            <!-- Hoy -->
+            <div class="mt-6">
+              <p class="text-caption mb-3">Hoy</p>
+              <div class="space-y-3">
+
+                <!-- No leída: cita confirmada -->
+                <article class="relative overflow-hidden rounded-xl border border-brand-200 bg-brand-50/40 p-4">
+                  <span class="absolute left-0 top-0 h-full w-1 bg-brand-500"></span>
+                  <div class="flex items-start gap-4 pl-2">
+                    <div class="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-brand-100 text-brand-600">
+                      <i data-lucide="calendar-days" class="h-5 w-5"></i>
+                    </div>
+                    <div class="min-w-0 flex-1">
+                      <div class="flex flex-wrap items-center gap-2">
+                        <p class="text-sm font-semibold text-surface-900">Cita confirmada para atención</p>
+                        <span class="h-2 w-2 rounded-full bg-brand-500"></span>
+                        <span class="inline-flex items-center rounded-full bg-brand-100 px-2.5 py-0.5 text-xs font-semibold text-brand-600">Citas</span>
+                      </div>
+                      <p class="mt-1.5 text-sm text-surface-500">Max · Control Post-Operatorio · 10:00</p>
+                      <p class="mt-1.5 text-sm leading-6 text-surface-500">La cita de Max ha sido confirmada por administración y está lista para su atención.</p>
+                      <div class="mt-3 flex flex-wrap items-center gap-3">
+                        <a href="#" class="text-sm font-semibold text-brand-600 hover:underline">Ir a la cita</a>
+                        <button type="button" class="text-sm font-semibold text-surface-500 hover:text-surface-700">Marcar como leída</button>
+                      </div>
+                    </div>
+                  </div>
+                </article>
+
+                <!-- No leída: requiere acción -->
+                <article class="relative overflow-hidden rounded-xl border border-brand-200 bg-brand-50/40 p-4">
+                  <span class="absolute left-0 top-0 h-full w-1 bg-brand-500"></span>
+                  <div class="flex items-start gap-4 pl-2">
+                    <div class="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-warning-100 text-warning-700">
+                      <i data-lucide="check-circle-2" class="h-5 w-5"></i>
+                    </div>
+                    <div class="min-w-0 flex-1">
+                      <div class="flex flex-wrap items-center gap-2">
+                        <p class="text-sm font-semibold text-surface-900">Solicitud pendiente de confirmación</p>
+                        <span class="h-2 w-2 rounded-full bg-brand-500"></span>
+                        <span class="inline-flex items-center rounded-full bg-warning-100 px-2.5 py-0.5 text-xs font-semibold text-warning-700">Requiere acción</span>
+                        <span class="inline-flex items-center rounded-full bg-brand-100 px-2.5 py-0.5 text-xs font-semibold text-brand-600">Citas</span>
+                      </div>
+                      <p class="mt-1.5 text-sm text-surface-500">Rocky · Consulta General · 09:00</p>
+                      <p class="mt-1.5 text-sm leading-6 text-surface-500">Existe una solicitud de cita para Rocky que aún no ha sido confirmada por administración.</p>
+                      <div class="mt-3 flex flex-wrap items-center gap-3">
+                        <a href="#" class="text-sm font-semibold text-brand-600 hover:underline">Ver agenda</a>
+                        <button type="button" class="text-sm font-semibold text-surface-500 hover:text-surface-700">Marcar como leída</button>
+                      </div>
+                    </div>
+                  </div>
+                </article>
+              </div>
+            </div>
+
+            <!-- Ayer -->
+            <div class="mt-6">
+              <p class="text-caption mb-3">Ayer</p>
+              <div class="space-y-3">
+
+                <!-- Leída: consulta finalizada -->
+                <article class="relative overflow-hidden rounded-xl border border-surface-200 bg-surface-50 p-4">
+                  <div class="flex items-start gap-4 pl-2">
+                    <div class="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-success-100 text-success-700">
+                      <i data-lucide="activity" class="h-5 w-5"></i>
+                    </div>
+                    <div class="min-w-0 flex-1">
+                      <div class="flex flex-wrap items-center gap-2">
+                        <p class="text-sm font-semibold text-surface-900">Consulta finalizada</p>
+                        <span class="inline-flex items-center rounded-full bg-brand-100 px-2.5 py-0.5 text-xs font-semibold text-brand-600">Seguimiento</span>
+                      </div>
+                      <p class="mt-1.5 text-sm text-surface-500">Luna · Vacunación · 08:30</p>
+                      <p class="mt-1.5 text-sm leading-6 text-surface-500">La consulta de Luna fue registrada correctamente y el tratamiento fue actualizado.</p>
+                      <div class="mt-3 flex flex-wrap items-center gap-3">
+                        <a href="#" class="text-sm font-semibold text-brand-600 hover:underline">Ver historial</a>
+                      </div>
+                    </div>
+                  </div>
+                </article>
+
+                <!-- Leída: historial actualizado -->
+                <article class="relative overflow-hidden rounded-xl border border-surface-200 bg-surface-50 p-4">
+                  <div class="flex items-start gap-4 pl-2">
+                    <div class="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-brand-100 text-brand-700">
+                      <i data-lucide="history" class="h-5 w-5"></i>
+                    </div>
+                    <div class="min-w-0 flex-1">
+                      <div class="flex flex-wrap items-center gap-2">
+                        <p class="text-sm font-semibold text-surface-900">Evolución clínica registrada</p>
+                        <span class="inline-flex items-center rounded-full bg-brand-100 px-2.5 py-0.5 text-xs font-semibold text-brand-600">Historial</span>
+                      </div>
+                      <p class="mt-1.5 text-sm text-surface-500">Pancho · Desparasitación · 11:15</p>
+                      <p class="mt-1.5 text-sm leading-6 text-surface-500">Se agregó una nueva evolución clínica al expediente de Pancho.</p>
+                      <div class="mt-3 flex flex-wrap items-center gap-3">
+                        <a href="#" class="text-sm font-semibold text-brand-600 hover:underline">Ver historial</a>
+                      </div>
+                    </div>
+                  </div>
+                </article>
+              </div>
+            </div>
+
+          </section>
+
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <script>lucide.createIcons();</script>
+</body>
+</html>
