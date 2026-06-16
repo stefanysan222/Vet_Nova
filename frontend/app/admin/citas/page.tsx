@@ -21,12 +21,14 @@ function RescheduleModal({
   onClose,
   onSave,
   saving,
+  mode = "reprogramar",
 }: {
   appointment: Appointment;
   allAppointments: Appointment[];
   onClose: () => void;
   onSave: (date: string, time: string, veterinarian: string, veterinarianId?: number) => void;
   saving: boolean;
+  mode?: "editar" | "reprogramar";
 }) {
   const [date, setDate] = useState(appointment.date);
   const [time, setTime] = useState(appointment.time || "09:00");
@@ -91,7 +93,7 @@ function RescheduleModal({
           <div className="mb-6 flex items-start justify-between gap-3">
             <div>
               <p className="text-xs font-semibold uppercase tracking-widest text-brand-600 dark:text-brand-300">
-                Reprogramar cita
+                {mode === "editar" ? "Editar cita" : "Reprogramar cita"}
               </p>
               <h2 className="mt-1 text-xl font-semibold text-slate-900 dark:text-white">
                 {appointment.petName}
@@ -278,6 +280,7 @@ export default function CitasPage() {
   const [filtro, setFiltro] = useState<"todas" | "pendientes" | "confirmadas">("todas");
   const [confirmCancel, setConfirmCancel] = useState<Appointment | null>(null);
   const [rescheduleTarget, setRescheduleTarget] = useState<Appointment | null>(null);
+  const [editTarget, setEditTarget] = useState<Appointment | null>(null);
   const [savingReschedule, setSavingReschedule] = useState(false);
   const { success, error } = useToast();
 
@@ -331,28 +334,32 @@ export default function CitasPage() {
     veterinarian: string,
     veterinarianId?: number,
   ) => {
-    if (!rescheduleTarget) return;
-    const cita = rescheduleTarget;
+    const cita = rescheduleTarget ?? editTarget;
+    const isEdit = !!editTarget;
+    if (!cita) return;
     setSavingReschedule(true);
     try {
       const updated = await updateCita({
         ...cita,
         date,
         time,
-        status: "Pendiente",
+        status: isEdit ? cita.status : "Pendiente",
         veterinarian: veterinarian || cita.veterinarian,
         veterinarianId: veterinarianId ?? cita.veterinarianId,
       });
       setAppointments((prev) => prev.map((a) => (a.id === cita.id ? updated : a)));
       setRescheduleTarget(null);
+      setEditTarget(null);
       success(
-        "Cita reprogramada",
-        `La cita de ${cita.petName} fue reprogramada para el ${date} a las ${time}.`,
+        isEdit ? "Cita actualizada" : "Cita reprogramada",
+        isEdit
+          ? `La cita de ${cita.petName} fue actualizada.`
+          : `La cita de ${cita.petName} fue reprogramada para el ${date} a las ${time}.`,
       );
     } catch (err) {
       error(
-        "Error al reprogramar",
-        err instanceof Error ? err.message : "No se pudo reprogramar la cita.",
+        isEdit ? "Error al actualizar" : "Error al reprogramar",
+        err instanceof Error ? err.message : "No se pudo actualizar la cita.",
       );
     } finally {
       setSavingReschedule(false);
@@ -481,6 +488,16 @@ export default function CitasPage() {
                         </button>
                       )}
 
+                      {(appointment.status === "Pendiente" ||
+                        appointment.status === "Confirmada") && (
+                        <button
+                          onClick={() => setEditTarget(appointment)}
+                          className="rounded-xl border border-slate-200 bg-white px-4 py-2 text-sm font-semibold text-slate-700 transition hover:bg-slate-50 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-300 dark:hover:bg-slate-700"
+                        >
+                          Editar
+                        </button>
+                      )}
+
                       {appointment.status === "Cancelada" && (
                         <button
                           onClick={() => setRescheduleTarget(appointment)}
@@ -517,6 +534,17 @@ export default function CitasPage() {
             onClose={() => setRescheduleTarget(null)}
             onSave={handleReschedule}
             saving={savingReschedule}
+            mode="reprogramar"
+          />
+        )}
+        {editTarget && (
+          <RescheduleModal
+            appointment={editTarget}
+            allAppointments={appointments}
+            onClose={() => setEditTarget(null)}
+            onSave={handleReschedule}
+            saving={savingReschedule}
+            mode="editar"
           />
         )}
       </AnimatePresence>
