@@ -16,24 +16,36 @@ import {
   formatSlot,
   getScheduleLabel,
 } from "../../../../lib/utils/clinic-schedule";
-import { ArrowLeft, ArrowRight, CalendarDays, CheckCircle, Clock, User } from "lucide-react";
+import {
+  Activity,
+  AlertCircle,
+  ArrowLeft,
+  ArrowRight,
+  CalendarDays,
+  CheckCircle,
+  ClipboardList,
+  Clock,
+  Pill,
+  Shield,
+  User,
+} from "lucide-react";
 
 const SERVICIOS = [
   {
     id: "Consulta general",
     label: "Consulta general",
     desc: "Revisión médica completa",
-    emoji: "🩺",
+    icon: Activity,
   },
-  { id: "Vacunación", label: "Vacunación", desc: "Aplicación de vacunas", emoji: "💉" },
-  { id: "Desparasitación", label: "Desparasitación", desc: "Control de parásitos", emoji: "🪱" },
+  { id: "Vacunación", label: "Vacunación", desc: "Aplicación de vacunas", icon: Shield },
+  { id: "Desparasitación", label: "Desparasitación", desc: "Control de parásitos", icon: Pill },
   {
     id: "Control médico",
     label: "Control médico",
     desc: "Seguimiento de tratamiento",
-    emoji: "📋",
+    icon: ClipboardList,
   },
-  { id: "Urgencia", label: "Urgencia", desc: "Atención prioritaria", emoji: "🚨" },
+  { id: "Urgencia", label: "Urgencia", desc: "Atención prioritaria", icon: AlertCircle },
 ] as const;
 
 function fechaMin() {
@@ -329,7 +341,7 @@ export default function NuevaCitaPage() {
                       : "border-slate-200 bg-white hover:border-brand-300 dark:border-slate-700 dark:bg-slate-900"
                   }`}
                 >
-                  <span className="text-2xl">{s.emoji}</span>
+                  <s.icon className="h-5 w-5 shrink-0 text-brand-500 dark:text-brand-400" />
                   <div className="min-w-0">
                     <p className="text-sm font-semibold text-slate-900 dark:text-white">
                       {s.label}
