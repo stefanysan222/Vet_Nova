@@ -5,55 +5,61 @@
  */
 
 import { test, expect, type Page, type ConsoleMessage } from "@playwright/test";
-
-// ─── Fake JWT (Cliente) ───────────────────────────────────────────────────────
-function makeFakeJWT(name = "María Prueba", email = "maria@test.com"): string {
-  const header = btoa(JSON.stringify({ alg: "HS256", typ: "JWT" }));
-  const payload = btoa(
-    JSON.stringify({
-      sub: 99,
-      name,
-      email,
-      role: "Cliente",
-      exp: Math.floor(Date.now() / 1000) + 86400 * 7,
-    }),
-  );
-  return `${header}.${payload}.fake-signature`;
-}
+import { injectAuthAs } from "./auth-helper";
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
-async function injectAuthAs(page: Page, role: string, sub: number, name: string, email: string) {
-  const header = btoa(JSON.stringify({ alg: "HS256", typ: "JWT" }));
-  const payload = btoa(
-    JSON.stringify({ sub, name, email, role, exp: Math.floor(Date.now() / 1000) + 86400 }),
-  );
-  await page.context().addCookies([
-    {
-      name: "vetnova-token",
-      value: `${header}.${payload}.fake-signature`,
-      domain: "localhost",
-      path: "/",
-      httpOnly: true,
-      secure: false, // dev usa http
-      sameSite: "Strict",
-      expires: Math.floor(Date.now() / 1000) + 86400,
-    },
-  ]);
+async function injectAuth(page: Page, name = "María Prueba", email = "maria@test.com") {
+  await injectAuthAs(page, "Cliente", 99, name, email);
 }
 
-async function injectAuth(page: Page, name?: string, email?: string) {
-  await page.context().addCookies([
-    {
-      name: "vetnova-token",
-      value: makeFakeJWT(name, email),
-      domain: "localhost",
-      path: "/",
-      httpOnly: true,
-      secure: false, // dev usa http
-      sameSite: "Strict",
-      expires: Math.floor(Date.now() / 1000) + 86400 * 7,
-    },
-  ]);
+// Sobrescribe el mock por defecto (sin mascotas) para los tests del flujo de
+// "Nueva cita" que necesitan mascotas reales para ejercitar la selección.
+async function mockMascotasDePrueba(
+  page: Page,
+  mascotas: { id: number; nombre: string; especie?: string; raza?: string }[],
+) {
+  await page.route("**/api/backend/propietarios*", (route) => {
+    if (route.request().method() !== "GET") return route.continue();
+    return route.fulfill({
+      status: 200,
+      contentType: "application/json",
+      body: JSON.stringify([
+        {
+          id_propietario: 1,
+          nombre: "María Prueba",
+          telefono: "",
+          direccion: "",
+          email: "maria@test.com",
+          documento: "",
+          estado: "activo",
+        },
+      ]),
+    });
+  });
+
+  await page.route("**/api/backend/mascotas*", (route) => {
+    if (route.request().method() !== "GET") return route.continue();
+    return route.fulfill({
+      status: 200,
+      contentType: "application/json",
+      body: JSON.stringify({
+        data: mascotas.map((m) => ({
+          id_mascota: m.id,
+          nombre: m.nombre,
+          especie: m.especie ?? "Perro",
+          raza: m.raza ?? "Mestizo",
+          edad: 2,
+          peso: 10,
+          sexo: "Macho",
+          fecha_nacimiento: null,
+          foto: null,
+          id_propietario: 1,
+        })),
+        total: mascotas.length,
+        lastPage: 1,
+      }),
+    });
+  });
 }
 
 type Issue = {
@@ -127,7 +133,7 @@ const HARDCODED_STRINGS = [
 
 // ─── TESTS ────────────────────────────────────────────────────────────────────
 
-test.describe("Auditoría Cliente — Autenticación y protección de rutas", () => {
+test.describe("@auth Auditoría Cliente — Autenticación y protección de rutas", () => {
   test("redirige a /login si no hay token", async ({ page }) => {
     await page.goto("/cliente");
     await page.waitForURL(/login/, { timeout: 6000 });
@@ -168,8 +174,8 @@ test.describe("Auditoría Cliente — Dashboard (/cliente)", () => {
   test("tarjetas de estadísticas existen", async ({ page }) => {
     await page.goto("/cliente");
     await page.waitForLoadState("networkidle");
-    const cards = page.locator("article");
-    await expect(cards.first()).toBeVisible();
+    await expect(page.getByText("Citas hoy")).toBeVisible();
+    await expect(page.getByText("Próximas", { exact: true })).toBeVisible();
   });
 
   test("enlace 'Agendar cita' navega a /cliente/agendar/nueva", async ({ page }) => {
@@ -244,16 +250,26 @@ test.describe("Auditoría Cliente — Nueva cita (/cliente/agendar/nueva)", () =
   });
 
   test("paso 1 → botón Siguiente está deshabilitado sin mascota seleccionada", async ({ page }) => {
+    // Con 2+ mascotas el botón no se deshabilita automáticamente; debe
+    // bloquear el avance con un mensaje de validación hasta elegir una.
+    await mockMascotasDePrueba(page, [
+      { id: 1, nombre: "Firulais" },
+      { id: 2, nombre: "Michi" },
+    ]);
     await page.goto("/cliente/agendar/nueva");
     await page.waitForLoadState("networkidle");
+    await expect(page.getByText("Firulais")).toBeVisible();
+
     const btnNext = page.getByRole("button", { name: /siguiente/i });
+    await expect(btnNext).toBeEnabled();
     await btnNext.click();
-    // Debe mostrar error
+
     const errorMsg = page.locator("text=/Selecciona una mascota/i");
     await expect(errorMsg).toBeVisible({ timeout: 3000 });
   });
 
   test("paso 3 — domingo muestra aviso de clínica cerrada", async ({ page }) => {
+    await mockMascotasDePrueba(page, [{ id: 1, nombre: "Firulais" }]);
     await page.goto("/cliente/agendar/nueva");
     await page.waitForLoadState("networkidle");
 
@@ -264,27 +280,19 @@ test.describe("Auditoría Cliente — Nueva cita (/cliente/agendar/nueva)", () =
     sunday.setDate(today.getDate() + daysUntilSunday);
     const sundayStr = sunday.toISOString().slice(0, 10);
 
-    // Avanzar al paso 3 si hay mascotas, de lo contrario solo verificar validación
-    const nextBtn = page.getByRole("button", { name: /siguiente/i });
-    await nextBtn.click();
-    // Si no avanza (no hay mascotas) sólo validamos el mensaje de error
-    const errorEl = page.locator("text=/Selecciona una mascota/i");
-    if ((await errorEl.count()) > 0) {
-      log(
-        "/cliente/agendar/nueva",
-        "INFO",
-        "Sin mascotas",
-        "El usuario de prueba no tiene mascotas; se omiten pasos 2-3",
-      );
-      return;
-    }
-
-    // Si avanzó: ir al paso 3 y seleccionar domingo
+    // Paso 1: seleccionar mascota y avanzar
+    await page.getByText("Firulais").click();
     await page.getByRole("button", { name: /siguiente/i }).click();
+
+    // Paso 2: seleccionar servicio y avanzar
+    await page.getByText("Consulta general").click();
+    await page.getByRole("button", { name: /siguiente/i }).click();
+
+    // Paso 3: seleccionar domingo
     const dateInput = page.locator("input[type='date']");
     await dateInput.fill(sundayStr);
     await dateInput.dispatchEvent("change");
-    await expect(page.getByText(/cerrada|Domingo/i)).toBeVisible({ timeout: 4000 });
+    await expect(page.getByText(/cerrada|Domingo/i).first()).toBeVisible({ timeout: 4000 });
   });
 
   test("botón Cancelar regresa a /cliente/agendar", async ({ page }) => {
@@ -308,7 +316,7 @@ test.describe("Auditoría Cliente — Mascotas (/cliente/mascotas)", () => {
     await page.goto("/cliente/mascotas");
     await page.waitForLoadState("networkidle");
     stopNet();
-    await expect(page.locator("h1")).toBeVisible();
+    await expect(page.locator("h1.text-page-title")).toBeVisible();
   });
 
   test("buscador filtra mascotas", async ({ page }) => {
@@ -317,7 +325,7 @@ test.describe("Auditoría Cliente — Mascotas (/cliente/mascotas)", () => {
     const searchInput = page.locator("input[type='text']").first();
     await searchInput.fill("zzz_inexistente");
     await page.waitForTimeout(300);
-    const noResults = page.getByText(/No se encontraron/i);
+    const noResults = page.getByText(/No se encontraron/i).first();
     await expect(noResults).toBeVisible();
     await searchInput.fill("");
   });
@@ -542,6 +550,9 @@ test.describe("Auditoría Cliente — Configuración (/cliente/configuracion)", 
     const nombreInput = page.locator("input[name='nombre']");
     if ((await nombreInput.count()) > 0) {
       await nombreInput.fill("Laura");
+      // El teléfono es un campo requerido del formulario; sin valor, la
+      // validación HTML5 nativa bloquea el submit antes de llegar al JS.
+      await page.locator("input[name='telefono']").fill("3001234567");
       const submitBtn = page.getByRole("button", { name: /guardar/i });
       await submitBtn.click();
       // Debe aparecer mensaje de éxito
@@ -577,14 +588,14 @@ test.describe("Auditoría Cliente — Notificaciones (/cliente/notificaciones)",
     await page.goto("/cliente/notificaciones");
     await page.waitForLoadState("networkidle");
     stopConsole();
-    await expect(page.locator("h1")).toBeVisible();
+    await expect(page.locator("h1.text-page-title")).toBeVisible();
   });
 
   test("filtros Todas / No leídas / Leídas funcionan", async ({ page }) => {
     await page.goto("/cliente/notificaciones");
     await page.waitForLoadState("networkidle");
     for (const filtro of ["Todas", "No leídas", "Leídas"]) {
-      const btn = page.getByRole("button", { name: new RegExp(filtro, "i") });
+      const btn = page.getByRole("button", { name: filtro, exact: true });
       if ((await btn.count()) > 0) await btn.click();
     }
   });

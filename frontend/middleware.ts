@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
+import { jwtVerify } from "jose";
 import { API_URL } from "./lib/config";
 
 type UserRole = "SuperAdministrador" | "Administrador" | "Veterinario" | "Cliente";
@@ -20,12 +21,18 @@ const ROLE_HOME: Record<UserRole, string> = {
 
 const PROTECTED_PREFIXES = Object.keys(ROLE_REQUIRED);
 
-function decodeToken(token: string): { sub: number; role: UserRole; exp: number } | null {
+type TokenPayload = { sub: string; role: UserRole; exp: number };
+
+const JWT_SECRET = process.env.JWT_SECRET ? new TextEncoder().encode(process.env.JWT_SECRET) : null;
+
+async function verifyToken(token: string): Promise<TokenPayload | null> {
+  if (!JWT_SECRET) {
+    console.error("JWT_SECRET no está configurado: no se puede verificar la firma del token");
+    return null;
+  }
   try {
-    const raw = token.split(".")[1];
-    if (!raw) return null;
-    const json = Buffer.from(raw, "base64url").toString("utf-8");
-    return JSON.parse(json);
+    const { payload } = await jwtVerify(token, JWT_SECRET);
+    return payload as unknown as TokenPayload;
   } catch {
     return null;
   }
@@ -46,7 +53,7 @@ function buildCsp(nonce: string): string {
   ].join("; ");
 }
 
-export function middleware(request: NextRequest) {
+export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
   const nonce = Buffer.from(crypto.randomUUID()).toString("base64");
@@ -65,13 +72,9 @@ export function middleware(request: NextRequest) {
       return NextResponse.redirect(new URL("/login", request.url));
     }
 
-    const payload = decodeToken(token);
+    const payload = await verifyToken(token);
 
     if (!payload) {
-      return NextResponse.redirect(new URL("/login", request.url));
-    }
-
-    if (payload.exp * 1000 < Date.now()) {
       const response = NextResponse.redirect(new URL("/login", request.url));
       response.cookies.delete("vetnova-token");
       return response;
