@@ -39,9 +39,19 @@ async function verifyToken(token: string): Promise<TokenPayload | null> {
 }
 
 function buildCsp(nonce: string): string {
+  // En dev, webpack/Turbopack usan eval() para HMR y carga de módulos; sin
+  // 'unsafe-eval' la app nunca hidrata (ningún botón/formulario responde) y
+  // no aparece ningún error visible más que un CSP violation en consola.
+  // En producción no se usa eval() en el bundle del cliente, así que el CSP
+  // se mantiene estricto.
+  const scriptSrc =
+    process.env.NODE_ENV === "production"
+      ? `script-src 'self' 'nonce-${nonce}' 'strict-dynamic' https://accounts.google.com`
+      : `script-src 'self' 'unsafe-eval' 'nonce-${nonce}' 'strict-dynamic' https://accounts.google.com`;
+
   return [
     "default-src 'self'",
-    `script-src 'self' 'nonce-${nonce}' 'strict-dynamic' https://accounts.google.com`,
+    scriptSrc,
     "style-src 'self' 'unsafe-inline' https://accounts.google.com",
     "img-src 'self' data: blob: https://res.cloudinary.com https://lh3.googleusercontent.com",
     `connect-src 'self' ${API_URL} https://accounts.google.com https://api.cloudinary.com`,
