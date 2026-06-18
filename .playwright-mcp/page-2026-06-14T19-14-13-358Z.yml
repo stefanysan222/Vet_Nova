@@ -1,0 +1,180 @@
+- generic [ref=e2]:
+  - complementary [ref=e3]:
+    - generic [ref=e5]:
+      - generic [ref=e6]: A
+      - generic [ref=e7]:
+        - paragraph [ref=e8]: Administrador
+        - paragraph [ref=e9]: Administrador
+    - navigation [ref=e11]:
+      - link "Dashboard" [ref=e12] [cursor=pointer]:
+        - /url: /admin
+        - img [ref=e13]
+        - text: Dashboard
+      - link "Usuarios" [ref=e16] [cursor=pointer]:
+        - /url: /admin/usuarios
+        - img [ref=e17]
+        - text: Usuarios
+      - link "Citas" [ref=e21] [cursor=pointer]:
+        - /url: /admin/citas
+        - img [ref=e22]
+        - text: Citas
+      - link "Mascotas" [ref=e24] [cursor=pointer]:
+        - /url: /admin/mascotas
+        - img [ref=e25]
+        - text: Mascotas
+      - link "Reportes" [ref=e28] [cursor=pointer]:
+        - /url: /admin/reportes
+        - img [ref=e29]
+        - text: Reportes
+      - link "Notificaciones" [ref=e31] [cursor=pointer]:
+        - /url: /admin/notificaciones
+        - img [ref=e32]
+        - text: Notificaciones
+      - link "Configuración" [ref=e35] [cursor=pointer]:
+        - /url: /admin/configuracion
+        - img [ref=e36]
+        - text: Configuración
+    - generic [ref=e39]:
+      - generic [ref=e41]:
+        - img [ref=e42]
+        - paragraph [ref=e45]: Soporte 24/7
+      - button "Cerrar sesión" [ref=e46] [cursor=pointer]:
+        - img [ref=e47]
+        - text: Cerrar sesión
+  - generic [ref=e50]:
+    - banner [ref=e51]:
+      - generic [ref=e52]:
+        - generic [ref=e53]:
+          - img
+          - searchbox "Buscar citas, usuarios o mascotas..." [ref=e54]
+        - generic [ref=e55]:
+          - button "Activar modo oscuro" [ref=e56] [cursor=pointer]:
+            - img [ref=e57]
+          - button [ref=e60] [cursor=pointer]:
+            - img [ref=e61]
+          - generic [ref=e64]:
+            - generic [ref=e65]: A
+            - generic [ref=e66]: Admin
+    - main [ref=e67]:
+      - generic [ref=e70]:
+        - generic [ref=e71]:
+          - generic [ref=e72]:
+            - paragraph [ref=e73]: Panel administrativo
+            - heading "Hola, Administrador 👋" [level=1] [ref=e74]
+            - paragraph [ref=e75]: Gestiona usuarios, citas y mascotas desde aquí.
+            - generic [ref=e76]:
+              - button "Nuevo usuario" [ref=e77] [cursor=pointer]:
+                - img [ref=e78]
+                - text: Nuevo usuario
+              - link "Nueva cita" [ref=e79] [cursor=pointer]:
+                - /url: /admin/citas
+                - img [ref=e80]
+                - text: Nueva cita
+          - generic [ref=e81]:
+            - generic [ref=e82]:
+              - img [ref=e83]
+              - heading "Agenda de hoy" [level=3] [ref=e85]
+            - paragraph [ref=e86]: Sin citas programadas para hoy.
+        - generic [ref=e87]:
+          - generic [ref=e88]:
+            - img [ref=e90]
+            - paragraph [ref=e95]: "0"
+            - paragraph [ref=e96]: Clientes
+          - generic [ref=e97]:
+            - img [ref=e99]
+            - paragraph [ref=e103]: "0"
+            - paragraph [ref=e104]: Veterinarios
+          - generic [ref=e105]:
+            - img [ref=e107]
+            - paragraph [ref=e112]: "0"
+            - paragraph [ref=e113]: Mascotas
+          - generic [ref=e114]:
+            - img [ref=e116]
+            - paragraph [ref=e118]: "0"
+            - paragraph [ref=e119]: Citas hoy
+          - generic [ref=e120]:
+            - img [ref=e122]
+            - paragraph [ref=e125]: "0"
+            - paragraph [ref=e126]: Pendientes
+        - generic [ref=e127]:
+          - generic [ref=e128]:
+            - heading "Citas programadas por día" [level=2] [ref=e129]
+            - paragraph [ref=e130]: Últimos 30 días y próximos 14
+            - generic [ref=e131]:
+              - generic [ref=e132]: Hoy
+              - generic [ref=e134]: Pasado
+              - generic [ref=e136]: Próximo
+          - generic [ref=e140]:
+            - generic [ref=e141]:
+              - heading "Junio 2026" [level=3] [ref=e142]
+              - generic [ref=e143]:
+                - button "Mes anterior" [ref=e144] [cursor=pointer]:
+                  - img [ref=e145]
+                - button "Mes siguiente" [ref=e147] [cursor=pointer]:
+                  - img [ref=e148]
+            - generic [ref=e150]:
+              - generic [ref=e151]: L
+              - generic [ref=e152]: M
+              - generic [ref=e153]: M
+              - generic [ref=e154]: J
+              - generic [ref=e155]: V
+              - generic [ref=e156]: S
+              - generic [ref=e157]: D
+              - generic [ref=e159]: "1"
+              - generic [ref=e162]: "2"
+              - generic [ref=e165]: "3"
+              - generic [ref=e168]: "4"
+              - generic [ref=e171]: "5"
+              - generic [ref=e174]: "6"
+              - generic [ref=e177]: "7"
+              - generic [ref=e180]: "8"
+              - generic [ref=e183]: "9"
+              - generic [ref=e186]: "10"
+              - generic [ref=e189]: "11"
+              - generic [ref=e192]: "12"
+              - generic [ref=e195]: "13"
+              - generic [ref=e198]: "14"
+              - generic [ref=e201]: "15"
+              - generic [ref=e204]: "16"
+              - generic [ref=e207]: "17"
+              - generic [ref=e210]: "18"
+              - generic [ref=e213]: "19"
+              - generic [ref=e216]: "20"
+              - generic [ref=e219]: "21"
+              - generic [ref=e222]: "22"
+              - generic [ref=e225]: "23"
+              - generic [ref=e228]: "24"
+              - generic [ref=e231]: "25"
+              - generic [ref=e234]: "26"
+              - generic [ref=e237]: "27"
+              - generic [ref=e240]: "28"
+              - generic [ref=e243]: "29"
+              - generic [ref=e246]: "30"
+            - generic [ref=e248]:
+              - generic [ref=e249]: Con citas
+              - generic [ref=e251]: Libre
+        - generic [ref=e253]:
+          - generic [ref=e254]:
+            - generic [ref=e255]:
+              - img [ref=e256]
+              - heading "Actividad reciente" [level=3] [ref=e258]
+            - paragraph [ref=e260]: No hay actividad reciente.
+          - generic [ref=e261]:
+            - generic [ref=e262]:
+              - img [ref=e263]
+              - heading "Acciones rápidas" [level=3] [ref=e265]
+            - generic [ref=e266]:
+              - link "Nueva cita" [ref=e267] [cursor=pointer]:
+                - /url: /admin/citas
+                - img [ref=e268]
+                - text: Nueva cita
+              - link "Nueva mascota" [ref=e270] [cursor=pointer]:
+                - /url: /admin/mascotas
+                - img [ref=e271]
+                - text: Nueva mascota
+              - button "Nuevo cliente" [ref=e276] [cursor=pointer]:
+                - img [ref=e277]
+                - text: Nuevo cliente
+              - button "Nuevo veterinario" [ref=e280] [cursor=pointer]:
+                - img [ref=e281]
+                - text: Nuevo veterinario

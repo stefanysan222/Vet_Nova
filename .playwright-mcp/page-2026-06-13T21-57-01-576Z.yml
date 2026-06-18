@@ -1,0 +1,83 @@
+- generic [active] [ref=e1]:
+  - main [ref=e2]:
+    - generic [ref=e3]:
+      - complementary [ref=e4]:
+        - generic [ref=e5]:
+          - img "VetNova" [ref=e6]
+          - generic [ref=e7]:
+            - heading "VetNova" [level=1] [ref=e8]
+            - paragraph [ref=e9]: Sistema Veterinario
+        - navigation [ref=e10]:
+          - link "Dashboard" [ref=e11] [cursor=pointer]:
+            - /url: /veterinario
+            - img [ref=e12]
+            - text: Dashboard
+          - link "Citas" [ref=e17] [cursor=pointer]:
+            - /url: /veterinario/citas
+            - img [ref=e18]
+            - text: Citas
+          - link "Pacientes" [ref=e20] [cursor=pointer]:
+            - /url: /veterinario/mascotas
+            - img [ref=e21]
+            - text: Pacientes
+          - link "Historial Clínico" [ref=e26] [cursor=pointer]:
+            - /url: /veterinario/historial
+            - img [ref=e27]
+            - text: Historial Clínico
+          - link "Mi perfil" [ref=e31] [cursor=pointer]:
+            - /url: /veterinario/configuracion
+            - img [ref=e32]
+            - text: Mi perfil
+        - button "Cerrar Sesión" [ref=e36] [cursor=pointer]:
+          - img [ref=e37]
+          - text: Cerrar Sesión
+      - generic [ref=e40]:
+        - generic [ref=e41]:
+          - generic [ref=e43]:
+            - img [ref=e44]
+            - textbox "Buscar pacientes, citas o historiales..." [ref=e47]
+          - generic [ref=e48]:
+            - button "Ver notificaciones" [ref=e50] [cursor=pointer]:
+              - img [ref=e51]
+            - button "Vet E2E Test Veterinario VE" [ref=e141] [cursor=pointer]:
+              - generic [ref=e58]:
+                - paragraph [ref=e59]: Vet E2E Test
+                - paragraph [ref=e60]: Veterinario
+              - generic [ref=e61]: VE
+        - generic [ref=e63]:
+          - generic [ref=e143]:
+            - generic [ref=e144]:
+              - paragraph [ref=e145]: Agenda diaria
+              - heading "Agenda Veterinaria" [level=1] [ref=e146]
+              - paragraph [ref=e147]: Consulta las citas programadas y registra nuevas solicitudes de atención. Las citas creadas por el veterinario quedan pendientes de confirmación administrativa.
+            - button "Agendar cita" [ref=e148] [cursor=pointer]:
+              - img [ref=e149]
+              - text: Agendar cita
+          - generic [ref=e150]:
+            - article [ref=e151]:
+              - paragraph [ref=e152]: Pendientes de confirmación
+              - paragraph [ref=e153]: "0"
+              - paragraph [ref=e154]: Solicitudes registradas que deben ser confirmadas por administración.
+            - article [ref=e155]:
+              - paragraph [ref=e156]: Citas confirmadas
+              - paragraph [ref=e157]: "0"
+              - paragraph [ref=e158]: Citas autorizadas previamente por administración para atención.
+          - generic [ref=e159]:
+            - generic [ref=e160]:
+              - generic [ref=e161]:
+                - heading "Citas registradas" [level=2] [ref=e162]
+                - paragraph [ref=e163]: Consulta el estado actual y revisa los detalles de cada cita.
+              - generic [ref=e164]: 0 citas
+            - paragraph [ref=e165]: No hay citas registradas.
+  - generic [ref=e170] [cursor=pointer]:
+    - button "Open Next.js Dev Tools" [ref=e171]:
+      - img [ref=e172]
+    - generic [ref=e175]:
+      - button "Open issues overlay" [ref=e176]:
+        - generic [ref=e177]:
+          - generic [ref=e178]: "0"
+          - generic [ref=e179]: "1"
+        - generic [ref=e180]: Issue
+      - button "Collapse issues badge" [ref=e181]:
+        - img [ref=e182]
+  - alert [ref=e184]

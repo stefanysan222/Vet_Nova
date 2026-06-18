@@ -1,0 +1,125 @@
+- generic [active] [ref=e1]:
+  - generic [ref=e53] [cursor=pointer]:
+    - button "Open Next.js Dev Tools" [ref=e54]:
+      - img [ref=e55]
+    - generic [ref=e74]:
+      - button "Open issues overlay" [ref=e75]:
+        - generic [ref=e76]:
+          - generic [ref=e77]: "0"
+          - generic [ref=e78]: "1"
+        - generic [ref=e79]: Issue
+      - button "Collapse issues badge" [ref=e80]:
+        - img [ref=e81]
+  - alert [ref=e83]
+  - generic [ref=e84]:
+    - complementary [ref=e85]:
+      - generic [ref=e87]:
+        - generic [ref=e88]: AC
+        - generic [ref=e89]:
+          - paragraph [ref=e90]: Admin Clínica Norte
+          - paragraph [ref=e91]: Clínica Norte de Prueba
+      - navigation [ref=e93]:
+        - link "Dashboard" [ref=e94] [cursor=pointer]:
+          - /url: /admin
+          - img [ref=e95]
+          - text: Dashboard
+        - link "Usuarios" [ref=e98] [cursor=pointer]:
+          - /url: /admin/usuarios
+          - img [ref=e99]
+          - text: Usuarios
+        - link "Citas" [ref=e103] [cursor=pointer]:
+          - /url: /admin/citas
+          - img [ref=e104]
+          - text: Citas
+        - link "Mascotas" [ref=e106] [cursor=pointer]:
+          - /url: /admin/mascotas
+          - img [ref=e107]
+          - text: Mascotas
+        - link "Reportes" [ref=e110] [cursor=pointer]:
+          - /url: /admin/reportes
+          - img [ref=e111]
+          - text: Reportes
+        - link "Notificaciones" [ref=e113] [cursor=pointer]:
+          - /url: /admin/notificaciones
+          - img [ref=e114]
+          - text: Notificaciones
+        - link "Configuración" [ref=e117] [cursor=pointer]:
+          - /url: /admin/configuracion
+          - img [ref=e118]
+          - text: Configuración
+      - generic [ref=e121]:
+        - generic [ref=e123]:
+          - img [ref=e124]
+          - paragraph [ref=e127]: Soporte 24/7
+        - button "Cerrar sesión" [ref=e128] [cursor=pointer]:
+          - img [ref=e129]
+          - text: Cerrar sesión
+    - generic [ref=e132]:
+      - banner [ref=e133]:
+        - generic [ref=e134]:
+          - generic [ref=e135]:
+            - img
+            - searchbox "Buscar citas, usuarios o mascotas..." [ref=e136]
+          - generic [ref=e137]:
+            - button "Activar modo oscuro" [ref=e138] [cursor=pointer]:
+              - img [ref=e139]
+            - button [ref=e142] [cursor=pointer]:
+              - img [ref=e143]
+            - generic [ref=e146]:
+              - generic [ref=e147]: AC
+              - generic [ref=e148]: Admin Clínica Norte
+      - main [ref=e149]:
+        - generic [ref=e151]:
+          - generic [ref=e153]:
+            - generic [ref=e154]:
+              - paragraph [ref=e155]: Panel administrativo
+              - heading "Hola, Admin Clínica Norte" [level=1] [ref=e156]
+              - paragraph [ref=e157]: Desde aquí puedes gestionar usuarios, revisar citas pendientes, consultar el registro de mascotas y monitorear la actividad del sistema.
+            - button "+ Nuevo usuario" [ref=e158] [cursor=pointer]
+          - generic [ref=e160]:
+            - article [ref=e161]:
+              - generic [ref=e163]:
+                - img [ref=e166]
+                - paragraph [ref=e171]: "0"
+                - paragraph [ref=e172]: Total clientes
+            - article [ref=e173]:
+              - generic [ref=e175]:
+                - img [ref=e178]
+                - paragraph [ref=e182]: "0"
+                - paragraph [ref=e183]: Veterinarios
+            - article [ref=e184]:
+              - generic [ref=e186]:
+                - img [ref=e189]
+                - paragraph [ref=e194]: "0"
+                - paragraph [ref=e195]: Mascotas
+            - article [ref=e196]:
+              - generic [ref=e198]:
+                - img [ref=e201]
+                - paragraph [ref=e203]: "0"
+                - paragraph [ref=e204]: Citas hoy
+            - article [ref=e205]:
+              - generic [ref=e207]:
+                - img [ref=e210]
+                - paragraph [ref=e213]: "0"
+                - paragraph [ref=e214]: Pendientes
+          - generic [ref=e215]:
+            - generic [ref=e216]:
+              - generic [ref=e217]:
+                - heading "Citas programadas por día" [level=2] [ref=e218]
+                - paragraph [ref=e219]:
+                  - text: Últimos 30 días y próximos 14 ·
+                  - generic [ref=e220]: Hoy
+                  - generic [ref=e222]: Pasado
+                  - generic [ref=e224]: Próximo
+              - img [ref=e227]
+            - generic [ref=e228]:
+              - generic [ref=e230]:
+                - img [ref=e232]
+                - heading "Notificaciones" [level=3] [ref=e235]
+              - generic [ref=e237]:
+                - img [ref=e239]
+                - generic [ref=e242]:
+                  - paragraph [ref=e243]: Todo en orden
+                  - paragraph [ref=e244]: No hay notificaciones nuevas.
+              - link "Ver todas las notificaciones" [ref=e245] [cursor=pointer]:
+                - /url: /admin/notificaciones

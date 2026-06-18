@@ -1,0 +1,370 @@
+- generic [active] [ref=e1]:
+  - generic [ref=e56] [cursor=pointer]:
+    - button "Open Next.js Dev Tools" [ref=e57]:
+      - img [ref=e58]
+    - generic [ref=e61]:
+      - button "Open issues overlay" [ref=e62]:
+        - generic [ref=e63]:
+          - generic [ref=e64]: "0"
+          - generic [ref=e65]: "1"
+        - generic [ref=e66]: Issue
+      - button "Collapse issues badge" [ref=e67]:
+        - img [ref=e68]
+  - alert [ref=e70]
+  - generic [ref=e72]:
+    - complementary [ref=e73]:
+      - generic [ref=e74]:
+        - generic [ref=e75]: SA
+        - generic [ref=e76]:
+          - paragraph [ref=e77]: Super Administrador
+          - paragraph [ref=e78]: Super Administrador
+      - navigation [ref=e79]:
+        - link "Veterinarias" [ref=e80] [cursor=pointer]:
+          - /url: /super-admin
+          - img [ref=e81]
+          - text: Veterinarias
+      - generic [ref=e85]:
+        - generic [ref=e87]:
+          - img [ref=e88]
+          - paragraph [ref=e91]: Panel global VetNova
+        - button "Cerrar sesión" [ref=e92] [cursor=pointer]:
+          - img [ref=e93]
+          - text: Cerrar sesión
+    - generic [ref=e96]:
+      - banner [ref=e97]:
+        - generic [ref=e98]:
+          - generic [ref=e99]:
+            - img
+            - searchbox "Buscar clínicas..." [ref=e100]
+          - generic [ref=e101]:
+            - button "Activar modo oscuro" [ref=e102] [cursor=pointer]:
+              - img [ref=e103]
+            - generic [ref=e105]:
+              - generic [ref=e106]: SA
+              - generic [ref=e107]: Super Administrador
+      - main [ref=e108]:
+        - generic [ref=e109]:
+          - generic [ref=e110]:
+            - generic [ref=e111]:
+              - generic [ref=e112]:
+                - paragraph [ref=e113]: Panel super administrativo
+                - heading "Hola, Super Administrador 👋" [level=1] [ref=e114]
+                - paragraph [ref=e115]: Gestiona las clínicas que usan VetNova, activa o desactiva sus accesos y registra nuevas sedes.
+                - generic [ref=e116]:
+                  - button "Nueva clínica" [ref=e117] [cursor=pointer]:
+                    - img [ref=e118]
+                    - text: Nueva clínica
+                  - link "Ver listado" [ref=e119] [cursor=pointer]:
+                    - /url: "#tabla-clinicas"
+                    - img [ref=e120]
+                    - text: Ver listado
+              - generic [ref=e123]:
+                - generic [ref=e124]:
+                  - img [ref=e125]
+                  - heading "Últimas clínicas" [level=3] [ref=e129]
+                - generic [ref=e130]:
+                  - paragraph [ref=e627]:
+                    - text: Clinica E2E Test
+                    - text: hace un momento
+                  - paragraph [ref=e133]:
+                    - text: VetNova Default
+                    - text: hace 21 h
+                  - paragraph [ref=e136]:
+                    - text: Clínica VetNova Norte
+                    - text: hace 1 d
+            - generic [ref=e140]:
+              - generic [ref=e141]:
+                - img [ref=e143]
+                - paragraph [ref=e147]: "6"
+                - paragraph [ref=e148]: Total clínicas
+              - generic [ref=e149]:
+                - img [ref=e151]
+                - paragraph [ref=e154]: "5"
+                - paragraph [ref=e155]: Activas
+              - generic [ref=e156]:
+                - img [ref=e158]
+                - paragraph [ref=e161]: "1"
+                - paragraph [ref=e162]: Inactivas
+              - generic [ref=e163]:
+                - img [ref=e165]
+                - paragraph [ref=e167]: "6"
+                - paragraph [ref=e168]: Nuevas este mes
+              - generic [ref=e169]:
+                - img [ref=e171]
+                - paragraph [ref=e174]: "2"
+                - paragraph [ref=e175]: Contacto completo
+            - generic [ref=e176]:
+              - generic [ref=e177]:
+                - heading "Clínicas registradas por mes" [level=2] [ref=e178]
+                - paragraph [ref=e179]: Últimos 6 meses
+                - generic [ref=e180]:
+                  - generic [ref=e181]: Mes actual
+                  - generic [ref=e183]: Meses anteriores
+                - generic [ref=e187]:
+                  - generic:
+                    - status:
+                      - paragraph: may
+                      - list:
+                        - listitem: ": 0 clínicas"
+                        - listitem: ": 0 clínicas"
+                  - application [ref=e188]:
+                    - generic [ref=e200]:
+                      - generic [ref=e201]:
+                        - generic [ref=e203]: ene
+                        - generic [ref=e205]: feb
+                        - generic [ref=e207]: mar
+                        - generic [ref=e209]: abr
+                        - generic [ref=e211]: may
+                        - generic [ref=e213]: jun
+                      - generic [ref=e214]:
+                        - generic [ref=e216]: "0"
+                        - generic [ref=e218]: "2"
+                        - generic [ref=e220]: "4"
+                        - generic [ref=e222]: "6"
+                        - generic [ref=e224]: "8"
+              - generic [ref=e225]:
+                - generic [ref=e226]:
+                  - heading "Junio 2026" [level=3] [ref=e227]
+                  - generic [ref=e228]:
+                    - button "Mes anterior" [ref=e229] [cursor=pointer]:
+                      - img [ref=e230]
+                    - button "Mes siguiente" [ref=e232] [cursor=pointer]:
+                      - img [ref=e233]
+                - generic [ref=e235]:
+                  - generic [ref=e236]: L
+                  - generic [ref=e237]: M
+                  - generic [ref=e238]: M
+                  - generic [ref=e239]: J
+                  - generic [ref=e240]: V
+                  - generic [ref=e241]: S
+                  - generic [ref=e242]: D
+                  - generic [ref=e244]: "1"
+                  - generic [ref=e247]: "2"
+                  - generic [ref=e250]: "3"
+                  - generic [ref=e253]: "4"
+                  - generic [ref=e256]: "5"
+                  - generic [ref=e259]: "6"
+                  - generic [ref=e262]: "7"
+                  - generic [ref=e265]: "8"
+                  - generic [ref=e268]: "9"
+                  - generic [ref=e271]: "10"
+                  - generic [ref=e274]: "11"
+                  - generic [ref=e277]: "12"
+                  - generic [ref=e280]: "13"
+                  - generic [ref=e283]: "14"
+                  - generic [ref=e286]: "15"
+                  - generic [ref=e289]: "16"
+                  - generic [ref=e292]: "17"
+                  - generic [ref=e295]: "18"
+                  - generic [ref=e298]: "19"
+                  - generic [ref=e301]: "20"
+                  - generic [ref=e304]: "21"
+                  - generic [ref=e307]: "22"
+                  - generic [ref=e310]: "23"
+                  - generic [ref=e313]: "24"
+                  - generic [ref=e316]: "25"
+                  - generic [ref=e319]: "26"
+                  - generic [ref=e322]: "27"
+                  - generic [ref=e325]: "28"
+                  - generic [ref=e328]: "29"
+                  - generic [ref=e331]: "30"
+                - generic [ref=e333]:
+                  - generic [ref=e334]: Registros
+                  - generic [ref=e336]: Libre
+            - generic [ref=e338]:
+              - generic [ref=e339]:
+                - generic [ref=e340]:
+                  - img [ref=e341]
+                  - heading "Actividad reciente" [level=3] [ref=e343]
+                - generic [ref=e344]:
+                  - generic [ref=e632]:
+                    - img [ref=e634]
+                    - generic [ref=e638]:
+                      - paragraph [ref=e639]: Se registró la clínica «Clinica E2E Test»
+                      - paragraph [ref=e640]: hace un momento
+                  - generic [ref=e345]:
+                    - img [ref=e347]
+                    - generic [ref=e351]:
+                      - paragraph [ref=e352]: Se registró la clínica «VetNova Default»
+                      - paragraph [ref=e353]: hace 21 h
+                  - generic [ref=e354]:
+                    - img [ref=e356]
+                    - generic [ref=e360]:
+                      - paragraph [ref=e361]: Se registró la clínica «Clínica VetNova Norte»
+                      - paragraph [ref=e362]: hace 1 d
+              - generic [ref=e372]:
+                - generic [ref=e373]:
+                  - img [ref=e374]
+                  - heading "Acciones rápidas" [level=3] [ref=e376]
+                - generic [ref=e377]:
+                  - button "Nueva clínica" [ref=e378] [cursor=pointer]:
+                    - img [ref=e379]
+                    - text: Nueva clínica
+                  - link "Ver listado completo" [ref=e380] [cursor=pointer]:
+                    - /url: "#tabla-clinicas"
+                    - img [ref=e381]
+                    - text: Ver listado completo
+          - generic [ref=e384]:
+            - generic [ref=e385]:
+              - heading "Veterinarias registradas" [level=2] [ref=e386]
+              - paragraph [ref=e387]: Gestiona las clínicas que usan VetNova y su administrador inicial.
+            - table [ref=e642]:
+              - rowgroup [ref=e643]:
+                - row "Clínica Contacto Registrada Estado Acciones" [ref=e644]:
+                  - columnheader "Clínica" [ref=e645]
+                  - columnheader "Contacto" [ref=e646]
+                  - columnheader "Registrada" [ref=e647]
+                  - columnheader "Estado" [ref=e648]
+                  - columnheader "Acciones" [ref=e649]
+              - rowgroup [ref=e650]:
+                - row "Clinica E2E Test /register?clinica=clinica-e2e-test Copiar enlace de registro — 13 jun 2026 Activa Desactivar" [ref=e651]:
+                  - cell "Clinica E2E Test /register?clinica=clinica-e2e-test Copiar enlace de registro" [ref=e652]:
+                    - generic [ref=e653]:
+                      - img [ref=e655]
+                      - generic [ref=e659]:
+                        - paragraph [ref=e660]: Clinica E2E Test
+                        - generic [ref=e661]:
+                          - paragraph [ref=e662]: /register?clinica=clinica-e2e-test
+                          - button "Copiar enlace de registro" [ref=e663] [cursor=pointer]:
+                            - img [ref=e664]
+                  - cell "—" [ref=e667]:
+                    - generic [ref=e669]: —
+                  - cell "13 jun 2026" [ref=e670]
+                  - cell "Activa" [ref=e671]:
+                    - generic [ref=e672]: Activa
+                  - cell "Desactivar" [ref=e673]:
+                    - generic [ref=e674]:
+                      - button "Agregar coordenadas" [ref=e675] [cursor=pointer]:
+                        - img [ref=e676]
+                      - button "Desactivar" [ref=e679] [cursor=pointer]
+                - 'row "Clínica Norte de Prueba /register?clinica=clinica-norte-de-prueba Copiar enlace de registro Cra. 65 #97-57, Castilla, Medellín, Antioquia 10 jun 2026 Activa Desactivar" [ref=e680]':
+                  - cell "Clínica Norte de Prueba /register?clinica=clinica-norte-de-prueba Copiar enlace de registro" [ref=e681]:
+                    - generic [ref=e682]:
+                      - img [ref=e684]
+                      - generic [ref=e688]:
+                        - paragraph [ref=e689]: Clínica Norte de Prueba
+                        - generic [ref=e690]:
+                          - paragraph [ref=e691]: /register?clinica=clinica-norte-de-prueba
+                          - button "Copiar enlace de registro" [ref=e692] [cursor=pointer]:
+                            - img [ref=e693]
+                  - 'cell "Cra. 65 #97-57, Castilla, Medellín, Antioquia" [ref=e696]':
+                    - generic [ref=e698]:
+                      - img [ref=e699]
+                      - text: "Cra. 65 #97-57, Castilla, Medellín, Antioquia"
+                  - cell "10 jun 2026" [ref=e702]
+                  - cell "Activa" [ref=e703]:
+                    - generic [ref=e704]: Activa
+                  - cell "Desactivar" [ref=e705]:
+                    - generic [ref=e706]:
+                      - button "Agregar coordenadas" [ref=e707] [cursor=pointer]:
+                        - img [ref=e708]
+                      - button "Desactivar" [ref=e711] [cursor=pointer]
+                - 'row "Clínica VetNova Centro /register?clinica=vetnova-centro Copiar enlace de registro Cl. 98 #51A-83, Aranjuez, Medellín, Antioquia 3001112233 centro@vetnova.com 12 jun 2026 Activa Desactivar" [ref=e712]':
+                  - cell "Clínica VetNova Centro /register?clinica=vetnova-centro Copiar enlace de registro" [ref=e713]:
+                    - generic [ref=e714]:
+                      - img [ref=e716]
+                      - generic [ref=e720]:
+                        - paragraph [ref=e721]: Clínica VetNova Centro
+                        - generic [ref=e722]:
+                          - paragraph [ref=e723]: /register?clinica=vetnova-centro
+                          - button "Copiar enlace de registro" [ref=e724] [cursor=pointer]:
+                            - img [ref=e725]
+                  - 'cell "Cl. 98 #51A-83, Aranjuez, Medellín, Antioquia 3001112233 centro@vetnova.com" [ref=e728]':
+                    - generic [ref=e729]:
+                      - generic [ref=e730]:
+                        - img [ref=e731]
+                        - text: "Cl. 98 #51A-83, Aranjuez, Medellín, Antioquia"
+                      - generic [ref=e734]:
+                        - img [ref=e735]
+                        - text: "3001112233"
+                      - generic [ref=e737]:
+                        - img [ref=e738]
+                        - text: centro@vetnova.com
+                  - cell "12 jun 2026" [ref=e741]
+                  - cell "Activa" [ref=e742]:
+                    - generic [ref=e743]: Activa
+                  - cell "Desactivar" [ref=e744]:
+                    - generic [ref=e745]:
+                      - button "Agregar coordenadas" [ref=e746] [cursor=pointer]:
+                        - img [ref=e747]
+                      - button "Desactivar" [ref=e750] [cursor=pointer]
+                - 'row "Clínica VetNova Norte /register?clinica=vetnova-norte Copiar enlace de registro Cra. 65 #103D-05, Medellín, Antioquia 3004445566 norte@vetnova.com 12 jun 2026 Activa Desactivar" [ref=e751]':
+                  - cell "Clínica VetNova Norte /register?clinica=vetnova-norte Copiar enlace de registro" [ref=e752]:
+                    - generic [ref=e753]:
+                      - img [ref=e755]
+                      - generic [ref=e759]:
+                        - paragraph [ref=e760]: Clínica VetNova Norte
+                        - generic [ref=e761]:
+                          - paragraph [ref=e762]: /register?clinica=vetnova-norte
+                          - button "Copiar enlace de registro" [ref=e763] [cursor=pointer]:
+                            - img [ref=e764]
+                  - 'cell "Cra. 65 #103D-05, Medellín, Antioquia 3004445566 norte@vetnova.com" [ref=e767]':
+                    - generic [ref=e768]:
+                      - generic [ref=e769]:
+                        - img [ref=e770]
+                        - text: "Cra. 65 #103D-05, Medellín, Antioquia"
+                      - generic [ref=e773]:
+                        - img [ref=e774]
+                        - text: "3004445566"
+                      - generic [ref=e776]:
+                        - img [ref=e777]
+                        - text: norte@vetnova.com
+                  - cell "12 jun 2026" [ref=e780]
+                  - cell "Activa" [ref=e781]:
+                    - generic [ref=e782]: Activa
+                  - cell "Desactivar" [ref=e783]:
+                    - generic [ref=e784]:
+                      - button "Agregar coordenadas" [ref=e785] [cursor=pointer]:
+                        - img [ref=e786]
+                      - button "Desactivar" [ref=e789] [cursor=pointer]
+                - 'row "VetNova - Sede Principal /register?clinica=principal Copiar enlace de registro Cra. 43B #12-157, El Poblado, Medellín, Antioquia 10 jun 2026 Activa Desactivar" [ref=e790]':
+                  - cell "VetNova - Sede Principal /register?clinica=principal Copiar enlace de registro" [ref=e791]:
+                    - generic [ref=e792]:
+                      - img [ref=e794]
+                      - generic [ref=e798]:
+                        - paragraph [ref=e799]: VetNova - Sede Principal
+                        - generic [ref=e800]:
+                          - paragraph [ref=e801]: /register?clinica=principal
+                          - button "Copiar enlace de registro" [ref=e802] [cursor=pointer]:
+                            - img [ref=e803]
+                  - 'cell "Cra. 43B #12-157, El Poblado, Medellín, Antioquia" [ref=e806]':
+                    - generic [ref=e808]:
+                      - img [ref=e809]
+                      - text: "Cra. 43B #12-157, El Poblado, Medellín, Antioquia"
+                  - cell "10 jun 2026" [ref=e812]
+                  - cell "Activa" [ref=e813]:
+                    - generic [ref=e814]: Activa
+                  - cell "Desactivar" [ref=e815]:
+                    - generic [ref=e816]:
+                      - button "Agregar coordenadas" [ref=e817] [cursor=pointer]:
+                        - img [ref=e818]
+                      - button "Desactivar" [ref=e821] [cursor=pointer]
+                - row "VetNova Default /register?clinica=vetnova-default Copiar enlace de registro — 12 jun 2026 Inactiva Activar" [ref=e822]:
+                  - cell "VetNova Default /register?clinica=vetnova-default Copiar enlace de registro" [ref=e823]:
+                    - generic [ref=e824]:
+                      - img [ref=e826]
+                      - generic [ref=e830]:
+                        - paragraph [ref=e831]: VetNova Default
+                        - generic [ref=e832]:
+                          - paragraph [ref=e833]: /register?clinica=vetnova-default
+                          - button "Copiar enlace de registro" [ref=e834] [cursor=pointer]:
+                            - img [ref=e835]
+                  - cell "—" [ref=e838]:
+                    - generic [ref=e840]: —
+                  - cell "12 jun 2026" [ref=e841]
+                  - cell "Inactiva" [ref=e842]:
+                    - generic [ref=e843]: Inactiva
+                  - cell "Activar" [ref=e844]:
+                    - generic [ref=e845]:
+                      - button "Agregar coordenadas" [ref=e846] [cursor=pointer]:
+                        - img [ref=e847]
+                      - button "Activar" [ref=e850] [cursor=pointer]
+  - generic [ref=e570]: "0"
+  - generic "Notificaciones" [ref=e851]:
+    - alert [ref=e852]:
+      - img [ref=e853]
+      - generic [ref=e856]:
+        - paragraph [ref=e857]: Clínica registrada
+        - paragraph [ref=e858]: La clínica y su administrador se crearon correctamente.
+      - button "Cerrar notificación" [ref=e859] [cursor=pointer]:
+        - img [ref=e860]

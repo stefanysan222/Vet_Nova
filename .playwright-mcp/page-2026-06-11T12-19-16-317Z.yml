@@ -1,0 +1,57 @@
+- main [ref=e2]:
+  - generic [ref=e3]:
+    - complementary [ref=e4]:
+      - generic [ref=e5]:
+        - img "VetNova Logo" [ref=e6]
+        - generic [ref=e7]:
+          - heading "VetNova" [level=1] [ref=e8]
+          - paragraph [ref=e9]: Sistema Veterinario
+      - navigation [ref=e10]:
+        - link "Dashboard" [ref=e11] [cursor=pointer]:
+          - /url: /cliente
+          - img [ref=e12]
+          - text: Dashboard
+        - link "Citas" [ref=e15] [cursor=pointer]:
+          - /url: /cliente/agendar
+          - img [ref=e16]
+          - text: Citas
+        - link "Mascotas" [ref=e18] [cursor=pointer]:
+          - /url: /cliente/mascotas
+          - img [ref=e19]
+          - text: Mascotas
+        - link "Configuración" [ref=e24] [cursor=pointer]:
+          - /url: /cliente/configuracion
+          - img [ref=e25]
+          - text: Configuración
+      - button "Cerrar Sesión" [ref=e29] [cursor=pointer]:
+        - img [ref=e30]
+        - text: Cerrar Sesión
+    - generic [ref=e33]:
+      - generic [ref=e34]:
+        - generic [ref=e36]:
+          - img [ref=e37]
+          - textbox "Buscar mascotas, citas..." [ref=e40]
+        - generic [ref=e41]:
+          - button "Abrir notificaciones" [ref=e42] [cursor=pointer]:
+            - img [ref=e43]
+          - button "Abrir menú de perfil" [ref=e48] [cursor=pointer]:
+            - generic [ref=e49]:
+              - paragraph
+              - paragraph [ref=e50]: Cliente
+      - generic [ref=e54]:
+        - generic [ref=e55]:
+          - heading "Historial Médico" [level=1] [ref=e56]
+          - paragraph [ref=e57]: Revisa el historial de consultas y tratamientos de tus mascotas.
+        - generic [ref=e58]:
+          - article [ref=e59]:
+            - paragraph [ref=e60]: Total consultas
+            - heading "0" [level=3] [ref=e61]
+          - article [ref=e62]:
+            - paragraph [ref=e63]: Finalizadas
+            - heading "0" [level=3] [ref=e64]
+          - article [ref=e65]:
+            - paragraph [ref=e66]: Canceladas
+            - heading "0" [level=3] [ref=e67]
+        - generic [ref=e69]:
+          - img [ref=e70]
+          - textbox "Buscar por mascota, servicio, veterinario..." [ref=e73]

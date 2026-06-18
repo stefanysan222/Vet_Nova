@@ -1,0 +1,138 @@
+- generic [ref=e2]:
+  - banner [ref=e3]:
+    - link "VetNova VetNova" [ref=e5] [cursor=pointer]:
+      - /url: "#"
+      - img "VetNova" [ref=e7]
+      - generic [ref=e8]: VetNova
+  - main [ref=e9]:
+    - generic [ref=e12]:
+      - generic [ref=e13]: Sistema de gestión veterinaria
+      - generic [ref=e16]:
+        - heading "Tu clínica, organizada. Tus pacientes, cuidados." [level=1] [ref=e17]:
+          - text: Tu clínica, organizada.
+          - text: Tus pacientes, cuidados.
+        - paragraph [ref=e18]: "VetNova centraliza la agenda, la historia clínica y la gestión de tu clínica veterinaria en un solo sistema, pensado para que puedas concentrarte en lo que importa: el bienestar de cada mascota."
+        - generic [ref=e19]:
+          - link "Entrar al sistema" [ref=e20] [cursor=pointer]:
+            - /url: /login
+            - text: Entrar al sistema
+            - img [ref=e21]
+          - link "Crear cuenta gratuita" [ref=e23] [cursor=pointer]:
+            - /url: /register
+        - paragraph [ref=e24]: Sin tarjeta de crédito · Acceso inmediato · Soporte incluido
+      - generic [ref=e25]:
+        - generic [ref=e26]:
+          - img [ref=e28]
+          - paragraph [ref=e31]: Citas sin complicaciones
+          - paragraph [ref=e32]: Agenda, confirma y recuerda citas desde cualquier dispositivo.
+        - generic [ref=e33]:
+          - img [ref=e35]
+          - paragraph [ref=e38]: Historia clínica digital
+          - paragraph [ref=e39]: Accede al expediente completo de cada paciente en segundos.
+        - generic [ref=e40]:
+          - img [ref=e42]
+          - paragraph [ref=e44]: Seguimiento de pacientes
+          - paragraph [ref=e45]: Evoluciones, tratamientos y alertas de seguimiento integrados.
+        - generic [ref=e46]:
+          - img [ref=e48]
+          - paragraph [ref=e51]: Roles y accesos seguros
+          - paragraph [ref=e52]: Administrador, veterinario y cliente con vistas personalizadas.
+    - generic [ref=e53]:
+      - generic [ref=e54]:
+        - paragraph [ref=e55]: Módulos del sistema
+        - heading "Todo lo que necesita una clínica veterinaria moderna." [level=2] [ref=e56]
+        - paragraph [ref=e57]: "Cada módulo está diseñado para un rol específico: el administrador gestiona, el veterinario atiende y el cliente hace seguimiento."
+      - generic [ref=e58]:
+        - article [ref=e59]:
+          - img [ref=e61]
+          - heading "Agenda inteligente" [level=3] [ref=e64]
+          - paragraph [ref=e65]: Los clientes solicitan citas desde su cuenta. El administrador las confirma. Sin llamadas, sin confusiones.
+        - article [ref=e66]:
+          - img [ref=e68]
+          - heading "Historia clínica" [level=3] [ref=e71]
+          - paragraph [ref=e72]: Registra consultas, diagnósticos, vacunas y tratamientos. Todo queda guardado y accesible para el veterinario.
+        - article [ref=e73]:
+          - img [ref=e75]
+          - heading "Gestión de pacientes" [level=3] [ref=e80]
+          - paragraph [ref=e81]: "Cada mascota tiene su perfil completo: especie, raza, edad, peso, alergias y su propietario vinculado."
+        - article [ref=e82]:
+          - img [ref=e84]
+          - heading "Reportes y control" [level=3] [ref=e86]
+          - paragraph [ref=e87]: Estadísticas de citas, usuarios activos y actividad del sistema, disponibles para el administrador en tiempo real.
+    - generic [ref=e90]:
+      - paragraph [ref=e91]: Por qué VetNova
+      - heading "Construido con claridad. Sin funciones de relleno." [level=2] [ref=e92]
+      - generic [ref=e93]:
+        - generic [ref=e94]:
+          - paragraph [ref=e95]: Un sistema, tres roles
+          - paragraph [ref=e96]: Administrador, veterinario y cliente tienen vistas y permisos ajustados a lo que necesitan, sin acceso a lo que no corresponde.
+        - generic [ref=e97]:
+          - paragraph [ref=e98]: Datos reales, no estimaciones
+          - paragraph [ref=e99]: Citas, mascotas y usuarios se obtienen directamente de la base de datos. Ningún número es inventado.
+        - generic [ref=e100]:
+          - paragraph [ref=e101]: Acceso desde cualquier lugar
+          - paragraph [ref=e102]: Sistema web responsivo que funciona en computador, tablet o celular, sin instalar nada.
+        - generic [ref=e103]:
+          - paragraph [ref=e104]: Diseñado para crecer
+          - paragraph [ref=e105]: La arquitectura soporta agregar funcionalidades sin reescribir lo que ya funciona.
+    - generic [ref=e108]:
+      - generic [ref=e109]:
+        - generic [ref=e110]:
+          - paragraph [ref=e111]: Contacto
+          - heading "¿Tienes alguna pregunta sobre el sistema?" [level=2] [ref=e112]
+          - paragraph [ref=e113]: Si necesitas ayuda con tu cuenta, tienes una consulta técnica o quieres reportar un problema, escríbenos y te respondemos a la brevedad.
+        - generic [ref=e114]:
+          - generic [ref=e115]:
+            - img [ref=e117]
+            - text: suportvetnova@gmail.com
+          - generic [ref=e120]:
+            - img [ref=e122]
+            - text: +57 300 123 4567
+          - generic [ref=e124]:
+            - img [ref=e126]
+            - text: Bogotá, Colombia
+        - generic [ref=e129]:
+          - paragraph [ref=e130]: Tiempo de respuesta
+          - paragraph [ref=e131]: Respondemos dentro de las 24 horas hábiles siguientes.
+      - generic [ref=e132]:
+        - generic [ref=e133]:
+          - generic [ref=e134]: Nombre completo
+          - textbox "Tu nombre" [ref=e135]
+        - generic [ref=e136]:
+          - generic [ref=e137]: Correo electrónico
+          - textbox "correo@ejemplo.com" [ref=e138]
+        - generic [ref=e139]:
+          - generic [ref=e140]: Asunto
+          - combobox [ref=e141]:
+            - option "Selecciona un asunto" [selected]
+            - option "Problema con mi cuenta"
+            - option "Error en el sistema"
+            - option "Consulta general"
+            - option "Solicitud de soporte"
+            - option "Otro"
+        - generic [ref=e142]:
+          - generic [ref=e143]: Mensaje
+          - textbox "Describe tu consulta o problema..." [ref=e144]
+        - button "Enviar mensaje" [ref=e145] [cursor=pointer]
+  - contentinfo [ref=e146]:
+    - generic [ref=e147]:
+      - generic [ref=e148]:
+        - paragraph [ref=e149]: VetNova
+        - paragraph [ref=e150]: Sistema de gestión veterinaria para clínicas que quieren organizarse mejor sin complicarse.
+      - generic [ref=e151]:
+        - generic [ref=e152]:
+          - paragraph [ref=e153]: Sistema
+          - generic [ref=e154]:
+            - paragraph [ref=e155]:
+              - link "Iniciar sesión" [ref=e156] [cursor=pointer]:
+                - /url: /login
+            - paragraph [ref=e157]:
+              - link "Crear cuenta" [ref=e158] [cursor=pointer]:
+                - /url: /register
+        - generic [ref=e159]:
+          - paragraph [ref=e160]: Contacto
+          - generic [ref=e161]:
+            - paragraph [ref=e162]: suportvetnova@gmail.com
+            - paragraph [ref=e163]: +57 300 123 4567
+            - paragraph [ref=e164]: Bogotá, Colombia
+    - paragraph [ref=e166]: © 2026 VetNova. Todos los derechos reservados.

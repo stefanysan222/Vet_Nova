@@ -1,0 +1,182 @@
+- generic [ref=e1]:
+  - main [ref=e2]:
+    - generic [ref=e3]:
+      - complementary [ref=e4]:
+        - generic [ref=e5]:
+          - img "VetNova Logo" [ref=e6]
+          - generic [ref=e7]:
+            - heading "VetNova" [level=1] [ref=e8]
+            - paragraph [ref=e9]: Sistema Veterinario
+        - navigation [ref=e10]:
+          - link "Dashboard" [ref=e11] [cursor=pointer]:
+            - /url: /cliente
+            - img [ref=e12]
+            - text: Dashboard
+          - link "Citas" [ref=e15] [cursor=pointer]:
+            - /url: /cliente/agendar
+            - img [ref=e16]
+            - text: Citas
+          - link "Mascotas" [ref=e18] [cursor=pointer]:
+            - /url: /cliente/mascotas
+            - img [ref=e19]
+            - text: Mascotas
+          - link "Configuración" [ref=e24] [cursor=pointer]:
+            - /url: /cliente/configuracion
+            - img [ref=e25]
+            - text: Configuración
+        - button "Cerrar Sesión" [ref=e29] [cursor=pointer]:
+          - img [ref=e30]
+          - text: Cerrar Sesión
+      - generic [ref=e33]:
+        - generic [ref=e34]:
+          - generic [ref=e36]:
+            - img [ref=e37]
+            - textbox "Buscar mascotas, citas..." [ref=e40]
+          - generic [ref=e41]:
+            - button "Abrir notificaciones" [ref=e42] [cursor=pointer]:
+              - img [ref=e43]
+              - generic [ref=e90]: "1"
+            - button "Abrir menú de perfil" [ref=e48] [cursor=pointer]:
+              - generic [ref=e49]:
+                - paragraph [ref=e91]: Cliente E2E Test
+                - paragraph [ref=e50]: Cliente
+              - generic [ref=e51]: CE
+        - generic [ref=e341]:
+          - generic [ref=e343]:
+            - generic [ref=e344]:
+              - img [ref=e345]
+              - generic [ref=e348]:
+                - paragraph [ref=e349]: Solicitud enviada correctamente
+                - paragraph [ref=e350]:
+                  - text: Tu cita quedó registrada como
+                  - strong [ref=e351]: Pendiente
+                  - text: . La clínica la revisará y te notificará cuando sea confirmada.
+            - button "Cerrar" [ref=e352] [cursor=pointer]: ×
+          - generic [ref=e353]:
+            - generic [ref=e354]:
+              - heading "Mis citas" [level=1] [ref=e355]
+              - paragraph [ref=e356]: Consulta y administra las citas programadas para tus mascotas
+            - link "Nueva cita" [ref=e357] [cursor=pointer]:
+              - /url: /cliente/agendar/nueva
+              - img [ref=e358]
+              - text: Nueva cita
+          - generic [ref=e359]:
+            - article [ref=e361]:
+              - generic [ref=e363]:
+                - generic [ref=e364]:
+                  - paragraph [ref=e365]: Próximas citas
+                  - paragraph [ref=e366]: "1"
+                  - paragraph [ref=e367]: Citas por atender
+                - img [ref=e369]
+            - article [ref=e372]:
+              - generic [ref=e374]:
+                - generic [ref=e375]:
+                  - paragraph [ref=e376]: Confirmadas
+                  - paragraph [ref=e377]: "0"
+                  - paragraph [ref=e378]: Horario confirmado
+                - img [ref=e380]
+            - article [ref=e384]:
+              - generic [ref=e386]:
+                - generic [ref=e387]:
+                  - paragraph [ref=e388]: Pendientes
+                  - paragraph [ref=e389]: "1"
+                  - paragraph [ref=e390]: En espera de confirmación
+                - img [ref=e392]
+          - generic [ref=e396]:
+            - generic [ref=e397]:
+              - img [ref=e398]
+              - textbox "Buscar por mascota, servicio o veterinario..." [ref=e401]
+            - generic [ref=e402]:
+              - button "Todas" [ref=e403] [cursor=pointer]
+              - button "Próximas" [ref=e404] [cursor=pointer]
+              - button "Confirmadas" [ref=e405] [cursor=pointer]
+              - button "Canceladas" [ref=e406] [cursor=pointer]
+          - generic [ref=e407]:
+            - generic [ref=e408]:
+              - heading "Citas programadas" [level=2] [ref=e409]
+              - paragraph [ref=e410]: 1 resultado
+            - article [ref=e412]:
+              - generic [ref=e413]:
+                - generic [ref=e414]:
+                  - generic [ref=e415]:
+                    - generic [ref=e416]: "15"
+                    - generic [ref=e417]: JUN
+                  - generic [ref=e418]:
+                    - generic [ref=e419]:
+                      - heading "Firulais" [level=3] [ref=e420]
+                      - generic [ref=e421]: Pendiente
+                    - paragraph [ref=e423]: Perro · Labrador
+                    - generic [ref=e424]:
+                      - generic [ref=e425]:
+                        - img [ref=e427]
+                        - generic [ref=e430]: Consulta general
+                      - generic [ref=e431]:
+                        - img [ref=e433]
+                        - generic [ref=e436]: 10:00
+                      - generic [ref=e437]:
+                        - img [ref=e439]
+                        - generic [ref=e442]: Por asignar
+                - generic [ref=e443]:
+                  - button "Ver detalle" [active] [ref=e444] [cursor=pointer]
+                  - button "Cancelar cita" [ref=e445] [cursor=pointer]
+              - generic [ref=e446]: "Motivo: Sin motivo registrado"
+          - dialog "Detalle de la cita" [ref=e448]:
+            - generic [ref=e449]:
+              - generic [ref=e450]:
+                - img [ref=e452]
+                - generic [ref=e454]:
+                  - heading "Detalle de la cita" [level=2] [ref=e455]
+                  - paragraph [ref=e456]: Información completa de la atención programada
+              - button "Cerrar detalle" [ref=e457] [cursor=pointer]:
+                - img [ref=e458]
+            - generic [ref=e461]:
+              - generic [ref=e462]:
+                - generic [ref=e463]:
+                  - paragraph [ref=e464]: Mascota
+                  - heading "Firulais" [level=3] [ref=e465]
+                  - paragraph [ref=e466]: Perro · Labrador
+                - generic [ref=e467]: Pendiente
+              - generic [ref=e469]:
+                - generic [ref=e470]:
+                  - img [ref=e472]
+                  - generic [ref=e474]:
+                    - paragraph [ref=e475]: Fecha
+                    - paragraph [ref=e476]: 15 de junio de 2026
+                - generic [ref=e477]:
+                  - img [ref=e479]
+                  - generic [ref=e482]:
+                    - paragraph [ref=e483]: Hora
+                    - paragraph [ref=e484]: 10:00
+                - generic [ref=e485]:
+                  - img [ref=e487]
+                  - generic [ref=e490]:
+                    - paragraph [ref=e491]: Tipo de atención
+                    - paragraph [ref=e492]: Consulta general
+                - generic [ref=e493]:
+                  - img [ref=e495]
+                  - generic [ref=e498]:
+                    - paragraph [ref=e499]: Veterinario
+                    - paragraph [ref=e500]: Por asignar
+              - generic [ref=e501]:
+                - paragraph [ref=e502]: Motivo de la cita
+                - paragraph [ref=e503]: Sin motivo registrado
+              - generic [ref=e504]:
+                - img [ref=e505]
+                - paragraph [ref=e507]:
+                  - strong [ref=e508]: "En revisión:"
+                  - text: tu solicitud fue recibida. La clínica la revisará y te confirmará el horario a la brevedad.
+            - generic [ref=e509]:
+              - button "Cancelar cita" [ref=e510] [cursor=pointer]
+              - button "Cerrar" [ref=e511] [cursor=pointer]
+  - generic [ref=e104] [cursor=pointer]:
+    - button "Open Next.js Dev Tools" [ref=e105]:
+      - img [ref=e106]
+    - generic [ref=e109]:
+      - button "Open issues overlay" [ref=e110]:
+        - generic [ref=e111]:
+          - generic [ref=e112]: "0"
+          - generic [ref=e113]: "1"
+        - generic [ref=e114]: Issue
+      - button "Collapse issues badge" [ref=e115]:
+        - img [ref=e116]
+  - alert [ref=e118]

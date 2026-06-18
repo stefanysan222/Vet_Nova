@@ -1,0 +1,100 @@
+- generic [ref=e1]:
+  - generic [ref=e2]:
+    - complementary [ref=e99]:
+      - generic [ref=e101]:
+        - generic [ref=e102]: SA
+        - generic [ref=e103]:
+          - paragraph [ref=e104]: Super Administrador VetNova
+          - paragraph [ref=e105]: Super Administrador
+      - navigation [ref=e106]:
+        - link "Veterinarias" [ref=e107] [cursor=pointer]:
+          - /url: /super-admin
+          - img [ref=e108]
+          - text: Veterinarias
+      - generic [ref=e112]:
+        - generic [ref=e114]:
+          - img [ref=e115]
+          - paragraph [ref=e118]: Panel global VetNova
+        - button "Cerrar sesión" [ref=e119] [cursor=pointer]:
+          - img [ref=e120]
+          - text: Cerrar sesión
+    - main [ref=e4]:
+      - generic [ref=e6]:
+        - generic [ref=e7]:
+          - generic [ref=e8]:
+            - paragraph [ref=e9]: Super Administración
+            - heading "Veterinarias registradas" [level=1] [ref=e10]
+            - paragraph [ref=e11]: Gestiona las clínicas que usan VetNova y su administrador inicial.
+          - button "Nueva clínica" [active] [ref=e12] [cursor=pointer]:
+            - img [ref=e13]
+            - text: Nueva clínica
+        - generic [ref=e14]:
+          - article [ref=e15]:
+            - paragraph [ref=e16]: Total
+            - paragraph [ref=e17]: "1"
+          - article [ref=e18]:
+            - paragraph [ref=e19]: Activas
+            - paragraph [ref=e20]: "1"
+          - article [ref=e21]:
+            - paragraph [ref=e22]: Inactivas
+            - paragraph [ref=e23]: "0"
+        - generic [ref=e67]:
+          - generic [ref=e68]:
+            - img [ref=e70]
+            - generic [ref=e74]:
+              - generic [ref=e75]:
+                - paragraph [ref=e76]: VetNova - Sede Principal
+                - generic [ref=e77]: Activa
+              - paragraph [ref=e78]: /register?clinica=principal
+          - button "Desactivar" [ref=e79] [cursor=pointer]
+      - generic [ref=e124]:
+        - generic [ref=e125]:
+          - heading "Nueva clínica" [level=2] [ref=e126]
+          - button [ref=e127] [cursor=pointer]:
+            - img [ref=e128]
+        - generic [ref=e132]:
+          - generic [ref=e133]:
+            - heading "Datos de la clínica" [level=3] [ref=e134]
+            - generic [ref=e135]:
+              - generic [ref=e136]:
+                - generic [ref=e137]: Nombre *
+                - textbox "Nombre de la clínica" [ref=e138]
+              - generic [ref=e139]:
+                - generic [ref=e140]: Slug (enlace de registro) *
+                - textbox "mi-clinica" [ref=e141]
+              - generic [ref=e142]:
+                - generic [ref=e143]: Dirección
+                - textbox [ref=e144]
+              - generic [ref=e145]:
+                - generic [ref=e146]: Teléfono
+                - textbox [ref=e147]
+              - generic [ref=e148]:
+                - generic [ref=e149]: Email de la clínica
+                - textbox [ref=e150]
+          - generic [ref=e151]:
+            - heading "Administrador inicial" [level=3] [ref=e152]
+            - generic [ref=e153]:
+              - generic [ref=e154]:
+                - generic [ref=e155]: Nombre *
+                - textbox [ref=e156]
+              - generic [ref=e157]:
+                - generic [ref=e158]: Email *
+                - textbox [ref=e159]
+              - generic [ref=e160]:
+                - generic [ref=e161]: Contraseña *
+                - textbox [ref=e162]
+        - generic [ref=e163]:
+          - button "Cancelar" [ref=e164] [cursor=pointer]
+          - button "Registrar clínica" [ref=e165] [cursor=pointer]
+  - generic [ref=e84] [cursor=pointer]:
+    - button "Open Next.js Dev Tools" [ref=e85]:
+      - img [ref=e86]
+    - generic [ref=e89]:
+      - button "Open issues overlay" [ref=e90]:
+        - generic [ref=e91]:
+          - generic [ref=e92]: "0"
+          - generic [ref=e93]: "1"
+        - generic [ref=e94]: Issue
+      - button "Collapse issues badge" [ref=e95]:
+        - img [ref=e96]
+  - alert [ref=e98]

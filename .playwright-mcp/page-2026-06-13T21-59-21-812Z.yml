@@ -1,0 +1,81 @@
+- generic [active] [ref=e1]:
+  - main [ref=e2]:
+    - generic [ref=e3]:
+      - complementary [ref=e4]:
+        - generic [ref=e5]:
+          - img "VetNova Logo" [ref=e6]
+          - generic [ref=e7]:
+            - heading "VetNova" [level=1] [ref=e8]
+            - paragraph [ref=e9]: Sistema Veterinario
+        - navigation [ref=e10]:
+          - link "Dashboard" [ref=e11] [cursor=pointer]:
+            - /url: /cliente
+            - img [ref=e12]
+            - text: Dashboard
+          - link "Citas" [ref=e15] [cursor=pointer]:
+            - /url: /cliente/agendar
+            - img [ref=e16]
+            - text: Citas
+          - link "Mascotas" [ref=e18] [cursor=pointer]:
+            - /url: /cliente/mascotas
+            - img [ref=e19]
+            - text: Mascotas
+          - link "Configuración" [ref=e24] [cursor=pointer]:
+            - /url: /cliente/configuracion
+            - img [ref=e25]
+            - text: Configuración
+        - button "Cerrar Sesión" [ref=e29] [cursor=pointer]:
+          - img [ref=e30]
+          - text: Cerrar Sesión
+      - generic [ref=e33]:
+        - generic [ref=e34]:
+          - generic [ref=e36]:
+            - img [ref=e37]
+            - textbox "Buscar mascotas, citas..." [ref=e40]
+          - generic [ref=e41]:
+            - button "Abrir notificaciones" [ref=e42] [cursor=pointer]:
+              - img [ref=e43]
+              - generic [ref=e78]: "1"
+            - button "Abrir menú de perfil" [ref=e48] [cursor=pointer]:
+              - generic [ref=e49]:
+                - paragraph [ref=e79]: Cliente E2E Test
+                - paragraph [ref=e50]: Cliente
+              - generic [ref=e51]: CE
+        - generic [ref=e168]:
+          - generic [ref=e169]:
+            - generic [ref=e170]:
+              - heading "Mis mascotas" [level=1] [ref=e171]
+              - paragraph [ref=e172]: 0 mascotas registradas
+            - link "Nueva mascota" [ref=e173] [cursor=pointer]:
+              - /url: /cliente/mascotas/nueva
+              - img [ref=e174]
+              - text: Nueva mascota
+          - generic [ref=e176]:
+            - generic [ref=e177]:
+              - img [ref=e178]
+              - textbox "Buscar por nombre, dueño o raza..." [ref=e181]
+            - generic [ref=e182]:
+              - combobox [ref=e183] [cursor=pointer]:
+                - option "Todas las especies" [selected]
+                - option "Perros"
+                - option "Gatos"
+                - option "Otros"
+              - generic:
+                - img
+          - generic [ref=e184]:
+            - img [ref=e186]
+            - heading "No se encontraron mascotas" [level=2] [ref=e189]
+            - paragraph [ref=e190]: Intenta buscar con otro nombre, dueño, raza o especie.
+            - button "Limpiar filtros" [ref=e191] [cursor=pointer]
+  - generic [ref=e84] [cursor=pointer]:
+    - button "Open Next.js Dev Tools" [ref=e85]:
+      - img [ref=e86]
+    - generic [ref=e89]:
+      - button "Open issues overlay" [ref=e90]:
+        - generic [ref=e91]:
+          - generic [ref=e92]: "0"
+          - generic [ref=e93]: "1"
+        - generic [ref=e94]: Issue
+      - button "Collapse issues badge" [ref=e95]:
+        - img [ref=e96]
+  - alert [ref=e98]

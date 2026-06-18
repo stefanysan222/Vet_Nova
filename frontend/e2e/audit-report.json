@@ -1,0 +1,430 @@
+{
+  "config": {
+    "configFile": "C:\\Users\\Anderson\\Desktop\\VetNova\\Vet_Nova\\frontend\\playwright.config.ts",
+    "rootDir": "C:/Users/Anderson/Desktop/VetNova/Vet_Nova/frontend/e2e",
+    "forbidOnly": false,
+    "fullyParallel": false,
+    "globalSetup": null,
+    "globalTeardown": null,
+    "globalTimeout": 0,
+    "grep": {},
+    "grepInvert": null,
+    "maxFailures": 0,
+    "metadata": {},
+    "preserveOutput": "always",
+    "projects": [
+      {
+        "outputDir": "C:/Users/Anderson/Desktop/VetNova/Vet_Nova/frontend/test-results",
+        "repeatEach": 1,
+        "retries": 0,
+        "metadata": {},
+        "id": "chromium",
+        "name": "chromium",
+        "testDir": "C:/Users/Anderson/Desktop/VetNova/Vet_Nova/frontend/e2e",
+        "testIgnore": [],
+        "testMatch": ["**/*.@(spec|test).?(c|m)[jt]s?(x)"],
+        "timeout": 30000
+      }
+    ],
+    "quiet": false,
+    "reporter": [
+      ["list", null],
+      [
+        "json",
+        {
+          "outputFile": "e2e/audit-report.json"
+        }
+      ]
+    ],
+    "reportSlowTests": {
+      "max": 5,
+      "threshold": 300000
+    },
+    "shard": null,
+    "tags": [],
+    "updateSnapshots": "missing",
+    "updateSourceMethod": "patch",
+    "version": "1.60.0",
+    "workers": 4,
+    "webServer": null
+  },
+  "suites": [
+    {
+      "title": "admin-audit.spec.ts",
+      "file": "admin-audit.spec.ts",
+      "column": 0,
+      "line": 0,
+      "specs": [],
+      "suites": [
+        {
+          "title": "@auth Auditoría Admin — Autenticación y protección de rutas",
+          "file": "admin-audit.spec.ts",
+          "line": 42,
+          "column": 6,
+          "specs": [
+            {
+              "title": "redirige a /login si no hay token",
+              "ok": true,
+              "tags": ["auth"],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [],
+                  "status": "skipped"
+                }
+              ],
+              "id": "1e4164cbcd7d7052b193-f452ec17ecc42ac9bff0",
+              "file": "admin-audit.spec.ts",
+              "line": 43,
+              "column": 7
+            },
+            {
+              "title": "redirige a /cliente si el usuario es Cliente",
+              "ok": true,
+              "tags": ["auth"],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [],
+                  "status": "skipped"
+                }
+              ],
+              "id": "1e4164cbcd7d7052b193-afe33fe23a6d3e9c40a6",
+              "file": "admin-audit.spec.ts",
+              "line": 49,
+              "column": 7
+            },
+            {
+              "title": "redirige a /veterinario si el usuario es Veterinario",
+              "ok": true,
+              "tags": ["auth"],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [],
+                  "status": "skipped"
+                }
+              ],
+              "id": "1e4164cbcd7d7052b193-8da8059f0b1e0954317e",
+              "file": "admin-audit.spec.ts",
+              "line": 56,
+              "column": 7
+            },
+            {
+              "title": "token con firma inválida no da acceso",
+              "ok": true,
+              "tags": ["auth"],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [],
+                  "status": "skipped"
+                }
+              ],
+              "id": "1e4164cbcd7d7052b193-b6cf127ee957618437b6",
+              "file": "admin-audit.spec.ts",
+              "line": 63,
+              "column": 7
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "title": "cliente-audit.spec.ts",
+      "file": "cliente-audit.spec.ts",
+      "column": 0,
+      "line": 0,
+      "specs": [],
+      "suites": [
+        {
+          "title": "@auth Auditoría Cliente — Autenticación y protección de rutas",
+          "file": "cliente-audit.spec.ts",
+          "line": 86,
+          "column": 6,
+          "specs": [
+            {
+              "title": "redirige a /login si no hay token",
+              "ok": true,
+              "tags": ["auth"],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [],
+                  "status": "skipped"
+                }
+              ],
+              "id": "a664be8ec022999012da-23159611f373b604c919",
+              "file": "cliente-audit.spec.ts",
+              "line": 87,
+              "column": 7
+            },
+            {
+              "title": "redirige a /admin si el usuario es Administrador",
+              "ok": true,
+              "tags": ["auth"],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [],
+                  "status": "skipped"
+                }
+              ],
+              "id": "a664be8ec022999012da-f1fa93210dc797e8c67f",
+              "file": "cliente-audit.spec.ts",
+              "line": 93,
+              "column": 7
+            },
+            {
+              "title": "redirige a /veterinario si el usuario es Veterinario",
+              "ok": true,
+              "tags": ["auth"],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [],
+                  "status": "skipped"
+                }
+              ],
+              "id": "a664be8ec022999012da-e67cd85ccd2987108fb2",
+              "file": "cliente-audit.spec.ts",
+              "line": 100,
+              "column": 7
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "title": "super-admin-audit.spec.ts",
+      "file": "super-admin-audit.spec.ts",
+      "column": 0,
+      "line": 0,
+      "specs": [],
+      "suites": [
+        {
+          "title": "@auth Auditoría SuperAdmin — Autenticación y protección de rutas",
+          "file": "super-admin-audit.spec.ts",
+          "line": 32,
+          "column": 6,
+          "specs": [
+            {
+              "title": "redirige a /login si no hay token",
+              "ok": true,
+              "tags": ["auth"],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [],
+                  "status": "skipped"
+                }
+              ],
+              "id": "b657e9e42c7690f58f94-728d414b0b9a90d10184",
+              "file": "super-admin-audit.spec.ts",
+              "line": 33,
+              "column": 7
+            },
+            {
+              "title": "redirige a /admin si el usuario es Administrador (no SuperAdministrador)",
+              "ok": true,
+              "tags": ["auth"],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [],
+                  "status": "skipped"
+                }
+              ],
+              "id": "b657e9e42c7690f58f94-78606bc3532032d05c24",
+              "file": "super-admin-audit.spec.ts",
+              "line": 39,
+              "column": 7
+            },
+            {
+              "title": "redirige a /cliente si el usuario es Cliente",
+              "ok": true,
+              "tags": ["auth"],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [],
+                  "status": "skipped"
+                }
+              ],
+              "id": "b657e9e42c7690f58f94-c11300150972ef1f709a",
+              "file": "super-admin-audit.spec.ts",
+              "line": 46,
+              "column": 7
+            },
+            {
+              "title": "un JWT firmado con otro secreto no da acceso (firma inválida)",
+              "ok": true,
+              "tags": ["auth"],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [],
+                  "status": "skipped"
+                }
+              ],
+              "id": "b657e9e42c7690f58f94-302a529a6b62203eac0c",
+              "file": "super-admin-audit.spec.ts",
+              "line": 53,
+              "column": 7
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "title": "veterinario-audit.spec.ts",
+      "file": "veterinario-audit.spec.ts",
+      "column": 0,
+      "line": 0,
+      "specs": [],
+      "suites": [
+        {
+          "title": "@auth Auditoría Veterinario — Autenticación y protección de rutas",
+          "file": "veterinario-audit.spec.ts",
+          "line": 43,
+          "column": 6,
+          "specs": [
+            {
+              "title": "redirige a /login si no hay token",
+              "ok": true,
+              "tags": ["auth"],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [],
+                  "status": "skipped"
+                }
+              ],
+              "id": "f6f788e54c1d943ce5b0-2d2fbaf2de55c0d0495f",
+              "file": "veterinario-audit.spec.ts",
+              "line": 44,
+              "column": 7
+            },
+            {
+              "title": "redirige a /cliente si el usuario es Cliente",
+              "ok": true,
+              "tags": ["auth"],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [],
+                  "status": "skipped"
+                }
+              ],
+              "id": "f6f788e54c1d943ce5b0-34ebf3fb6a6de6577be1",
+              "file": "veterinario-audit.spec.ts",
+              "line": 50,
+              "column": 7
+            },
+            {
+              "title": "redirige a /admin si el usuario es Administrador",
+              "ok": true,
+              "tags": ["auth"],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [],
+                  "status": "skipped"
+                }
+              ],
+              "id": "f6f788e54c1d943ce5b0-891a889988c6947fab49",
+              "file": "veterinario-audit.spec.ts",
+              "line": 57,
+              "column": 7
+            },
+            {
+              "title": "token expirado redirige a /login",
+              "ok": true,
+              "tags": ["auth"],
+              "tests": [
+                {
+                  "timeout": 30000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "chromium",
+                  "projectName": "chromium",
+                  "results": [],
+                  "status": "skipped"
+                }
+              ],
+              "id": "f6f788e54c1d943ce5b0-fc85abf1715e5c1d142c",
+              "file": "veterinario-audit.spec.ts",
+              "line": 64,
+              "column": 7
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "errors": [],
+  "stats": {
+    "startTime": "2026-06-17T12:54:36.112Z",
+    "duration": 624.2099999999999,
+    "expected": 0,
+    "skipped": 15,
+    "unexpected": 0,
+    "flaky": 0
+  }
+}

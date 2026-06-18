@@ -1,0 +1,14 @@
+**/node_modules
+frontend/.next
+frontend/coverage
+frontend/test-results
+frontend/playwright-report
+.git
+**/.env
+**/.env.*
+!**/.env.example
+*.md
+*.png
+*.sql
+figma-export
+audit

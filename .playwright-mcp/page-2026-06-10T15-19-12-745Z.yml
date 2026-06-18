@@ -1,0 +1,77 @@
+- generic [active] [ref=e1]:
+  - alert [ref=e149]
+  - generic [ref=e150]:
+    - generic:
+      - generic: 🐾
+      - generic: 🐶
+      - generic: 🐱
+      - generic: 🦮
+      - generic: 🐕
+      - generic: 🐈
+      - generic: 🩺
+      - generic: 💊
+      - generic: 🦴
+      - generic: ❤️
+      - generic: 🐾
+      - generic: 🐶
+      - generic: 🐱
+      - generic: 🦮
+      - generic: 🐕
+      - generic: 🐈
+      - generic: 🩺
+      - generic: 💊
+      - generic: 🦴
+      - generic: ❤️
+      - generic: 🐾
+      - generic: 🐶
+      - generic: 🐱
+      - generic: 🦮
+      - generic: 🐕
+      - generic: 🐈
+      - generic: 🩺
+      - generic: 💊
+      - generic: 🦴
+      - generic: ❤️
+    - generic [ref=e151]:
+      - generic [ref=e152]:
+        - link "Volver al inicio" [ref=e153] [cursor=pointer]:
+          - /url: /
+          - img [ref=e154]
+          - text: Volver al inicio
+        - button "Cambiar tema" [ref=e156] [cursor=pointer]:
+          - img [ref=e157]
+      - generic [ref=e159]:
+        - generic [ref=e160]:
+          - link "VetNova VetNova" [ref=e161] [cursor=pointer]:
+            - /url: /
+            - img "VetNova" [ref=e163]
+            - generic [ref=e164]: VetNova
+          - generic [ref=e165]: 🐾 Clínica veterinaria
+        - generic [ref=e166]:
+          - generic [ref=e167]:
+            - heading "Bienvenido de nuevo" [level=1] [ref=e168]
+            - paragraph [ref=e169]: Accede al panel de VetNova para gestionar citas, pacientes y clientes con facilidad.
+          - generic [ref=e171]:
+            - generic [ref=e175]: o con correo electrónico
+            - generic [ref=e178]:
+              - generic [ref=e179]: Correo electrónico
+              - generic [ref=e180]:
+                - img
+                - textbox "Correo electrónico" [ref=e181]:
+                  - /placeholder: tucorreo@ejemplo.com
+            - generic [ref=e182]:
+              - generic [ref=e183]: Contraseña
+              - generic [ref=e184]:
+                - img
+                - textbox "Contraseña" [ref=e185]:
+                  - /placeholder: ••••••••
+                - button [ref=e186] [cursor=pointer]:
+                  - img [ref=e187]
+            - link "¿Olvidaste tu contraseña?" [ref=e191] [cursor=pointer]:
+              - /url: /forgot-password
+            - button "Iniciar sesión" [ref=e193] [cursor=pointer]
+            - paragraph [ref=e194]:
+              - text: ¿Aún no tienes cuenta?
+              - link "Crear cuenta" [ref=e195] [cursor=pointer]:
+                - /url: /register
+      - paragraph [ref=e196]: © 2026 VetNova · Todos los derechos reservados

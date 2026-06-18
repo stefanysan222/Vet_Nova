@@ -1,0 +1,151 @@
+- generic [ref=e1]:
+  - main [ref=e2]:
+    - generic [ref=e3]:
+      - complementary [ref=e4]:
+        - generic [ref=e5]:
+          - img "VetNova Logo" [ref=e6]
+          - generic [ref=e7]:
+            - heading "VetNova" [level=1] [ref=e8]
+            - paragraph [ref=e9]: Sistema Veterinario
+        - navigation [ref=e10]:
+          - link "Dashboard" [ref=e11] [cursor=pointer]:
+            - /url: /cliente
+            - img [ref=e12]
+            - text: Dashboard
+          - link "Citas" [ref=e15] [cursor=pointer]:
+            - /url: /cliente/agendar
+            - img [ref=e16]
+            - text: Citas
+          - link "Mascotas" [ref=e18] [cursor=pointer]:
+            - /url: /cliente/mascotas
+            - img [ref=e19]
+            - text: Mascotas
+          - link "Configuración" [ref=e24] [cursor=pointer]:
+            - /url: /cliente/configuracion
+            - img [ref=e25]
+            - text: Configuración
+        - button "Cerrar Sesión" [ref=e29] [cursor=pointer]:
+          - img [ref=e30]
+          - text: Cerrar Sesión
+      - generic [ref=e33]:
+        - generic [ref=e34]:
+          - generic [ref=e36]:
+            - img [ref=e37]
+            - textbox "Buscar mascotas, citas..." [ref=e40]
+          - generic [ref=e41]:
+            - button "Abrir notificaciones" [ref=e42] [cursor=pointer]:
+              - img [ref=e43]
+            - button "Abrir menú de perfil" [ref=e48] [cursor=pointer]:
+              - generic [ref=e49]:
+                - paragraph [ref=e104]: Audit Tester
+                - paragraph [ref=e50]: Cliente
+              - generic [ref=e51]: AT
+        - generic [ref=e54]:
+          - generic [ref=e55]:
+            - heading "Configuración" [level=1] [ref=e56]
+            - paragraph [ref=e57]: Administra tu información personal y seguridad
+          - generic [ref=e58]:
+            - generic [ref=e59]:
+              - generic [ref=e60]:
+                - img [ref=e61]
+                - heading "Información Personal" [level=2] [ref=e64]
+              - generic [ref=e65]:
+                - generic [ref=e66]:
+                  - generic [ref=e67]: Nombre
+                  - textbox "Nombre" [ref=e68]: Audit
+                - generic [ref=e69]:
+                  - generic [ref=e70]: Apellido
+                  - textbox "Apellido" [ref=e71]: Tester
+              - generic [ref=e73]:
+                - generic [ref=e74]: Email
+                - textbox "Email" [ref=e75]: audit_ux_review@vetnova.com
+              - generic [ref=e77]:
+                - generic [ref=e78]: Teléfono
+                - textbox "Teléfono" [ref=e79]
+              - generic [ref=e80]:
+                - button "Cancelar" [ref=e81] [cursor=pointer]
+                - button "Guardar Cambios" [ref=e82] [cursor=pointer]
+            - generic [ref=e83]:
+              - generic [ref=e84]:
+                - img [ref=e85]
+                - heading "Seguridad" [level=2] [ref=e88]
+              - generic [ref=e89]:
+                - generic [ref=e90]:
+                  - generic [ref=e91]: Contraseña Actual
+                  - textbox "Contraseña Actual" [ref=e92]:
+                    - /placeholder: ••••••••
+                - generic [ref=e94]:
+                  - generic [ref=e95]: Nueva Contraseña
+                  - textbox "Nueva Contraseña" [ref=e96]:
+                    - /placeholder: ••••••••
+                - generic [ref=e98]:
+                  - generic [ref=e99]: Confirmar Contraseña
+                  - textbox "Confirmar Contraseña" [ref=e100]:
+                    - /placeholder: ••••••••
+              - generic [ref=e101]:
+                - button "Cancelar" [ref=e102] [cursor=pointer]
+                - button "Actualizar Contraseña" [ref=e103] [cursor=pointer]
+  - generic [active]:
+    - generic [ref=e126]:
+      - generic [ref=e127]:
+        - generic [ref=e128]:
+          - navigation [ref=e129]:
+            - button "previous" [disabled] [ref=e130]:
+              - img "previous" [ref=e131]
+            - generic [ref=e133]:
+              - generic [ref=e134]: 1/
+              - text: "1"
+            - button "next" [disabled] [ref=e135]:
+              - img "next" [ref=e136]
+          - img
+        - generic [ref=e138]:
+          - link "Next.js 16.2.7 (stale) Turbopack" [ref=e139] [cursor=pointer]:
+            - /url: https://nextjs.org/docs/messages/version-staleness
+            - img [ref=e140]
+            - generic "There is a newer version (16.2.9) available, upgrade recommended!" [ref=e142]: Next.js 16.2.7 (stale)
+            - generic [ref=e143]: Turbopack
+          - img
+      - generic [ref=e144]:
+        - dialog "Console Error" [ref=e145]:
+          - generic [ref=e148]:
+            - generic [ref=e149]:
+              - generic [ref=e150]:
+                - generic [ref=e152]: Console Error
+                - generic [ref=e153]:
+                  - button "Copy Error Info" [ref=e154] [cursor=pointer]:
+                    - img [ref=e155]
+                  - button "No related documentation found" [disabled] [ref=e157]:
+                    - img [ref=e158]
+                  - button "Attach Node.js inspector" [ref=e160] [cursor=pointer]:
+                    - img [ref=e161]
+              - generic [ref=e170]: "eval() is not supported in this environment. If this page was served with a `Content-Security-Policy` header, make sure that `unsafe-eval` is included. React requires eval() in development mode for various debugging features like reconstructing callstacks from a different environment. React will never use eval() in production mode"
+            - generic [ref=e173]:
+              - paragraph [ref=e174]:
+                - text: Call Stack
+                - generic [ref=e175]: "24"
+              - button "Show 24 ignore-listed frame(s)" [ref=e176] [cursor=pointer]:
+                - text: Show 24 ignore-listed frame(s)
+                - img [ref=e177]
+          - generic [ref=e179]: "1"
+          - generic [ref=e180]: "2"
+        - contentinfo [ref=e181]:
+          - region "Error feedback" [ref=e182]:
+            - paragraph [ref=e183]:
+              - link "Was this helpful?" [ref=e184] [cursor=pointer]:
+                - /url: https://nextjs.org/telemetry#error-feedback
+            - button "Mark as helpful" [ref=e185] [cursor=pointer]:
+              - img [ref=e186]
+            - button "Mark as not helpful" [ref=e189] [cursor=pointer]:
+              - img [ref=e190]
+    - generic [ref=e109] [cursor=pointer]:
+      - button "Open Next.js Dev Tools" [ref=e110]:
+        - img [ref=e111]
+      - generic [ref=e114]:
+        - button "Open issues overlay" [ref=e115]:
+          - generic [ref=e116]:
+            - generic [ref=e117]: "0"
+            - generic [ref=e118]: "1"
+          - generic [ref=e119]: Issue
+        - button "Collapse issues badge" [ref=e120]:
+          - img [ref=e121]
+  - alert [ref=e123]

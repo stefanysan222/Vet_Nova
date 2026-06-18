@@ -1,0 +1,117 @@
+- generic [ref=e1]:
+  - main [ref=e2]:
+    - generic [ref=e3]:
+      - complementary [ref=e4]:
+        - generic [ref=e5]:
+          - img "VetNova Logo" [ref=e6]
+          - generic [ref=e7]:
+            - heading "VetNova" [level=1] [ref=e8]
+            - paragraph [ref=e9]: Sistema Veterinario
+        - navigation [ref=e10]:
+          - link "Dashboard" [ref=e11] [cursor=pointer]:
+            - /url: /cliente
+            - img [ref=e12]
+            - text: Dashboard
+          - link "Citas" [ref=e15] [cursor=pointer]:
+            - /url: /cliente/agendar
+            - img [ref=e16]
+            - text: Citas
+          - link "Mascotas" [ref=e18] [cursor=pointer]:
+            - /url: /cliente/mascotas
+            - img [ref=e19]
+            - text: Mascotas
+          - link "Configuración" [ref=e24] [cursor=pointer]:
+            - /url: /cliente/configuracion
+            - img [ref=e25]
+            - text: Configuración
+        - button "Cerrar Sesión" [ref=e29] [cursor=pointer]:
+          - img [ref=e30]
+          - text: Cerrar Sesión
+      - generic [ref=e33]:
+        - generic [ref=e34]:
+          - generic [ref=e36]:
+            - img [ref=e37]
+            - textbox "Buscar mascotas, citas..." [ref=e40]
+          - generic [ref=e41]:
+            - button "Abrir notificaciones" [ref=e42] [cursor=pointer]:
+              - img [ref=e43]
+            - button "Abrir menú de perfil" [ref=e48] [cursor=pointer]:
+              - generic [ref=e49]:
+                - paragraph [ref=e56]: Audit Tester
+                - paragraph [ref=e50]: Cliente
+              - generic [ref=e51]: AT
+        - generic [ref=e144]:
+          - generic [ref=e145]:
+            - link "Volver a citas" [ref=e146] [cursor=pointer]:
+              - /url: /cliente/agendar
+              - img [ref=e147]
+              - text: Volver a citas
+            - heading "Nueva solicitud de cita" [level=1] [ref=e149]
+          - generic [ref=e151]:
+            - generic [ref=e153]:
+              - img [ref=e188]
+              - paragraph [ref=e155]: Mascota
+            - generic [ref=e158]:
+              - img [ref=e226]
+              - paragraph [ref=e160]: Servicio
+            - generic [ref=e163]:
+              - generic [ref=e164]: "3"
+              - paragraph [ref=e165]: Fecha y hora
+          - generic [ref=e229]:
+            - heading "Elige fecha, hora y veterinario" [level=2] [ref=e230]
+            - paragraph [ref=e231]: Selecciona cuándo quieres que Rocky sea atendida.
+            - generic [ref=e232]:
+              - generic [ref=e233]:
+                - generic [ref=e234]:
+                  - img [ref=e235]
+                  - text: Fecha
+                - textbox [ref=e237]
+              - generic [ref=e238]:
+                - generic [ref=e239]:
+                  - img [ref=e240]
+                  - text: Hora disponible
+                - paragraph [ref=e243]: Selecciona una fecha primero.
+            - generic [ref=e244]:
+              - generic [ref=e245]: Motivo de la consulta (opcional)
+              - textbox "Describe brevemente el motivo de la consulta o síntomas observados..." [ref=e246]
+            - generic [ref=e247]:
+              - paragraph [ref=e248]: Resumen de la solicitud
+              - generic [ref=e249]:
+                - generic [ref=e250]:
+                  - paragraph [ref=e251]: Mascota
+                  - paragraph [ref=e252]: Rocky
+                - generic [ref=e253]:
+                  - paragraph [ref=e254]: Servicio
+                  - paragraph [ref=e255]: Consulta general
+                - generic [ref=e256]:
+                  - paragraph [ref=e257]: Fecha
+                  - paragraph [ref=e258]: —
+                - generic [ref=e259]:
+                  - paragraph [ref=e260]: Hora
+                  - paragraph [ref=e261]: —
+                - generic [ref=e262]:
+                  - paragraph [ref=e263]: Veterinario
+                  - paragraph [ref=e264]: Sin preferencia (la clínica asignará)
+              - paragraph [ref=e265]:
+                - text: La cita quedará en estado
+                - strong [ref=e266]: Pendiente de confirmación
+                - text: . La clínica revisará y confirmará el horario.
+          - generic [ref=e173]:
+            - button "Atrás" [ref=e220] [cursor=pointer]:
+              - img [ref=e221]
+              - text: Atrás
+            - button "Solicitar cita" [active] [ref=e267] [cursor=pointer]:
+              - text: Solicitar cita
+              - img [ref=e268]
+  - generic [ref=e128] [cursor=pointer]:
+    - button "Open Next.js Dev Tools" [ref=e129]:
+      - img [ref=e130]
+    - generic [ref=e133]:
+      - button "Open issues overlay" [ref=e134]:
+        - generic [ref=e135]:
+          - generic [ref=e136]: "0"
+          - generic [ref=e137]: "1"
+        - generic [ref=e138]: Issue
+      - button "Collapse issues badge" [ref=e139]:
+        - img [ref=e140]
+  - alert [ref=e142]

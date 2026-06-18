@@ -1,0 +1,130 @@
+- generic [active] [ref=e1]:
+  - generic [ref=e87] [cursor=pointer]:
+    - button "Open Next.js Dev Tools" [ref=e88]:
+      - img [ref=e89]
+    - generic [ref=e92]:
+      - button "Open issues overlay" [ref=e93]:
+        - generic [ref=e94]:
+          - generic [ref=e95]: "0"
+          - generic [ref=e96]: "1"
+        - generic [ref=e97]: Issue
+      - button "Collapse issues badge" [ref=e98]:
+        - img [ref=e99]
+  - alert [ref=e101]
+  - main [ref=e163]:
+    - generic [ref=e164]:
+      - complementary [ref=e165]:
+        - generic [ref=e166]:
+          - img "VetNova Logo" [ref=e167]
+          - generic [ref=e168]:
+            - heading "VetNova" [level=1] [ref=e169]
+            - paragraph [ref=e170]: Sistema Veterinario
+        - navigation [ref=e171]:
+          - link "Dashboard" [ref=e172] [cursor=pointer]:
+            - /url: /cliente
+            - img [ref=e173]
+            - text: Dashboard
+          - link "Citas" [ref=e176] [cursor=pointer]:
+            - /url: /cliente/agendar
+            - img [ref=e177]
+            - text: Citas
+          - link "Mascotas" [ref=e179] [cursor=pointer]:
+            - /url: /cliente/mascotas
+            - img [ref=e180]
+            - text: Mascotas
+          - link "Configuración" [ref=e185] [cursor=pointer]:
+            - /url: /cliente/configuracion
+            - img [ref=e186]
+            - text: Configuración
+        - button "Cerrar Sesión" [ref=e190] [cursor=pointer]:
+          - img [ref=e191]
+          - text: Cerrar Sesión
+      - generic [ref=e194]:
+        - generic [ref=e195]:
+          - generic [ref=e197]:
+            - img [ref=e198]
+            - textbox "Buscar mascotas, citas..." [ref=e201]
+          - generic [ref=e202]:
+            - button "Abrir notificaciones" [ref=e203] [cursor=pointer]:
+              - img [ref=e204]
+              - generic [ref=e442]: "1"
+            - button "Abrir menú de perfil" [ref=e209] [cursor=pointer]:
+              - generic [ref=e210]:
+                - paragraph [ref=e211]: Cliente Prueba E2E
+                - paragraph [ref=e212]: Cliente
+              - generic [ref=e213]: CP
+        - generic [ref=e469]:
+          - generic [ref=e470]:
+            - link "Volver a mascotas" [ref=e471] [cursor=pointer]:
+              - /url: /cliente/mascotas
+              - img [ref=e472]
+              - text: Volver a mascotas
+            - heading "Nueva Mascota" [level=1] [ref=e474]
+            - paragraph [ref=e475]: Registra la información de tu mascota
+          - generic [ref=e476]:
+            - generic [ref=e477]:
+              - generic [ref=e478]:
+                - img [ref=e480]
+                - generic [ref=e483]:
+                  - heading "Información de la mascota" [level=2] [ref=e484]
+                  - paragraph [ref=e485]: Completa los datos básicos del registro
+              - generic [ref=e486]:
+                - img [ref=e488]
+                - generic [ref=e491]:
+                  - paragraph [ref=e492]: Foto de la mascota
+                  - paragraph [ref=e493]: Selecciona una imagen JPG o PNG. Máximo 5 MB.
+                  - generic [ref=e495] [cursor=pointer]: Seleccionar foto
+              - generic [ref=e496]:
+                - generic [ref=e497]:
+                  - generic [ref=e498]: Nombre*
+                  - textbox "Nombre*" [ref=e499]:
+                    - /placeholder: Ej. Toby
+                - generic [ref=e500]:
+                  - generic [ref=e501]: Especie*
+                  - combobox "Especie*" [ref=e502]:
+                    - option "Perro" [selected]
+                    - option "Gato"
+                    - option "Otro"
+                - generic [ref=e503]:
+                  - generic [ref=e504]: Raza*
+                  - textbox "Raza*" [ref=e505]:
+                    - /placeholder: Ej. Golden Retriever
+                - generic [ref=e506]:
+                  - generic [ref=e507]: Sexo
+                  - combobox "Sexo" [ref=e508]:
+                    - option "Seleccionar sexo" [selected]
+                    - option "Macho"
+                    - option "Hembra"
+                - generic [ref=e509]:
+                  - generic [ref=e510]: Fecha de nacimiento
+                  - textbox "Fecha de nacimiento" [ref=e511]
+                - generic [ref=e512]:
+                  - generic [ref=e513]: Peso aproximado (kg)
+                  - spinbutton "Peso aproximado (kg)" [ref=e514]
+                - generic [ref=e515]:
+                  - generic [ref=e516]: Color
+                  - textbox "Color" [ref=e517]:
+                    - /placeholder: Ej. Dorado
+                - generic [ref=e518]:
+                  - generic [ref=e519]: Estado
+                  - combobox "Estado" [ref=e520]:
+                    - option "Activo" [selected]
+                    - option "En tratamiento"
+              - generic [ref=e521]:
+                - generic [ref=e522]: Observaciones
+                - textbox "Observaciones" [ref=e523]:
+                  - /placeholder: Alergias, cuidados especiales o información adicional...
+            - complementary [ref=e524]:
+              - generic [ref=e525]:
+                - heading "Propietario asociado" [level=2] [ref=e526]
+                - generic [ref=e527]:
+                  - generic [ref=e528]: CP
+                  - generic [ref=e529]:
+                    - paragraph [ref=e530]: Cliente Prueba E2E
+                    - paragraph [ref=e531]: Cliente
+                - paragraph [ref=e532]: Esta mascota quedará asociada automáticamente a tu cuenta.
+              - generic [ref=e533]:
+                - button "Guardar Mascota" [ref=e534] [cursor=pointer]
+                - link "Cancelar" [ref=e535] [cursor=pointer]:
+                  - /url: /cliente/mascotas
+  - generic [ref=e441]: 13/06

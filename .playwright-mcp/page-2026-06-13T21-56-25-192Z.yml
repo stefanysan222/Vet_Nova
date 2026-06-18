@@ -1,0 +1,194 @@
+- generic [active] [ref=e1]:
+  - generic [ref=e56] [cursor=pointer]:
+    - button "Open Next.js Dev Tools" [ref=e57]:
+      - img [ref=e58]
+    - generic [ref=e61]:
+      - button "Open issues overlay" [ref=e62]:
+        - generic [ref=e63]:
+          - generic [ref=e64]: "0"
+          - generic [ref=e65]: "1"
+        - generic [ref=e66]: Issue
+      - button "Collapse issues badge" [ref=e67]:
+        - img [ref=e68]
+  - alert [ref=e70]
+  - main [ref=e71]:
+    - generic [ref=e72]:
+      - complementary [ref=e73]:
+        - generic [ref=e74]:
+          - img "VetNova" [ref=e75]
+          - generic [ref=e76]:
+            - heading "VetNova" [level=1] [ref=e77]
+            - paragraph [ref=e78]: Sistema Veterinario
+        - navigation [ref=e79]:
+          - link "Dashboard" [ref=e80] [cursor=pointer]:
+            - /url: /veterinario
+            - img [ref=e81]
+            - text: Dashboard
+          - link "Citas" [ref=e86] [cursor=pointer]:
+            - /url: /veterinario/citas
+            - img [ref=e87]
+            - text: Citas
+          - link "Pacientes" [ref=e89] [cursor=pointer]:
+            - /url: /veterinario/mascotas
+            - img [ref=e90]
+            - text: Pacientes
+          - link "Historial Clínico" [ref=e95] [cursor=pointer]:
+            - /url: /veterinario/historial
+            - img [ref=e96]
+            - text: Historial Clínico
+          - link "Mi perfil" [ref=e100] [cursor=pointer]:
+            - /url: /veterinario/configuracion
+            - img [ref=e101]
+            - text: Mi perfil
+        - button "Cerrar Sesión" [ref=e105] [cursor=pointer]:
+          - img [ref=e106]
+          - text: Cerrar Sesión
+      - generic [ref=e109]:
+        - generic [ref=e110]:
+          - generic [ref=e112]:
+            - img [ref=e113]
+            - textbox "Buscar pacientes, citas o historiales..." [ref=e116]
+          - generic [ref=e117]:
+            - button "Ver notificaciones" [ref=e119] [cursor=pointer]:
+              - img [ref=e120]
+            - button "Vet E2E Test Veterinario VE" [ref=e126] [cursor=pointer]:
+              - generic [ref=e127]:
+                - paragraph [ref=e128]: Vet E2E Test
+                - paragraph [ref=e129]: Veterinario
+              - generic [ref=e130]: VE
+        - generic [ref=e133]:
+          - generic [ref=e134]:
+            - generic [ref=e135]:
+              - paragraph [ref=e136]: Módulo veterinario
+              - heading "Hola, Vet E2E Test 👋" [level=1] [ref=e137]
+              - paragraph [ref=e138]: Consulta tu agenda diaria, registra valoraciones y revisa la historia clínica de tus pacientes.
+              - generic [ref=e139]:
+                - link "Registrar consulta" [ref=e140] [cursor=pointer]:
+                  - /url: /veterinario/consulta
+                  - img [ref=e141]
+                  - text: Registrar consulta
+                - link "Ver agenda" [ref=e142] [cursor=pointer]:
+                  - /url: /veterinario/citas
+                  - img [ref=e143]
+                  - text: Ver agenda
+            - generic [ref=e145]:
+              - generic [ref=e146]:
+                - img [ref=e147]
+                - heading "Agenda de hoy" [level=3] [ref=e149]
+              - paragraph [ref=e150]: Sin citas programadas para hoy.
+          - generic [ref=e151]:
+            - generic [ref=e152]:
+              - img [ref=e154]
+              - paragraph [ref=e156]: "0"
+              - paragraph [ref=e157]: Citas hoy
+            - generic [ref=e158]:
+              - img [ref=e160]
+              - paragraph [ref=e163]: "0"
+              - paragraph [ref=e164]: Atendidas
+            - generic [ref=e165]:
+              - img [ref=e167]
+              - paragraph [ref=e170]: "0"
+              - paragraph [ref=e171]: Pendientes
+            - generic [ref=e172]:
+              - img [ref=e174]
+              - paragraph [ref=e177]: "0"
+              - paragraph [ref=e178]: Tratamientos
+            - generic [ref=e179]:
+              - img [ref=e181]
+              - paragraph [ref=e183]: "0"
+              - paragraph [ref=e184]: Esta semana
+          - generic [ref=e185]:
+            - generic [ref=e186]:
+              - heading "Citas programadas por día" [level=2] [ref=e187]
+              - paragraph [ref=e188]: Últimos 30 días y próximos 14
+              - generic [ref=e189]:
+                - generic [ref=e190]: Hoy
+                - generic [ref=e192]: Pasado
+                - generic [ref=e194]: Próximo
+              - generic [ref=e198]:
+                - generic:
+                  - status:
+                    - paragraph: 13/06
+                    - list:
+                      - listitem: ": 0 citas"
+                      - listitem: ": 0 citas"
+                      - listitem: ": 0 citas"
+                - application [ref=e199]:
+                  - generic [ref=e207]: 13/06
+            - generic [ref=e208]:
+              - generic [ref=e209]:
+                - heading "Junio 2026" [level=3] [ref=e210]
+                - generic [ref=e211]:
+                  - button "Mes anterior" [ref=e212] [cursor=pointer]:
+                    - img [ref=e213]
+                  - button "Mes siguiente" [ref=e215] [cursor=pointer]:
+                    - img [ref=e216]
+              - generic [ref=e218]:
+                - generic [ref=e219]: L
+                - generic [ref=e220]: M
+                - generic [ref=e221]: M
+                - generic [ref=e222]: J
+                - generic [ref=e223]: V
+                - generic [ref=e224]: S
+                - generic [ref=e225]: D
+                - generic [ref=e227]: "1"
+                - generic [ref=e230]: "2"
+                - generic [ref=e233]: "3"
+                - generic [ref=e236]: "4"
+                - generic [ref=e239]: "5"
+                - generic [ref=e242]: "6"
+                - generic [ref=e245]: "7"
+                - generic [ref=e248]: "8"
+                - generic [ref=e251]: "9"
+                - generic [ref=e254]: "10"
+                - generic [ref=e257]: "11"
+                - generic [ref=e260]: "12"
+                - generic [ref=e263]: "13"
+                - generic [ref=e266]: "14"
+                - generic [ref=e269]: "15"
+                - generic [ref=e272]: "16"
+                - generic [ref=e275]: "17"
+                - generic [ref=e278]: "18"
+                - generic [ref=e281]: "19"
+                - generic [ref=e284]: "20"
+                - generic [ref=e287]: "21"
+                - generic [ref=e290]: "22"
+                - generic [ref=e293]: "23"
+                - generic [ref=e296]: "24"
+                - generic [ref=e299]: "25"
+                - generic [ref=e302]: "26"
+                - generic [ref=e305]: "27"
+                - generic [ref=e308]: "28"
+                - generic [ref=e311]: "29"
+                - generic [ref=e314]: "30"
+              - generic [ref=e316]:
+                - generic [ref=e317]: Con citas
+                - generic [ref=e319]: Libre
+          - generic [ref=e321]:
+            - generic [ref=e322]:
+              - generic [ref=e323]:
+                - img [ref=e324]
+                - heading "Pacientes atendidos recientemente" [level=3] [ref=e326]
+              - paragraph [ref=e327]: No hay pacientes atendidos recientemente.
+            - generic [ref=e328]:
+              - generic [ref=e329]:
+                - img [ref=e330]
+                - heading "Acciones rápidas" [level=3] [ref=e332]
+              - generic [ref=e333]:
+                - link "Registrar consulta" [ref=e334] [cursor=pointer]:
+                  - /url: /veterinario/consulta
+                  - img [ref=e335]
+                  - text: Registrar consulta
+                - link "Ver agenda completa" [ref=e339] [cursor=pointer]:
+                  - /url: /veterinario/citas
+                  - img [ref=e340]
+                  - text: Ver agenda completa
+                - link "Pacientes" [ref=e342] [cursor=pointer]:
+                  - /url: /veterinario/mascotas
+                  - img [ref=e343]
+                  - text: Pacientes
+                - link "Historial clínico" [ref=e348] [cursor=pointer]:
+                  - /url: /veterinario/historial
+                  - img [ref=e349]
+                  - text: Historial clínico
+  - generic [ref=e352]: 13/06

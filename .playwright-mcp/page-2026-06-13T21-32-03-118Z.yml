@@ -1,0 +1,262 @@
+- generic [ref=e1]:
+  - generic [ref=e2]:
+    - banner [ref=e3]:
+      - generic [ref=e4]:
+        - link "VetNova VetNova" [ref=e5] [cursor=pointer]:
+          - /url: "#"
+          - img "VetNova" [ref=e7]
+          - generic [ref=e8]: VetNova
+        - navigation [ref=e9]:
+          - link "Inicio" [ref=e10] [cursor=pointer]:
+            - /url: "#"
+          - link "Servicios" [ref=e11] [cursor=pointer]:
+            - /url: "#servicios"
+          - link "Nosotros" [ref=e12] [cursor=pointer]:
+            - /url: "#nosotros"
+          - link "Contacto" [ref=e13] [cursor=pointer]:
+            - /url: "#contacto"
+        - generic [ref=e14]:
+          - link "Iniciar sesión" [ref=e15] [cursor=pointer]:
+            - /url: /login
+          - link "Registrarse" [ref=e16] [cursor=pointer]:
+            - /url: /register
+    - main [ref=e17]:
+      - generic [ref=e20]:
+        - generic [ref=e21]: Sistema de gestión veterinaria
+        - generic [ref=e23]:
+          - generic [ref=e24]:
+            - heading "Tu clínica, organizada. Tus pacientes, cuidados." [level=1] [ref=e25]:
+              - text: Tu clínica, organizada.
+              - text: Tus pacientes, cuidados.
+            - paragraph [ref=e26]: "VetNova centraliza la agenda, la historia clínica y la gestión de tu clínica veterinaria en un solo sistema, pensado para que puedas concentrarte en lo que importa: el bienestar de cada mascota."
+            - generic [ref=e27]:
+              - link "Entrar al sistema" [ref=e28] [cursor=pointer]:
+                - /url: /login
+                - text: Entrar al sistema
+                - img [ref=e29]
+              - link "Crear cuenta gratuita" [ref=e31] [cursor=pointer]:
+                - /url: /register
+            - paragraph [ref=e32]: Sin tarjeta de crédito · Acceso inmediato · Soporte incluido
+          - generic [ref=e34]:
+            - generic [ref=e35]:
+              - paragraph [ref=e36]: Hoy en la clínica
+              - generic [ref=e37]: En línea
+            - generic [ref=e39]:
+              - generic [ref=e40]:
+                - generic [ref=e41]:
+                  - generic [ref=e42]: 09:00
+                  - generic [ref=e43]:
+                    - paragraph [ref=e44]: Luna
+                    - paragraph [ref=e45]: Vacunación
+                - generic [ref=e46]: Confirmada
+              - generic [ref=e47]:
+                - generic [ref=e48]:
+                  - generic [ref=e49]: 10:30
+                  - generic [ref=e50]:
+                    - paragraph [ref=e51]: Toby
+                    - paragraph [ref=e52]: Consulta general
+                - generic [ref=e53]: En atención
+              - generic [ref=e54]:
+                - generic [ref=e55]:
+                  - generic [ref=e56]: 11:00
+                  - generic [ref=e57]:
+                    - paragraph [ref=e58]: Mochi
+                    - paragraph [ref=e59]: Control post-op
+                - generic [ref=e60]: Pendiente
+              - generic [ref=e61]:
+                - generic [ref=e62]:
+                  - generic [ref=e63]: 14:00
+                  - generic [ref=e64]:
+                    - paragraph [ref=e65]: Rocky
+                    - paragraph [ref=e66]: Desparasitación
+                - generic [ref=e67]: Confirmada
+            - generic [ref=e68]:
+              - generic [ref=e69]:
+                - paragraph [ref=e70]: "4"
+                - paragraph [ref=e71]: Citas hoy
+              - generic [ref=e72]:
+                - paragraph [ref=e73]: "2"
+                - paragraph [ref=e74]: Confirmadas
+              - generic [ref=e75]:
+                - paragraph [ref=e76]: "1"
+                - paragraph [ref=e77]: Pendientes
+        - generic [ref=e78]:
+          - generic [ref=e79]:
+            - img [ref=e81]
+            - paragraph [ref=e84]: Citas sin complicaciones
+            - paragraph [ref=e85]: Agenda, confirma y recuerda citas desde cualquier dispositivo.
+          - generic [ref=e86]:
+            - img [ref=e88]
+            - paragraph [ref=e91]: Historia clínica digital
+            - paragraph [ref=e92]: Accede al expediente completo de cada paciente en segundos.
+          - generic [ref=e93]:
+            - img [ref=e95]
+            - paragraph [ref=e97]: Seguimiento de pacientes
+            - paragraph [ref=e98]: Evoluciones, tratamientos y alertas de seguimiento integrados.
+          - generic [ref=e99]:
+            - img [ref=e101]
+            - paragraph [ref=e104]: Roles y accesos seguros
+            - paragraph [ref=e105]: Administrador, veterinario y cliente con vistas personalizadas.
+      - generic [ref=e106]:
+        - generic [ref=e107]:
+          - paragraph [ref=e108]: Módulos del sistema
+          - heading "Todo lo que necesita una clínica veterinaria moderna." [level=2] [ref=e109]
+          - paragraph [ref=e110]: "Cada módulo está diseñado para un rol específico: el administrador gestiona, el veterinario atiende y el cliente hace seguimiento."
+        - generic [ref=e111]:
+          - article [ref=e112]:
+            - img [ref=e114]
+            - heading "Agenda inteligente" [level=3] [ref=e117]
+            - paragraph [ref=e118]: Los clientes solicitan citas desde su cuenta. El administrador las confirma. Sin llamadas, sin confusiones.
+          - article [ref=e119]:
+            - img [ref=e121]
+            - heading "Historia clínica" [level=3] [ref=e124]
+            - paragraph [ref=e125]: Registra consultas, diagnósticos, vacunas y tratamientos. Todo queda guardado y accesible para el veterinario.
+          - article [ref=e126]:
+            - img [ref=e128]
+            - heading "Gestión de pacientes" [level=3] [ref=e133]
+            - paragraph [ref=e134]: "Cada mascota tiene su perfil completo: especie, raza, edad, peso, alergias y su propietario vinculado."
+          - article [ref=e135]:
+            - img [ref=e137]
+            - heading "Reportes y control" [level=3] [ref=e139]
+            - paragraph [ref=e140]: Estadísticas de citas, usuarios activos y actividad del sistema, disponibles para el administrador en tiempo real.
+      - generic [ref=e143]:
+        - paragraph [ref=e144]: Por qué VetNova
+        - heading "Construido con claridad. Sin funciones de relleno." [level=2] [ref=e145]
+        - generic [ref=e146]:
+          - generic [ref=e147]:
+            - paragraph [ref=e148]: Un sistema, tres roles
+            - paragraph [ref=e149]: Administrador, veterinario y cliente tienen vistas y permisos ajustados a lo que necesitan, sin acceso a lo que no corresponde.
+          - generic [ref=e150]:
+            - paragraph [ref=e151]: Datos reales, no estimaciones
+            - paragraph [ref=e152]: Citas, mascotas y usuarios se obtienen directamente de la base de datos. Ningún número es inventado.
+          - generic [ref=e153]:
+            - paragraph [ref=e154]: Acceso desde cualquier lugar
+            - paragraph [ref=e155]: Sistema web responsivo que funciona en computador, tablet o celular, sin instalar nada.
+          - generic [ref=e156]:
+            - paragraph [ref=e157]: Diseñado para crecer
+            - paragraph [ref=e158]: La arquitectura soporta agregar funcionalidades sin reescribir lo que ya funciona.
+      - generic [ref=e161]:
+        - generic [ref=e162]:
+          - generic [ref=e163]:
+            - paragraph [ref=e164]: Contacto
+            - heading "¿Tienes alguna pregunta sobre el sistema?" [level=2] [ref=e165]
+            - paragraph [ref=e166]: Si necesitas ayuda con tu cuenta, tienes una consulta técnica o quieres reportar un problema, escríbenos y te respondemos a la brevedad.
+          - generic [ref=e167]:
+            - generic [ref=e168]:
+              - img [ref=e170]
+              - text: suportvetnova@gmail.com
+            - generic [ref=e173]:
+              - img [ref=e175]
+              - text: +57 300 123 4567
+            - generic [ref=e177]:
+              - img [ref=e179]
+              - text: Bogotá, Colombia
+          - generic [ref=e182]:
+            - paragraph [ref=e183]: Tiempo de respuesta
+            - paragraph [ref=e184]: Respondemos dentro de las 24 horas hábiles siguientes.
+        - generic [ref=e185]:
+          - generic [ref=e186]:
+            - generic [ref=e187]: Nombre completo
+            - textbox "Tu nombre" [ref=e188]
+          - generic [ref=e189]:
+            - generic [ref=e190]: Correo electrónico
+            - textbox "correo@ejemplo.com" [ref=e191]
+          - generic [ref=e192]:
+            - generic [ref=e193]: Asunto
+            - combobox [ref=e194]:
+              - option "Selecciona un asunto" [selected]
+              - option "Problema con mi cuenta"
+              - option "Error en el sistema"
+              - option "Consulta general"
+              - option "Solicitud de soporte"
+              - option "Otro"
+          - generic [ref=e195]:
+            - generic [ref=e196]: Mensaje
+            - textbox "Describe tu consulta o problema..." [ref=e197]
+          - button "Enviar mensaje" [ref=e198] [cursor=pointer]
+    - contentinfo [ref=e199]:
+      - generic [ref=e200]:
+        - generic [ref=e201]:
+          - paragraph [ref=e202]: VetNova
+          - paragraph [ref=e203]: Sistema de gestión veterinaria para clínicas que quieren organizarse mejor sin complicarse.
+        - generic [ref=e204]:
+          - generic [ref=e205]:
+            - paragraph [ref=e206]: Sistema
+            - generic [ref=e207]:
+              - paragraph [ref=e208]:
+                - link "Iniciar sesión" [ref=e209] [cursor=pointer]:
+                  - /url: /login
+              - paragraph [ref=e210]:
+                - link "Crear cuenta" [ref=e211] [cursor=pointer]:
+                  - /url: /register
+          - generic [ref=e212]:
+            - paragraph [ref=e213]: Contacto
+            - generic [ref=e214]:
+              - paragraph [ref=e215]: suportvetnova@gmail.com
+              - paragraph [ref=e216]: +57 300 123 4567
+              - paragraph [ref=e217]: Bogotá, Colombia
+      - paragraph [ref=e219]: © 2026 VetNova. Todos los derechos reservados.
+  - generic [active]:
+    - generic [ref=e241]:
+      - generic [ref=e242]:
+        - generic [ref=e243]:
+          - navigation [ref=e244]:
+            - button "previous" [disabled] [ref=e245]:
+              - img "previous" [ref=e246]
+            - generic [ref=e248]:
+              - generic [ref=e249]: 1/
+              - text: "1"
+            - button "next" [disabled] [ref=e250]:
+              - img "next" [ref=e251]
+          - img
+        - generic [ref=e253]:
+          - link "Next.js 16.2.7 (stale) Turbopack" [ref=e254] [cursor=pointer]:
+            - /url: https://nextjs.org/docs/messages/version-staleness
+            - img [ref=e255]
+            - generic "There is a newer version (16.2.9) available, upgrade recommended!" [ref=e257]: Next.js 16.2.7 (stale)
+            - generic [ref=e258]: Turbopack
+          - img
+      - generic [ref=e259]:
+        - dialog "Console Error" [ref=e260]:
+          - generic [ref=e263]:
+            - generic [ref=e264]:
+              - generic [ref=e265]:
+                - generic [ref=e267]: Console Error
+                - generic [ref=e268]:
+                  - button "Copy Error Info" [ref=e269] [cursor=pointer]:
+                    - img [ref=e270]
+                  - button "No related documentation found" [disabled] [ref=e272]:
+                    - img [ref=e273]
+                  - button "Attach Node.js inspector" [ref=e275] [cursor=pointer]:
+                    - img [ref=e276]
+              - generic [ref=e285]: "eval() is not supported in this environment. If this page was served with a `Content-Security-Policy` header, make sure that `unsafe-eval` is included. React requires eval() in development mode for various debugging features like reconstructing callstacks from a different environment. React will never use eval() in production mode"
+            - generic [ref=e288]:
+              - paragraph [ref=e289]:
+                - text: Call Stack
+                - generic [ref=e290]: "24"
+              - button "Show 24 ignore-listed frame(s)" [ref=e291] [cursor=pointer]:
+                - text: Show 24 ignore-listed frame(s)
+                - img [ref=e292]
+          - generic [ref=e294]: "1"
+          - generic [ref=e295]: "2"
+        - contentinfo [ref=e296]:
+          - region "Error feedback" [ref=e297]:
+            - paragraph [ref=e298]:
+              - link "Was this helpful?" [ref=e299] [cursor=pointer]:
+                - /url: https://nextjs.org/telemetry#error-feedback
+            - button "Mark as helpful" [ref=e300] [cursor=pointer]:
+              - img [ref=e301]
+            - button "Mark as not helpful" [ref=e304] [cursor=pointer]:
+              - img [ref=e305]
+    - generic [ref=e224] [cursor=pointer]:
+      - button "Open Next.js Dev Tools" [ref=e225]:
+        - img [ref=e226]
+      - generic [ref=e229]:
+        - button "Open issues overlay" [ref=e230]:
+          - generic [ref=e231]:
+            - generic [ref=e232]: "0"
+            - generic [ref=e233]: "1"
+          - generic [ref=e234]: Issue
+        - button "Collapse issues badge" [ref=e235]:
+          - img [ref=e236]
+  - alert [ref=e238]
