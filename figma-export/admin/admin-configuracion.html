@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>VetNova — Panel Admin — Configuración</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<script>
+  tailwind.config = {
+    darkMode: 'class',
+    theme: {
+      extend: {
+        fontFamily: { sans: ['Inter', 'system-ui', 'sans-serif'] },
+        colors: {
+          brand: { 50:"#F5F3FE",100:"#EDE8FA",200:"#DDD6F7",300:"#C4B5FD",400:"#A78BFA",500:"#8B5CF6",600:"#7C3AED",700:"#6D28D9",800:"#5B21B6",900:"#4C1D95" },
+          surface: { 50:"#F8F8FC",100:"#F1F1F8",200:"#E4E4F0",300:"#CBCBE0",400:"#9D9DBE",500:"#71719C",600:"#54547A",700:"#3D3D5C",800:"#25253D",900:"#15152B",950:"#0F172A" },
+          danger: { 50:"#FFF1F2",500:"#EF4444",600:"#DC2626" },
+        },
+        borderRadius: { '2xl':'1rem', '3xl':'1.25rem', '4xl':'1.5rem' },
+        boxShadow: {
+          card: "0 1px 2px rgba(15,23,42,0.04), 0 8px 24px rgba(124,58,237,0.06)",
+          'brand-sm': "0 2px 10px rgba(124,58,237,0.18)",
+        },
+      },
+    },
+  };
+</script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
+<style>
+  body { font-family: 'Inter', system-ui, sans-serif; }
+  .card { border-radius: 14px; border: 0.5px solid #E4DFF0; background: #fff; }
+  .cfg-input { width: 100%; border-radius: 9px; border: 0.5px solid #E4DFF0; background: #F7F6FA; padding: 9px 12px; font-size: 0.875rem; color: #0F172A; outline: none; }
+  .cfg-input:focus { border-color: #7C3AED; background: #fff; }
+  .cfg-label { display: block; margin-bottom: 6px; font-size: 10px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; color: #555068; }
+  .cfg-btn-primary { display: inline-flex; align-items: center; justify-content: center; gap: 0.5rem; border-radius: 9px; background: #7C3AED; color: #fff; padding: 0.55rem 1.25rem; font-size: 0.875rem; font-weight: 600; transition: background 0.15s; }
+  .cfg-btn-primary:hover { background: #6D28D9; }
+  .cfg-btn-secondary { display: inline-flex; align-items: center; justify-content: center; gap: 0.5rem; border-radius: 9px; border: 0.5px solid #E4DFF0; background: #fff; color: #334155; padding: 0.55rem 1.25rem; font-size: 0.875rem; font-weight: 600; transition: background 0.15s; }
+  .cfg-btn-secondary:hover { background: #F7F6FA; }
+</style>
+</head>
+<body class="bg-surface-50 text-surface-900">
+
+  <div class="flex h-screen overflow-hidden">
+
+    <!-- Sidebar -->
+    <aside class="hidden h-screen w-[260px] shrink-0 border-r border-surface-200 bg-white lg:flex lg:flex-col">
+      <div class="border-b border-surface-200 px-5 py-5">
+        <div class="flex items-center gap-3">
+          <div class="flex h-11 w-11 items-center justify-center rounded-xl bg-[#7C3AED] text-base font-bold text-white">CV</div>
+          <div class="min-w-0">
+            <p class="truncate text-sm font-semibold text-surface-900">Carla Vásquez</p>
+            <p class="truncate text-[11px] text-surface-400">Clínica VetNova Centro</p>
+          </div>
+        </div>
+      </div>
+
+      <nav class="flex-1 px-4 py-4 space-y-1.5">
+        <a href="#" class="flex h-11 items-center gap-3 rounded-xl px-4 text-sm font-semibold text-slate-700 hover:bg-slate-100">
+          <i data-lucide="home" class="h-5 w-5"></i> Dashboard
+        </a>
+        <a href="#" class="flex h-11 items-center gap-3 rounded-xl px-4 text-sm font-semibold text-slate-700 hover:bg-slate-100">
+          <i data-lucide="users" class="h-5 w-5"></i> Usuarios
+        </a>
+        <a href="#" class="flex h-11 items-center gap-3 rounded-xl px-4 text-sm font-semibold text-slate-700 hover:bg-slate-100">
+          <i data-lucide="calendar-days" class="h-5 w-5"></i> Citas
+        </a>
+        <a href="#" class="flex h-11 items-center gap-3 rounded-xl px-4 text-sm font-semibold text-slate-700 hover:bg-slate-100">
+          <i data-lucide="paw-print" class="h-5 w-5"></i> Mascotas
+        </a>
+        <a href="#" class="flex h-11 items-center gap-3 rounded-xl px-4 text-sm font-semibold text-slate-700 hover:bg-slate-100">
+          <i data-lucide="bar-chart-3" class="h-5 w-5"></i> Reportes
+        </a>
+        <a href="#" class="flex h-11 items-center gap-3 rounded-xl px-4 text-sm font-semibold text-slate-700 hover:bg-slate-100">
+          <i data-lucide="bell" class="h-5 w-5"></i> Notificaciones
+        </a>
+        <a href="#" class="flex h-11 items-center gap-3 rounded-xl px-4 text-sm font-semibold" style="background:rgba(124,58,237,0.1); color:#7C3AED;">
+          <i data-lucide="settings" class="h-5 w-5"></i> Configuración
+        </a>
+      </nav>
+
+      <div class="space-y-3 border-t border-surface-200 px-5 py-5">
+        <div class="flex items-center gap-2 rounded-xl px-3 py-2 text-[11px] font-semibold" style="background:rgba(124,58,237,0.08); color:#7C3AED;">
+          <i data-lucide="headphones" class="h-3.5 w-3.5"></i> Soporte 24/7
+        </div>
+        <button class="flex items-center gap-3 text-sm font-semibold text-surface-900 hover:text-[#7C3AED]">
+          <i data-lucide="log-out" class="h-[19px] w-[19px]"></i> Cerrar sesión
+        </button>
+      </div>
+    </aside>
+
+    <!-- Main -->
+    <section class="min-w-0 flex-1 overflow-y-auto">
+
+      <!-- Navbar -->
+      <header class="flex h-[64px] items-center justify-between border-b border-surface-200 bg-white px-5">
+        <div class="relative w-full max-w-sm">
+          <i data-lucide="search" class="pointer-events-none absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400"></i>
+          <input type="search" placeholder="Buscar usuarios, citas, mascotas..." class="w-full rounded-xl border border-slate-200 bg-slate-50 py-2.5 pl-10 pr-4 text-sm text-slate-900 outline-none" />
+        </div>
+        <div class="ml-5 flex items-center gap-4">
+          <button class="flex h-8 w-8 items-center justify-center rounded-lg text-surface-900 hover:bg-surface-100">
+            <i data-lucide="moon" class="h-[18px] w-[18px]"></i>
+          </button>
+          <button class="relative flex h-8 w-8 items-center justify-center rounded-lg text-surface-900 hover:bg-surface-100">
+            <i data-lucide="bell" class="h-[19px] w-[19px]"></i>
+            <span class="absolute right-0.5 top-0.5 flex h-4 w-4 items-center justify-center rounded-full bg-danger-500 text-[9px] font-bold text-white ring-2 ring-white">3</span>
+          </button>
+          <div class="h-8 w-px bg-surface-200"></div>
+          <div class="flex items-center gap-3">
+            <div class="text-right">
+              <p class="text-sm font-semibold leading-none text-surface-900">Carla Vásquez</p>
+              <p class="mt-1.5 text-[11px] font-medium uppercase tracking-wide text-surface-400">Administrador</p>
+            </div>
+            <div class="flex h-9 w-9 items-center justify-center rounded-full text-sm font-bold text-white" style="background:#7C3AED;">CV</div>
+          </div>
+        </div>
+      </header>
+
+      <!-- Content -->
+      <div class="bg-[#F7F6FA] px-5 py-6 sm:px-6 lg:px-10">
+        <div class="space-y-6">
+
+          <!-- Header -->
+          <div>
+            <p class="text-xs font-semibold uppercase tracking-[0.24em]" style="color:#7C3AED;">Configuración</p>
+            <h1 class="mt-2 text-2xl font-bold tracking-tight text-slate-900 sm:text-3xl">Perfil de cuenta</h1>
+            <p class="mt-2 max-w-xl text-sm leading-6 text-slate-500">Actualiza tu nombre de usuario, correo electrónico y contraseña.</p>
+          </div>
+
+          <!-- Grid principal -->
+          <div class="grid grid-cols-1 gap-3 lg:grid-cols-4">
+
+            <!-- Tarjeta de perfil -->
+            <div class="card p-6 lg:col-span-2">
+              <div class="flex items-center gap-4">
+                <div class="flex h-16 w-16 items-center justify-center rounded-2xl text-xl font-bold text-white" style="background:#7C3AED;">CV</div>
+                <div>
+                  <h2 class="text-lg font-semibold text-slate-900">Carla Vásquez</h2>
+                  <p class="text-sm text-slate-500">Administrador</p>
+                  <p class="text-sm text-slate-500">Clínica VetNova Centro</p>
+                </div>
+              </div>
+
+              <div class="mt-6 space-y-4 border-t border-[#E4DFF0] pt-4">
+                <div class="flex items-center justify-between">
+                  <p class="text-sm text-slate-500">Nombre</p>
+                  <p class="text-sm font-semibold text-slate-900">Carla Vásquez</p>
+                </div>
+                <div class="flex items-center justify-between">
+                  <p class="text-sm text-slate-500">Correo</p>
+                  <p class="text-sm font-semibold text-slate-900">carla.vasquez@vetnova.com</p>
+                </div>
+                <div class="flex items-center justify-between">
+                  <p class="text-sm text-slate-500">Clínica</p>
+                  <p class="text-sm font-semibold text-slate-900">Clínica VetNova Centro</p>
+                </div>
+              </div>
+            </div>
+
+            <!-- Información personal -->
+            <div class="card p-6 lg:col-span-2">
+              <h2 class="text-lg font-semibold text-slate-900">Información personal</h2>
+              <div class="mt-4 space-y-4">
+                <div>
+                  <label class="cfg-label">Nombre completo</label>
+                  <input type="text" class="cfg-input" value="Carla Vásquez" />
+                </div>
+                <div>
+                  <label class="cfg-label">Correo electrónico</label>
+                  <input type="email" class="cfg-input" value="carla.vasquez@vetnova.com" />
+                </div>
+              </div>
+              <div class="mt-5 flex justify-end gap-3">
+                <button class="cfg-btn-secondary">Cancelar</button>
+                <button class="cfg-btn-primary">Guardar cambios</button>
+              </div>
+            </div>
+
+            <!-- Cambiar contraseña -->
+            <div class="card p-6 lg:col-span-2 lg:col-start-3">
+              <h2 class="text-lg font-semibold text-slate-900">Cambiar contraseña</h2>
+              <div class="mt-4 grid grid-cols-1 gap-4 sm:grid-cols-3">
+                <div>
+                  <label class="cfg-label">Contraseña actual</label>
+                  <div class="relative">
+                    <input type="password" class="cfg-input pr-9" value="••••••••" />
+                    <button class="absolute right-2.5 top-1/2 -translate-y-1/2 text-slate-400"><i data-lucide="eye" class="h-4 w-4"></i></button>
+                  </div>
+                </div>
+                <div>
+                  <label class="cfg-label">Nueva contraseña</label>
+                  <div class="relative">
+                    <input type="password" class="cfg-input pr-9" value="••••••••" />
+                    <button class="absolute right-2.5 top-1/2 -translate-y-1/2 text-slate-400"><i data-lucide="eye-off" class="h-4 w-4"></i></button>
+                  </div>
+                </div>
+                <div>
+                  <label class="cfg-label">Confirmar contraseña</label>
+                  <div class="relative">
+                    <input type="password" class="cfg-input pr-9" value="••••••••" />
+                    <button class="absolute right-2.5 top-1/2 -translate-y-1/2 text-slate-400"><i data-lucide="eye-off" class="h-4 w-4"></i></button>
+                  </div>
+                  <p class="mt-1.5 text-xs font-medium" style="color:#059669;">✓ Las contraseñas coinciden</p>
+                </div>
+              </div>
+              <div class="mt-5 flex justify-end gap-3">
+                <button class="cfg-btn-secondary">Cancelar</button>
+                <button class="cfg-btn-primary">Actualizar contraseña</button>
+              </div>
+            </div>
+
+          </div>
+
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <script>lucide.createIcons();</script>
+</body>
+</html>

@@ -1,0 +1,267 @@
+- generic [ref=e1]:
+  - generic [ref=e148] [cursor=pointer]:
+    - button "Open Next.js Dev Tools" [ref=e149]:
+      - img [ref=e150]
+    - generic [ref=e153]:
+      - button "Open issues overlay" [ref=e154]:
+        - generic [ref=e155]:
+          - generic [ref=e156]: "1"
+          - generic [ref=e157]: "2"
+        - generic [ref=e158]:
+          - text: Issue
+          - generic [ref=e159]: s
+      - button "Collapse issues badge" [ref=e160]:
+        - img [ref=e161]
+  - generic [ref=e163]:
+    - complementary [ref=e164]:
+      - generic [ref=e166]:
+        - generic [ref=e167]: AV
+        - generic [ref=e168]:
+          - paragraph [ref=e169]: Admin VetNova
+          - paragraph [ref=e170]: Administrador
+      - navigation [ref=e172]:
+        - link "Dashboard" [ref=e173] [cursor=pointer]:
+          - /url: /admin
+          - img [ref=e174]
+          - text: Dashboard
+        - link "Usuarios" [ref=e177] [cursor=pointer]:
+          - /url: /admin/usuarios
+          - img [ref=e178]
+          - text: Usuarios
+        - link "Citas" [ref=e182] [cursor=pointer]:
+          - /url: /admin/citas
+          - img [ref=e183]
+          - text: Citas
+        - link "Mascotas" [ref=e185] [cursor=pointer]:
+          - /url: /admin/mascotas
+          - img [ref=e186]
+          - text: Mascotas
+        - link "Reportes" [ref=e189] [cursor=pointer]:
+          - /url: /admin/reportes
+          - img [ref=e190]
+          - text: Reportes
+        - link "Notificaciones" [ref=e192] [cursor=pointer]:
+          - /url: /admin/notificaciones
+          - img [ref=e193]
+          - text: Notificaciones
+        - link "Configuración" [ref=e196] [cursor=pointer]:
+          - /url: /admin/configuracion
+          - img [ref=e197]
+          - text: Configuración
+      - generic [ref=e200]:
+        - generic [ref=e202]:
+          - img [ref=e203]
+          - paragraph [ref=e206]: Soporte 24/7
+        - button "Cerrar sesión" [ref=e207] [cursor=pointer]:
+          - img [ref=e208]
+          - text: Cerrar sesión
+    - generic [ref=e211]:
+      - banner [ref=e212]:
+        - generic [ref=e213]:
+          - generic [ref=e214]:
+            - img
+            - searchbox "Buscar citas, usuarios o mascotas..." [ref=e215]
+          - generic [ref=e216]:
+            - button "Activar modo claro" [ref=e217] [cursor=pointer]:
+              - img [ref=e218]
+            - button [ref=e225] [cursor=pointer]:
+              - img [ref=e226]
+            - generic [ref=e229]:
+              - generic [ref=e230]: AV
+              - generic [ref=e231]: Admin VetNova
+      - main [ref=e232]:
+        - generic [ref=e233]:
+          - generic [ref=e235]:
+            - generic [ref=e236]:
+              - paragraph [ref=e237]: Citas
+              - heading "Agenda de atención" [level=1] [ref=e238]
+              - paragraph [ref=e239]: Gestiona las citas del sistema. Confirma, reprograma o cancela las solicitudes pendientes.
+            - generic [ref=e240]:
+              - article [ref=e241]:
+                - paragraph [ref=e243]: Total citas
+                - paragraph [ref=e244]: "11"
+              - article [ref=e245]:
+                - paragraph [ref=e247]: Pendientes
+                - paragraph [ref=e248]: "0"
+              - article [ref=e249]:
+                - paragraph [ref=e251]: Confirmadas
+                - paragraph [ref=e252]: "8"
+            - generic [ref=e253]:
+              - button "Todas" [ref=e254] [cursor=pointer]
+              - button "Pendientes" [ref=e255] [cursor=pointer]
+              - button "Confirmadas" [ref=e256] [cursor=pointer]
+            - generic [ref=e257]:
+              - article [ref=e381]:
+                - generic [ref=e382]:
+                  - generic [ref=e383]:
+                    - paragraph [ref=e384]: 2026-06-05 · 17:00
+                    - heading "Kora" [level=2] [ref=e385]
+                    - paragraph [ref=e386]: Consulta general · Sin veterinario asignado
+                    - paragraph [ref=e387]: "Propietario: Lorena Romero"
+                  - generic [ref=e388]:
+                    - generic [ref=e389]: Confirmada
+                    - button "Cancelar" [ref=e391] [cursor=pointer]
+              - article [ref=e392]:
+                - generic [ref=e393]:
+                  - generic [ref=e394]:
+                    - paragraph [ref=e395]: 2026-06-05 · 17:00
+                    - heading "Kora" [level=2] [ref=e396]
+                    - paragraph [ref=e397]: Consulta general · Sin veterinario asignado
+                    - paragraph [ref=e398]: "Propietario: Lorena Romero"
+                  - generic [ref=e399]:
+                    - generic [ref=e400]: Confirmada
+                    - button "Cancelar" [ref=e402] [cursor=pointer]
+              - article [ref=e403]:
+                - generic [ref=e404]:
+                  - generic [ref=e405]:
+                    - paragraph [ref=e406]: 2026-06-05 · 17:00
+                    - heading "Firulais" [level=2] [ref=e407]
+                    - paragraph [ref=e408]: Vacunación · Sin veterinario asignado
+                    - paragraph [ref=e409]: "Propietario: ANDERSON"
+                  - generic [ref=e410]:
+                    - generic [ref=e411]: Confirmada
+                    - button "Cancelar" [ref=e413] [cursor=pointer]
+              - article [ref=e414]:
+                - generic [ref=e415]:
+                  - generic [ref=e416]:
+                    - paragraph [ref=e417]: 2026-06-06 · 15:00
+                    - heading "Firulais" [level=2] [ref=e418]
+                    - paragraph [ref=e419]: Vacunación · Sin veterinario asignado
+                    - paragraph [ref=e420]: "Propietario: ANDERSON"
+                  - generic [ref=e421]:
+                    - generic [ref=e422]: Confirmada
+                    - button "Cancelar" [ref=e424] [cursor=pointer]
+              - article [ref=e469]:
+                - generic [ref=e470]:
+                  - generic [ref=e471]:
+                    - paragraph [ref=e472]: 2026-06-07 · 20:38
+                    - heading "Ethan" [level=2] [ref=e473]
+                    - paragraph [ref=e474]: Evolución clínica · Sin veterinario asignado
+                    - paragraph [ref=e475]: "Propietario: ANDERSON"
+                  - generic [ref=e477]: Finalizada
+              - article [ref=e479]:
+                - generic [ref=e480]:
+                  - generic [ref=e481]:
+                    - paragraph [ref=e482]: 2026-06-11 · 04:30 PM
+                    - heading "Ethan" [level=2] [ref=e483]
+                    - paragraph [ref=e484]: Consulta general · Sin veterinario asignado
+                    - paragraph [ref=e485]: "Propietario: ANDERSON"
+                  - generic [ref=e486]:
+                    - generic [ref=e487]: Cancelada
+                    - button "Reprogramar" [active] [ref=e489] [cursor=pointer]
+              - article [ref=e425]:
+                - generic [ref=e426]:
+                  - generic [ref=e427]:
+                    - paragraph [ref=e428]: 2026-06-12 · 09:30 AM
+                    - heading "Kora" [level=2] [ref=e429]
+                    - paragraph [ref=e430]: Control médico · Sin veterinario asignado
+                    - paragraph [ref=e431]: "Propietario: Lorena Romero"
+                  - generic [ref=e432]:
+                    - generic [ref=e433]: Confirmada
+                    - button "Cancelar" [ref=e435] [cursor=pointer]
+              - article [ref=e436]:
+                - generic [ref=e437]:
+                  - generic [ref=e438]:
+                    - paragraph [ref=e439]: 2026-06-12 · 13:00
+                    - heading "Lorax" [level=2] [ref=e440]
+                    - paragraph [ref=e441]: Desparasitación · Sin veterinario asignado
+                    - paragraph [ref=e442]: "Propietario: Viviana Morales"
+                  - generic [ref=e443]:
+                    - generic [ref=e444]: Confirmada
+                    - button "Cancelar" [ref=e446] [cursor=pointer]
+              - article [ref=e490]:
+                - generic [ref=e491]:
+                  - generic [ref=e492]:
+                    - paragraph [ref=e493]: 2026-06-18 · 04:30 PM
+                    - heading "Ethan" [level=2] [ref=e494]
+                    - paragraph [ref=e495]: Desparasitación · Sin veterinario asignado
+                    - paragraph [ref=e496]: "Propietario: ANDERSON"
+                  - generic [ref=e497]:
+                    - generic [ref=e498]: Cancelada
+                    - button "Reprogramar" [ref=e500] [cursor=pointer]
+              - article [ref=e447]:
+                - generic [ref=e448]:
+                  - generic [ref=e449]:
+                    - paragraph [ref=e450]: 2026-06-23 · 09:30
+                    - heading "Kora" [level=2] [ref=e451]
+                    - paragraph [ref=e452]: Consulta General · Sin veterinario asignado
+                    - paragraph [ref=e453]: "Propietario: Lorena Romero"
+                  - generic [ref=e454]:
+                    - generic [ref=e455]: Confirmada
+                    - button "Cancelar" [ref=e457] [cursor=pointer]
+              - article [ref=e458]:
+                - generic [ref=e459]:
+                  - generic [ref=e460]:
+                    - paragraph [ref=e461]: 2026-06-25 · 04:00 PM
+                    - heading "Kora" [level=2] [ref=e462]
+                    - paragraph [ref=e463]: Consulta general · Sin veterinario asignado
+                    - paragraph [ref=e464]: "Propietario: Lorena Romero"
+                  - generic [ref=e465]:
+                    - generic [ref=e466]: Confirmada
+                    - button "Cancelar" [ref=e468] [cursor=pointer]
+          - generic [ref=e502]:
+            - generic [ref=e503]:
+              - generic [ref=e504]:
+                - generic [ref=e505]:
+                  - paragraph [ref=e506]: Reprogramar cita
+                  - heading "Ethan" [level=2] [ref=e507]
+                  - paragraph [ref=e508]: Consulta general
+                - button [ref=e509] [cursor=pointer]:
+                  - img [ref=e510]
+              - generic [ref=e513]:
+                - paragraph [ref=e514]: Fecha y hora anterior
+                - paragraph [ref=e515]: 2026-06-11 · 04:30 PM
+              - generic [ref=e516]:
+                - generic [ref=e517]:
+                  - generic [ref=e518]:
+                    - img [ref=e519]
+                    - text: Nueva fecha
+                  - textbox [ref=e521]: 2026-06-11
+                  - paragraph [ref=e522]: "Horario: 08:00 – 20:00"
+                - generic [ref=e523]:
+                  - generic [ref=e524]:
+                    - img [ref=e525]
+                    - text: Nueva hora
+                  - generic [ref=e528]:
+                    - button "08:00" [ref=e529] [cursor=pointer]
+                    - button "08:30" [ref=e530] [cursor=pointer]
+                    - button "09:00" [ref=e531] [cursor=pointer]
+                    - button "09:30" [ref=e532] [cursor=pointer]
+                    - button "10:00" [ref=e533] [cursor=pointer]
+                    - button "10:30" [ref=e534] [cursor=pointer]
+                    - button "11:00" [ref=e535] [cursor=pointer]
+                    - button "11:30" [ref=e536] [cursor=pointer]
+                    - button "12:00" [ref=e537] [cursor=pointer]
+                    - button "12:30" [ref=e538] [cursor=pointer]
+                    - button "13:00" [ref=e539] [cursor=pointer]
+                    - button "13:30" [ref=e540] [cursor=pointer]
+                    - button "14:00" [ref=e541] [cursor=pointer]
+                    - button "14:30" [ref=e542] [cursor=pointer]
+                    - button "15:00" [ref=e543] [cursor=pointer]
+                    - button "15:30" [ref=e544] [cursor=pointer]
+                    - button "16:00" [ref=e545] [cursor=pointer]
+                    - button "16:30" [ref=e546] [cursor=pointer]
+                    - button "17:00" [ref=e547] [cursor=pointer]
+                    - button "17:30" [ref=e548] [cursor=pointer]
+                    - button "18:00" [ref=e549] [cursor=pointer]
+                    - button "18:30" [ref=e550] [cursor=pointer]
+                    - button "19:00" [ref=e551] [cursor=pointer]
+                    - button "19:30" [ref=e552] [cursor=pointer]
+                - generic [ref=e553]:
+                  - generic [ref=e554]:
+                    - img [ref=e555]
+                    - text: Veterinario
+                    - generic [ref=e558]: 2 disponibles
+                  - generic [ref=e559]:
+                    - button "A Anderson Ibañez Disponible" [ref=e560] [cursor=pointer]:
+                      - generic [ref=e561]: A
+                      - generic [ref=e562]: Anderson Ibañez
+                      - generic [ref=e563]: Disponible
+                    - button "L Lorena Isabel Disponible" [ref=e564] [cursor=pointer]:
+                      - generic [ref=e565]: L
+                      - generic [ref=e566]: Lorena Isabel
+                      - generic [ref=e567]: Disponible
+            - generic [ref=e569]:
+              - button "Cancelar" [ref=e570] [cursor=pointer]
+              - button "Guardar cambios" [ref=e571] [cursor=pointer]
+  - alert [ref=e378]

@@ -1,0 +1,254 @@
+- generic [ref=e1]:
+  - generic [active]:
+    - generic [ref=e420]:
+      - generic [ref=e421]:
+        - generic [ref=e422]:
+          - navigation [ref=e423]:
+            - button "previous" [disabled] [ref=e424]:
+              - img "previous" [ref=e425]
+            - generic [ref=e427]:
+              - generic [ref=e428]: 1/
+              - text: "2"
+            - button "next" [ref=e429] [cursor=pointer]:
+              - img "next" [ref=e430]
+          - img
+        - generic [ref=e432]:
+          - link "Next.js 16.2.7 (stale) Turbopack" [ref=e433] [cursor=pointer]:
+            - /url: https://nextjs.org/docs/messages/version-staleness
+            - img [ref=e434]
+            - generic "There is a newer version (16.2.9) available, upgrade recommended!" [ref=e436]: Next.js 16.2.7 (stale)
+            - generic [ref=e437]: Turbopack
+          - img
+      - generic [ref=e438]:
+        - dialog "Console Error" [ref=e439]:
+          - generic [ref=e442]:
+            - generic [ref=e443]:
+              - generic [ref=e444]:
+                - generic [ref=e446]: Console Error
+                - generic [ref=e447]:
+                  - button "Copy Error Info" [ref=e448] [cursor=pointer]:
+                    - img [ref=e449]
+                  - button "No related documentation found" [disabled] [ref=e451]:
+                    - img [ref=e452]
+                  - button "Attach Node.js inspector" [ref=e454] [cursor=pointer]:
+                    - img [ref=e455]
+              - generic [ref=e464]: "eval() is not supported in this environment. If this page was served with a `Content-Security-Policy` header, make sure that `unsafe-eval` is included. React requires eval() in development mode for various debugging features like reconstructing callstacks from a different environment. React will never use eval() in production mode"
+            - generic [ref=e467]:
+              - paragraph [ref=e468]:
+                - text: Call Stack
+                - generic [ref=e469]: "24"
+              - button "Show 24 ignore-listed frame(s)" [ref=e470] [cursor=pointer]:
+                - text: Show 24 ignore-listed frame(s)
+                - img [ref=e471]
+          - generic [ref=e473]: "1"
+          - generic [ref=e474]: "2"
+        - contentinfo [ref=e475]:
+          - region "Error feedback" [ref=e476]:
+            - paragraph [ref=e477]:
+              - link "Was this helpful?" [ref=e478] [cursor=pointer]:
+                - /url: https://nextjs.org/telemetry#error-feedback
+            - button "Mark as helpful" [ref=e479] [cursor=pointer]:
+              - img [ref=e480]
+            - button "Mark as not helpful" [ref=e483] [cursor=pointer]:
+              - img [ref=e484]
+    - generic [ref=e148] [cursor=pointer]:
+      - button "Open Next.js Dev Tools" [ref=e149]:
+        - img [ref=e150]
+      - generic [ref=e153]:
+        - button "Open issues overlay" [ref=e154]:
+          - generic [ref=e155]:
+            - generic [ref=e156]: "1"
+            - generic [ref=e157]: "2"
+          - generic [ref=e158]:
+            - text: Issue
+            - generic [ref=e159]: s
+        - button "Collapse issues badge" [ref=e160]:
+          - img [ref=e161]
+  - generic [ref=e163]:
+    - complementary [ref=e164]:
+      - generic [ref=e166]:
+        - generic [ref=e167]: AV
+        - generic [ref=e168]:
+          - paragraph [ref=e169]: Admin VetNova
+          - paragraph [ref=e170]: Administrador
+      - navigation [ref=e172]:
+        - link "Dashboard" [ref=e173] [cursor=pointer]:
+          - /url: /admin
+          - img [ref=e174]
+          - text: Dashboard
+        - link "Usuarios" [ref=e177] [cursor=pointer]:
+          - /url: /admin/usuarios
+          - img [ref=e178]
+          - text: Usuarios
+        - link "Citas" [ref=e182] [cursor=pointer]:
+          - /url: /admin/citas
+          - img [ref=e183]
+          - text: Citas
+        - link "Mascotas" [ref=e185] [cursor=pointer]:
+          - /url: /admin/mascotas
+          - img [ref=e186]
+          - text: Mascotas
+        - link "Reportes" [ref=e189] [cursor=pointer]:
+          - /url: /admin/reportes
+          - img [ref=e190]
+          - text: Reportes
+        - link "Notificaciones" [ref=e192] [cursor=pointer]:
+          - /url: /admin/notificaciones
+          - img [ref=e193]
+          - text: Notificaciones
+        - link "Configuración" [ref=e196] [cursor=pointer]:
+          - /url: /admin/configuracion
+          - img [ref=e197]
+          - text: Configuración
+      - generic [ref=e200]:
+        - generic [ref=e202]:
+          - img [ref=e203]
+          - paragraph [ref=e206]: Soporte 24/7
+        - button "Cerrar sesión" [ref=e207] [cursor=pointer]:
+          - img [ref=e208]
+          - text: Cerrar sesión
+    - generic [ref=e211]:
+      - banner [ref=e212]:
+        - generic [ref=e213]:
+          - generic [ref=e214]:
+            - img
+            - searchbox "Buscar citas, usuarios o mascotas..." [ref=e215]
+          - generic [ref=e216]:
+            - button "Activar modo claro" [ref=e217] [cursor=pointer]:
+              - img [ref=e218]
+            - button [ref=e225] [cursor=pointer]:
+              - img [ref=e226]
+            - generic [ref=e229]:
+              - generic [ref=e230]: AV
+              - generic [ref=e231]: Admin VetNova
+      - main [ref=e232]:
+        - generic [ref=e234]:
+          - generic [ref=e236]:
+            - generic [ref=e237]:
+              - paragraph [ref=e238]: Usuarios
+              - heading "Gestión de Usuarios" [level=1] [ref=e239]
+              - paragraph [ref=e240]: Registra y administra los veterinarios y clientes de VetNova.
+            - button "+ Nuevo Usuario" [ref=e241] [cursor=pointer]
+          - generic [ref=e242]:
+            - generic [ref=e243]:
+              - article [ref=e244]:
+                - generic [ref=e246]:
+                  - img [ref=e249]
+                  - paragraph [ref=e254]: "2"
+                  - paragraph [ref=e255]: Total clientes
+              - article [ref=e256]:
+                - generic [ref=e258]:
+                  - img [ref=e261]
+                  - paragraph [ref=e265]: "3"
+                  - paragraph [ref=e266]: Veterinarios
+              - article [ref=e267]:
+                - generic [ref=e269]:
+                  - img [ref=e272]
+                  - paragraph [ref=e277]: "5"
+                  - paragraph [ref=e278]: Mascotas
+              - article [ref=e279]:
+                - generic [ref=e281]:
+                  - img [ref=e284]
+                  - paragraph [ref=e286]: "0"
+                  - paragraph [ref=e287]: Citas hoy
+              - article [ref=e288]:
+                - generic [ref=e290]:
+                  - img [ref=e293]
+                  - paragraph [ref=e296]: "0"
+                  - paragraph [ref=e297]: Pendientes
+            - generic [ref=e298]:
+              - generic [ref=e299]:
+                - heading "Usuarios activos" [level=2] [ref=e300]
+                - paragraph [ref=e301]: Revisa y administra el acceso de cada miembro del equipo.
+              - generic [ref=e302]:
+                - article [ref=e303]:
+                  - generic [ref=e304]:
+                    - generic [ref=e305]:
+                      - generic [ref=e306]: AI
+                      - generic [ref=e307]:
+                        - paragraph [ref=e308]: ANDERSON IBAÑEZ
+                        - generic [ref=e310]: Cliente
+                        - paragraph [ref=e312]: andersonmoralesyya@gmail.com
+                    - generic [ref=e313]:
+                      - button "Editar" [ref=e314] [cursor=pointer]:
+                        - img [ref=e315]
+                        - text: Editar
+                      - button "Eliminar" [ref=e318] [cursor=pointer]:
+                        - img [ref=e319]
+                        - text: Eliminar
+                - article [ref=e322]:
+                  - generic [ref=e323]:
+                    - generic [ref=e324]:
+                      - generic [ref=e325]: AV
+                      - generic [ref=e326]:
+                        - paragraph [ref=e327]: Admin VetNova
+                        - generic [ref=e329]: Administrador
+                        - paragraph [ref=e331]: admin@vetnova.com
+                    - generic [ref=e332]:
+                      - button "Editar" [ref=e333] [cursor=pointer]:
+                        - img [ref=e334]
+                        - text: Editar
+                      - button "Eliminar" [ref=e337] [cursor=pointer]:
+                        - img [ref=e338]
+                        - text: Eliminar
+                - article [ref=e341]:
+                  - generic [ref=e342]:
+                    - generic [ref=e343]:
+                      - generic [ref=e344]: AI
+                      - generic [ref=e345]:
+                        - paragraph [ref=e346]: Anderson Ibañez
+                        - generic [ref=e348]: Veterinario
+                        - paragraph [ref=e350]: andresfelipe20062006@gmail.com
+                    - generic [ref=e351]:
+                      - button "Editar" [ref=e352] [cursor=pointer]:
+                        - img [ref=e353]
+                        - text: Editar
+                      - button "Eliminar" [ref=e356] [cursor=pointer]:
+                        - img [ref=e357]
+                        - text: Eliminar
+                - article [ref=e360]:
+                  - generic [ref=e361]:
+                    - generic [ref=e362]:
+                      - generic [ref=e363]: LI
+                      - generic [ref=e364]:
+                        - paragraph [ref=e365]: Lorena Isabel
+                        - generic [ref=e367]: Veterinario
+                        - paragraph [ref=e369]: lorenaisabel023@gmail.com
+                    - generic [ref=e370]:
+                      - button "Editar" [ref=e371] [cursor=pointer]:
+                        - img [ref=e372]
+                        - text: Editar
+                      - button "Eliminar" [ref=e375] [cursor=pointer]:
+                        - img [ref=e376]
+                        - text: Eliminar
+                - article [ref=e379]:
+                  - generic [ref=e380]:
+                    - generic [ref=e381]:
+                      - generic [ref=e382]: TQ
+                      - generic [ref=e383]:
+                        - paragraph [ref=e384]: Test QA Veterinario
+                        - generic [ref=e386]: Veterinario
+                        - paragraph [ref=e388]: qa.vet.test@vetnova.com
+                    - generic [ref=e389]:
+                      - button "Editar" [ref=e390] [cursor=pointer]:
+                        - img [ref=e391]
+                        - text: Editar
+                      - button "Eliminar" [ref=e394] [cursor=pointer]:
+                        - img [ref=e395]
+                        - text: Eliminar
+                - article [ref=e398]:
+                  - generic [ref=e399]:
+                    - generic [ref=e400]:
+                      - generic [ref=e401]: VO
+                      - generic [ref=e402]:
+                        - paragraph [ref=e403]: Viviana Ospina
+                        - generic [ref=e405]: Cliente
+                        - paragraph [ref=e407]: vm790449@gmail.com
+                    - generic [ref=e408]:
+                      - button "Editar" [ref=e409] [cursor=pointer]:
+                        - img [ref=e410]
+                        - text: Editar
+                      - button "Eliminar" [ref=e413] [cursor=pointer]:
+                        - img [ref=e414]
+                        - text: Eliminar
+  - alert [ref=e417]

@@ -1,0 +1,108 @@
+- generic [active] [ref=e1]:
+  - generic [ref=e2]:
+    - generic:
+      - generic: 🐾
+      - generic: 🐶
+      - generic: 🐱
+      - generic: 🦮
+      - generic: 🐕
+      - generic: 🐈
+      - generic: 🩺
+      - generic: 💊
+      - generic: 🦴
+      - generic: ❤️
+      - generic: 🐾
+      - generic: 🐶
+      - generic: 🐱
+      - generic: 🦮
+      - generic: 🐕
+      - generic: 🐈
+      - generic: 🩺
+      - generic: 💊
+      - generic: 🦴
+      - generic: ❤️
+      - generic: 🐾
+      - generic: 🐶
+      - generic: 🐱
+      - generic: 🦮
+      - generic: 🐕
+      - generic: 🐈
+      - generic: 🩺
+      - generic: 💊
+      - generic: 🦴
+      - generic: ❤️
+    - generic [ref=e3]:
+      - generic [ref=e4]:
+        - link "Volver al inicio" [ref=e5] [cursor=pointer]:
+          - /url: /
+          - img [ref=e6]
+          - text: Volver al inicio
+        - button "Cambiar tema" [ref=e8] [cursor=pointer]:
+          - img [ref=e9]
+      - generic [ref=e11]:
+        - generic [ref=e12]:
+          - link "VetNova VetNova" [ref=e13] [cursor=pointer]:
+            - /url: /
+            - img "VetNova" [ref=e15]
+            - generic [ref=e16]: VetNova
+          - generic [ref=e17]: 🐾 Clínica veterinaria
+        - generic [ref=e18]:
+          - heading "Crear cuenta" [level=1] [ref=e20]
+          - generic [ref=e113]:
+            - generic [ref=e114]:
+              - img [ref=e115]
+              - generic [ref=e119]:
+                - text: Te estás registrando en
+                - strong [ref=e120]: Clinica E2E Test
+            - iframe [ref=e125]:
+              - button "Continuar con Google. Se abre en una pestaña nueva." [ref=f9e3] [cursor=pointer]:
+                - generic [ref=f9e5]:
+                  - img [ref=f9e7]
+                  - generic [ref=f9e14]: Continuar con Google
+            - generic [ref=e126]: o crear cuenta con correo
+            - generic [ref=e129]:
+              - generic [ref=e130]: Nombre completo
+              - generic [ref=e131]:
+                - img
+                - textbox "Nombre completo" [ref=e132]:
+                  - /placeholder: Tu nombre completo
+            - generic [ref=e133]:
+              - generic [ref=e134]: Correo electrónico
+              - generic [ref=e135]:
+                - img
+                - textbox "Correo electrónico" [ref=e136]:
+                  - /placeholder: tucorreo@ejemplo.com
+            - generic [ref=e137]:
+              - generic [ref=e138]:
+                - generic [ref=e139]: Contraseña
+                - generic [ref=e140]:
+                  - img
+                  - textbox "Contraseña" [ref=e141]:
+                    - /placeholder: ••••••••
+                  - button [ref=e142] [cursor=pointer]:
+                    - img [ref=e143]
+              - generic [ref=e146]:
+                - generic [ref=e147]: Confirmar
+                - textbox "Confirmar" [ref=e149]:
+                  - /placeholder: ••••••••
+            - generic [ref=e151]:
+              - checkbox "Acepto los términos y condiciones del servicio" [ref=e152]
+              - text: Acepto los términos y condiciones del servicio
+            - button "Crear cuenta" [ref=e154] [cursor=pointer]
+            - paragraph [ref=e155]:
+              - text: ¿Ya tienes cuenta?
+              - link "Iniciar sesión" [ref=e156] [cursor=pointer]:
+                - /url: /login
+      - paragraph [ref=e34]: © 2026 VetNova · Todos los derechos reservados
+  - generic [ref=e98] [cursor=pointer]:
+    - button "Open Next.js Dev Tools" [ref=e99]:
+      - img [ref=e100]
+    - generic [ref=e103]:
+      - button "Open issues overlay" [ref=e104]:
+        - generic [ref=e105]:
+          - generic [ref=e106]: "0"
+          - generic [ref=e107]: "1"
+        - generic [ref=e108]: Issue
+      - button "Collapse issues badge" [ref=e109]:
+        - img [ref=e110]
+  - alert [ref=e112]

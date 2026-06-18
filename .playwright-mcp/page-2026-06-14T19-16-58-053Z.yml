@@ -1,0 +1,98 @@
+- generic [active] [ref=e1]:
+  - generic [ref=e53] [cursor=pointer]:
+    - button "Open Next.js Dev Tools" [ref=e54]:
+      - img [ref=e55]
+    - generic [ref=e58]:
+      - button "Open issues overlay" [ref=e59]:
+        - generic [ref=e60]:
+          - generic [ref=e61]: "1"
+          - generic [ref=e62]: "2"
+        - generic [ref=e63]:
+          - text: Issue
+          - generic [ref=e64]: s
+      - button "Collapse issues badge" [ref=e65]:
+        - img [ref=e66]
+  - generic [ref=e68]:
+    - generic:
+      - generic: 🐾
+      - generic: 🐶
+      - generic: 🐱
+      - generic: 🦮
+      - generic: 🐕
+      - generic: 🐈
+      - generic: 🩺
+      - generic: 💊
+      - generic: 🦴
+      - generic: ❤️
+      - generic: 🐾
+      - generic: 🐶
+      - generic: 🐱
+      - generic: 🦮
+      - generic: 🐕
+      - generic: 🐈
+      - generic: 🩺
+      - generic: 💊
+      - generic: 🦴
+      - generic: ❤️
+      - generic: 🐾
+      - generic: 🐶
+      - generic: 🐱
+      - generic: 🦮
+      - generic: 🐕
+      - generic: 🐈
+      - generic: 🩺
+      - generic: 💊
+      - generic: 🦴
+      - generic: ❤️
+    - generic [ref=e69]:
+      - generic [ref=e70]:
+        - link "Volver al inicio" [ref=e71] [cursor=pointer]:
+          - /url: /
+          - img [ref=e72]
+          - text: Volver al inicio
+        - button "Cambiar tema" [ref=e74] [cursor=pointer]:
+          - img [ref=e75]
+      - generic [ref=e81]:
+        - generic [ref=e82]:
+          - link "VetNova VetNova" [ref=e83] [cursor=pointer]:
+            - /url: /
+            - img "VetNova" [ref=e85]
+            - generic [ref=e86]: VetNova
+          - generic [ref=e87]: 🐾 Clínica veterinaria
+        - generic [ref=e88]:
+          - generic [ref=e89]:
+            - heading "Bienvenido de nuevo" [level=1] [ref=e90]
+            - paragraph [ref=e91]: Accede al panel de VetNova para gestionar citas, pacientes y clientes con facilidad.
+          - generic [ref=e93]:
+            - iframe [ref=e98]:
+              - button "Continuar con Google. Se abre en una pestaña nueva." [ref=f2e3] [cursor=pointer]:
+                - generic [ref=f2e5]:
+                  - img [ref=f2e7]
+                  - generic [ref=f2e14]: Continuar con Google
+            - generic [ref=e99]: o con correo electrónico
+            - generic [ref=e122]: No existe una cuenta con ese correo.
+            - generic [ref=e102]:
+              - generic [ref=e103]: Correo electrónico
+              - generic [ref=e104]:
+                - img
+                - textbox "Correo electrónico" [ref=e105]:
+                  - /placeholder: tucorreo@ejemplo.com
+                  - text: test@test.com
+            - generic [ref=e106]:
+              - generic [ref=e107]: Contraseña
+              - generic [ref=e108]:
+                - img
+                - textbox "Contraseña" [ref=e109]:
+                  - /placeholder: ••••••••
+                  - text: Test1234
+                - button [ref=e110] [cursor=pointer]:
+                  - img [ref=e111]
+            - link "¿Olvidaste tu contraseña?" [ref=e115] [cursor=pointer]:
+              - /url: /forgot-password
+            - button "Iniciar sesión" [ref=e117] [cursor=pointer]
+            - paragraph [ref=e118]:
+              - text: ¿Aún no tienes cuenta?
+              - link "Crear cuenta" [ref=e119] [cursor=pointer]:
+                - /url: /register
+      - paragraph [ref=e120]: © 2026 VetNova · Todos los derechos reservados
+  - alert [ref=e121]

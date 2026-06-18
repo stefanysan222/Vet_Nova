@@ -1,0 +1,44 @@
+- main [ref=e2]:
+  - generic [ref=e3]:
+    - complementary [ref=e4]:
+      - generic [ref=e5]:
+        - img "VetNova" [ref=e6]
+        - generic [ref=e7]:
+          - heading "VetNova" [level=1] [ref=e8]
+          - paragraph [ref=e9]: Sistema Veterinario
+      - navigation [ref=e10]:
+        - link "Dashboard" [ref=e11] [cursor=pointer]:
+          - /url: /veterinario
+          - img [ref=e12]
+          - text: Dashboard
+        - link "Citas" [ref=e17] [cursor=pointer]:
+          - /url: /veterinario/citas
+          - img [ref=e18]
+          - text: Citas
+        - link "Pacientes" [ref=e20] [cursor=pointer]:
+          - /url: /veterinario/mascotas
+          - img [ref=e21]
+          - text: Pacientes
+        - link "Historial Clínico" [ref=e26] [cursor=pointer]:
+          - /url: /veterinario/historial
+          - img [ref=e27]
+          - text: Historial Clínico
+        - link "Mi perfil" [ref=e31] [cursor=pointer]:
+          - /url: /veterinario/configuracion
+          - img [ref=e32]
+          - text: Mi perfil
+      - button "Cerrar Sesión" [ref=e36] [cursor=pointer]:
+        - img [ref=e37]
+        - text: Cerrar Sesión
+    - generic [ref=e41]:
+      - generic [ref=e43]:
+        - img [ref=e44]
+        - textbox "Buscar pacientes, citas o historiales..." [ref=e47]
+      - generic [ref=e48]:
+        - button "Ver notificaciones" [ref=e50] [cursor=pointer]:
+          - img [ref=e51]
+        - button "Veterinario Veterinario V" [ref=e57] [cursor=pointer]:
+          - generic [ref=e58]:
+            - paragraph [ref=e59]: Veterinario
+            - paragraph [ref=e60]: Veterinario
+          - generic [ref=e61]: V

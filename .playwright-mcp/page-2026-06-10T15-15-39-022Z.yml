@@ -1,0 +1,122 @@
+- generic [active] [ref=e1]:
+  - generic [ref=e127] [cursor=pointer]:
+    - button "Open Next.js Dev Tools" [ref=e128]:
+      - img [ref=e129]
+    - generic [ref=e132]:
+      - button "Open issues overlay" [ref=e133]:
+        - generic [ref=e134]:
+          - generic [ref=e135]: "1"
+          - generic [ref=e136]: "2"
+        - generic [ref=e137]:
+          - text: Issue
+          - generic [ref=e138]: s
+      - button "Collapse issues badge" [ref=e139]:
+        - img [ref=e140]
+  - generic [ref=e142]:
+    - complementary [ref=e143]:
+      - generic [ref=e145]:
+        - generic [ref=e146]: AV
+        - generic [ref=e147]:
+          - paragraph [ref=e148]: Admin VetNova
+          - paragraph [ref=e149]: Administrador
+      - navigation [ref=e151]:
+        - link "Dashboard" [ref=e152] [cursor=pointer]:
+          - /url: /admin
+          - img [ref=e153]
+          - text: Dashboard
+        - link "Usuarios" [ref=e156] [cursor=pointer]:
+          - /url: /admin/usuarios
+          - img [ref=e157]
+          - text: Usuarios
+        - link "Citas" [ref=e161] [cursor=pointer]:
+          - /url: /admin/citas
+          - img [ref=e162]
+          - text: Citas
+        - link "Mascotas" [ref=e164] [cursor=pointer]:
+          - /url: /admin/mascotas
+          - img [ref=e165]
+          - text: Mascotas
+        - link "Reportes" [ref=e168] [cursor=pointer]:
+          - /url: /admin/reportes
+          - img [ref=e169]
+          - text: Reportes
+        - link "Notificaciones" [ref=e171] [cursor=pointer]:
+          - /url: /admin/notificaciones
+          - img [ref=e172]
+          - text: Notificaciones
+        - link "Configuración" [ref=e175] [cursor=pointer]:
+          - /url: /admin/configuracion
+          - img [ref=e176]
+          - text: Configuración
+      - generic [ref=e179]:
+        - generic [ref=e181]:
+          - img [ref=e182]
+          - paragraph [ref=e185]: Soporte 24/7
+        - button "Cerrar sesión" [ref=e186] [cursor=pointer]:
+          - img [ref=e187]
+          - text: Cerrar sesión
+    - generic [ref=e190]:
+      - banner [ref=e191]:
+        - generic [ref=e192]:
+          - generic [ref=e193]:
+            - img
+            - searchbox "Buscar citas, usuarios o mascotas..." [ref=e194]
+          - generic [ref=e195]:
+            - button "Activar modo oscuro" [ref=e268] [cursor=pointer]:
+              - img [ref=e269]
+            - button [ref=e204] [cursor=pointer]:
+              - img [ref=e205]
+            - generic [ref=e208]:
+              - generic [ref=e209]: AV
+              - generic [ref=e210]: Admin VetNova
+      - main [ref=e211]:
+        - generic [ref=e214]:
+          - generic [ref=e215]:
+            - paragraph [ref=e216]: Configuración
+            - heading "Perfil de cuenta" [level=1] [ref=e217]
+            - paragraph [ref=e218]: Actualiza tu nombre de usuario, correo electrónico y contraseña.
+          - generic [ref=e219]:
+            - generic [ref=e220]:
+              - generic [ref=e221]:
+                - img [ref=e222]
+                - heading "Nombre de usuario" [level=2] [ref=e225]
+              - textbox "Tu nombre completo" [ref=e226]: Admin VetNova
+              - button "Guardar nombre" [disabled] [ref=e228]
+            - generic [ref=e229]:
+              - generic [ref=e230]:
+                - img [ref=e231]
+                - heading "Correo electrónico" [level=2] [ref=e234]
+              - textbox "correo@ejemplo.com" [ref=e235]: admin@vetnova.com
+              - button "Guardar correo" [disabled] [ref=e237]
+            - generic [ref=e238]:
+              - generic [ref=e239]:
+                - img [ref=e240]
+                - heading "Contraseña" [level=2] [ref=e243]
+              - generic [ref=e244]:
+                - generic [ref=e245]:
+                  - generic [ref=e246]: Contraseña actual
+                  - textbox "••••••••" [ref=e247]: wrongpassword
+                - generic [ref=e248]:
+                  - generic [ref=e249]: Nueva contraseña
+                  - generic [ref=e250]:
+                    - textbox "Mínimo 8 caracteres" [ref=e251]: NewPass123
+                    - button [ref=e252] [cursor=pointer]:
+                      - img [ref=e253]
+                - generic [ref=e256]:
+                  - generic [ref=e257]: Confirmar contraseña
+                  - generic [ref=e258]:
+                    - textbox "Repite la nueva contraseña" [ref=e259]: NewPass123
+                    - button [ref=e260] [cursor=pointer]:
+                      - img [ref=e261]
+                - paragraph [ref=e271]: ✓ Las contraseñas coinciden
+              - button "Cambiar contraseña" [ref=e265] [cursor=pointer]
+            - paragraph [ref=e266]: Los cambios de nombre y correo se aplican en la próxima sesión iniciada.
+  - alert [ref=e267]
+  - generic "Notificaciones" [ref=e272]:
+    - alert [ref=e273]:
+      - img [ref=e274]
+      - generic [ref=e278]:
+        - paragraph [ref=e279]: Error al actualizar
+        - paragraph [ref=e280]: No tienes permiso para realizar esta acción.
+      - button "Cerrar notificación" [ref=e281] [cursor=pointer]:
+        - img [ref=e282]

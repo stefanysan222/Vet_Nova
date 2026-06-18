@@ -1,0 +1,66 @@
+- main [ref=e2]:
+  - generic [ref=e3]:
+    - complementary [ref=e4]:
+      - generic [ref=e5]:
+        - img "VetNova Logo" [ref=e6]
+        - generic [ref=e7]:
+          - heading "VetNova" [level=1] [ref=e8]
+          - paragraph [ref=e9]: Sistema Veterinario
+      - navigation [ref=e10]:
+        - link "Dashboard" [ref=e11] [cursor=pointer]:
+          - /url: /cliente
+          - img [ref=e12]
+          - text: Dashboard
+        - link "Citas" [ref=e15] [cursor=pointer]:
+          - /url: /cliente/agendar
+          - img [ref=e16]
+          - text: Citas
+        - link "Mascotas" [ref=e18] [cursor=pointer]:
+          - /url: /cliente/mascotas
+          - img [ref=e19]
+          - text: Mascotas
+        - link "Configuración" [ref=e24] [cursor=pointer]:
+          - /url: /cliente/configuracion
+          - img [ref=e25]
+          - text: Configuración
+      - button "Cerrar Sesión" [ref=e29] [cursor=pointer]:
+        - img [ref=e30]
+        - text: Cerrar Sesión
+    - generic [ref=e33]:
+      - generic [ref=e34]:
+        - generic [ref=e36]:
+          - img [ref=e37]
+          - textbox "Buscar mascotas, citas..." [ref=e40]
+        - generic [ref=e41]:
+          - button "Abrir notificaciones" [ref=e42] [cursor=pointer]:
+            - img [ref=e43]
+          - button "Abrir menú de perfil" [ref=e48] [cursor=pointer]:
+            - generic [ref=e49]:
+              - paragraph
+              - paragraph [ref=e50]: Cliente
+      - generic [ref=e54]:
+        - generic [ref=e55]:
+          - generic [ref=e56]:
+            - heading "Mis mascotas" [level=1] [ref=e57]
+            - paragraph [ref=e58]: 0 mascotas registradas
+          - link "Nueva mascota" [ref=e59] [cursor=pointer]:
+            - /url: /cliente/mascotas/nueva
+            - img [ref=e60]
+            - text: Nueva mascota
+        - generic [ref=e62]:
+          - generic [ref=e63]:
+            - img [ref=e64]
+            - textbox "Buscar por nombre, dueño o raza..." [ref=e67]
+          - generic [ref=e68]:
+            - combobox [ref=e69] [cursor=pointer]:
+              - option "Todas las especies" [selected]
+              - option "Perros"
+              - option "Gatos"
+              - option "Otros"
+            - generic:
+              - img
+        - generic [ref=e70]:
+          - img [ref=e72]
+          - heading "No se encontraron mascotas" [level=2] [ref=e75]
+          - paragraph [ref=e76]: Intenta buscar con otro nombre, dueño, raza o especie.
+          - button "Limpiar filtros" [ref=e77] [cursor=pointer]

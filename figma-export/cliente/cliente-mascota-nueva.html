@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>VetNova — Panel Cliente — Nueva mascota</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<script>
+  tailwind.config = {
+    darkMode: 'class',
+    theme: {
+      extend: {
+        fontFamily: { sans: ['Inter', 'system-ui', 'sans-serif'] },
+        colors: {
+          brand: { 50:"#EEF0FE",100:"#E0E7FF",200:"#C7D2FE",300:"#A5B4FC",400:"#818CF8",500:"#6366F1",600:"#5457E5",700:"#4347C9",800:"#3739A3",900:"#2D2F82",950:"#1B1C50" },
+          surface: { 50:"#F8F8FC",100:"#F1F1F8",200:"#E4E4F0",300:"#CBCBE0",400:"#9D9DBE",500:"#71719C",600:"#54547A",700:"#3D3D5C",800:"#25253D",900:"#15152B",950:"#0F172A" },
+          success: { 50:"#ECFDF5",100:"#D1FAE5",400:"#34D399",600:"#059669",700:"#047857",900:"#064E3B" },
+          danger: { 50:"#FEF2F2",100:"#FEE2E2",200:"#FECACA",400:"#F87171",500:"#EF4444",600:"#DC2626",700:"#B91C1C",800:"#991B1B",900:"#7F1D1D" },
+          warning: { 50:"#FFFBEB",100:"#FEF3C7",400:"#FBBF24",600:"#D97706",700:"#B45309",900:"#78350F" },
+        },
+        borderRadius: { '2xl':'1rem', '3xl':'1.25rem', '4xl':'1.5rem' },
+        boxShadow: {
+          card: "0 1px 2px rgba(15,23,42,0.04), 0 8px 24px rgba(99,102,241,0.06)",
+          'card-hover': "0 4px 12px rgba(15,23,42,0.06), 0 12px 32px rgba(99,102,241,0.10)",
+          'brand-sm': "0 2px 10px rgba(99,102,241,0.18)",
+          brand: "0 8px 24px rgba(99,102,241,0.25)",
+          xs: "0 1px 2px rgba(15,23,42,0.04)",
+        },
+      },
+    },
+  };
+</script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
+<style type="text/tailwindcss">
+  @layer components {
+    .text-page-title { @apply text-2xl font-bold tracking-tight text-slate-900 sm:text-3xl; }
+    .text-section-title { @apply text-lg font-semibold tracking-tight text-slate-900; }
+    .text-subtitle { @apply text-sm leading-6 text-slate-500; }
+    .admin-card { @apply rounded-2xl border border-slate-200/60 bg-white shadow-card; }
+    .admin-card-padded { @apply admin-card p-6; }
+    .btn-primary { @apply inline-flex items-center justify-center gap-2 rounded-xl bg-brand-600 px-5 py-2.5 text-sm font-semibold text-white shadow-brand-sm transition-all duration-150 hover:-translate-y-0.5 hover:bg-brand-700 hover:shadow-brand active:translate-y-0 active:scale-[0.98]; }
+    .btn-secondary { @apply inline-flex items-center justify-center gap-2 rounded-xl border border-slate-200 bg-white px-5 py-2.5 text-sm font-semibold text-slate-700 shadow-xs transition-all duration-150 hover:-translate-y-0.5 hover:border-slate-300 hover:shadow-sm active:translate-y-0 active:scale-[0.98]; }
+    .form-input { @apply w-full rounded-xl border border-surface-200 bg-white px-3.5 py-2.5 text-sm text-surface-900 transition placeholder:text-surface-400 focus:border-brand-400 focus:bg-brand-50/40 focus:outline-none focus:ring-2 focus:ring-brand-100; }
+    .form-label { @apply mb-1.5 block text-xs font-medium text-surface-500; }
+  }
+</style>
+<style>body{font-family:'Inter',system-ui,sans-serif;}</style>
+</head>
+<body class="bg-surface-50 text-surface-900">
+
+  <div class="flex h-screen overflow-hidden">
+
+    <!-- Sidebar -->
+    <aside class="hidden h-screen w-[260px] shrink-0 border-r border-surface-200 bg-white lg:flex lg:flex-col">
+      <div class="flex h-[78px] items-center gap-3 border-b border-surface-200 px-5">
+        <div class="flex h-10 w-10 items-center justify-center rounded-xl bg-brand-600 text-base font-bold text-white">V</div>
+        <div>
+          <h1 class="text-xl font-semibold leading-none text-surface-900">VetNova</h1>
+          <p class="mt-1.5 text-[11px] font-medium uppercase tracking-wide text-surface-400">Sistema Veterinario</p>
+        </div>
+      </div>
+
+      <nav class="flex-1 px-4 py-4 space-y-2">
+        <a href="#" class="flex h-11 items-center gap-3 rounded-xl px-4 text-sm font-semibold text-slate-700 hover:bg-slate-100">
+          <i data-lucide="home" class="h-5 w-5"></i> Dashboard
+        </a>
+        <a href="#" class="flex h-11 items-center gap-3 rounded-xl px-4 text-sm font-semibold text-slate-700 hover:bg-slate-100">
+          <i data-lucide="calendar-days" class="h-5 w-5"></i> Citas
+        </a>
+        <a href="#" class="flex h-11 items-center gap-3 rounded-xl bg-brand-600 px-4 text-sm font-semibold text-white shadow-brand-sm">
+          <i data-lucide="paw-print" class="h-5 w-5"></i> Mascotas
+        </a>
+        <a href="#" class="flex h-11 items-center gap-3 rounded-xl px-4 text-sm font-semibold text-slate-700 hover:bg-slate-100">
+          <i data-lucide="settings" class="h-5 w-5"></i> Configuración
+        </a>
+      </nav>
+
+      <div class="border-t border-surface-200 px-5 py-5">
+        <button class="flex items-center gap-3 text-sm font-semibold text-surface-900 hover:text-brand-600">
+          <i data-lucide="log-out" class="h-[19px] w-[19px]"></i> Cerrar Sesión
+        </button>
+      </div>
+    </aside>
+
+    <!-- Main -->
+    <section class="min-w-0 flex-1 overflow-y-auto">
+
+      <!-- Header -->
+      <header class="flex h-[64px] items-center justify-between border-b border-surface-200 bg-white px-5">
+        <div class="relative w-full max-w-sm">
+          <i data-lucide="search" class="pointer-events-none absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400"></i>
+          <input type="search" placeholder="Buscar citas o mascotas..." class="w-full rounded-xl border border-slate-200 bg-slate-50 py-2.5 pl-10 pr-4 text-sm text-slate-900 outline-none" />
+        </div>
+        <div class="ml-5 flex items-center gap-4">
+          <button class="relative flex h-8 w-8 items-center justify-center rounded-lg text-surface-900 hover:bg-surface-100">
+            <i data-lucide="bell" class="h-[19px] w-[19px]"></i>
+            <span class="absolute right-0.5 top-0.5 flex h-4 w-4 items-center justify-center rounded-full bg-danger-500 text-[9px] font-bold text-white ring-2 ring-white">2</span>
+          </button>
+          <div class="h-8 w-px bg-surface-200"></div>
+          <div class="flex items-center gap-3">
+            <div class="text-right">
+              <p class="text-sm font-semibold leading-none text-surface-900">María González</p>
+              <p class="mt-1.5 text-[11px] font-medium uppercase tracking-wide text-surface-400">Cliente</p>
+            </div>
+            <div class="flex h-9 w-9 items-center justify-center rounded-full bg-brand-100 text-sm font-bold text-brand-600">MG</div>
+          </div>
+        </div>
+      </header>
+
+      <!-- Content -->
+      <div class="bg-surface-50 px-6 py-8">
+
+        <a href="#" class="mb-4 inline-flex items-center gap-2 text-sm font-semibold text-slate-500 hover:text-brand-600">
+          <i data-lucide="arrow-left" class="h-4 w-4"></i> Volver a mis mascotas
+        </a>
+
+        <div class="mb-8">
+          <h1 class="text-page-title">Nueva Mascota</h1>
+          <p class="text-subtitle mt-2">Registra los datos de tu nueva mascota.</p>
+        </div>
+
+        <div class="grid grid-cols-1 gap-6 xl:grid-cols-[1fr_360px]">
+
+          <!-- Left: form -->
+          <section class="admin-card-padded">
+            <h2 class="text-section-title">Información de la mascota</h2>
+
+            <!-- Photo upload -->
+            <div class="mt-5 flex items-center gap-4">
+              <div class="flex h-20 w-20 items-center justify-center rounded-2xl border-2 border-dashed border-surface-300 bg-surface-50 text-surface-400">
+                <i data-lucide="camera" class="h-7 w-7"></i>
+              </div>
+              <div>
+                <button class="btn-secondary">
+                  <i data-lucide="upload" class="h-[16px] w-[16px]"></i> Subir foto
+                </button>
+                <p class="mt-2 text-xs text-slate-500">JPG o PNG, máx. 5MB (opcional).</p>
+              </div>
+            </div>
+
+            <div class="mt-6 grid grid-cols-1 gap-5 sm:grid-cols-2">
+              <div>
+                <label class="form-label">Nombre</label>
+                <input type="text" placeholder="Ej. Rocky" class="form-input" />
+              </div>
+              <div>
+                <label class="form-label">Especie</label>
+                <select class="form-input">
+                  <option>Perro</option>
+                  <option>Gato</option>
+                  <option>Conejo</option>
+                  <option>Ave</option>
+                  <option>Otro</option>
+                </select>
+              </div>
+              <div>
+                <label class="form-label">Raza</label>
+                <input type="text" placeholder="Ej. Labrador" class="form-input" />
+              </div>
+              <div>
+                <label class="form-label">Sexo</label>
+                <select class="form-input">
+                  <option>Macho</option>
+                  <option>Hembra</option>
+                </select>
+              </div>
+              <div>
+                <label class="form-label">Fecha de nacimiento</label>
+                <input type="date" class="form-input" />
+              </div>
+              <div>
+                <label class="form-label">Peso (kg)</label>
+                <input type="number" placeholder="Ej. 12.5" class="form-input" />
+              </div>
+              <div>
+                <label class="form-label">Color</label>
+                <input type="text" placeholder="Ej. Dorado" class="form-input" />
+              </div>
+              <div>
+                <label class="form-label">Estado</label>
+                <select class="form-input">
+                  <option>Activo</option>
+                  <option>En tratamiento</option>
+                  <option>Inactivo</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="mt-5">
+              <label class="form-label">Observaciones</label>
+              <textarea rows="3" placeholder="Información adicional sobre la mascota (alergias, comportamiento, etc.)" class="form-input resize-none"></textarea>
+            </div>
+          </section>
+
+          <!-- Right: owner + actions -->
+          <aside class="space-y-5">
+            <div class="admin-card-padded">
+              <h2 class="text-section-title">Propietario asociado</h2>
+              <div class="mt-4 flex items-center gap-3 rounded-xl border border-surface-200 bg-surface-50 p-4">
+                <div class="flex h-10 w-10 items-center justify-center rounded-full bg-brand-100 text-sm font-bold text-brand-600">MG</div>
+                <div>
+                  <p class="text-sm font-semibold text-slate-900">María González</p>
+                  <p class="text-xs text-slate-500">Cliente</p>
+                </div>
+              </div>
+            </div>
+
+            <div class="flex flex-col gap-3">
+              <button class="btn-primary w-full justify-center">
+                <i data-lucide="save" class="h-[18px] w-[18px]"></i> Guardar Mascota
+              </button>
+              <button class="btn-secondary w-full justify-center">Cancelar</button>
+            </div>
+          </aside>
+
+        </div>
+
+      </div>
+    </section>
+  </div>
+
+  <script>lucide.createIcons();</script>
+</body>
+</html>

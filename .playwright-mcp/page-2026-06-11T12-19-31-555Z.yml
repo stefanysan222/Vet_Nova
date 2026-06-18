@@ -1,0 +1,116 @@
+- main [ref=e2]:
+  - generic [ref=e3]:
+    - complementary [ref=e4]:
+      - generic [ref=e5]:
+        - img "VetNova Logo" [ref=e6]
+        - generic [ref=e7]:
+          - heading "VetNova" [level=1] [ref=e8]
+          - paragraph [ref=e9]: Sistema Veterinario
+      - navigation [ref=e10]:
+        - link "Dashboard" [ref=e11] [cursor=pointer]:
+          - /url: /cliente
+          - img [ref=e12]
+          - text: Dashboard
+        - link "Citas" [ref=e15] [cursor=pointer]:
+          - /url: /cliente/agendar
+          - img [ref=e16]
+          - text: Citas
+        - link "Mascotas" [ref=e18] [cursor=pointer]:
+          - /url: /cliente/mascotas
+          - img [ref=e19]
+          - text: Mascotas
+        - link "Configuración" [ref=e24] [cursor=pointer]:
+          - /url: /cliente/configuracion
+          - img [ref=e25]
+          - text: Configuración
+      - button "Cerrar Sesión" [ref=e29] [cursor=pointer]:
+        - img [ref=e30]
+        - text: Cerrar Sesión
+    - generic [ref=e33]:
+      - generic [ref=e34]:
+        - generic [ref=e36]:
+          - img [ref=e37]
+          - textbox "Buscar mascotas, citas..." [ref=e40]
+        - generic [ref=e41]:
+          - button "Abrir notificaciones" [ref=e42] [cursor=pointer]:
+            - img [ref=e43]
+          - button "Abrir menú de perfil" [ref=e48] [cursor=pointer]:
+            - generic [ref=e49]:
+              - paragraph
+              - paragraph [ref=e50]: Cliente
+      - generic [ref=e54]:
+        - generic [ref=e55]:
+          - generic [ref=e56]:
+            - heading "Notificaciones" [level=1] [ref=e57]
+            - paragraph [ref=e58]: Centro de alertas y recordatorios
+          - button "Ver todas" [ref=e59] [cursor=pointer]:
+            - img [ref=e60]
+            - text: Ver todas
+        - generic [ref=e62]:
+          - article [ref=e63]:
+            - generic [ref=e64]:
+              - paragraph [ref=e65]: Total
+              - heading "0" [level=3] [ref=e66]
+            - img [ref=e68]
+          - article [ref=e71]:
+            - generic [ref=e72]:
+              - paragraph [ref=e73]: No leídas
+              - heading "0" [level=3] [ref=e74]
+            - img [ref=e76]
+          - article [ref=e81]:
+            - generic [ref=e82]:
+              - paragraph [ref=e83]: Citas
+              - heading "0" [level=3] [ref=e84]
+            - img [ref=e86]
+          - article [ref=e88]:
+            - generic [ref=e89]:
+              - paragraph [ref=e90]: Recordatorios
+              - heading "0" [level=3] [ref=e91]
+            - img [ref=e93]
+        - generic [ref=e96]:
+          - generic [ref=e97]:
+            - generic [ref=e98]:
+              - generic [ref=e99]:
+                - heading "Notificaciones recientes" [level=2] [ref=e100]
+                - paragraph [ref=e101]: Revisa las novedades relacionadas con tus mascotas y citas.
+              - generic [ref=e102]:
+                - button "Todas" [ref=e103] [cursor=pointer]
+                - button "No leídas" [ref=e104] [cursor=pointer]
+                - button "Leídas" [ref=e105] [cursor=pointer]
+            - generic [ref=e106]:
+              - paragraph [ref=e107]: No hay notificaciones con este filtro.
+              - paragraph [ref=e108]: Presiona "Ver todas" para regresar al listado completo.
+              - button "Ver todas" [ref=e109] [cursor=pointer]
+          - generic [ref=e110]:
+            - complementary [ref=e111]:
+              - generic [ref=e112]:
+                - paragraph [ref=e113]: Selecciona una notificación
+                - paragraph [ref=e114]: Haz clic en "Ver" para ver el detalle.
+                - button "Volver a todas" [ref=e115] [cursor=pointer]
+            - generic [ref=e116]:
+              - heading "Preferencias" [level=2] [ref=e117]
+              - generic [ref=e118]:
+                - generic [ref=e119]:
+                  - paragraph [ref=e120]: Citas
+                  - button [ref=e121] [cursor=pointer]
+                - generic [ref=e123]:
+                  - paragraph [ref=e124]: Vacunas
+                  - button [ref=e125] [cursor=pointer]
+                - generic [ref=e127]:
+                  - paragraph [ref=e128]: Pagos
+                  - button [ref=e129] [cursor=pointer]
+                - generic [ref=e131]:
+                  - paragraph [ref=e132]: Sistema
+                  - button [ref=e133] [cursor=pointer]
+            - generic [ref=e135]:
+              - heading "Resumen" [level=2] [ref=e136]
+              - generic [ref=e137]:
+                - generic [ref=e138]:
+                  - generic [ref=e139]: Notificaciones nuevas
+                  - generic [ref=e140]: "0"
+                - generic [ref=e141]:
+                  - generic [ref=e142]: Este mes
+                  - generic [ref=e143]: "0"
+                - generic [ref=e144]:
+                  - generic [ref=e145]: Recordatorios activos
+                  - generic [ref=e146]: "0"

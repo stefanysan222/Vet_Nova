@@ -1,0 +1,318 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>VetNova — Panel Cliente</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<script>
+  tailwind.config = {
+    darkMode: 'class',
+    theme: {
+      extend: {
+        fontFamily: { sans: ['Inter', 'system-ui', 'sans-serif'] },
+        colors: {
+          brand: { 50:"#EEF0FE",100:"#E0E7FF",200:"#C7D2FE",300:"#A5B4FC",400:"#818CF8",500:"#6366F1",600:"#5457E5",700:"#4347C9",800:"#3739A3",900:"#2D2F82",950:"#1B1C50" },
+          surface: { 50:"#F8F8FC",100:"#F1F1F8",200:"#E4E4F0",300:"#CBCBE0",400:"#9D9DBE",500:"#71719C",600:"#54547A",700:"#3D3D5C",800:"#25253D",900:"#15152B",950:"#0F172A" },
+          success: { 50:"#ECFDF5",600:"#059669" },
+          danger: { 50:"#FEF2F2",500:"#EF4444",600:"#DC2626" },
+        },
+        borderRadius: { '2xl':'1rem', '3xl':'1.25rem', '4xl':'1.5rem' },
+        boxShadow: {
+          card: "0 1px 2px rgba(15,23,42,0.04), 0 8px 24px rgba(99,102,241,0.06)",
+          'brand-sm': "0 2px 10px rgba(99,102,241,0.18)",
+        },
+      },
+    },
+  };
+</script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
+<style>
+  body { font-family: 'Inter', system-ui, sans-serif; }
+  .card { border-radius: 13px; border: 0.5px solid #E4DFF0; background: #fff; padding: 14px 16px; }
+</style>
+</head>
+<body class="bg-surface-50 text-surface-900">
+
+  <div class="flex h-screen overflow-hidden">
+
+    <!-- Sidebar -->
+    <aside class="hidden h-screen w-[260px] shrink-0 border-r border-surface-200 bg-white lg:flex lg:flex-col">
+      <div class="flex h-[78px] items-center gap-3 border-b border-surface-200 px-5">
+        <div class="flex h-10 w-10 items-center justify-center rounded-xl bg-brand-600 text-base font-bold text-white">V</div>
+        <div>
+          <h1 class="text-xl font-semibold leading-none text-surface-900">VetNova</h1>
+          <p class="mt-1.5 text-[11px] font-medium uppercase tracking-wide text-surface-400">Sistema Veterinario</p>
+        </div>
+      </div>
+
+      <nav class="flex-1 px-4 py-4 space-y-2">
+        <a href="#" class="flex h-11 items-center gap-3 rounded-xl bg-brand-600 px-4 text-sm font-semibold text-white shadow-brand-sm">
+          <i data-lucide="home" class="h-5 w-5"></i> Dashboard
+        </a>
+        <a href="#" class="flex h-11 items-center gap-3 rounded-xl px-4 text-sm font-semibold text-slate-700 hover:bg-slate-100">
+          <i data-lucide="calendar-days" class="h-5 w-5"></i> Citas
+        </a>
+        <a href="#" class="flex h-11 items-center gap-3 rounded-xl px-4 text-sm font-semibold text-slate-700 hover:bg-slate-100">
+          <i data-lucide="paw-print" class="h-5 w-5"></i> Mascotas
+        </a>
+        <a href="#" class="flex h-11 items-center gap-3 rounded-xl px-4 text-sm font-semibold text-slate-700 hover:bg-slate-100">
+          <i data-lucide="settings" class="h-5 w-5"></i> Configuración
+        </a>
+      </nav>
+
+      <div class="border-t border-surface-200 px-5 py-5">
+        <button class="flex items-center gap-3 text-sm font-semibold text-surface-900 hover:text-brand-600">
+          <i data-lucide="log-out" class="h-[19px] w-[19px]"></i> Cerrar Sesión
+        </button>
+      </div>
+    </aside>
+
+    <!-- Main -->
+    <section class="min-w-0 flex-1 overflow-y-auto">
+
+      <!-- Header -->
+      <header class="flex h-[64px] items-center justify-between border-b border-surface-200 bg-white px-5">
+        <div class="relative w-full max-w-sm">
+          <i data-lucide="search" class="pointer-events-none absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400"></i>
+          <input type="search" placeholder="Buscar citas o mascotas..." class="w-full rounded-xl border border-slate-200 bg-slate-50 py-2.5 pl-10 pr-4 text-sm text-slate-900 outline-none" />
+        </div>
+        <div class="ml-5 flex items-center gap-4">
+          <button class="relative flex h-8 w-8 items-center justify-center rounded-lg text-surface-900 hover:bg-surface-100">
+            <i data-lucide="bell" class="h-[19px] w-[19px]"></i>
+            <span class="absolute right-0.5 top-0.5 flex h-4 w-4 items-center justify-center rounded-full bg-danger-500 text-[9px] font-bold text-white ring-2 ring-white">2</span>
+          </button>
+          <div class="h-8 w-px bg-surface-200"></div>
+          <div class="flex items-center gap-3">
+            <div class="text-right">
+              <p class="text-sm font-semibold leading-none text-surface-900">María González</p>
+              <p class="mt-1.5 text-[11px] font-medium uppercase tracking-wide text-surface-400">Cliente</p>
+            </div>
+            <div class="flex h-9 w-9 items-center justify-center rounded-full bg-brand-100 text-sm font-bold text-brand-600">MG</div>
+          </div>
+        </div>
+      </header>
+
+      <!-- Content -->
+      <div class="bg-[#F7F6FA] p-3">
+        <div class="flex flex-col gap-3">
+
+          <!-- FILA 1 — Hero + Próxima cita -->
+          <div class="grid grid-cols-1 gap-3 lg:grid-cols-[1fr_240px]">
+            <div class="rounded-[13px] bg-gradient-to-br from-[#E9EAFB] via-[#E1E4F9] to-[#E7E9FB] p-6">
+              <p class="text-[11px] font-semibold uppercase tracking-[0.25em] text-[#4C4A8A]">Panel cliente</p>
+              <h1 class="mt-2 text-2xl font-bold tracking-tight text-[#1E1B4B] sm:text-3xl">Hola, María 🐾</h1>
+              <p class="mt-2 max-w-md text-sm leading-6 text-[#4C4A8A]">Tienes 2 citas próximas.</p>
+              <div class="mt-5 flex flex-wrap gap-3">
+                <a href="#" class="inline-flex items-center gap-2 rounded-[9px] bg-[#6366F1] px-4 py-2 text-[12px] font-semibold text-white">
+                  <i data-lucide="plus" class="h-3.5 w-3.5"></i> Agendar cita
+                </a>
+                <a href="#" class="inline-flex items-center gap-2 rounded-[9px] border-[0.5px] border-[#6366F1]/30 bg-white/60 px-4 py-2 text-[12px] font-semibold text-[#6366F1]">
+                  <i data-lucide="paw-print" class="h-3.5 w-3.5"></i> Mis mascotas
+                </a>
+              </div>
+            </div>
+
+            <!-- Próxima cita -->
+            <div class="card">
+              <div class="mb-3 flex items-center gap-2">
+                <i data-lucide="calendar-days" class="h-4 w-4 text-[#6366F1]"></i>
+                <h3 class="text-[12px] font-semibold text-slate-900">Próxima cita</h3>
+              </div>
+              <div class="space-y-1.5">
+                <p class="text-[11px] font-semibold text-slate-900">Rocky</p>
+                <p class="text-[11px] text-[#555068]">Consulta general</p>
+                <p class="text-[11px] text-[#555068]">viernes, 12 de junio · 10:30 AM</p>
+                <div class="pt-1">
+                  <span class="inline-flex items-center rounded-full bg-amber-50 px-2.5 py-1 text-[10px] font-semibold text-amber-600">Pendiente</span>
+                </div>
+                <a href="#" class="mt-2 inline-flex items-center gap-1 text-[11px] font-semibold text-[#6366F1]">
+                  Ver detalle <i data-lucide="chevron-right" class="h-3 w-3"></i>
+                </a>
+              </div>
+            </div>
+          </div>
+
+          <!-- FILA 2 — Métricas -->
+          <div class="grid grid-cols-2 gap-3 sm:grid-cols-5">
+            <div class="card">
+              <div class="mb-3 flex h-8 w-8 items-center justify-center rounded-lg" style="background:#EFF6FF"><i data-lucide="calendar-days" class="h-4 w-4" style="color:#1D4ED8"></i></div>
+              <p class="text-[22px] font-bold leading-none" style="color:#1D4ED8">1</p>
+              <p class="mt-1.5 text-[11px] text-[#555068]">Citas hoy</p>
+            </div>
+            <div class="card">
+              <div class="mb-3 flex h-8 w-8 items-center justify-center rounded-lg" style="background:#F0FDF4"><i data-lucide="paw-print" class="h-4 w-4" style="color:#15803D"></i></div>
+              <p class="text-[22px] font-bold leading-none" style="color:#15803D">3</p>
+              <p class="mt-1.5 text-[11px] text-[#555068]">Mascotas</p>
+            </div>
+            <div class="card">
+              <div class="mb-3 flex h-8 w-8 items-center justify-center rounded-lg" style="background:#FFF7ED"><i data-lucide="clock" class="h-4 w-4" style="color:#C2410C"></i></div>
+              <p class="text-[22px] font-bold leading-none" style="color:#C2410C">2</p>
+              <p class="mt-1.5 text-[11px] text-[#555068]">Próximas</p>
+            </div>
+            <div class="card">
+              <div class="mb-3 flex h-8 w-8 items-center justify-center rounded-lg" style="background:#EEF2FF"><i data-lucide="check-circle-2" class="h-4 w-4" style="color:#4338CA"></i></div>
+              <p class="text-[22px] font-bold leading-none" style="color:#4338CA">8</p>
+              <p class="mt-1.5 text-[11px] text-[#555068]">Completadas</p>
+            </div>
+            <div class="card">
+              <div class="mb-3 flex h-8 w-8 items-center justify-center rounded-lg" style="background:#FFF1F2"><i data-lucide="x-circle" class="h-4 w-4" style="color:#BE123C"></i></div>
+              <p class="text-[22px] font-bold leading-none" style="color:#BE123C">1</p>
+              <p class="mt-1.5 text-[11px] text-[#555068]">Canceladas</p>
+            </div>
+          </div>
+
+          <!-- FILA 3 — Gráfica + Calendario -->
+          <div class="grid grid-cols-1 gap-3 lg:grid-cols-[1fr_240px]">
+            <div class="card">
+              <h2 class="text-[12px] font-semibold text-slate-900">Mis citas por día</h2>
+              <p class="mt-0.5 text-[11px] text-[#555068]">Últimos 30 días y próximos 14</p>
+
+              <div class="mb-1 mt-3 flex items-center gap-4">
+                <span class="flex items-center gap-1.5 text-[11px] text-[#555068]"><span class="inline-block h-2 w-2 rounded-full" style="background:#6366F1"></span>Hoy</span>
+                <span class="flex items-center gap-1.5 text-[11px] text-[#555068]"><span class="inline-block h-2 w-2 rounded-full" style="background:#A5B4FC"></span>Pasado</span>
+                <span class="flex items-center gap-1.5 text-[11px] text-[#555068]"><span class="inline-block h-2 w-2 rounded-full" style="background:#E0E7FF"></span>Próximo</span>
+              </div>
+
+              <div class="mt-4 flex h-60 items-end gap-2">
+                <div class="flex h-[40%] flex-1 rounded-[6px]" style="background:#A5B4FC"></div>
+                <div class="flex h-[65%] flex-1 rounded-[6px]" style="background:#A5B4FC"></div>
+                <div class="flex h-[30%] flex-1 rounded-[6px]" style="background:#A5B4FC"></div>
+                <div class="flex h-[80%] flex-1 rounded-[6px]" style="background:#A5B4FC"></div>
+                <div class="flex h-[55%] flex-1 rounded-[6px]" style="background:#A5B4FC"></div>
+                <div class="flex h-[20%] flex-1 rounded-[6px]" style="background:#A5B4FC"></div>
+                <div class="flex h-[45%] flex-1 rounded-[6px]" style="background:#A5B4FC"></div>
+                <div class="flex h-[70%] flex-1 rounded-[6px]" style="background:#6366F1"></div>
+                <div class="flex h-[35%] flex-1 rounded-[6px]" style="background:#E0E7FF"></div>
+                <div class="flex h-[60%] flex-1 rounded-[6px]" style="background:#E0E7FF"></div>
+                <div class="flex h-[25%] flex-1 rounded-[6px]" style="background:#E0E7FF"></div>
+                <div class="flex h-[50%] flex-1 rounded-[6px]" style="background:#E0E7FF"></div>
+                <div class="flex h-[15%] flex-1 rounded-[6px]" style="background:#E0E7FF"></div>
+              </div>
+            </div>
+
+            <!-- Calendario -->
+            <div class="card">
+              <div class="mb-3 flex items-center justify-between">
+                <h3 class="text-[12px] font-semibold capitalize text-slate-900">Junio 2026</h3>
+                <div class="flex items-center gap-1">
+                  <span class="flex h-6 w-6 items-center justify-center rounded-md text-[#555068]"><i data-lucide="chevron-left" class="h-3.5 w-3.5"></i></span>
+                  <span class="flex h-6 w-6 items-center justify-center rounded-md text-[#555068]"><i data-lucide="chevron-right" class="h-3.5 w-3.5"></i></span>
+                </div>
+              </div>
+              <div class="grid grid-cols-7 gap-y-1.5 text-center">
+                <span class="text-[11px] font-semibold text-[#555068]">L</span>
+                <span class="text-[11px] font-semibold text-[#555068]">M</span>
+                <span class="text-[11px] font-semibold text-[#555068]">M</span>
+                <span class="text-[11px] font-semibold text-[#555068]">J</span>
+                <span class="text-[11px] font-semibold text-[#555068]">V</span>
+                <span class="text-[11px] font-semibold text-[#555068]">S</span>
+                <span class="text-[11px] font-semibold text-[#555068]">D</span>
+                <span></span><span></span>
+                <!-- 1 -->
+                <div class="flex flex-col items-center gap-0.5"><span class="flex h-6 w-6 items-center justify-center rounded-full text-[11px] text-slate-700">1</span><span class="h-1 w-1 rounded-full"></span></div>
+                <div class="flex flex-col items-center gap-0.5"><span class="flex h-6 w-6 items-center justify-center rounded-full text-[11px] text-slate-700">2</span><span class="h-1 w-1 rounded-full"></span></div>
+                <div class="flex flex-col items-center gap-0.5"><span class="flex h-6 w-6 items-center justify-center rounded-full text-[11px] text-slate-700">3</span><span class="h-1 w-1 rounded-full" style="background:#6366F1"></span></div>
+                <div class="flex flex-col items-center gap-0.5"><span class="flex h-6 w-6 items-center justify-center rounded-full text-[11px] text-slate-700">4</span><span class="h-1 w-1 rounded-full"></span></div>
+                <div class="flex flex-col items-center gap-0.5"><span class="flex h-6 w-6 items-center justify-center rounded-full text-[11px] text-slate-700">5</span><span class="h-1 w-1 rounded-full"></span></div>
+                <div class="flex flex-col items-center gap-0.5"><span class="flex h-6 w-6 items-center justify-center rounded-full text-[11px] text-slate-700">6</span><span class="h-1 w-1 rounded-full"></span></div>
+                <div class="flex flex-col items-center gap-0.5"><span class="flex h-6 w-6 items-center justify-center rounded-full text-[11px] text-slate-700">7</span><span class="h-1 w-1 rounded-full"></span></div>
+                <div class="flex flex-col items-center gap-0.5"><span class="flex h-6 w-6 items-center justify-center rounded-full text-[11px] text-slate-700">8</span><span class="h-1 w-1 rounded-full" style="background:#6366F1"></span></div>
+                <div class="flex flex-col items-center gap-0.5"><span class="flex h-6 w-6 items-center justify-center rounded-full text-[11px] text-slate-700">9</span><span class="h-1 w-1 rounded-full"></span></div>
+                <div class="flex flex-col items-center gap-0.5"><span class="flex h-6 w-6 items-center justify-center rounded-full text-[11px] text-slate-700">10</span><span class="h-1 w-1 rounded-full"></span></div>
+                <div class="flex flex-col items-center gap-0.5"><span class="flex h-6 w-6 items-center justify-center rounded-full text-[11px] text-slate-700">11</span><span class="h-1 w-1 rounded-full"></span></div>
+                <div class="flex flex-col items-center gap-0.5"><span class="flex h-6 w-6 items-center justify-center rounded-full text-[11px] font-semibold text-white" style="background:#6366F1">12</span><span class="h-1 w-1 rounded-full" style="background:#6366F1"></span></div>
+                <div class="flex flex-col items-center gap-0.5"><span class="flex h-6 w-6 items-center justify-center rounded-full text-[11px] text-slate-700">13</span><span class="h-1 w-1 rounded-full"></span></div>
+                <div class="flex flex-col items-center gap-0.5"><span class="flex h-6 w-6 items-center justify-center rounded-full text-[11px] text-slate-700">14</span><span class="h-1 w-1 rounded-full"></span></div>
+                <div class="flex flex-col items-center gap-0.5"><span class="flex h-6 w-6 items-center justify-center rounded-full text-[11px] text-slate-700">15</span><span class="h-1 w-1 rounded-full" style="background:#6366F1"></span></div>
+                <div class="flex flex-col items-center gap-0.5"><span class="flex h-6 w-6 items-center justify-center rounded-full text-[11px] text-slate-700">16</span><span class="h-1 w-1 rounded-full"></span></div>
+                <div class="flex flex-col items-center gap-0.5"><span class="flex h-6 w-6 items-center justify-center rounded-full text-[11px] text-slate-700">17</span><span class="h-1 w-1 rounded-full"></span></div>
+                <div class="flex flex-col items-center gap-0.5"><span class="flex h-6 w-6 items-center justify-center rounded-full text-[11px] text-slate-700">18</span><span class="h-1 w-1 rounded-full" style="background:#6366F1"></span></div>
+                <div class="flex flex-col items-center gap-0.5"><span class="flex h-6 w-6 items-center justify-center rounded-full text-[11px] text-slate-700">19</span><span class="h-1 w-1 rounded-full"></span></div>
+                <div class="flex flex-col items-center gap-0.5"><span class="flex h-6 w-6 items-center justify-center rounded-full text-[11px] text-slate-700">20</span><span class="h-1 w-1 rounded-full"></span></div>
+                <div class="flex flex-col items-center gap-0.5"><span class="flex h-6 w-6 items-center justify-center rounded-full text-[11px] text-slate-700">21</span><span class="h-1 w-1 rounded-full"></span></div>
+                <div class="flex flex-col items-center gap-0.5"><span class="flex h-6 w-6 items-center justify-center rounded-full text-[11px] text-slate-700">22</span><span class="h-1 w-1 rounded-full" style="background:#6366F1"></span></div>
+                <div class="flex flex-col items-center gap-0.5"><span class="flex h-6 w-6 items-center justify-center rounded-full text-[11px] text-slate-700">23</span><span class="h-1 w-1 rounded-full"></span></div>
+                <div class="flex flex-col items-center gap-0.5"><span class="flex h-6 w-6 items-center justify-center rounded-full text-[11px] text-slate-700">24</span><span class="h-1 w-1 rounded-full"></span></div>
+                <div class="flex flex-col items-center gap-0.5"><span class="flex h-6 w-6 items-center justify-center rounded-full text-[11px] text-slate-700">25</span><span class="h-1 w-1 rounded-full"></span></div>
+                <div class="flex flex-col items-center gap-0.5"><span class="flex h-6 w-6 items-center justify-center rounded-full text-[11px] text-slate-700">26</span><span class="h-1 w-1 rounded-full"></span></div>
+                <div class="flex flex-col items-center gap-0.5"><span class="flex h-6 w-6 items-center justify-center rounded-full text-[11px] text-slate-700">27</span><span class="h-1 w-1 rounded-full" style="background:#6366F1"></span></div>
+                <div class="flex flex-col items-center gap-0.5"><span class="flex h-6 w-6 items-center justify-center rounded-full text-[11px] text-slate-700">28</span><span class="h-1 w-1 rounded-full"></span></div>
+                <div class="flex flex-col items-center gap-0.5"><span class="flex h-6 w-6 items-center justify-center rounded-full text-[11px] text-slate-700">29</span><span class="h-1 w-1 rounded-full"></span></div>
+                <div class="flex flex-col items-center gap-0.5"><span class="flex h-6 w-6 items-center justify-center rounded-full text-[11px] text-slate-700">30</span><span class="h-1 w-1 rounded-full"></span></div>
+              </div>
+              <div class="mt-3 flex items-center gap-4 border-t border-[#E4DFF0] pt-3">
+                <span class="flex items-center gap-1.5 text-[11px] text-[#555068]"><span class="h-1.5 w-1.5 rounded-full" style="background:#6366F1"></span>Con citas</span>
+                <span class="flex items-center gap-1.5 text-[11px] text-[#555068]"><span class="h-1.5 w-1.5 rounded-full bg-slate-300"></span>Libre</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- FILA 4 — Mis mascotas + Acciones rápidas -->
+          <div class="grid grid-cols-1 gap-3 lg:grid-cols-[1fr_240px]">
+            <div class="card">
+              <div class="mb-3 flex items-center gap-2">
+                <i data-lucide="activity" class="h-4 w-4 text-[#6366F1]"></i>
+                <h3 class="text-[12px] font-semibold text-slate-900">Mis mascotas</h3>
+              </div>
+              <div class="space-y-3">
+                <a href="#" class="flex items-center gap-3">
+                  <div class="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg bg-[#EEF2FF] text-[11px] font-bold text-[#6366F1]">R</div>
+                  <div class="min-w-0 flex-1">
+                    <p class="truncate text-[11px] font-semibold text-slate-900">Rocky</p>
+                    <p class="text-[11px] text-[#555068]">Perro · Labrador</p>
+                  </div>
+                  <i data-lucide="chevron-right" class="h-3.5 w-3.5 shrink-0 text-slate-300"></i>
+                </a>
+                <a href="#" class="flex items-center gap-3">
+                  <div class="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg bg-[#EEF2FF] text-[11px] font-bold text-[#6366F1]">L</div>
+                  <div class="min-w-0 flex-1">
+                    <p class="truncate text-[11px] font-semibold text-slate-900">Luna</p>
+                    <p class="text-[11px] text-[#555068]">Gato · Siames</p>
+                  </div>
+                  <i data-lucide="chevron-right" class="h-3.5 w-3.5 shrink-0 text-slate-300"></i>
+                </a>
+                <a href="#" class="flex items-center gap-3">
+                  <div class="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg bg-[#EEF2FF] text-[11px] font-bold text-[#6366F1]">P</div>
+                  <div class="min-w-0 flex-1">
+                    <p class="truncate text-[11px] font-semibold text-slate-900">Pancho</p>
+                    <p class="text-[11px] text-[#555068]">Conejo</p>
+                  </div>
+                  <i data-lucide="chevron-right" class="h-3.5 w-3.5 shrink-0 text-slate-300"></i>
+                </a>
+              </div>
+            </div>
+
+            <!-- Acciones rápidas -->
+            <div class="card">
+              <div class="mb-3 flex items-center gap-2">
+                <i data-lucide="zap" class="h-4 w-4 text-[#6366F1]"></i>
+                <h3 class="text-[12px] font-semibold text-slate-900">Acciones rápidas</h3>
+              </div>
+              <div class="space-y-2">
+                <a href="#" class="flex w-full items-center gap-2 rounded-[9px] border-[0.5px] border-[#E4DFF0] bg-[#F7F6FA] px-3 py-2 text-[11px] font-semibold text-slate-700">
+                  <i data-lucide="calendar-plus" class="h-3.5 w-3.5 text-[#6366F1]"></i> Agendar cita
+                </a>
+                <a href="#" class="flex w-full items-center gap-2 rounded-[9px] border-[0.5px] border-[#E4DFF0] bg-[#F7F6FA] px-3 py-2 text-[11px] font-semibold text-slate-700">
+                  <i data-lucide="paw-print" class="h-3.5 w-3.5 text-[#6366F1]"></i> Mis mascotas
+                </a>
+                <a href="#" class="flex w-full items-center gap-2 rounded-[9px] border-[0.5px] border-[#E4DFF0] bg-[#F7F6FA] px-3 py-2 text-[11px] font-semibold text-slate-700">
+                  <i data-lucide="calendar-days" class="h-3.5 w-3.5 text-[#6366F1]"></i> Ver citas
+                </a>
+                <a href="#" class="flex w-full items-center gap-2 rounded-[9px] border-[0.5px] border-[#E4DFF0] bg-[#F7F6FA] px-3 py-2 text-[11px] font-semibold text-slate-700">
+                  <i data-lucide="settings" class="h-3.5 w-3.5 text-[#6366F1]"></i> Mi perfil
+                </a>
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <script>lucide.createIcons();</script>
+</body>
+</html>

@@ -1,0 +1,125 @@
+- generic [ref=e1]:
+  - generic [ref=e56] [cursor=pointer]:
+    - button "Open Next.js Dev Tools" [ref=e57]:
+      - img [ref=e58]
+    - generic [ref=e61]:
+      - button "Open issues overlay" [ref=e62]:
+        - generic [ref=e63]:
+          - generic [ref=e64]: "0"
+          - generic [ref=e65]: "1"
+        - generic [ref=e66]: Issue
+      - button "Collapse issues badge" [ref=e67]:
+        - img [ref=e68]
+  - alert [ref=e70]
+  - generic [ref=e71]:
+    - button "Menú" [active] [ref=e72] [cursor=pointer]:
+      - img [ref=e73]
+      - text: Menú
+    - complementary [ref=e190]:
+      - button "×" [ref=e192] [cursor=pointer]
+      - generic [ref=e194]:
+        - generic [ref=e195]: AV
+        - generic [ref=e196]:
+          - paragraph [ref=e197]: Admin VetNova
+          - paragraph [ref=e198]: Administrador
+      - navigation [ref=e199]:
+        - link "Dashboard" [ref=e200] [cursor=pointer]:
+          - /url: /admin
+          - img [ref=e201]
+          - text: Dashboard
+        - link "Usuarios" [ref=e204] [cursor=pointer]:
+          - /url: /admin/usuarios
+          - img [ref=e205]
+          - text: Usuarios
+        - link "Citas" [ref=e209] [cursor=pointer]:
+          - /url: /admin/citas
+          - img [ref=e210]
+          - text: Citas
+        - link "Mascotas" [ref=e212] [cursor=pointer]:
+          - /url: /admin/mascotas
+          - img [ref=e213]
+          - text: Mascotas
+        - link "Reportes" [ref=e216] [cursor=pointer]:
+          - /url: /admin/reportes
+          - img [ref=e217]
+          - text: Reportes
+        - link "Notificaciones" [ref=e219] [cursor=pointer]:
+          - /url: /admin/notificaciones
+          - img [ref=e220]
+          - text: Notificaciones
+        - link "Configuración" [ref=e223] [cursor=pointer]:
+          - /url: /admin/configuracion
+          - img [ref=e224]
+          - text: Configuración
+      - button "Cerrar sesión" [ref=e228] [cursor=pointer]:
+        - img [ref=e229]
+        - text: Cerrar sesión
+    - generic [ref=e75]:
+      - banner [ref=e76]:
+        - generic [ref=e77]:
+          - generic [ref=e78]:
+            - img
+            - searchbox "Buscar citas, usuarios o mascotas..." [ref=e79]
+          - generic [ref=e80]:
+            - button "Activar modo oscuro" [ref=e81] [cursor=pointer]:
+              - img [ref=e82]
+            - button [ref=e85] [cursor=pointer]:
+              - img [ref=e86]
+            - generic [ref=e89]:
+              - generic [ref=e90]: AV
+              - generic [ref=e91]: Admin VetNova
+      - main [ref=e92]:
+        - generic [ref=e94]:
+          - generic [ref=e96]:
+            - generic [ref=e97]:
+              - paragraph [ref=e98]: Panel administrativo
+              - heading "Hola, Admin VetNova" [level=1] [ref=e99]
+              - paragraph [ref=e100]: Desde aquí puedes gestionar usuarios, revisar citas pendientes, consultar el registro de mascotas y monitorear la actividad del sistema.
+            - button "+ Nuevo usuario" [ref=e101] [cursor=pointer]
+          - generic [ref=e103]:
+            - article [ref=e104]:
+              - generic [ref=e106]:
+                - img [ref=e109]
+                - paragraph [ref=e114]: "2"
+                - paragraph [ref=e115]: Total clientes
+            - article [ref=e116]:
+              - generic [ref=e118]:
+                - img [ref=e121]
+                - paragraph [ref=e125]: "2"
+                - paragraph [ref=e126]: Veterinarios
+            - article [ref=e127]:
+              - generic [ref=e129]:
+                - img [ref=e132]
+                - paragraph [ref=e137]: "5"
+                - paragraph [ref=e138]: Mascotas
+            - article [ref=e139]:
+              - generic [ref=e141]:
+                - img [ref=e144]
+                - paragraph [ref=e146]: "0"
+                - paragraph [ref=e147]: Citas hoy
+            - article [ref=e148]:
+              - generic [ref=e150]:
+                - img [ref=e153]
+                - paragraph [ref=e156]: "0"
+                - paragraph [ref=e157]: Pendientes
+          - generic [ref=e158]:
+            - generic [ref=e159]:
+              - generic [ref=e160]:
+                - heading "Citas programadas por día" [level=2] [ref=e161]
+                - paragraph [ref=e162]:
+                  - text: Últimos 30 días y próximos 14 ·
+                  - generic [ref=e163]: Hoy
+                  - generic [ref=e165]: Pasado
+                  - generic [ref=e167]: Próximo
+              - img [ref=e170]
+            - generic [ref=e171]:
+              - generic [ref=e173]:
+                - img [ref=e175]
+                - heading "Notificaciones" [level=3] [ref=e178]
+              - generic [ref=e180]:
+                - img [ref=e182]
+                - generic [ref=e185]:
+                  - paragraph [ref=e186]: Todo en orden
+                  - paragraph [ref=e187]: No hay notificaciones nuevas.
+              - link "Ver todas las notificaciones" [ref=e188] [cursor=pointer]:
+                - /url: /admin/notificaciones

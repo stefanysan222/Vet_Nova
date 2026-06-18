@@ -1,0 +1,85 @@
+- main [ref=e2]:
+  - generic [ref=e3]:
+    - complementary [ref=e4]:
+      - generic [ref=e5]:
+        - img "VetNova Logo" [ref=e6]
+        - generic [ref=e7]:
+          - heading "VetNova" [level=1] [ref=e8]
+          - paragraph [ref=e9]: Sistema Veterinario
+      - navigation [ref=e10]:
+        - link "Dashboard" [ref=e11] [cursor=pointer]:
+          - /url: /cliente
+          - img [ref=e12]
+          - text: Dashboard
+        - link "Citas" [ref=e15] [cursor=pointer]:
+          - /url: /cliente/agendar
+          - img [ref=e16]
+          - text: Citas
+        - link "Mascotas" [ref=e18] [cursor=pointer]:
+          - /url: /cliente/mascotas
+          - img [ref=e19]
+          - text: Mascotas
+        - link "Configuración" [ref=e24] [cursor=pointer]:
+          - /url: /cliente/configuracion
+          - img [ref=e25]
+          - text: Configuración
+      - button "Cerrar Sesión" [ref=e29] [cursor=pointer]:
+        - img [ref=e30]
+        - text: Cerrar Sesión
+    - generic [ref=e33]:
+      - generic [ref=e34]:
+        - generic [ref=e36]:
+          - img [ref=e37]
+          - textbox "Buscar mascotas, citas..." [ref=e40]
+        - generic [ref=e41]:
+          - button "Abrir notificaciones" [ref=e42] [cursor=pointer]:
+            - img [ref=e43]
+          - button "Abrir menú de perfil" [ref=e48] [cursor=pointer]:
+            - generic [ref=e49]:
+              - paragraph
+              - paragraph [ref=e50]: Cliente
+      - generic [ref=e54]:
+        - generic [ref=e55]:
+          - heading "Configuración" [level=1] [ref=e56]
+          - paragraph [ref=e57]: Administra tu información personal y seguridad
+        - generic [ref=e58]:
+          - generic [ref=e59]:
+            - generic [ref=e60]:
+              - img [ref=e61]
+              - heading "Información Personal" [level=2] [ref=e64]
+            - generic [ref=e65]:
+              - generic [ref=e66]:
+                - generic [ref=e67]: Nombre
+                - textbox "Nombre" [ref=e68]
+              - generic [ref=e69]:
+                - generic [ref=e70]: Apellido
+                - textbox "Apellido" [ref=e71]
+            - generic [ref=e73]:
+              - generic [ref=e74]: Email
+              - textbox "Email" [ref=e75]
+            - generic [ref=e77]:
+              - generic [ref=e78]: Teléfono
+              - textbox "Teléfono" [ref=e79]
+            - generic [ref=e80]:
+              - button "Cancelar" [ref=e81] [cursor=pointer]
+              - button "Guardar Cambios" [ref=e82] [cursor=pointer]
+          - generic [ref=e83]:
+            - generic [ref=e84]:
+              - img [ref=e85]
+              - heading "Seguridad" [level=2] [ref=e88]
+            - generic [ref=e89]:
+              - generic [ref=e90]:
+                - generic [ref=e91]: Contraseña Actual
+                - textbox "Contraseña Actual" [ref=e92]:
+                  - /placeholder: ••••••••
+              - generic [ref=e94]:
+                - generic [ref=e95]: Nueva Contraseña
+                - textbox "Nueva Contraseña" [ref=e96]:
+                  - /placeholder: ••••••••
+              - generic [ref=e98]:
+                - generic [ref=e99]: Confirmar Contraseña
+                - textbox "Confirmar Contraseña" [ref=e100]:
+                  - /placeholder: ••••••••
+            - generic [ref=e101]:
+              - button "Cancelar" [ref=e102] [cursor=pointer]
+              - button "Actualizar Contraseña" [ref=e103] [cursor=pointer]

@@ -1,0 +1,97 @@
+- generic [active] [ref=e1]:
+  - generic [ref=e2]:
+    - complementary [ref=e3]:
+      - generic [ref=e5]:
+        - generic [ref=e6]: AE
+        - generic [ref=e7]:
+          - paragraph [ref=e8]: Admin E2E
+          - paragraph [ref=e9]: Clinica E2E Test
+      - navigation [ref=e11]:
+        - link "Dashboard" [ref=e12] [cursor=pointer]:
+          - /url: /admin
+          - img [ref=e13]
+          - text: Dashboard
+        - link "Usuarios" [ref=e16] [cursor=pointer]:
+          - /url: /admin/usuarios
+          - img [ref=e17]
+          - text: Usuarios
+        - link "Citas" [ref=e21] [cursor=pointer]:
+          - /url: /admin/citas
+          - img [ref=e22]
+          - text: Citas
+        - link "Mascotas" [ref=e24] [cursor=pointer]:
+          - /url: /admin/mascotas
+          - img [ref=e25]
+          - text: Mascotas
+        - link "Reportes" [ref=e28] [cursor=pointer]:
+          - /url: /admin/reportes
+          - img [ref=e29]
+          - text: Reportes
+        - link "Notificaciones" [ref=e31] [cursor=pointer]:
+          - /url: /admin/notificaciones
+          - img [ref=e32]
+          - text: Notificaciones
+        - link "Configuración" [ref=e35] [cursor=pointer]:
+          - /url: /admin/configuracion
+          - img [ref=e36]
+          - text: Configuración
+      - generic [ref=e39]:
+        - generic [ref=e41]:
+          - img [ref=e42]
+          - paragraph [ref=e45]: Soporte 24/7
+        - button "Cerrar sesión" [ref=e46] [cursor=pointer]:
+          - img [ref=e47]
+          - text: Cerrar sesión
+    - generic [ref=e50]:
+      - banner [ref=e51]:
+        - generic [ref=e52]:
+          - generic [ref=e53]:
+            - img
+            - searchbox "Buscar citas, usuarios o mascotas..." [ref=e54]
+          - generic [ref=e55]:
+            - button "Activar modo oscuro" [ref=e56] [cursor=pointer]:
+              - img [ref=e57]
+            - button [ref=e60] [cursor=pointer]:
+              - img [ref=e61]
+            - generic [ref=e64]:
+              - generic [ref=e65]: AE
+              - generic [ref=e66]: Admin E2E
+      - main [ref=e67]:
+        - generic [ref=e70]:
+          - generic [ref=e71]:
+            - paragraph [ref=e72]: Reportes
+            - heading "Resumen del sistema" [level=1] [ref=e73]
+            - paragraph [ref=e74]: Indicadores en tiempo real obtenidos de la base de datos.
+          - generic [ref=e75]:
+            - article [ref=e76]:
+              - img [ref=e78]
+              - paragraph [ref=e83]: "0"
+              - paragraph [ref=e85]: Total clientes
+            - article [ref=e86]:
+              - img [ref=e88]
+              - paragraph [ref=e92]: "1"
+              - paragraph [ref=e94]: Total veterinarios
+            - article [ref=e95]:
+              - img [ref=e97]
+              - paragraph [ref=e102]: "0"
+              - paragraph [ref=e104]: Total mascotas
+            - article [ref=e105]:
+              - img [ref=e107]
+              - paragraph [ref=e109]: "0"
+              - paragraph [ref=e111]: Citas hoy
+            - article [ref=e112]:
+              - img [ref=e114]
+              - paragraph [ref=e117]: "0"
+              - paragraph [ref=e119]: Citas pendientes
+  - generic [ref=e124] [cursor=pointer]:
+    - button "Open Next.js Dev Tools" [ref=e125]:
+      - img [ref=e126]
+    - generic [ref=e129]:
+      - button "Open issues overlay" [ref=e130]:
+        - generic [ref=e131]:
+          - generic [ref=e132]: "0"
+          - generic [ref=e133]: "1"
+        - generic [ref=e134]: Issue
+      - button "Collapse issues badge" [ref=e135]:
+        - img [ref=e136]
+  - alert [ref=e138]

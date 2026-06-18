@@ -1,36 +1,89 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# VetNova Frontend
 
-## Getting Started
+Landing page moderna para VetNova, software SaaS de gestión veterinaria.
 
-First, run the development server:
+## 🏗️ Arquitectura
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+### Estructura de Archivos
+
+```
+frontend/
+├── app/
+│   ├── components/          # Componentes reutilizables
+│   │   ├── Button.tsx      # Componente Button base
+│   │   ├── Footer.tsx      # Pie de página
+│   │   ├── Hero.tsx        # Sección principal
+│   │   ├── Navbar.tsx      # Barra de navegación
+│   │   ├── Services.tsx    # Servicios ofrecidos
+│   │   └── Stats.tsx       # Estadísticas
+│   ├── constants/          # Constantes compartidas
+│   │   └── index.ts        # Colores y estilos comunes
+│   ├── types/              # Tipos TypeScript
+│   │   └── index.ts        # Interfaces compartidas
+│   ├── globals.css         # Estilos globales
+│   ├── layout.tsx          # Layout principal
+│   └── page.tsx            # Página principal
+├── public/
+│   └── Vetnova_logo.jpeg   # Logo de la aplicación
+└── package.json
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## 🎨 Diseño
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+- **Colores principales**: Azul (#2563eb), Blanco, Gris
+- **Framework CSS**: Tailwind CSS
+- **Iconos**: Lucide React
+- **Tipografía**: Sistema de Tailwind
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## 🧹 Código Limpio
 
-## Learn More
+### Principios Aplicados
 
-To learn more about Next.js, take a look at the following resources:
+1. **Separación de responsabilidades**: Componentes, constantes, tipos separados
+2. **Reutilización**: Componente Button base para consistencia
+3. **TypeScript**: Interfaces bien definidas para type safety
+4. **Constantes**: Estilos y datos centralizados
+5. **Nombres descriptivos**: Variables y funciones autoexplicativas
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+### Patrones de Código
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+- **Constantes arriba**: Todas las constantes al inicio de cada archivo
+- **Imports organizados**: Librerías externas, luego locales
+- **Interfaces compartidas**: Tipos reutilizables en `/types`
+- **Estilos consistentes**: Sistema de constantes para colores y espaciado
 
-## Deploy on Vercel
+## 🚀 Desarrollo
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+```bash
+# Instalar dependencias
+npm install
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+# Ejecutar en desarrollo
+npm run dev
+
+# Build de producción
+npm run build
+
+# Verificar linting
+npx eslint .
+```
+
+## 📦 Dependencias
+
+- **Next.js 16**: Framework React con App Router
+- **React 19**: Biblioteca de componentes
+- **TypeScript**: Type safety
+- **Tailwind CSS**: Utilidades de estilos
+- **Lucide React**: Iconos SVG
+
+## 🎯 Mejores Prácticas Implementadas
+
+- ✅ Componentes funcionales con hooks
+- ✅ Props bien tipadas con TypeScript
+- ✅ Estilos responsive con Tailwind
+- ✅ Optimización de imágenes con Next.js
+- ✅ Accesibilidad básica (alt texts, navegación por teclado)
+- ✅ Código modular y reutilizable
+- ✅ Constantes centralizadas
+- ✅ Nombres semánticos en inglés
+- ✅ Documentación inline donde necesario

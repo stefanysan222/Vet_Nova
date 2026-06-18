@@ -1,0 +1,85 @@
+- generic [active] [ref=e1]:
+  - main [ref=e2]:
+    - generic [ref=e3]:
+      - complementary [ref=e4]:
+        - generic [ref=e5]:
+          - img "VetNova Logo" [ref=e6]
+          - generic [ref=e7]:
+            - heading "VetNova" [level=1] [ref=e8]
+            - paragraph [ref=e9]: Sistema Veterinario
+        - navigation [ref=e10]:
+          - link "Dashboard" [ref=e11] [cursor=pointer]:
+            - /url: /cliente
+            - img [ref=e12]
+            - text: Dashboard
+          - link "Citas" [ref=e15] [cursor=pointer]:
+            - /url: /cliente/agendar
+            - img [ref=e16]
+            - text: Citas
+          - link "Mascotas" [ref=e18] [cursor=pointer]:
+            - /url: /cliente/mascotas
+            - img [ref=e19]
+            - text: Mascotas
+          - link "Configuración" [ref=e24] [cursor=pointer]:
+            - /url: /cliente/configuracion
+            - img [ref=e25]
+            - text: Configuración
+        - button "Cerrar Sesión" [ref=e29] [cursor=pointer]:
+          - img [ref=e30]
+          - text: Cerrar Sesión
+      - generic [ref=e33]:
+        - generic [ref=e34]:
+          - generic [ref=e36]:
+            - img [ref=e37]
+            - textbox "Buscar mascotas, citas..." [ref=e40]
+          - generic [ref=e41]:
+            - button "Abrir notificaciones" [ref=e42] [cursor=pointer]:
+              - img [ref=e43]
+            - button "Abrir menú de perfil" [ref=e48] [cursor=pointer]:
+              - generic [ref=e49]:
+                - paragraph [ref=e56]: Audit Tester
+                - paragraph [ref=e50]: Cliente
+              - generic [ref=e51]: AT
+        - generic [ref=e144]:
+          - generic [ref=e145]:
+            - link "Volver a citas" [ref=e146] [cursor=pointer]:
+              - /url: /cliente/agendar
+              - img [ref=e147]
+              - text: Volver a citas
+            - heading "Nueva solicitud de cita" [level=1] [ref=e149]
+          - generic [ref=e151]:
+            - generic [ref=e153]:
+              - generic [ref=e154]: "1"
+              - paragraph [ref=e155]: Mascota
+            - generic [ref=e158]:
+              - generic [ref=e159]: "2"
+              - paragraph [ref=e160]: Servicio
+            - generic [ref=e163]:
+              - generic [ref=e164]: "3"
+              - paragraph [ref=e165]: Fecha y hora
+          - generic [ref=e167]:
+            - heading "¿Para qué mascota es la cita?" [level=2] [ref=e168]
+            - paragraph [ref=e169]: Selecciona la mascota que necesita atención.
+            - generic [ref=e170]:
+              - paragraph [ref=e171]: No tienes mascotas registradas.
+              - paragraph [ref=e172]: Registra una mascota para poder agendar citas.
+          - generic [ref=e173]:
+            - link "Cancelar" [ref=e174] [cursor=pointer]:
+              - /url: /cliente/agendar
+              - img [ref=e175]
+              - text: Cancelar
+            - button "Siguiente" [disabled] [ref=e177]:
+              - text: Siguiente
+              - img [ref=e178]
+  - generic [ref=e128] [cursor=pointer]:
+    - button "Open Next.js Dev Tools" [ref=e129]:
+      - img [ref=e130]
+    - generic [ref=e133]:
+      - button "Open issues overlay" [ref=e134]:
+        - generic [ref=e135]:
+          - generic [ref=e136]: "0"
+          - generic [ref=e137]: "1"
+        - generic [ref=e138]: Issue
+      - button "Collapse issues badge" [ref=e139]:
+        - img [ref=e140]
+  - alert [ref=e142]

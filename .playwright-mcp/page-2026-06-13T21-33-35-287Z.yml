@@ -1,0 +1,105 @@
+- generic [ref=e1]:
+  - generic [ref=e87] [cursor=pointer]:
+    - button "Open Next.js Dev Tools" [ref=e88]:
+      - img [ref=e89]
+    - generic [ref=e92]:
+      - button "Open issues overlay" [ref=e93]:
+        - generic [ref=e94]:
+          - generic [ref=e95]: "0"
+          - generic [ref=e96]: "1"
+        - generic [ref=e97]: Issue
+      - button "Collapse issues badge" [ref=e98]:
+        - img [ref=e99]
+  - alert [ref=e101]
+  - main [ref=e163]:
+    - generic [ref=e164]:
+      - complementary [ref=e165]:
+        - generic [ref=e166]:
+          - img "VetNova Logo" [ref=e167]
+          - generic [ref=e168]:
+            - heading "VetNova" [level=1] [ref=e169]
+            - paragraph [ref=e170]: Sistema Veterinario
+        - navigation [ref=e171]:
+          - link "Dashboard" [ref=e172] [cursor=pointer]:
+            - /url: /cliente
+            - img [ref=e173]
+            - text: Dashboard
+          - link "Citas" [active] [ref=e176] [cursor=pointer]:
+            - /url: /cliente/agendar
+            - img [ref=e177]
+            - text: Citas
+          - link "Mascotas" [ref=e179] [cursor=pointer]:
+            - /url: /cliente/mascotas
+            - img [ref=e180]
+            - text: Mascotas
+          - link "Configuración" [ref=e185] [cursor=pointer]:
+            - /url: /cliente/configuracion
+            - img [ref=e186]
+            - text: Configuración
+        - button "Cerrar Sesión" [ref=e190] [cursor=pointer]:
+          - img [ref=e191]
+          - text: Cerrar Sesión
+      - generic [ref=e194]:
+        - generic [ref=e195]:
+          - generic [ref=e197]:
+            - img [ref=e198]
+            - textbox "Buscar mascotas, citas..." [ref=e201]
+          - generic [ref=e202]:
+            - button "Abrir notificaciones" [ref=e203] [cursor=pointer]:
+              - img [ref=e204]
+              - generic [ref=e442]: "1"
+            - button "Abrir menú de perfil" [ref=e209] [cursor=pointer]:
+              - generic [ref=e210]:
+                - paragraph [ref=e211]: Cliente Prueba E2E
+                - paragraph [ref=e212]: Cliente
+              - generic [ref=e213]: CP
+        - generic [ref=e583]:
+          - generic [ref=e584]:
+            - generic [ref=e585]:
+              - heading "Mis citas" [level=1] [ref=e586]
+              - paragraph [ref=e587]: Consulta y administra las citas programadas para tus mascotas
+            - link "Nueva cita" [ref=e588] [cursor=pointer]:
+              - /url: /cliente/agendar/nueva
+              - img [ref=e589]
+              - text: Nueva cita
+          - generic [ref=e590]:
+            - article [ref=e592]:
+              - generic [ref=e594]:
+                - generic [ref=e595]:
+                  - paragraph [ref=e596]: Próximas citas
+                  - paragraph [ref=e597]: "0"
+                  - paragraph [ref=e598]: Citas por atender
+                - img [ref=e600]
+            - article [ref=e603]:
+              - generic [ref=e605]:
+                - generic [ref=e606]:
+                  - paragraph [ref=e607]: Confirmadas
+                  - paragraph [ref=e608]: "0"
+                  - paragraph [ref=e609]: Horario confirmado
+                - img [ref=e611]
+            - article [ref=e615]:
+              - generic [ref=e617]:
+                - generic [ref=e618]:
+                  - paragraph [ref=e619]: Pendientes
+                  - paragraph [ref=e620]: "0"
+                  - paragraph [ref=e621]: En espera de confirmación
+                - img [ref=e623]
+          - generic [ref=e627]:
+            - generic [ref=e628]:
+              - img [ref=e629]
+              - textbox "Buscar por mascota, servicio o veterinario..." [ref=e632]
+            - generic [ref=e633]:
+              - button "Todas" [ref=e634] [cursor=pointer]
+              - button "Próximas" [ref=e635] [cursor=pointer]
+              - button "Confirmadas" [ref=e636] [cursor=pointer]
+              - button "Canceladas" [ref=e637] [cursor=pointer]
+          - generic [ref=e638]:
+            - generic [ref=e639]:
+              - heading "Citas programadas" [level=2] [ref=e640]
+              - paragraph [ref=e641]: 0 resultados
+            - generic [ref=e642]:
+              - img [ref=e644]
+              - heading "No se encontraron citas" [level=3] [ref=e648]
+              - paragraph [ref=e649]: No hay citas que coincidan con la búsqueda o filtro seleccionado.
+              - button "Limpiar filtros" [ref=e650] [cursor=pointer]
+  - generic [ref=e441]: 13/06

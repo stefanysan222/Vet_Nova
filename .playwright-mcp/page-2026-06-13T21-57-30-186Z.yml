@@ -1,0 +1,116 @@
+- main [ref=e2]:
+  - generic [ref=e3]:
+    - complementary [ref=e4]:
+      - generic [ref=e5]:
+        - img "VetNova" [ref=e6]
+        - generic [ref=e7]:
+          - heading "VetNova" [level=1] [ref=e8]
+          - paragraph [ref=e9]: Sistema Veterinario
+      - navigation [ref=e10]:
+        - link "Dashboard" [ref=e11] [cursor=pointer]:
+          - /url: /veterinario
+          - img [ref=e12]
+          - text: Dashboard
+        - link "Citas" [ref=e17] [cursor=pointer]:
+          - /url: /veterinario/citas
+          - img [ref=e18]
+          - text: Citas
+        - link "Pacientes" [ref=e20] [cursor=pointer]:
+          - /url: /veterinario/mascotas
+          - img [ref=e21]
+          - text: Pacientes
+        - link "Historial Clínico" [ref=e26] [cursor=pointer]:
+          - /url: /veterinario/historial
+          - img [ref=e27]
+          - text: Historial Clínico
+        - link "Mi perfil" [ref=e31] [cursor=pointer]:
+          - /url: /veterinario/configuracion
+          - img [ref=e32]
+          - text: Mi perfil
+      - button "Cerrar Sesión" [ref=e36] [cursor=pointer]:
+        - img [ref=e37]
+        - text: Cerrar Sesión
+    - generic [ref=e40]:
+      - generic [ref=e41]:
+        - generic [ref=e43]:
+          - img [ref=e44]
+          - textbox "Buscar pacientes, citas o historiales..." [ref=e47]
+        - generic [ref=e48]:
+          - button "Ver notificaciones" [ref=e50] [cursor=pointer]:
+            - img [ref=e51]
+          - button "Veterinario Veterinario V" [ref=e57] [cursor=pointer]:
+            - generic [ref=e58]:
+              - paragraph [ref=e59]: Veterinario
+              - paragraph [ref=e60]: Veterinario
+            - generic [ref=e61]: V
+      - generic [ref=e63]:
+        - generic [ref=e65]:
+          - generic [ref=e66]:
+            - paragraph [ref=e67]: Mi perfil
+            - heading "Información del veterinario" [level=1] [ref=e68]
+            - paragraph [ref=e69]: Consulta y actualiza tus datos profesionales y administra la seguridad de tu cuenta.
+          - generic [ref=e70]:
+            - generic [ref=e71]: V
+            - generic [ref=e72]:
+              - paragraph
+              - paragraph [ref=e73]: Veterinario
+        - generic [ref=e74]:
+          - generic [ref=e75]:
+            - img [ref=e77]
+            - generic [ref=e80]:
+              - heading "Información personal" [level=2] [ref=e81]
+              - paragraph [ref=e82]: Actualiza tus datos de contacto y consulta tu información profesional.
+          - generic [ref=e83]:
+            - generic [ref=e84]:
+              - generic [ref=e85]: Nombre
+              - textbox "Nombre" [ref=e86]
+            - generic [ref=e87]:
+              - generic [ref=e88]: Cargo
+              - textbox "Cargo" [ref=e89]: Veterinario
+            - generic [ref=e90]:
+              - generic [ref=e91]: Especialidad
+              - textbox "Especialidad" [ref=e92]
+            - generic [ref=e93]:
+              - generic [ref=e94]: Registro profesional
+              - textbox "Registro profesional" [ref=e95]
+            - generic [ref=e96]:
+              - generic [ref=e97]: Correo electrónico
+              - textbox "Correo electrónico" [ref=e98]
+            - generic [ref=e99]:
+              - generic [ref=e100]: Teléfono
+              - textbox "Teléfono" [ref=e101]
+            - generic [ref=e103]:
+              - generic [ref=e104]: Horario de atención
+              - textbox "Horario de atención" [ref=e105]
+          - generic [ref=e106]:
+            - button "Cancelar" [ref=e107] [cursor=pointer]
+            - button "Guardar cambios" [ref=e108] [cursor=pointer]:
+              - img [ref=e109]
+              - text: Guardar cambios
+        - generic [ref=e113]:
+          - generic [ref=e114]:
+            - img [ref=e116]
+            - generic [ref=e119]:
+              - heading "Seguridad de la cuenta" [level=2] [ref=e120]
+              - paragraph [ref=e121]: Cambia tu contraseña para mantener protegido el acceso a tu perfil veterinario.
+          - generic [ref=e122]:
+            - generic [ref=e124]:
+              - generic [ref=e125]: Contraseña actual
+              - textbox "Contraseña actual" [ref=e126]:
+                - /placeholder: Ingresa tu contraseña actual
+            - generic [ref=e127]:
+              - generic [ref=e128]: Nueva contraseña
+              - textbox "Nueva contraseña" [ref=e129]:
+                - /placeholder: Mínimo 8 caracteres
+            - generic [ref=e130]:
+              - generic [ref=e131]: Confirmar nueva contraseña
+              - textbox "Confirmar nueva contraseña" [ref=e132]:
+                - /placeholder: Repite la nueva contraseña
+          - generic [ref=e133]:
+            - img [ref=e134]
+            - paragraph [ref=e136]: Utiliza una contraseña de mínimo 8 caracteres y evita compartir tus credenciales de acceso.
+          - generic [ref=e137]:
+            - button "Cancelar" [ref=e138] [cursor=pointer]
+            - button "Actualizar contraseña" [ref=e139] [cursor=pointer]:
+              - img [ref=e140]
+              - text: Actualizar contraseña

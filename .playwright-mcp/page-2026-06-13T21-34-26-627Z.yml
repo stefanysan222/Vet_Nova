@@ -1,0 +1,144 @@
+- generic [ref=e1]:
+  - generic [ref=e87] [cursor=pointer]:
+    - button "Open Next.js Dev Tools" [ref=e88]:
+      - img [ref=e89]
+    - generic [ref=e92]:
+      - button "Open issues overlay" [ref=e93]:
+        - generic [ref=e94]:
+          - generic [ref=e95]: "0"
+          - generic [ref=e96]: "1"
+        - generic [ref=e97]: Issue
+      - button "Collapse issues badge" [ref=e98]:
+        - img [ref=e99]
+  - alert [ref=e101]
+  - main [ref=e163]:
+    - generic [ref=e164]:
+      - complementary [ref=e165]:
+        - generic [ref=e166]:
+          - img "VetNova Logo" [ref=e167]
+          - generic [ref=e168]:
+            - heading "VetNova" [level=1] [ref=e169]
+            - paragraph [ref=e170]: Sistema Veterinario
+        - navigation [ref=e171]:
+          - link "Dashboard" [ref=e172] [cursor=pointer]:
+            - /url: /cliente
+            - img [ref=e173]
+            - text: Dashboard
+          - link "Citas" [ref=e176] [cursor=pointer]:
+            - /url: /cliente/agendar
+            - img [ref=e177]
+            - text: Citas
+          - link "Mascotas" [ref=e179] [cursor=pointer]:
+            - /url: /cliente/mascotas
+            - img [ref=e180]
+            - text: Mascotas
+          - link "Configuración" [ref=e185] [cursor=pointer]:
+            - /url: /cliente/configuracion
+            - img [ref=e186]
+            - text: Configuración
+        - button "Cerrar Sesión" [ref=e190] [cursor=pointer]:
+          - img [ref=e191]
+          - text: Cerrar Sesión
+      - generic [ref=e194]:
+        - generic [ref=e195]:
+          - generic [ref=e197]:
+            - img [ref=e198]
+            - textbox "Buscar mascotas, citas..." [ref=e201]
+          - generic [ref=e202]:
+            - button "Abrir notificaciones" [ref=e203] [cursor=pointer]:
+              - img [ref=e204]
+              - generic [ref=e442]: "1"
+            - button "Abrir menú de perfil" [ref=e209] [cursor=pointer]:
+              - generic [ref=e210]:
+                - paragraph [ref=e211]: Cliente Prueba E2E
+                - paragraph [ref=e212]: Cliente
+              - generic [ref=e213]: CP
+        - generic [ref=e652]:
+          - generic [ref=e653]:
+            - link "Volver a citas" [ref=e654] [cursor=pointer]:
+              - /url: /cliente/agendar
+              - img [ref=e655]
+              - text: Volver a citas
+            - heading "Nueva solicitud de cita" [level=1] [ref=e657]
+          - generic [ref=e659]:
+            - generic [ref=e661]:
+              - img [ref=e696]
+              - paragraph [ref=e663]: Mascota
+            - generic [ref=e666]:
+              - img [ref=e734]
+              - paragraph [ref=e668]: Servicio
+            - generic [ref=e671]:
+              - generic [ref=e672]: "3"
+              - paragraph [ref=e673]: Fecha y hora
+          - generic [ref=e737]:
+            - heading "Elige fecha, hora y veterinario" [level=2] [ref=e738]
+            - paragraph [ref=e739]: Selecciona cuándo quieres que Firulais sea atendida.
+            - generic [ref=e740]:
+              - generic [ref=e741]:
+                - generic [ref=e742]:
+                  - img [ref=e743]
+                  - text: Fecha
+                - textbox [ref=e745]: 2026-06-20
+                - paragraph [ref=e779]: "Horario: 08:00 – 17:00"
+              - generic [ref=e746]:
+                - generic [ref=e747]:
+                  - img [ref=e748]
+                  - text: Hora disponible
+                - generic [ref=e780]:
+                  - button "08:00 AM" [ref=e781] [cursor=pointer]
+                  - button "08:30 AM" [ref=e782] [cursor=pointer]
+                  - button "09:00 AM" [ref=e783] [cursor=pointer]
+                  - button "09:30 AM" [ref=e784] [cursor=pointer]
+                  - button "10:00 AM" [active] [ref=e785] [cursor=pointer]
+                  - button "10:30 AM" [ref=e786] [cursor=pointer]
+                  - button "11:00 AM" [ref=e787] [cursor=pointer]
+                  - button "11:30 AM" [ref=e788] [cursor=pointer]
+                  - button "12:00 PM" [ref=e789] [cursor=pointer]
+                  - button "12:30 PM" [ref=e790] [cursor=pointer]
+                  - button "01:00 PM" [ref=e791] [cursor=pointer]
+                  - button "01:30 PM" [ref=e792] [cursor=pointer]
+                  - button "02:00 PM" [ref=e793] [cursor=pointer]
+                  - button "02:30 PM" [ref=e794] [cursor=pointer]
+                  - button "03:00 PM" [ref=e795] [cursor=pointer]
+                  - button "03:30 PM" [ref=e796] [cursor=pointer]
+                  - button "04:00 PM" [ref=e797] [cursor=pointer]
+                  - button "04:30 PM" [ref=e798] [cursor=pointer]
+            - generic [ref=e799]:
+              - generic [ref=e800]:
+                - img [ref=e801]
+                - text: Veterinario de preferencia
+                - generic [ref=e804]: (opcional)
+              - paragraph [ref=e805]: La clínica asignará un veterinario disponible al confirmar tu cita.
+            - generic [ref=e752]:
+              - generic [ref=e753]: Motivo de la consulta (opcional)
+              - textbox "Describe brevemente el motivo de la consulta o síntomas observados..." [ref=e754]
+            - generic [ref=e755]:
+              - paragraph [ref=e756]: Resumen de la solicitud
+              - generic [ref=e757]:
+                - generic [ref=e758]:
+                  - paragraph [ref=e759]: Mascota
+                  - paragraph [ref=e760]: Firulais
+                - generic [ref=e761]:
+                  - paragraph [ref=e762]: Servicio
+                  - paragraph [ref=e763]: Consulta general
+                - generic [ref=e764]:
+                  - paragraph [ref=e765]: Fecha
+                  - paragraph [ref=e766]: sábado, 20 de junio de 2026
+                - generic [ref=e767]:
+                  - paragraph [ref=e768]: Hora
+                  - paragraph [ref=e769]: 10:00 AM
+                - generic [ref=e770]:
+                  - paragraph [ref=e771]: Veterinario
+                  - paragraph [ref=e772]: Sin preferencia (la clínica asignará)
+              - paragraph [ref=e773]:
+                - text: La cita quedará en estado
+                - strong [ref=e774]: Pendiente de confirmación
+                - text: . La clínica revisará y confirmará el horario.
+          - generic [ref=e681]:
+            - button "Atrás" [ref=e728] [cursor=pointer]:
+              - img [ref=e729]
+              - text: Atrás
+            - button "Solicitar cita" [ref=e775] [cursor=pointer]:
+              - text: Solicitar cita
+              - img [ref=e776]
+  - generic [ref=e441]: 13/06

@@ -1,0 +1,149 @@
+- generic [ref=e1]:
+  - generic [ref=e56] [cursor=pointer]:
+    - button "Open Next.js Dev Tools" [ref=e57]:
+      - img [ref=e58]
+    - generic [ref=e61]:
+      - button "Open issues overlay" [ref=e62]:
+        - generic [ref=e63]:
+          - generic [ref=e64]: "0"
+          - generic [ref=e65]: "1"
+        - generic [ref=e66]: Issue
+      - button "Collapse issues badge" [ref=e67]:
+        - img [ref=e68]
+  - alert [ref=e70]
+  - generic [ref=e71]:
+    - complementary [ref=e72]:
+      - generic [ref=e74]:
+        - generic [ref=e75]: AE
+        - generic [ref=e76]:
+          - paragraph [ref=e77]: Admin E2E
+          - paragraph [ref=e78]: Clinica E2E Test
+      - navigation [ref=e80]:
+        - link "Dashboard" [ref=e81] [cursor=pointer]:
+          - /url: /admin
+          - img [ref=e82]
+          - text: Dashboard
+        - link "Usuarios" [ref=e85] [cursor=pointer]:
+          - /url: /admin/usuarios
+          - img [ref=e86]
+          - text: Usuarios
+        - link "Citas" [ref=e90] [cursor=pointer]:
+          - /url: /admin/citas
+          - img [ref=e91]
+          - text: Citas
+        - link "Mascotas" [ref=e93] [cursor=pointer]:
+          - /url: /admin/mascotas
+          - img [ref=e94]
+          - text: Mascotas
+        - link "Reportes" [ref=e97] [cursor=pointer]:
+          - /url: /admin/reportes
+          - img [ref=e98]
+          - text: Reportes
+        - link "Notificaciones" [ref=e100] [cursor=pointer]:
+          - /url: /admin/notificaciones
+          - img [ref=e101]
+          - text: Notificaciones
+        - link "Configuración" [ref=e104] [cursor=pointer]:
+          - /url: /admin/configuracion
+          - img [ref=e105]
+          - text: Configuración
+      - generic [ref=e108]:
+        - generic [ref=e110]:
+          - img [ref=e111]
+          - paragraph [ref=e114]: Soporte 24/7
+        - button "Cerrar sesión" [ref=e115] [cursor=pointer]:
+          - img [ref=e116]
+          - text: Cerrar sesión
+    - generic [ref=e119]:
+      - banner [ref=e120]:
+        - generic [ref=e121]:
+          - generic [ref=e122]:
+            - img
+            - searchbox "Buscar citas, usuarios o mascotas..." [ref=e123]
+          - generic [ref=e124]:
+            - button "Activar modo oscuro" [ref=e125] [cursor=pointer]:
+              - img [ref=e126]
+            - button [ref=e129] [cursor=pointer]:
+              - img [ref=e130]
+            - generic [ref=e133]:
+              - generic [ref=e134]: AE
+              - generic [ref=e135]: Admin E2E
+      - main [ref=e136]:
+        - generic [ref=e399]:
+          - generic [ref=e401]:
+            - generic [ref=e402]:
+              - paragraph [ref=e403]: Usuarios
+              - heading "Gestión de Usuarios" [level=1] [ref=e404]
+              - paragraph [ref=e405]: Registra y administra los veterinarios y clientes de VetNova.
+            - button "+ Nuevo Usuario" [active] [ref=e406] [cursor=pointer]
+          - generic [ref=e407]:
+            - generic [ref=e408]:
+              - article [ref=e409]:
+                - img [ref=e411]
+                - paragraph [ref=e416]: "0"
+                - paragraph [ref=e418]: Total clientes
+              - article [ref=e419]:
+                - img [ref=e421]
+                - paragraph [ref=e425]: "0"
+                - paragraph [ref=e427]: Veterinarios
+              - article [ref=e428]:
+                - img [ref=e430]
+                - paragraph [ref=e435]: "0"
+                - paragraph [ref=e437]: Mascotas
+              - article [ref=e438]:
+                - img [ref=e440]
+                - paragraph [ref=e442]: "0"
+                - paragraph [ref=e444]: Citas hoy
+              - article [ref=e445]:
+                - img [ref=e447]
+                - paragraph [ref=e450]: "0"
+                - paragraph [ref=e452]: Pendientes
+            - generic [ref=e453]:
+              - generic [ref=e454]:
+                - heading "Usuarios activos" [level=2] [ref=e455]
+                - paragraph [ref=e456]: Revisa y administra el acceso de cada miembro del equipo.
+              - article [ref=e459]:
+                - generic [ref=e460]:
+                  - generic [ref=e461]:
+                    - generic [ref=e462]: AE
+                    - generic [ref=e463]:
+                      - paragraph [ref=e464]: Admin E2E
+                      - generic [ref=e466]: Administrador
+                      - paragraph [ref=e468]: admin.e2e@example.com
+                  - generic [ref=e469]:
+                    - button "Editar" [ref=e470] [cursor=pointer]:
+                      - img [ref=e471]
+                      - text: Editar
+                    - button "Eliminar" [ref=e474] [cursor=pointer]:
+                      - img [ref=e475]
+                      - text: Eliminar
+          - generic [ref=e479]:
+            - generic [ref=e480]:
+              - generic [ref=e481]:
+                - heading "Registrar Nuevo Usuario" [level=2] [ref=e482]
+                - paragraph [ref=e483]: Crea una cuenta para un nuevo miembro del equipo
+              - button [ref=e484] [cursor=pointer]:
+                - img [ref=e485]
+            - generic [ref=e488]:
+              - generic [ref=e489]:
+                - generic [ref=e490]: Nombre Completo
+                - textbox "Juan Pérez García" [ref=e491]
+              - generic [ref=e492]:
+                - generic [ref=e493]: Correo Electrónico
+                - textbox "juan@vetnova.com" [ref=e494]
+              - generic [ref=e495]:
+                - generic [ref=e496]: Rol
+                - combobox [ref=e497]:
+                  - option "Veterinario" [selected]
+                  - option "Cliente"
+              - generic [ref=e498]:
+                - generic [ref=e499]:
+                  - generic [ref=e500]: Contraseña
+                  - textbox "••••••••" [ref=e501]
+                - generic [ref=e502]:
+                  - generic [ref=e503]: Confirmar Contraseña
+                  - textbox "••••••••" [ref=e504]
+              - generic [ref=e505]:
+                - button "Cancelar" [ref=e506] [cursor=pointer]
+                - button "Registrar Usuario" [ref=e507] [cursor=pointer]
+  - generic [ref=e397]: 13/06

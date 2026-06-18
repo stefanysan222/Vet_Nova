@@ -1,0 +1,191 @@
+- generic [active] [ref=e1]:
+  - generic [ref=e98] [cursor=pointer]:
+    - button "Open Next.js Dev Tools" [ref=e99]:
+      - img [ref=e100]
+    - generic [ref=e103]:
+      - button "Open issues overlay" [ref=e104]:
+        - generic [ref=e105]:
+          - generic [ref=e106]: "0"
+          - generic [ref=e107]: "1"
+        - generic [ref=e108]: Issue
+      - button "Collapse issues badge" [ref=e109]:
+        - img [ref=e110]
+  - alert [ref=e112]
+  - main [ref=e161]:
+    - generic [ref=e162]:
+      - complementary [ref=e163]:
+        - generic [ref=e164]:
+          - img "VetNova Logo" [ref=e165]
+          - generic [ref=e166]:
+            - heading "VetNova" [level=1] [ref=e167]
+            - paragraph [ref=e168]: Sistema Veterinario
+        - navigation [ref=e169]:
+          - link "Dashboard" [ref=e170] [cursor=pointer]:
+            - /url: /cliente
+            - img [ref=e171]
+            - text: Dashboard
+          - link "Citas" [ref=e174] [cursor=pointer]:
+            - /url: /cliente/agendar
+            - img [ref=e175]
+            - text: Citas
+          - link "Mascotas" [ref=e177] [cursor=pointer]:
+            - /url: /cliente/mascotas
+            - img [ref=e178]
+            - text: Mascotas
+          - link "Configuración" [ref=e183] [cursor=pointer]:
+            - /url: /cliente/configuracion
+            - img [ref=e184]
+            - text: Configuración
+        - button "Cerrar Sesión" [ref=e188] [cursor=pointer]:
+          - img [ref=e189]
+          - text: Cerrar Sesión
+      - generic [ref=e192]:
+        - generic [ref=e193]:
+          - generic [ref=e195]:
+            - img [ref=e196]
+            - textbox "Buscar mascotas, citas..." [ref=e199]
+          - generic [ref=e200]:
+            - button "Abrir notificaciones" [ref=e201] [cursor=pointer]:
+              - img [ref=e202]
+              - generic [ref=e205]: "1"
+            - button "Abrir menú de perfil" [ref=e208] [cursor=pointer]:
+              - generic [ref=e209]:
+                - paragraph [ref=e210]: Cliente E2E Test
+                - paragraph [ref=e211]: Cliente
+              - generic [ref=e212]: CE
+        - generic [ref=e216]:
+          - generic [ref=e217]:
+            - generic [ref=e218]:
+              - paragraph [ref=e219]: Panel cliente
+              - heading "Hola, Cliente 🐾" [level=1] [ref=e220]
+              - paragraph [ref=e221]: No tienes citas próximas. ¿Agendamos una?
+              - generic [ref=e222]:
+                - link "Agendar cita" [ref=e223] [cursor=pointer]:
+                  - /url: /cliente/agendar/nueva
+                  - img [ref=e224]
+                  - text: Agendar cita
+                - link "Mis mascotas" [ref=e225] [cursor=pointer]:
+                  - /url: /cliente/mascotas
+                  - img [ref=e226]
+                  - text: Mis mascotas
+            - generic [ref=e231]:
+              - generic [ref=e232]:
+                - img [ref=e233]
+                - heading "Próxima cita" [level=3] [ref=e235]
+              - paragraph [ref=e236]: Sin citas próximas.
+          - generic [ref=e237]:
+            - generic [ref=e238]:
+              - img [ref=e240]
+              - paragraph [ref=e242]: "0"
+              - paragraph [ref=e243]: Citas hoy
+            - generic [ref=e244]:
+              - img [ref=e246]
+              - paragraph [ref=e251]: "0"
+              - paragraph [ref=e252]: Mascotas
+            - generic [ref=e253]:
+              - img [ref=e255]
+              - paragraph [ref=e258]: "0"
+              - paragraph [ref=e259]: Próximas
+            - generic [ref=e260]:
+              - img [ref=e262]
+              - paragraph [ref=e265]: "0"
+              - paragraph [ref=e266]: Completadas
+            - generic [ref=e267]:
+              - img [ref=e269]
+              - paragraph [ref=e273]: "0"
+              - paragraph [ref=e274]: Canceladas
+          - generic [ref=e275]:
+            - generic [ref=e276]:
+              - heading "Mis citas por día" [level=2] [ref=e277]
+              - paragraph [ref=e278]: Últimos 30 días y próximos 14
+              - generic [ref=e279]:
+                - generic [ref=e280]: Hoy
+                - generic [ref=e282]: Pasado
+                - generic [ref=e284]: Próximo
+              - generic [ref=e288]:
+                - generic:
+                  - status:
+                    - paragraph: 13/06
+                    - list:
+                      - listitem: ": 0 citas"
+                      - listitem: ": 0 citas"
+                      - listitem: ": 0 citas"
+                - application [ref=e289]:
+                  - generic [ref=e297]: 13/06
+            - generic [ref=e298]:
+              - generic [ref=e299]:
+                - heading "Junio 2026" [level=3] [ref=e300]
+                - generic [ref=e301]:
+                  - button "Mes anterior" [ref=e302] [cursor=pointer]:
+                    - img [ref=e303]
+                  - button "Mes siguiente" [ref=e305] [cursor=pointer]:
+                    - img [ref=e306]
+              - generic [ref=e308]:
+                - generic [ref=e309]: L
+                - generic [ref=e310]: M
+                - generic [ref=e311]: M
+                - generic [ref=e312]: J
+                - generic [ref=e313]: V
+                - generic [ref=e314]: S
+                - generic [ref=e315]: D
+                - generic [ref=e317]: "1"
+                - generic [ref=e320]: "2"
+                - generic [ref=e323]: "3"
+                - generic [ref=e326]: "4"
+                - generic [ref=e329]: "5"
+                - generic [ref=e332]: "6"
+                - generic [ref=e335]: "7"
+                - generic [ref=e338]: "8"
+                - generic [ref=e341]: "9"
+                - generic [ref=e344]: "10"
+                - generic [ref=e347]: "11"
+                - generic [ref=e350]: "12"
+                - generic [ref=e353]: "13"
+                - generic [ref=e356]: "14"
+                - generic [ref=e359]: "15"
+                - generic [ref=e362]: "16"
+                - generic [ref=e365]: "17"
+                - generic [ref=e368]: "18"
+                - generic [ref=e371]: "19"
+                - generic [ref=e374]: "20"
+                - generic [ref=e377]: "21"
+                - generic [ref=e380]: "22"
+                - generic [ref=e383]: "23"
+                - generic [ref=e386]: "24"
+                - generic [ref=e389]: "25"
+                - generic [ref=e392]: "26"
+                - generic [ref=e395]: "27"
+                - generic [ref=e398]: "28"
+                - generic [ref=e401]: "29"
+                - generic [ref=e404]: "30"
+              - generic [ref=e406]:
+                - generic [ref=e407]: Con citas
+                - generic [ref=e409]: Libre
+          - generic [ref=e411]:
+            - generic [ref=e412]:
+              - generic [ref=e413]:
+                - img [ref=e414]
+                - heading "Mis mascotas" [level=3] [ref=e416]
+              - paragraph [ref=e417]: No tienes mascotas registradas.
+            - generic [ref=e418]:
+              - generic [ref=e419]:
+                - img [ref=e420]
+                - heading "Acciones rápidas" [level=3] [ref=e422]
+              - generic [ref=e423]:
+                - link "Agendar cita" [ref=e424] [cursor=pointer]:
+                  - /url: /cliente/agendar/nueva
+                  - img [ref=e425]
+                  - text: Agendar cita
+                - link "Mis mascotas" [ref=e427] [cursor=pointer]:
+                  - /url: /cliente/mascotas
+                  - img [ref=e428]
+                  - text: Mis mascotas
+                - link "Ver citas" [ref=e433] [cursor=pointer]:
+                  - /url: /cliente/citas
+                  - img [ref=e434]
+                  - text: Ver citas
+                - link "Mi perfil" [ref=e436] [cursor=pointer]:
+                  - /url: /cliente/configuracion
+                  - img [ref=e437]
+                  - text: Mi perfil
+  - generic [ref=e440]: 13/06
