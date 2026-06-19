@@ -170,8 +170,8 @@ jobs:
           file: Dockerfile
           push: true
           build-args: |
-            NEXT_PUBLIC_API_URL=${{ vars.NEXT_PUBLIC_API_URL }}
-            NEXT_PUBLIC_GOOGLE_CLIENT_ID=${{ vars.NEXT_PUBLIC_GOOGLE_CLIENT_ID }}
+            NEXT_PUBLIC_API_URL=https://api.vetnova.online
+            NEXT_PUBLIC_GOOGLE_CLIENT_ID=590317538413-4jp087ouhcg0rvgtvfjoa7tu286dn54b.apps.googleusercontent.com
           tags: |
             ghcr.io/stefanysan222/vetnova-frontend:latest
             ghcr.io/stefanysan222/vetnova-frontend:sha-${{ github.sha }}
