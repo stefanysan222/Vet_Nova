@@ -10,17 +10,16 @@ export default function Stats() {
         whileInView={{ opacity: 1, y: 0 }}
         viewport={{ once: true, margin: "-60px" }}
         transition={{ duration: 0.4 }}
-        className="relative flex min-h-[280px] items-center overflow-hidden rounded-3xl border border-surface-200 bg-white p-12 dark:border-surface-800 dark:bg-surface-900 sm:p-14"
+        className="relative flex min-h-[280px] flex-col items-start gap-8 overflow-hidden rounded-3xl border border-surface-200 bg-white p-12 dark:border-surface-800 dark:bg-surface-900 sm:flex-row sm:items-center sm:gap-12 sm:p-14"
       >
-        {/* Logo difuminado como marca de agua, sin recortes, adaptado a claro/oscuro */}
         <div
           aria-hidden
-          className="pointer-events-none absolute right-[-30px] top-1/2 hidden h-[300px] w-[300px] -translate-y-1/2 bg-contain bg-center bg-no-repeat opacity-50 blur-[7px] dark:hidden sm:block"
+          className="relative hidden h-[140px] w-[220px] shrink-0 bg-contain bg-center bg-no-repeat dark:hidden sm:block"
           style={{ backgroundImage: "url(/logos/Vetnova-ligth-word.jpg)" }}
         />
         <div
           aria-hidden
-          className="pointer-events-none absolute right-[-30px] top-1/2 hidden h-[300px] w-[300px] -translate-y-1/2 bg-contain bg-center bg-no-repeat opacity-55 mix-blend-lighten blur-[7px] dark:block sm:block"
+          className="relative hidden h-[140px] w-[220px] shrink-0 bg-contain bg-center bg-no-repeat dark:block sm:block"
           style={{ backgroundImage: "url(/logos/Vetnova-dark-word.jpg)" }}
         />
 

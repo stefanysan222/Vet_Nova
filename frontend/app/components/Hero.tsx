@@ -116,7 +116,7 @@ export default function Hero() {
           </div>
 
           {/* Foto circular + panel flotante de estado real */}
-          <div className="relative hidden w-[420px] shrink-0 pb-14 pr-16 lg:block">
+          <div className="relative hidden min-h-[540px] w-[560px] shrink-0 lg:block">
             <div className="pointer-events-none absolute -right-2 top-0 -z-10 h-20 w-20 rounded-full bg-success-100/60 blur-xl dark:bg-success-500/15" />
             <motion.div
               initial={{ opacity: 0, scale: 0.92 }}
@@ -138,14 +138,14 @@ export default function Hero() {
               initial={{ opacity: 0, x: 20, y: 20 }}
               animate={{ opacity: 1, x: 0, y: 0 }}
               transition={{ duration: 0.5, delay: 0.3 }}
-              className="absolute bottom-0 right-0 w-[230px] rounded-2xl border border-surface-200 bg-white p-4 shadow-card dark:border-surface-800 dark:bg-surface-900"
+              className="absolute left-[326px] top-[250px] w-[230px] rounded-2xl border border-surface-200 bg-white p-4 shadow-card dark:border-surface-800 dark:bg-surface-900"
             >
-              <div className="mb-3 flex items-center justify-between">
-                <p className="text-[10px] font-semibold uppercase tracking-widest text-surface-400 dark:text-surface-500">
+              <div className="mb-3 flex items-center justify-between gap-2">
+                <p className="whitespace-nowrap text-[9px] font-semibold uppercase tracking-wide text-surface-400 dark:text-surface-500">
                   Hoy en la clínica
                 </p>
-                <span className="flex items-center gap-1 rounded-full bg-success-50 px-2 py-1 text-[10px] font-semibold text-success-700 dark:bg-success-900/30 dark:text-success-400">
-                  <span className="h-1.5 w-1.5 rounded-full bg-success-500" />
+                <span className="flex shrink-0 items-center gap-1 whitespace-nowrap rounded-full bg-success-50 px-2 py-1 text-[10px] font-semibold text-success-700 dark:bg-success-900/30 dark:text-success-400">
+                  <span className="h-1.5 w-1.5 shrink-0 rounded-full bg-success-500" />
                   En línea
                 </span>
               </div>
@@ -154,23 +154,23 @@ export default function Hero() {
                 {CITAS_HOY.slice(0, 3).map((cita) => (
                   <div
                     key={cita.nombre}
-                    className="flex items-center justify-between rounded-xl bg-surface-50 px-3 py-2 dark:bg-surface-800/60"
+                    className="flex items-center justify-between gap-2 rounded-xl bg-surface-50 px-3 py-2 dark:bg-surface-800/60"
                   >
-                    <div className="flex items-center gap-2">
-                      <span className="w-9 text-[10px] font-semibold text-surface-400 dark:text-surface-500">
+                    <div className="flex min-w-0 items-center gap-2">
+                      <span className="w-9 shrink-0 text-[10px] font-semibold text-surface-400 dark:text-surface-500">
                         {cita.hora}
                       </span>
-                      <div>
-                        <p className="text-xs font-semibold text-surface-900 dark:text-white">
+                      <div className="min-w-0">
+                        <p className="truncate text-xs font-semibold text-surface-900 dark:text-white">
                           {cita.nombre}
                         </p>
-                        <p className="text-[10px] text-surface-400 dark:text-surface-500">
+                        <p className="truncate text-[10px] text-surface-400 dark:text-surface-500">
                           {cita.servicio}
                         </p>
                       </div>
                     </div>
                     <span
-                      className={`rounded-full px-2 py-0.5 text-[10px] font-semibold ${cita.color}`}
+                      className={`shrink-0 whitespace-nowrap rounded-full px-2 py-0.5 text-[9px] font-semibold ${cita.color}`}
                     >
                       {cita.estado}
                     </span>

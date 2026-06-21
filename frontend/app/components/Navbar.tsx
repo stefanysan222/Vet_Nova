@@ -36,26 +36,25 @@ export default function Navbar() {
   return (
     <header className="fixed inset-x-0 top-0 z-50 border-b border-surface-200/80 bg-surface-50/90 backdrop-blur-xl dark:border-surface-800/80 dark:bg-surface-950/90">
       <div className="mx-auto flex max-w-7xl items-center justify-between px-6 py-4 sm:px-8 lg:px-12">
-        <a href="#" className="inline-flex items-center gap-2.5">
-          <div className="relative h-8 w-8 shrink-0">
+        <a href="#" className="inline-flex items-center">
+          <div className="relative -my-2 h-[52px] w-[52px] shrink-0">
             <Image
-              src="/logos/vetnova-logo-light.png"
+              src="/logos/Vetnova-ligth-word.jpg"
               alt="VetNova"
-              width={32}
-              height={32}
+              fill
+              sizes="52px"
               className="block rounded-lg object-contain dark:hidden"
               priority
             />
             <Image
-              src="/logos/vetnova-logo-dark.png"
+              src="/logos/Vetnova-dark-word.jpg"
               alt="VetNova"
-              width={32}
-              height={32}
-              className="hidden rounded-lg object-contain dark:block"
+              fill
+              sizes="52px"
+              className="hidden rounded-lg object-contain mix-blend-lighten dark:block"
               priority
             />
           </div>
-          <span className="text-base font-semibold text-surface-900 dark:text-white">VetNova</span>
         </a>
 
         <nav className="hidden items-center gap-8 md:flex">

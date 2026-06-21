@@ -4,7 +4,6 @@ import Navbar from "./components/Navbar";
 import WhatIsVetnova from "./components/WhatIsVetnova";
 import Services from "./components/Services";
 import Stats from "./components/Stats";
-import Reviews from "./components/Reviews";
 import Clinics from "./components/Clinics";
 import ReportSection from "./components/ReportSection";
 
@@ -17,7 +16,6 @@ export default function Home() {
         <WhatIsVetnova />
         <Services />
         <Stats />
-        <Reviews />
         <Clinics />
         <div className="px-6 sm:px-8 lg:px-12">
           <ReportSection />
