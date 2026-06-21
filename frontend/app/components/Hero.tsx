@@ -1,31 +1,9 @@
 "use client";
 
+import Image from "next/image";
 import Link from "next/link";
 import { motion } from "framer-motion";
-import { ArrowRight, CalendarCheck, ClipboardList, Heart, ShieldCheck } from "lucide-react";
-
-const FEATURES = [
-  {
-    icon: CalendarCheck,
-    label: "Citas sin complicaciones",
-    desc: "Agenda, confirma y recuerda citas desde cualquier dispositivo.",
-  },
-  {
-    icon: ClipboardList,
-    label: "Historia clínica digital",
-    desc: "Accede al expediente completo de cada paciente en segundos.",
-  },
-  {
-    icon: Heart,
-    label: "Seguimiento de pacientes",
-    desc: "Evoluciones, tratamientos y alertas de seguimiento integrados.",
-  },
-  {
-    icon: ShieldCheck,
-    label: "Roles y accesos seguros",
-    desc: "Administrador, veterinario y cliente con vistas personalizadas.",
-  },
-] as const;
+import { ArrowRight } from "lucide-react";
 
 const CITAS_HOY = [
   {
@@ -89,7 +67,10 @@ export default function Hero() {
             >
               Tu clínica, organizada.
               <br />
-              <span className="text-brand-600 dark:text-brand-300">Tus pacientes, cuidados.</span>
+              Tus pacientes,{" "}
+              <span className="font-accent text-[1.5em] font-semibold leading-none text-brand-600 dark:text-brand-300">
+                cuidados.
+              </span>
             </motion.h1>
 
             <motion.p
@@ -134,45 +115,62 @@ export default function Hero() {
             </motion.p>
           </div>
 
-          {/* Panel de muestra — tarjetas de estado real */}
-          <motion.div
-            initial={{ opacity: 0, x: 20 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ duration: 0.5, delay: 0.2 }}
-            className="hidden w-[340px] shrink-0 lg:block"
-          >
-            <div className="rounded-2xl border border-surface-200 bg-white p-5 shadow-card dark:border-surface-800 dark:bg-surface-900">
-              <div className="mb-4 flex items-center justify-between">
-                <p className="text-xs font-semibold uppercase tracking-widest text-surface-400 dark:text-surface-500">
+          {/* Foto circular + panel flotante de estado real */}
+          <div className="relative hidden w-[420px] shrink-0 pb-14 pr-16 lg:block">
+            <div className="pointer-events-none absolute -right-2 top-0 -z-10 h-20 w-20 rounded-full bg-success-100/60 blur-xl dark:bg-success-500/15" />
+            <motion.div
+              initial={{ opacity: 0, scale: 0.92 }}
+              animate={{ opacity: 1, scale: 1 }}
+              transition={{ duration: 0.5, delay: 0.15 }}
+              className="relative h-[360px] w-[360px] overflow-hidden rounded-full shadow-brand"
+            >
+              <Image
+                src="/logos/Mascota-Vetnova.jpeg"
+                alt="Mascota atendida en VetNova"
+                fill
+                sizes="360px"
+                className="object-cover"
+                priority
+              />
+            </motion.div>
+
+            <motion.div
+              initial={{ opacity: 0, x: 20, y: 20 }}
+              animate={{ opacity: 1, x: 0, y: 0 }}
+              transition={{ duration: 0.5, delay: 0.3 }}
+              className="absolute bottom-0 right-0 w-[230px] rounded-2xl border border-surface-200 bg-white p-4 shadow-card dark:border-surface-800 dark:bg-surface-900"
+            >
+              <div className="mb-3 flex items-center justify-between">
+                <p className="text-[10px] font-semibold uppercase tracking-widest text-surface-400 dark:text-surface-500">
                   Hoy en la clínica
                 </p>
-                <span className="flex items-center gap-1 rounded-full bg-success-50 px-2.5 py-1 text-[11px] font-semibold text-success-700 dark:bg-success-900/30 dark:text-success-400">
+                <span className="flex items-center gap-1 rounded-full bg-success-50 px-2 py-1 text-[10px] font-semibold text-success-700 dark:bg-success-900/30 dark:text-success-400">
                   <span className="h-1.5 w-1.5 rounded-full bg-success-500" />
                   En línea
                 </span>
               </div>
 
-              <div className="space-y-3">
-                {CITAS_HOY.map((cita) => (
+              <div className="space-y-2">
+                {CITAS_HOY.slice(0, 3).map((cita) => (
                   <div
                     key={cita.nombre}
-                    className="flex items-center justify-between rounded-xl bg-surface-50 px-4 py-3 dark:bg-surface-800/60"
+                    className="flex items-center justify-between rounded-xl bg-surface-50 px-3 py-2 dark:bg-surface-800/60"
                   >
-                    <div className="flex items-center gap-3">
-                      <span className="w-10 text-xs font-semibold text-surface-400 dark:text-surface-500">
+                    <div className="flex items-center gap-2">
+                      <span className="w-9 text-[10px] font-semibold text-surface-400 dark:text-surface-500">
                         {cita.hora}
                       </span>
                       <div>
-                        <p className="text-sm font-semibold text-surface-900 dark:text-white">
+                        <p className="text-xs font-semibold text-surface-900 dark:text-white">
                           {cita.nombre}
                         </p>
-                        <p className="text-xs text-surface-400 dark:text-surface-500">
+                        <p className="text-[10px] text-surface-400 dark:text-surface-500">
                           {cita.servicio}
                         </p>
                       </div>
                     </div>
                     <span
-                      className={`rounded-full px-2.5 py-1 text-[11px] font-semibold ${cita.color}`}
+                      className={`rounded-full px-2 py-0.5 text-[10px] font-semibold ${cita.color}`}
                     >
                       {cita.estado}
                     </span>
@@ -180,50 +178,28 @@ export default function Hero() {
                 ))}
               </div>
 
-              <div className="mt-4 flex gap-3 border-t border-surface-100 pt-4 dark:border-surface-800">
-                <div className="flex-1 rounded-xl bg-surface-50 px-3 py-2.5 text-center dark:bg-surface-800/60">
-                  <p className="text-xl font-bold text-surface-900 dark:text-white">4</p>
-                  <p className="mt-0.5 text-[11px] text-surface-400 dark:text-surface-500">
+              <div className="mt-3 flex gap-2 border-t border-surface-100 pt-3 dark:border-surface-800">
+                <div className="flex-1 rounded-xl bg-surface-50 px-2 py-2 text-center dark:bg-surface-800/60">
+                  <p className="text-lg font-bold text-surface-900 dark:text-white">4</p>
+                  <p className="mt-0.5 text-[9px] text-surface-400 dark:text-surface-500">
                     Citas hoy
                   </p>
                 </div>
-                <div className="flex-1 rounded-xl bg-surface-50 px-3 py-2.5 text-center dark:bg-surface-800/60">
-                  <p className="text-xl font-bold text-brand-600 dark:text-brand-300">2</p>
-                  <p className="mt-0.5 text-[11px] text-surface-400 dark:text-surface-500">
+                <div className="flex-1 rounded-xl bg-surface-50 px-2 py-2 text-center dark:bg-surface-800/60">
+                  <p className="text-lg font-bold text-brand-600 dark:text-brand-300">2</p>
+                  <p className="mt-0.5 text-[9px] text-surface-400 dark:text-surface-500">
                     Confirmadas
                   </p>
                 </div>
-                <div className="flex-1 rounded-xl bg-surface-50 px-3 py-2.5 text-center dark:bg-surface-800/60">
-                  <p className="text-xl font-bold text-amber-500">1</p>
-                  <p className="mt-0.5 text-[11px] text-surface-400 dark:text-surface-500">
+                <div className="flex-1 rounded-xl bg-surface-50 px-2 py-2 text-center dark:bg-surface-800/60">
+                  <p className="text-lg font-bold text-amber-500">1</p>
+                  <p className="mt-0.5 text-[9px] text-surface-400 dark:text-surface-500">
                     Pendientes
                   </p>
                 </div>
               </div>
-            </div>
-          </motion.div>
-        </div>
-
-        {/* Grid de features */}
-        <div className="mt-20 grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
-          {FEATURES.map(({ icon: Icon, label, desc }, i) => (
-            <motion.div
-              key={label}
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true, margin: "-60px" }}
-              transition={{ duration: 0.4, delay: i * 0.08 }}
-              className="group rounded-2xl border border-surface-200 bg-white p-5 shadow-card transition hover:-translate-y-0.5 hover:border-brand-200 hover:shadow-card-hover dark:border-surface-800 dark:bg-surface-900 dark:hover:border-brand-700"
-            >
-              <div className="mb-4 flex h-10 w-10 items-center justify-center rounded-xl bg-brand-50 text-brand-600 transition group-hover:bg-brand-100 dark:bg-brand-900/30 dark:text-brand-300 dark:group-hover:bg-brand-900/50">
-                <Icon className="h-5 w-5" />
-              </div>
-              <p className="text-sm font-semibold text-surface-900 dark:text-white">{label}</p>
-              <p className="mt-2 text-sm leading-6 text-surface-500 dark:text-surface-400">
-                {desc}
-              </p>
             </motion.div>
-          ))}
+          </div>
         </div>
       </div>
     </section>

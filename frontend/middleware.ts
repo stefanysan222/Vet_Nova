@@ -56,7 +56,7 @@ function buildCsp(nonce: string): string {
     "img-src 'self' data: blob: https://res.cloudinary.com https://lh3.googleusercontent.com",
     `connect-src 'self' ${API_URL} https://accounts.google.com https://api.cloudinary.com`,
     "font-src 'self'",
-    "frame-src https://accounts.google.com",
+    "frame-src https://accounts.google.com https://maps.google.com https://www.google.com",
     "object-src 'none'",
     "base-uri 'self'",
     "form-action 'self'",

@@ -5,7 +5,7 @@ import { Mail, MapPin, Phone, CheckCircle, AlertCircle } from "lucide-react";
 
 const ASUNTOS = [
   "Problema con mi cuenta",
-  "Error en el sistema",
+  "Reporte de error",
   "Consulta general",
   "Solicitud de soporte",
   "Otro",
@@ -21,10 +21,20 @@ type Campos = {
   email: string;
   asunto: string;
   asuntoOtro: string;
+  errorSistema: string;
+  errorExplicacion: string;
   mensaje: string;
 };
 
-const VACIO: Campos = { nombre: "", email: "", asunto: "", asuntoOtro: "", mensaje: "" };
+const VACIO: Campos = {
+  nombre: "",
+  email: "",
+  asunto: "",
+  asuntoOtro: "",
+  errorSistema: "",
+  errorExplicacion: "",
+  mensaje: "",
+};
 
 export default function ReportSection() {
   const [campos, setCampos] = useState<Campos>(VACIO);
@@ -38,13 +48,28 @@ export default function ReportSection() {
   };
 
   const asuntoFinal = campos.asunto === "Otro" ? campos.asuntoOtro.trim() : campos.asunto;
+  const esReporteError = campos.asunto === "Reporte de error";
 
   const enviar = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
-    if (!campos.nombre.trim() || !campos.email.trim() || !asuntoFinal || !campos.mensaje.trim()) {
+    const mensajeValido = esReporteError
+      ? campos.errorExplicacion.trim().length > 0
+      : campos.mensaje.trim().length > 0;
+
+    if (!campos.nombre.trim() || !campos.email.trim() || !asuntoFinal || !mensajeValido) {
       return;
     }
+
+    const mensajeFinal = esReporteError
+      ? [
+          campos.errorSistema.trim() && `Error en pantalla: ${campos.errorSistema.trim()}`,
+          campos.errorExplicacion.trim(),
+          campos.mensaje.trim(),
+        ]
+          .filter(Boolean)
+          .join("\n\n")
+      : campos.mensaje.trim();
 
     setEstado("enviando");
 
@@ -56,7 +81,7 @@ export default function ReportSection() {
           nombre: campos.nombre.trim(),
           email: campos.email.trim(),
           asunto: asuntoFinal,
-          mensaje: campos.mensaje.trim(),
+          mensaje: mensajeFinal,
         }),
       });
 
@@ -214,17 +239,56 @@ export default function ReportSection() {
             </div>
           )}
 
+          {esReporteError && (
+            <>
+              <div className="space-y-1.5">
+                <label className="block text-sm font-medium text-surface-700 dark:text-surface-300">
+                  Error que presenta el sistema
+                </label>
+                <input
+                  type="text"
+                  name="errorSistema"
+                  value={campos.errorSistema}
+                  onChange={actualizar}
+                  placeholder="Ej. 'Error 500: no se pudo guardar la cita'"
+                  className={inputClass}
+                />
+                <p className="text-xs text-surface-400 dark:text-surface-500">
+                  Copia el mensaje o código de error exacto que viste en pantalla, si lo tienes.
+                </p>
+              </div>
+              <div className="space-y-1.5">
+                <label className="block text-sm font-medium text-surface-700 dark:text-surface-300">
+                  Explica qué pasó
+                </label>
+                <textarea
+                  required
+                  name="errorExplicacion"
+                  value={campos.errorExplicacion}
+                  onChange={actualizar}
+                  rows={3}
+                  placeholder="¿Qué estabas haciendo cuando ocurrió? ¿Se repite siempre?"
+                  className={`${inputClass} resize-none py-3`}
+                />
+              </div>
+            </>
+          )}
+
           <div className="space-y-1.5">
             <label className="block text-sm font-medium text-surface-700 dark:text-surface-300">
-              Mensaje
+              {esReporteError ? "Comentario adicional (opcional)" : "Mensaje"}
             </label>
             <textarea
-              required
+              required={!esReporteError}
               name="mensaje"
               value={campos.mensaje}
               onChange={actualizar}
               rows={4}
-              placeholder="Describe tu consulta o problema..."
+              placeholder={
+                esReporteError
+                  ? "Cualquier otro detalle que nos ayude a entender el problema..."
+                  : "Describe tu consulta o problema..."
+              }
               className={`${inputClass} resize-none py-3`}
             />
           </div>

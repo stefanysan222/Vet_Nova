@@ -10,7 +10,7 @@ import type { NavLink } from "../types";
 const NAV_LINKS: NavLink[] = [
   { label: "Inicio", href: "#" },
   { label: "Servicios", href: "#servicios" },
-  { label: "Nosotros", href: "#nosotros" },
+  { label: "Sedes", href: "#sedes" },
   { label: "Contacto", href: "#contacto" },
 ] as const;
 
