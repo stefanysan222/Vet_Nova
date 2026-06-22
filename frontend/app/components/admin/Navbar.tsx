@@ -17,6 +17,7 @@ import {
 } from "lucide-react";
 import { AnimatePresence, motion } from "framer-motion";
 import { useAuth } from "@/lib/auth-context";
+import { useClickOutside } from "@/lib/hooks/useClickOutside";
 import { fetchUsuarios } from "../../../lib/api/usuarios";
 import { fetchMascotas } from "../../../lib/api/mascotas";
 import { fetchCitas } from "../../../lib/api/citas";
@@ -124,6 +125,7 @@ export default function Navbar() {
   const [activeIdx, setActiveIdx] = useState(0);
   const searchRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
+  const notifRef = useRef<HTMLDivElement>(null);
   const { user } = useAuth();
 
   // Badge: contar no leídas al montar y cada 30s
@@ -193,15 +195,8 @@ export default function Navbar() {
   };
 
   // Cerrar al hacer clic fuera
-  useEffect(() => {
-    const handler = (e: MouseEvent) => {
-      if (searchRef.current && !searchRef.current.contains(e.target as Node)) {
-        setOpen(false);
-      }
-    };
-    document.addEventListener("mousedown", handler);
-    return () => document.removeEventListener("mousedown", handler);
-  }, []);
+  useClickOutside(searchRef, () => setOpen(false));
+  useClickOutside(notifRef, () => setNotifOpen(false));
 
   // Búsqueda con debounce
   const doSearch = useCallback(async (q: string) => {
@@ -437,7 +432,7 @@ export default function Navbar() {
           </button>
 
           {/* Notificaciones */}
-          <div className="relative">
+          <div className="relative" ref={notifRef}>
             <button
               onClick={() => setNotifOpen(!notifOpen)}
               className="relative flex h-9 w-9 items-center justify-center rounded-xl text-slate-500 transition hover:bg-slate-100 dark:text-slate-400 dark:hover:bg-slate-800"

@@ -8,22 +8,37 @@ import {
   Building2,
   CalendarDays,
   CheckCircle2,
+  ChevronLeft,
+  ChevronRight,
   ClipboardList,
   Copy,
+  History,
   Mail,
   MapPin,
   Phone,
   Plus,
+  User,
+  Users2,
   X,
   Zap,
 } from "lucide-react";
 import { useAuth } from "@/lib/auth-context";
-import { fetchClinicas, createClinica, updateClinica, type Clinica } from "../../lib/api/clinicas";
+import {
+  fetchClinicas,
+  createClinica,
+  updateClinica,
+  changeClinicaAdmin,
+  fetchAdminHistory,
+  type Clinica,
+  type AdminHistoryEntry,
+} from "../../lib/api/clinicas";
+import AddressAutocomplete from "../components/maps/AddressAutocomplete";
+import MapPreview from "../components/maps/MapPreview";
 import { SkeletonCardList } from "../components/ui/Skeleton";
 import { useToast } from "../components/ui/Toast";
 import ConfirmDialog from "../components/ui/ConfirmDialog";
 import StatusBadge from "../components/ui/StatusBadge";
-import MonthlyCalendar from "../components/ui/MonthlyCalendar";
+import MonthlyCalendar, { type CalendarEvent } from "../components/ui/MonthlyCalendar";
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from "recharts";
 import { useIsDarkMode } from "@/lib/hooks/useDarkMode";
 
@@ -43,11 +58,7 @@ const emptyForm = {
   direccion: "",
   telefono: "",
   email: "",
-  latitud: "",
-  longitud: "",
-  adminNombre: "",
   adminEmail: "",
-  adminPassword: "",
 };
 
 function slugify(value: string): string {
@@ -76,16 +87,32 @@ export default function SuperAdminPage() {
   const { user } = useAuth();
   const { success, error: notifyError } = useToast();
   const [clinicas, setClinicas] = useState<Clinica[]>([]);
+  const [hiddenChartSeries, setHiddenChartSeries] = useState<Set<string>>(new Set());
   const [loading, setLoading] = useState(true);
   const [showForm, setShowForm] = useState(false);
   const [saving, setSaving] = useState(false);
   const [formError, setFormError] = useState("");
   const [form, setForm] = useState(emptyForm);
+  const [formCoords, setFormCoords] = useState<{ latitud: number; longitud: number } | null>(null);
   const [slugEdited, setSlugEdited] = useState(false);
   const [toggleTarget, setToggleTarget] = useState<Clinica | null>(null);
   const [toggling, setToggling] = useState(false);
+  const [detailTarget, setDetailTarget] = useState<Clinica | null>(null);
+  const [historyPage, setHistoryPage] = useState<{
+    data: AdminHistoryEntry[];
+    page: number;
+    lastPage: number;
+  }>({ data: [], page: 1, lastPage: 1 });
+  const [historyLoading, setHistoryLoading] = useState(false);
+  const [changeAdminEmail, setChangeAdminEmail] = useState("");
+  const [changeAdminError, setChangeAdminError] = useState("");
+  const [changingAdmin, setChangingAdmin] = useState(false);
   const [coordsTarget, setCoordsTarget] = useState<Clinica | null>(null);
-  const [coordsForm, setCoordsForm] = useState({ latitud: "", longitud: "" });
+  const [coordsForm, setCoordsForm] = useState({
+    direccion: "",
+    latitud: null as number | null,
+    longitud: null as number | null,
+  });
   const [coordsError, setCoordsError] = useState("");
   const [savingCoords, setSavingCoords] = useState(false);
   const isDark = useIsDarkMode();
@@ -122,26 +149,31 @@ export default function SuperAdminPage() {
     setForm((prev) => ({ ...prev, [name]: value }));
   };
 
-  const handleUseMyLocation = () => {
-    if (!("geolocation" in navigator)) {
-      notifyError("No disponible", "Tu navegador no soporta geolocalización.");
-      return;
-    }
-    navigator.geolocation.getCurrentPosition(
-      (pos) => {
-        setForm((prev) => ({
-          ...prev,
-          latitud: pos.coords.latitude.toFixed(6),
-          longitud: pos.coords.longitude.toFixed(6),
-        }));
-      },
-      () => notifyError("No se pudo obtener tu ubicación", "Revisa los permisos del navegador."),
-    );
+  const handleDireccionChange = (value: string) => {
+    setFormError("");
+    setForm((prev) => ({ ...prev, direccion: value }));
+    // Si el usuario edita manualmente el texto, invalidamos las coordenadas
+    // previamente seleccionadas hasta que escoja una nueva sugerencia.
+    setFormCoords(null);
+  };
+
+  const handleDireccionSelect = ({
+    direccion,
+    latitud,
+    longitud,
+  }: {
+    direccion: string;
+    latitud: number;
+    longitud: number;
+  }) => {
+    setForm((prev) => ({ ...prev, direccion }));
+    setFormCoords({ latitud, longitud });
   };
 
   const closeForm = () => {
     setShowForm(false);
     setForm(emptyForm);
+    setFormCoords(null);
     setSlugEdited(false);
     setFormError("");
   };
@@ -152,12 +184,8 @@ export default function SuperAdminPage() {
       setFormError("El nombre y el slug de la clínica son obligatorios.");
       return;
     }
-    if (!form.adminNombre.trim() || !form.adminEmail.trim() || !form.adminPassword.trim()) {
-      setFormError("Completa los datos del administrador inicial.");
-      return;
-    }
-    if (form.adminPassword.length < 8) {
-      setFormError("La contraseña del administrador debe tener al menos 8 caracteres.");
+    if (!form.adminEmail.trim()) {
+      setFormError("El correo del administrador inicial es obligatorio.");
       return;
     }
     setSaving(true);
@@ -169,13 +197,14 @@ export default function SuperAdminPage() {
         direccion: form.direccion.trim() || undefined,
         telefono: form.telefono.trim() || undefined,
         email: form.email.trim() || undefined,
-        latitud: form.latitud.trim() ? Number(form.latitud) : undefined,
-        longitud: form.longitud.trim() ? Number(form.longitud) : undefined,
-        adminNombre: form.adminNombre.trim(),
+        latitud: formCoords?.latitud,
+        longitud: formCoords?.longitud,
         adminEmail: form.adminEmail.trim(),
-        adminPassword: form.adminPassword,
       });
-      success("Clínica registrada", "La clínica y su administrador se crearon correctamente.");
+      success(
+        "Clínica registrada",
+        "La clínica se creó correctamente. Enviamos una contraseña temporal al correo del administrador.",
+      );
       closeForm();
       cargar();
     } catch (err) {
@@ -210,56 +239,47 @@ export default function SuperAdminPage() {
   const openCoordsModal = (c: Clinica) => {
     setCoordsTarget(c);
     setCoordsForm({
-      latitud: c.latitud != null ? String(c.latitud) : "",
-      longitud: c.longitud != null ? String(c.longitud) : "",
+      direccion: c.direccion || "",
+      latitud: c.latitud ?? null,
+      longitud: c.longitud ?? null,
     });
     setCoordsError("");
   };
 
   const closeCoordsModal = () => {
     setCoordsTarget(null);
-    setCoordsForm({ latitud: "", longitud: "" });
+    setCoordsForm({ direccion: "", latitud: null, longitud: null });
     setCoordsError("");
   };
 
-  const handleCoordsUseMyLocation = () => {
-    if (!("geolocation" in navigator)) {
-      notifyError("No disponible", "Tu navegador no soporta geolocalización.");
-      return;
-    }
-    navigator.geolocation.getCurrentPosition(
-      (pos) => {
-        setCoordsForm({
-          latitud: pos.coords.latitude.toFixed(6),
-          longitud: pos.coords.longitude.toFixed(6),
-        });
-      },
-      () => notifyError("No se pudo obtener tu ubicación", "Revisa los permisos del navegador."),
-    );
+  const handleCoordsDireccionChange = (value: string) => {
+    setCoordsError("");
+    setCoordsForm((prev) => ({ ...prev, direccion: value, latitud: null, longitud: null }));
+  };
+
+  const handleCoordsDireccionSelect = ({
+    direccion,
+    latitud,
+    longitud,
+  }: {
+    direccion: string;
+    latitud: number;
+    longitud: number;
+  }) => {
+    setCoordsError("");
+    setCoordsForm({ direccion, latitud, longitud });
   };
 
   const handleSaveCoords = async () => {
     if (!coordsTarget) return;
-    const latStr = coordsForm.latitud.trim();
-    const lngStr = coordsForm.longitud.trim();
-    if ((latStr && !lngStr) || (!latStr && lngStr)) {
-      setCoordsError("Completa tanto la latitud como la longitud.");
-      return;
-    }
-    const latitud = latStr ? Number(latStr) : undefined;
-    const longitud = lngStr ? Number(lngStr) : undefined;
-    if (latStr && (Number.isNaN(latitud) || latitud! < -90 || latitud! > 90)) {
-      setCoordsError("La latitud debe estar entre -90 y 90.");
-      return;
-    }
-    if (lngStr && (Number.isNaN(longitud) || longitud! < -180 || longitud! > 180)) {
-      setCoordsError("La longitud debe estar entre -180 y 180.");
-      return;
-    }
     setSavingCoords(true);
     setCoordsError("");
     try {
-      await updateClinica(coordsTarget.id, { latitud, longitud });
+      await updateClinica(coordsTarget.id, {
+        direccion: coordsForm.direccion.trim() || undefined,
+        latitud: coordsForm.latitud ?? undefined,
+        longitud: coordsForm.longitud ?? undefined,
+      });
       success(
         "Ubicación actualizada",
         `La ubicación de ${coordsTarget.nombre} se guardó correctamente.`,
@@ -280,6 +300,60 @@ export default function SuperAdminPage() {
       success("Enlace copiado", `Enlace de registro de ${nombre} copiado al portapapeles.`);
     } catch {
       notifyError("No se pudo copiar", "Copia el enlace manualmente: " + url);
+    }
+  };
+
+  const loadHistory = (clinicaId: number, page = 1) => {
+    setHistoryLoading(true);
+    fetchAdminHistory(clinicaId, page, 5)
+      .then((res) =>
+        setHistoryPage({ data: res.data, page: res.page, lastPage: res.lastPage || 1 }),
+      )
+      .catch(() => setHistoryPage({ data: [], page: 1, lastPage: 1 }))
+      .finally(() => setHistoryLoading(false));
+  };
+
+  const openDetail = (c: Clinica) => {
+    setDetailTarget(c);
+    setChangeAdminEmail("");
+    setChangeAdminError("");
+    loadHistory(c.id, 1);
+  };
+
+  const closeDetail = () => {
+    setDetailTarget(null);
+    setHistoryPage({ data: [], page: 1, lastPage: 1 });
+    setChangeAdminEmail("");
+    setChangeAdminError("");
+  };
+
+  const handleChangeAdmin = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!detailTarget) return;
+    if (!changeAdminEmail.trim()) {
+      setChangeAdminError("El correo del nuevo administrador es obligatorio.");
+      return;
+    }
+    setChangingAdmin(true);
+    setChangeAdminError("");
+    try {
+      const updated = await changeClinicaAdmin(detailTarget.id, {
+        newAdminEmail: changeAdminEmail.trim(),
+      });
+      setDetailTarget(updated);
+      setClinicas((prev) => prev.map((c) => (c.id === updated.id ? updated : c)));
+      setChangeAdminEmail("");
+      success(
+        "Administrador actualizado",
+        "El nuevo administrador recibirá una contraseña temporal por correo.",
+      );
+      loadHistory(detailTarget.id, 1);
+    } catch (err) {
+      setChangeAdminError(
+        err instanceof Error ? err.message : "No se pudo cambiar el administrador.",
+      );
+    } finally {
+      setChangingAdmin(false);
     }
   };
 
@@ -323,6 +397,26 @@ export default function SuperAdminPage() {
     const set = new Set<string>();
     clinicas.forEach((c) => c.createdAt && set.add(c.createdAt.slice(0, 10)));
     return set;
+  }, [clinicas]);
+
+  const eventsByDate = useMemo(() => {
+    const map: Record<string, CalendarEvent[]> = {};
+    clinicas
+      .filter((c) => c.createdAt)
+      .forEach((c) => {
+        const key = c.createdAt.slice(0, 10);
+        (map[key] ??= []).push({
+          id: String(c.id),
+          title: c.nombre,
+          subtitle: c.direccion || undefined,
+          badgeLabel: c.estado === "activa" ? "Activa" : "Inactiva",
+          badgeClassName:
+            c.estado === "activa"
+              ? "bg-emerald-50 text-emerald-700 border border-emerald-200 dark:bg-emerald-950/40 dark:text-emerald-400 dark:border-emerald-800"
+              : "bg-slate-100 text-slate-600 border border-slate-200 dark:bg-slate-800 dark:text-slate-400 dark:border-slate-700",
+        });
+      });
+    return map;
   }, [clinicas]);
 
   const now = new Date();
@@ -426,9 +520,14 @@ export default function SuperAdminPage() {
                   Sin clínicas registradas todavía.
                 </p>
               ) : (
-                <div className="space-y-3">
+                <div className="space-y-2">
                   {ultimasClinicas.map((c) => (
-                    <div key={c.id} className="flex items-start gap-2">
+                    <button
+                      key={c.id}
+                      type="button"
+                      onClick={() => openDetail(c)}
+                      className="flex w-full items-start gap-2 rounded-[9px] p-1.5 text-left transition hover:-translate-y-0.5 hover:bg-[#F7F6FA] hover:shadow-card-hover focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#7C3AED] dark:hover:bg-slate-800/60"
+                    >
                       <span
                         className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full"
                         style={{ background: c.estado === "activa" ? "#16A34A" : "#94A3B8" }}
@@ -440,7 +539,7 @@ export default function SuperAdminPage() {
                         <br />
                         {c.createdAt ? timeAgo(c.createdAt) : "—"}
                       </p>
-                    </div>
+                    </button>
                   ))}
                 </div>
               )}
@@ -454,21 +553,27 @@ export default function SuperAdminPage() {
               return (
                 <motion.div
                   key={m.label}
-                  className={cardClass}
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ duration: 0.4, delay: i * 0.06 }}
                 >
-                  <div
-                    className="mb-3 flex h-8 w-8 items-center justify-center rounded-lg"
-                    style={{ background: iconBg(m.color, m.bg) }}
+                  <a
+                    href="#tabla-clinicas"
+                    className={`block ${cardClass} cursor-pointer transition hover:-translate-y-0.5 hover:shadow-card-hover focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#7C3AED]`}
                   >
-                    <Icon className="h-4 w-4" style={{ color: m.color }} />
-                  </div>
-                  <p className="text-[22px] font-bold leading-none" style={{ color: m.color }}>
-                    {loading ? "—" : m.value}
-                  </p>
-                  <p className="mt-1.5 text-[11px] text-[#555068] dark:text-slate-400">{m.label}</p>
+                    <div
+                      className="mb-3 flex h-8 w-8 items-center justify-center rounded-lg"
+                      style={{ background: iconBg(m.color, m.bg) }}
+                    >
+                      <Icon className="h-4 w-4" style={{ color: m.color }} />
+                    </div>
+                    <p className="text-[22px] font-bold leading-none" style={{ color: m.color }}>
+                      {loading ? "—" : m.value}
+                    </p>
+                    <p className="mt-1.5 text-[11px] text-[#555068] dark:text-slate-400">
+                      {m.label}
+                    </p>
+                  </a>
                 </motion.div>
               );
             })}
@@ -485,20 +590,31 @@ export default function SuperAdminPage() {
               </p>
 
               <div className="mb-1 mt-3 flex items-center gap-4">
-                <span className="flex items-center gap-1.5 text-[11px] text-[#555068] dark:text-slate-400">
-                  <span
-                    className="inline-block h-2 w-2 rounded-full"
-                    style={{ background: CHART_BAR_COLORS.actual }}
-                  />
-                  Mes actual
-                </span>
-                <span className="flex items-center gap-1.5 text-[11px] text-[#555068] dark:text-slate-400">
-                  <span
-                    className="inline-block h-2 w-2 rounded-full"
-                    style={{ background: CHART_BAR_COLORS.anterior }}
-                  />
-                  Meses anteriores
-                </span>
+                {(["actual", "anterior"] as const).map((key) => {
+                  const isHidden = hiddenChartSeries.has(key);
+                  return (
+                    <button
+                      key={key}
+                      type="button"
+                      onClick={() =>
+                        setHiddenChartSeries((prev) => {
+                          const next = new Set(prev);
+                          if (next.has(key)) next.delete(key);
+                          else next.add(key);
+                          return next;
+                        })
+                      }
+                      className={`flex items-center gap-1.5 text-[11px] transition-opacity ${isHidden ? "opacity-40" : ""} text-[#555068] dark:text-slate-400`}
+                      aria-pressed={!isHidden}
+                    >
+                      <span
+                        className="inline-block h-2 w-2 rounded-full"
+                        style={{ background: CHART_BAR_COLORS[key] }}
+                      />
+                      {key === "actual" ? "Mes actual" : "Meses anteriores"}
+                    </button>
+                  );
+                })}
               </div>
 
               <div className="h-60 w-full">
@@ -531,18 +647,22 @@ export default function SuperAdminPage() {
                         "",
                       ]}
                     />
-                    <Bar
-                      dataKey="actual"
-                      stackId="clinicas"
-                      fill={CHART_BAR_COLORS.actual}
-                      radius={[6, 6, 6, 6]}
-                    />
-                    <Bar
-                      dataKey="anterior"
-                      stackId="clinicas"
-                      fill={CHART_BAR_COLORS.anterior}
-                      radius={[6, 6, 6, 6]}
-                    />
+                    {!hiddenChartSeries.has("actual") && (
+                      <Bar
+                        dataKey="actual"
+                        stackId="clinicas"
+                        fill={CHART_BAR_COLORS.actual}
+                        radius={[6, 6, 6, 6]}
+                      />
+                    )}
+                    {!hiddenChartSeries.has("anterior") && (
+                      <Bar
+                        dataKey="anterior"
+                        stackId="clinicas"
+                        fill={CHART_BAR_COLORS.anterior}
+                        radius={[6, 6, 6, 6]}
+                      />
+                    )}
                   </BarChart>
                 </ResponsiveContainer>
               </div>
@@ -550,8 +670,10 @@ export default function SuperAdminPage() {
 
             <MonthlyCalendar
               datesWithCitas={datesConClinicas}
+              eventsByDate={eventsByDate}
               accentColor="#7C3AED"
               legendLabel="Registros"
+              emptyDayMessage="Sin clínicas registradas."
             />
           </div>
 
@@ -625,7 +747,14 @@ export default function SuperAdminPage() {
                   className="flex w-full items-center gap-2 rounded-[9px] border-[0.5px] border-[#E4DFF0] bg-[#F7F6FA] px-3 py-2 text-[11px] font-semibold text-slate-700 transition hover:border-[#7C3AED]/30 hover:bg-[#EDE8FA] dark:border-slate-700/60 dark:bg-slate-800/60 dark:text-slate-300 dark:hover:border-[#7C3AED]/40 dark:hover:bg-[#7C3AED]/10"
                 >
                   <ClipboardList className="h-3.5 w-3.5 text-[#7C3AED]" />
-                  Ver listado completo
+                  Ver reportes
+                </a>
+                <a
+                  href="#tabla-clinicas"
+                  className="flex w-full items-center gap-2 rounded-[9px] border-[0.5px] border-[#E4DFF0] bg-[#F7F6FA] px-3 py-2 text-[11px] font-semibold text-slate-700 transition hover:border-[#7C3AED]/30 hover:bg-[#EDE8FA] dark:border-slate-700/60 dark:bg-slate-800/60 dark:text-slate-300 dark:hover:border-[#7C3AED]/40 dark:hover:bg-[#7C3AED]/10"
+                >
+                  <Users2 className="h-3.5 w-3.5 text-[#7C3AED]" />
+                  Gestionar usuarios
                 </a>
               </div>
             </div>
@@ -679,7 +808,8 @@ export default function SuperAdminPage() {
                       <tr
                         key={c.id}
                         id={`clinica-row-${c.id}`}
-                        className="bg-white transition hover:bg-slate-50 dark:bg-transparent dark:hover:bg-slate-800/40"
+                        onClick={() => openDetail(c)}
+                        className="cursor-pointer bg-white transition hover:bg-slate-50 dark:bg-transparent dark:hover:bg-slate-800/40"
                       >
                         <td className="px-4 py-3">
                           <div className="flex items-center gap-3">
@@ -696,7 +826,10 @@ export default function SuperAdminPage() {
                                 </p>
                                 <button
                                   type="button"
-                                  onClick={() => handleCopyLink(c.slug, c.nombre)}
+                                  onClick={(e) => {
+                                    e.stopPropagation();
+                                    handleCopyLink(c.slug, c.nombre);
+                                  }}
                                   className="shrink-0 rounded-md p-1 text-slate-400 transition hover:bg-slate-100 hover:text-brand-600 dark:hover:bg-slate-800 dark:hover:text-brand-400"
                                   aria-label="Copiar enlace de registro"
                                   title="Copiar enlace de registro"
@@ -739,7 +872,7 @@ export default function SuperAdminPage() {
                         <td className="px-4 py-3">
                           <StatusBadge status={c.estado === "activa" ? "Activa" : "Inactiva"} />
                         </td>
-                        <td className="px-4 py-3 text-right">
+                        <td className="px-4 py-3 text-right" onClick={(e) => e.stopPropagation()}>
                           <div className="flex items-center justify-end gap-2">
                             <button
                               onClick={() => openCoordsModal(c)}
@@ -832,14 +965,16 @@ export default function SuperAdminPage() {
                           required
                         />
                       </div>
-                      <div>
+                      <div className="sm:col-span-2">
                         <label className="mb-1 block text-sm font-semibold text-slate-700 dark:text-slate-300">
                           Dirección
                         </label>
-                        <input
+                        <AddressAutocomplete
                           name="direccion"
                           value={form.direccion}
-                          onChange={handleChange}
+                          onChange={handleDireccionChange}
+                          onSelect={handleDireccionSelect}
+                          placeholder="Busca la dirección de la clínica..."
                           className={inputClass}
                         />
                       </div>
@@ -854,7 +989,7 @@ export default function SuperAdminPage() {
                           className={inputClass}
                         />
                       </div>
-                      <div className="sm:col-span-2">
+                      <div>
                         <label className="mb-1 block text-sm font-semibold text-slate-700 dark:text-slate-300">
                           Email de la clínica
                         </label>
@@ -866,88 +1001,35 @@ export default function SuperAdminPage() {
                           className={inputClass}
                         />
                       </div>
-                      <div>
-                        <label className="mb-1 block text-sm font-semibold text-slate-700 dark:text-slate-300">
-                          Latitud
-                        </label>
-                        <input
-                          type="number"
-                          step="any"
-                          name="latitud"
-                          value={form.latitud}
-                          onChange={handleChange}
-                          placeholder="-2.170998"
-                          className={inputClass}
-                        />
-                      </div>
-                      <div>
-                        <label className="mb-1 block text-sm font-semibold text-slate-700 dark:text-slate-300">
-                          Longitud
-                        </label>
-                        <input
-                          type="number"
-                          step="any"
-                          name="longitud"
-                          value={form.longitud}
-                          onChange={handleChange}
-                          placeholder="-79.922359"
-                          className={inputClass}
-                        />
-                      </div>
                       <div className="sm:col-span-2">
-                        <button
-                          type="button"
-                          onClick={handleUseMyLocation}
-                          className="inline-flex items-center gap-1.5 text-xs font-semibold text-brand-600 transition hover:text-brand-700 dark:text-brand-300 dark:hover:text-brand-200"
-                        >
-                          <MapPin className="h-3.5 w-3.5" />
-                          Usar mi ubicación actual
-                        </button>
+                        <label className="mb-1 block text-sm font-semibold text-slate-700 dark:text-slate-300">
+                          Vista previa del mapa
+                        </label>
+                        <MapPreview lat={formCoords?.latitud} lng={formCoords?.longitud} />
                       </div>
                     </div>
                   </div>
 
                   <div>
                     <h3 className="text-section-title mb-3">Administrador inicial</h3>
-                    <div className="grid gap-5 sm:grid-cols-2">
-                      <div className="sm:col-span-2">
-                        <label className="mb-1 block text-sm font-semibold text-slate-700 dark:text-slate-300">
-                          Nombre *
-                        </label>
-                        <input
-                          name="adminNombre"
-                          value={form.adminNombre}
-                          onChange={handleChange}
-                          className={inputClass}
-                          required
-                        />
-                      </div>
+                    <div className="grid gap-5">
                       <div>
                         <label className="mb-1 block text-sm font-semibold text-slate-700 dark:text-slate-300">
-                          Email *
+                          Correo del administrador *
                         </label>
                         <input
                           type="email"
                           name="adminEmail"
                           value={form.adminEmail}
                           onChange={handleChange}
+                          placeholder="admin@correo.com"
                           className={inputClass}
                           required
                         />
-                      </div>
-                      <div>
-                        <label className="mb-1 block text-sm font-semibold text-slate-700 dark:text-slate-300">
-                          Contraseña *
-                        </label>
-                        <input
-                          type="password"
-                          name="adminPassword"
-                          value={form.adminPassword}
-                          onChange={handleChange}
-                          className={inputClass}
-                          minLength={8}
-                          required
-                        />
+                        <p className="mt-1.5 text-xs text-slate-400">
+                          Le enviaremos una contraseña temporal a este correo para que pueda iniciar
+                          sesión y configurar su cuenta.
+                        </p>
                       </div>
                     </div>
                   </div>
@@ -1003,49 +1085,27 @@ export default function SuperAdminPage() {
               </div>
               <div className="space-y-4 p-6">
                 <p className="text-sm text-slate-500 dark:text-slate-400">
-                  Estas coordenadas se usan para mostrar la clínica en el mapa y calcular la
-                  distancia con los usuarios al registrarse.
+                  Busca y selecciona la dirección de la clínica para actualizar su ubicación en el
+                  mapa y calcular la distancia con los usuarios al registrarse.
                 </p>
-                <div className="grid gap-4 sm:grid-cols-2">
-                  <div>
-                    <label className="mb-1 block text-sm font-semibold text-slate-700 dark:text-slate-300">
-                      Latitud
-                    </label>
-                    <input
-                      type="number"
-                      step="any"
-                      value={coordsForm.latitud}
-                      onChange={(e) =>
-                        setCoordsForm((prev) => ({ ...prev, latitud: e.target.value }))
-                      }
-                      placeholder="-2.170998"
-                      className={inputClass}
-                    />
-                  </div>
-                  <div>
-                    <label className="mb-1 block text-sm font-semibold text-slate-700 dark:text-slate-300">
-                      Longitud
-                    </label>
-                    <input
-                      type="number"
-                      step="any"
-                      value={coordsForm.longitud}
-                      onChange={(e) =>
-                        setCoordsForm((prev) => ({ ...prev, longitud: e.target.value }))
-                      }
-                      placeholder="-79.922359"
-                      className={inputClass}
-                    />
-                  </div>
+                <div>
+                  <label className="mb-1 block text-sm font-semibold text-slate-700 dark:text-slate-300">
+                    Dirección
+                  </label>
+                  <AddressAutocomplete
+                    value={coordsForm.direccion}
+                    onChange={handleCoordsDireccionChange}
+                    onSelect={handleCoordsDireccionSelect}
+                    placeholder="Busca la dirección de la clínica..."
+                    className={inputClass}
+                  />
                 </div>
-                <button
-                  type="button"
-                  onClick={handleCoordsUseMyLocation}
-                  className="inline-flex items-center gap-1.5 text-xs font-semibold text-brand-600 transition hover:text-brand-700 dark:text-brand-300 dark:hover:text-brand-200"
-                >
-                  <MapPin className="h-3.5 w-3.5" />
-                  Usar mi ubicación actual
-                </button>
+                <div>
+                  <label className="mb-1 block text-sm font-semibold text-slate-700 dark:text-slate-300">
+                    Vista previa del mapa
+                  </label>
+                  <MapPreview lat={coordsForm.latitud} lng={coordsForm.longitud} />
+                </div>
                 {coordsError && (
                   <div className="dark:bg-danger-950/30 rounded-xl border border-danger-200 bg-danger-50 px-4 py-3 text-sm text-danger-700 dark:border-danger-800 dark:text-danger-300">
                     {coordsError}
@@ -1066,6 +1126,278 @@ export default function SuperAdminPage() {
                 </button>
               </div>
             </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* Drawer detalle de clínica */}
+      <AnimatePresence>
+        {detailTarget && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-50 bg-slate-900/50 backdrop-blur-sm"
+            onClick={closeDetail}
+          >
+            <motion.aside
+              initial={{ x: "100%" }}
+              animate={{ x: 0 }}
+              exit={{ x: "100%" }}
+              transition={{ type: "spring", bounce: 0, duration: 0.3 }}
+              className="absolute bottom-0 right-0 top-0 flex w-full max-w-full flex-col overflow-hidden bg-white shadow-2xl dark:bg-slate-950 sm:w-[440px] sm:max-w-[440px]"
+              onClick={(e) => e.stopPropagation()}
+            >
+              <div className="flex items-center justify-between border-b border-slate-100 px-6 py-4 dark:border-slate-800">
+                <div className="flex items-center gap-3">
+                  <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-violet-100 text-violet-700 dark:bg-violet-900/40 dark:text-violet-300">
+                    <Building2 className="h-5 w-5" />
+                  </div>
+                  <div className="min-w-0">
+                    <h2 className="truncate text-base font-bold text-slate-900 dark:text-white">
+                      {detailTarget.nombre}
+                    </h2>
+                    <StatusBadge
+                      status={detailTarget.estado === "activa" ? "Activa" : "Inactiva"}
+                    />
+                  </div>
+                </div>
+                <button
+                  onClick={closeDetail}
+                  className="flex h-8 w-8 shrink-0 items-center justify-center rounded-xl text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800"
+                  aria-label="Cerrar"
+                >
+                  <X className="h-4 w-4" />
+                </button>
+              </div>
+
+              <div className="flex-1 space-y-5 overflow-y-auto p-6">
+                <div>
+                  <h3 className="text-section-title mb-3">Datos generales</h3>
+                  <dl className="space-y-3">
+                    <div className="flex items-start gap-2">
+                      <ClipboardList className="mt-0.5 h-4 w-4 shrink-0 text-slate-400" />
+                      <div className="min-w-0">
+                        <dt className="text-xs text-slate-400">Slug / enlace de registro</dt>
+                        <dd className="flex items-center gap-1.5 text-sm text-slate-700 dark:text-slate-300">
+                          <span className="truncate">/register?clinica={detailTarget.slug}</span>
+                          <button
+                            type="button"
+                            onClick={() => handleCopyLink(detailTarget.slug, detailTarget.nombre)}
+                            className="shrink-0 rounded-md p-1 text-slate-400 transition hover:bg-slate-100 hover:text-brand-600 dark:hover:bg-slate-800 dark:hover:text-brand-400"
+                            aria-label="Copiar enlace de registro"
+                            title="Copiar enlace de registro"
+                          >
+                            <Copy className="h-3.5 w-3.5" />
+                          </button>
+                        </dd>
+                      </div>
+                    </div>
+                    <div className="flex items-start gap-2">
+                      <MapPin className="mt-0.5 h-4 w-4 shrink-0 text-slate-400" />
+                      <div className="min-w-0">
+                        <dt className="text-xs text-slate-400">Dirección</dt>
+                        <dd className="text-sm text-slate-700 dark:text-slate-300">
+                          {detailTarget.direccion || "Sin dirección registrada"}
+                        </dd>
+                      </div>
+                    </div>
+                    <div className="flex items-start gap-2">
+                      <Phone className="mt-0.5 h-4 w-4 shrink-0 text-slate-400" />
+                      <div className="min-w-0">
+                        <dt className="text-xs text-slate-400">Teléfono</dt>
+                        <dd className="text-sm text-slate-700 dark:text-slate-300">
+                          {detailTarget.telefono || "—"}
+                        </dd>
+                      </div>
+                    </div>
+                    <div className="flex items-start gap-2">
+                      <Mail className="mt-0.5 h-4 w-4 shrink-0 text-slate-400" />
+                      <div className="min-w-0">
+                        <dt className="text-xs text-slate-400">Email de la clínica</dt>
+                        <dd className="text-sm text-slate-700 dark:text-slate-300">
+                          {detailTarget.email || "—"}
+                        </dd>
+                      </div>
+                    </div>
+                    <div className="flex items-start gap-2">
+                      <CalendarDays className="mt-0.5 h-4 w-4 shrink-0 text-slate-400" />
+                      <div className="min-w-0">
+                        <dt className="text-xs text-slate-400">Registrada</dt>
+                        <dd className="text-sm text-slate-700 dark:text-slate-300">
+                          {detailTarget.createdAt
+                            ? new Date(detailTarget.createdAt).toLocaleDateString("es-ES", {
+                                day: "2-digit",
+                                month: "long",
+                                year: "numeric",
+                              })
+                            : "—"}
+                        </dd>
+                      </div>
+                    </div>
+                  </dl>
+                </div>
+
+                {detailTarget.latitud != null && detailTarget.longitud != null && (
+                  <div>
+                    <h3 className="text-section-title mb-3">Ubicación en el mapa</h3>
+                    <MapPreview lat={detailTarget.latitud} lng={detailTarget.longitud} />
+                  </div>
+                )}
+
+                <div>
+                  <h3 className="text-section-title mb-3">Administrador actual</h3>
+                  {detailTarget.admin ? (
+                    <div className="flex items-start gap-2">
+                      <User className="mt-0.5 h-4 w-4 shrink-0 text-slate-400" />
+                      <div className="min-w-0">
+                        <p className="text-sm font-semibold text-slate-900 dark:text-white">
+                          {detailTarget.admin.nombre || "—"}
+                        </p>
+                        <p className="text-sm text-slate-500 dark:text-slate-400">
+                          {detailTarget.admin.email}
+                        </p>
+                      </div>
+                    </div>
+                  ) : (
+                    <p className="text-sm text-slate-500 dark:text-slate-400">
+                      Esta clínica no tiene administrador asignado.
+                    </p>
+                  )}
+                </div>
+
+                <form
+                  onSubmit={handleChangeAdmin}
+                  className="rounded-xl border border-slate-200/70 p-4 dark:border-slate-700"
+                >
+                  <h3 className="text-section-title mb-3">Cambiar administrador</h3>
+                  <label className="mb-1 block text-sm font-semibold text-slate-700 dark:text-slate-300">
+                    Correo del nuevo administrador
+                  </label>
+                  <input
+                    type="email"
+                    value={changeAdminEmail}
+                    onChange={(e) => {
+                      setChangeAdminEmail(e.target.value);
+                      setChangeAdminError("");
+                    }}
+                    placeholder="nuevo-admin@correo.com"
+                    className={inputClass}
+                  />
+                  <p className="mt-1.5 text-xs text-slate-400">
+                    Si el correo no pertenece a un usuario existente, se creará una cuenta y se le
+                    enviará una contraseña temporal por email.
+                  </p>
+                  {changeAdminError && (
+                    <div className="dark:bg-danger-950/30 mt-3 rounded-xl border border-danger-200 bg-danger-50 px-3 py-2 text-xs text-danger-700 dark:border-danger-800 dark:text-danger-300">
+                      {changeAdminError}
+                    </div>
+                  )}
+                  <button
+                    type="submit"
+                    disabled={changingAdmin}
+                    className="btn-primary mt-3 w-full"
+                  >
+                    {changingAdmin ? "Cambiando..." : "Asignar nuevo administrador"}
+                  </button>
+                </form>
+
+                <div>
+                  <div className="mb-3 flex items-center gap-2">
+                    <History className="h-4 w-4 text-[#7C3AED]" />
+                    <h3 className="text-section-title">Historial de administradores</h3>
+                  </div>
+                  {historyLoading ? (
+                    <p className="text-sm text-slate-500 dark:text-slate-400">Cargando...</p>
+                  ) : historyPage.data.length === 0 ? (
+                    <p className="text-sm text-slate-500 dark:text-slate-400">
+                      Sin cambios de administrador registrados.
+                    </p>
+                  ) : (
+                    <div className="space-y-3">
+                      {historyPage.data.map((h) => (
+                        <div
+                          key={h.id}
+                          className="rounded-xl border border-slate-200/70 p-3 text-xs dark:border-slate-700"
+                        >
+                          <p className="text-slate-700 dark:text-slate-300">
+                            <span className="font-semibold text-slate-900 dark:text-white">
+                              {h.newAdmin.nombre || h.newAdmin.email}
+                            </span>{" "}
+                            asignado por{" "}
+                            <span className="font-medium">
+                              {h.changedBy.nombre || h.changedBy.email}
+                            </span>
+                          </p>
+                          {h.previousAdmin && (
+                            <p className="mt-0.5 text-slate-400">
+                              Reemplazó a {h.previousAdmin.nombre || h.previousAdmin.email}
+                            </p>
+                          )}
+                          <p className="mt-1 text-slate-400">
+                            {new Date(h.changedAt).toLocaleString("es-ES", {
+                              day: "2-digit",
+                              month: "short",
+                              year: "numeric",
+                              hour: "2-digit",
+                              minute: "2-digit",
+                            })}
+                          </p>
+                        </div>
+                      ))}
+                      {historyPage.lastPage > 1 && (
+                        <div className="flex items-center justify-between pt-1">
+                          <button
+                            type="button"
+                            disabled={historyPage.page <= 1}
+                            onClick={() => loadHistory(detailTarget.id, historyPage.page - 1)}
+                            className="btn-secondary px-2.5 py-1.5 text-xs disabled:opacity-40"
+                          >
+                            <ChevronLeft className="h-3.5 w-3.5" />
+                          </button>
+                          <span className="text-xs text-slate-400">
+                            Página {historyPage.page} de {historyPage.lastPage}
+                          </span>
+                          <button
+                            type="button"
+                            disabled={historyPage.page >= historyPage.lastPage}
+                            onClick={() => loadHistory(detailTarget.id, historyPage.page + 1)}
+                            className="btn-secondary px-2.5 py-1.5 text-xs disabled:opacity-40"
+                          >
+                            <ChevronRight className="h-3.5 w-3.5" />
+                          </button>
+                        </div>
+                      )}
+                    </div>
+                  )}
+                </div>
+              </div>
+
+              <div className="flex justify-end gap-3 border-t border-slate-100 px-6 py-4 dark:border-slate-800">
+                <button
+                  type="button"
+                  onClick={() => {
+                    const target = detailTarget;
+                    closeDetail();
+                    if (target) openCoordsModal(target);
+                  }}
+                  className="btn-secondary"
+                >
+                  Editar ubicación
+                </button>
+                <button
+                  type="button"
+                  onClick={() => {
+                    const target = detailTarget;
+                    closeDetail();
+                    if (target) setToggleTarget(target);
+                  }}
+                  className={detailTarget.estado === "activa" ? "btn-danger" : "btn-primary"}
+                >
+                  {detailTarget.estado === "activa" ? "Desactivar" : "Activar"}
+                </button>
+              </div>
+            </motion.aside>
           </motion.div>
         )}
       </AnimatePresence>

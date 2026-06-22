@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import Image from "next/image";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import {
@@ -17,6 +18,7 @@ import {
 import { motion, AnimatePresence } from "framer-motion";
 import { logout } from "../../../lib/auth";
 import { useAuth } from "@/lib/auth-context";
+import { useIsDarkMode } from "@/lib/hooks/useDarkMode";
 
 const menuItems = [
   { label: "Dashboard", icon: Home, href: "/admin" },
@@ -59,6 +61,7 @@ export default function Sidebar() {
   const pathname = usePathname();
   const router = useRouter();
   const { user } = useAuth();
+  const darkMode = useIsDarkMode();
 
   const handleLogout = async () => {
     await logout();
@@ -69,6 +72,20 @@ export default function Sidebar() {
     <>
       {/* Sidebar desktop */}
       <aside className="hidden lg:flex lg:h-screen lg:w-[260px] lg:flex-col lg:border-r lg:border-slate-200/70 lg:bg-white lg:px-4 lg:py-6 dark:lg:border-slate-800 dark:lg:bg-slate-950">
+        {/* Logo */}
+        <div className="mb-6 flex items-center gap-3 px-1">
+          <Image
+            src={darkMode ? "/logos/vetnova-logo-dark.png" : "/logos/vetnova-logo-light.png"}
+            alt="VetNova"
+            width={36}
+            height={36}
+            className="rounded-xl object-contain"
+          />
+          <span className="text-lg font-semibold leading-none text-slate-900 dark:text-white">
+            VetNova
+          </span>
+        </div>
+
         {/* Perfil del usuario */}
         <div className="mb-6 rounded-xl border border-slate-200/80 bg-slate-50 px-3 py-3 dark:border-slate-700 dark:bg-slate-900">
           <div className="flex items-center gap-3">
@@ -147,11 +164,25 @@ export default function Sidebar() {
               onClick={(e) => e.stopPropagation()}
             >
               {/* Cerrar mobile */}
-              <div className="mb-6 flex items-center justify-end">
+              <div className="mb-2 flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <Image
+                    src={
+                      darkMode ? "/logos/vetnova-logo-dark.png" : "/logos/vetnova-logo-light.png"
+                    }
+                    alt="VetNova"
+                    width={32}
+                    height={32}
+                    className="rounded-xl object-contain"
+                  />
+                  <span className="text-base font-semibold text-slate-900 dark:text-white">
+                    VetNova
+                  </span>
+                </div>
                 <button
                   type="button"
                   onClick={() => setMobileOpen(false)}
-                  className="rounded-lg p-1.5 text-slate-500 transition hover:bg-slate-100 dark:hover:bg-slate-800"
+                  className="cursor-pointer rounded-lg p-1.5 text-slate-500 transition hover:bg-slate-100 dark:hover:bg-slate-800"
                 >
                   ×
                 </button>

@@ -1,0 +1,169 @@
+/* Overrides mínimos de react-big-calendar para alinear con los design tokens de VetNova. */
+
+.vetnova-calendar .rbc-toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-bottom: 0.75rem;
+}
+
+.vetnova-calendar .rbc-toolbar button {
+  border-radius: 0.75rem;
+  border: 1px solid #e2e8f0;
+  background: #fff;
+  color: #475569;
+  font-size: 0.8125rem;
+  font-weight: 600;
+  padding: 0.4rem 0.75rem;
+  transition: all 0.15s ease;
+}
+
+.vetnova-calendar .rbc-toolbar button:hover {
+  border-color: #c7d2fe;
+  background: #eef0fe;
+  color: #5457e5;
+}
+
+.vetnova-calendar .rbc-toolbar button.rbc-active {
+  background: #5457e5;
+  border-color: #5457e5;
+  color: #fff;
+}
+
+.vetnova-calendar .rbc-toolbar-label {
+  font-weight: 700;
+  font-size: 0.95rem;
+  color: #0f172a;
+  text-transform: capitalize;
+}
+
+.vetnova-calendar .rbc-month-view,
+.vetnova-calendar .rbc-time-view,
+.vetnova-calendar .rbc-agenda-view {
+  border-radius: 0.75rem;
+  border-color: #e2e8f0;
+}
+
+.vetnova-calendar .rbc-header {
+  font-size: 0.7rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: #64748b;
+  padding: 0.5rem 0;
+  border-color: #e2e8f0;
+}
+
+.vetnova-calendar .rbc-today {
+  background-color: rgba(124, 58, 237, 0.08);
+}
+
+.vetnova-calendar .rbc-off-range-bg {
+  background: #f8f8fc;
+}
+
+.vetnova-calendar .rbc-event {
+  border-radius: 0.5rem;
+  border: none;
+  padding: 2px 6px;
+  font-size: 0.75rem;
+}
+
+.vetnova-calendar .rbc-event.rbc-selected {
+  box-shadow: 0 0 0 2px rgba(15, 23, 42, 0.25);
+}
+
+.vetnova-calendar .rbc-show-more {
+  color: #5457e5;
+  font-weight: 600;
+}
+
+.vetnova-calendar .rbc-day-slot .rbc-event {
+  border: none;
+}
+
+/* Dark mode */
+.vetnova-calendar--dark .rbc-toolbar button {
+  background: #1e293b;
+  border-color: #334155;
+  color: #cbd5e1;
+}
+
+.vetnova-calendar--dark .rbc-toolbar button:hover {
+  background: rgba(99, 102, 241, 0.15);
+  border-color: rgba(99, 102, 241, 0.4);
+  color: #c7d2fe;
+}
+
+.vetnova-calendar--dark .rbc-toolbar button.rbc-active {
+  background: #5457e5;
+  border-color: #5457e5;
+  color: #fff;
+}
+
+.vetnova-calendar--dark .rbc-toolbar-label {
+  color: #f1f5f9;
+}
+
+.vetnova-calendar--dark .rbc-header {
+  color: #94a3b8;
+  border-color: #334155;
+}
+
+.vetnova-calendar--dark .rbc-month-view,
+.vetnova-calendar--dark .rbc-time-view,
+.vetnova-calendar--dark .rbc-agenda-view,
+.vetnova-calendar--dark .rbc-time-header,
+.vetnova-calendar--dark .rbc-time-content,
+.vetnova-calendar--dark .rbc-month-row,
+.vetnova-calendar--dark .rbc-day-bg {
+  border-color: #334155 !important;
+  background-color: transparent;
+}
+
+.vetnova-calendar--dark .rbc-off-range-bg {
+  background: #0f172a;
+}
+
+.vetnova-calendar--dark .rbc-today {
+  background-color: rgba(124, 58, 237, 0.15);
+}
+
+.vetnova-calendar--dark .rbc-agenda-table,
+.vetnova-calendar--dark .rbc-agenda-view table.rbc-agenda-table tbody > tr > td,
+.vetnova-calendar--dark .rbc-agenda-time-cell {
+  border-color: #334155;
+  color: #e2e8f0;
+}
+
+.vetnova-calendar--dark .rbc-time-gutter,
+.vetnova-calendar--dark .rbc-label {
+  color: #94a3b8;
+}
+
+/* Responsive: evita overflow horizontal roto en móvil */
+.vetnova-calendar {
+  overflow-x: hidden;
+}
+
+@media (max-width: 640px) {
+  .vetnova-calendar .rbc-toolbar {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .vetnova-calendar .rbc-toolbar-label {
+    order: -1;
+    text-align: center;
+    margin-bottom: 0.25rem;
+  }
+
+  .vetnova-calendar .rbc-btn-group {
+    display: flex;
+    justify-content: center;
+  }
+
+  .vetnova-calendar .rbc-btn-group button {
+    flex: 1;
+  }
+}

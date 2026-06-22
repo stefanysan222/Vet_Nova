@@ -1,6 +1,6 @@
 ﻿"use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { fetchCitas, updateCitaEstado, updateCita } from "../../../lib/api/citas";
 import { fetchVeterinarios } from "../../../lib/api/usuarios";
 import type { UsuarioAPI } from "../../../lib/api/usuarios";
@@ -10,8 +10,13 @@ import { SkeletonCardList } from "../../components/ui/Skeleton";
 import { useToast } from "../../components/ui/Toast";
 import ConfirmDialog from "../../components/ui/ConfirmDialog";
 import { StatusBadge } from "../../../lib/utils/status-badge";
+import AppointmentDetailModal from "../../components/appointments/AppointmentDetailModal";
+import InteractiveCalendar, {
+  type CalendarAppointmentEvent,
+} from "../../components/calendar/InteractiveCalendar";
 import { AnimatePresence, motion } from "framer-motion";
-import { CalendarDays, CheckCircle2, Clock, User, X } from "lucide-react";
+import { CalendarDays, CheckCircle2, Clock, List, User, X } from "lucide-react";
+import type { SlotInfo } from "react-big-calendar";
 
 type AppointmentStatus = Appointment["status"];
 
@@ -282,6 +287,8 @@ export default function CitasPage() {
   const [rescheduleTarget, setRescheduleTarget] = useState<Appointment | null>(null);
   const [editTarget, setEditTarget] = useState<Appointment | null>(null);
   const [savingReschedule, setSavingReschedule] = useState(false);
+  const [vistaActiva, setVistaActiva] = useState<"lista" | "calendario">("lista");
+  const [citaDetalleCalendario, setCitaDetalleCalendario] = useState<Appointment | null>(null);
   const { success, error } = useToast();
 
   const cargar = () => {
@@ -375,6 +382,35 @@ export default function CitasPage() {
   const pendientes = appointments.filter((a) => a.status === "Pendiente").length;
   const confirmadas = appointments.filter((a) => a.status === "Confirmada").length;
 
+  const calendarEvents = useMemo<CalendarAppointmentEvent[]>(() => {
+    return citasFiltradas
+      .filter((a) => a.date)
+      .map((a) => {
+        const [hh, mm] = (a.time || "00:00").split(":").map((n) => parseInt(n, 10) || 0);
+        const start = new Date(`${a.date}T00:00:00`);
+        start.setHours(hh, mm, 0, 0);
+        const end = new Date(start);
+        end.setMinutes(end.getMinutes() + 30);
+        return {
+          title: `${a.time ?? ""} ${a.petName}`.trim(),
+          start,
+          end,
+          resource: a,
+        };
+      });
+  }, [citasFiltradas]);
+
+  // TODO(MP-01): el flujo de creación de cita en este rol vive en RescheduleModal /
+  // EditTarget, que requiere una cita existente. No hay un modal de "alta" reutilizable
+  // en admin/citas — crear uno de cero estaría fuera de alcance de esta tarea. Se deja
+  // el callback preparado para cuando exista un flujo de creación reutilizable.
+  const handleSelectSlot = (_slotInfo: SlotInfo) => {
+    error(
+      "Crear cita desde el calendario",
+      "Esta función aún no está disponible. Usa 'Agendar cita' desde el panel de veterinario o el flujo de creación existente.",
+    );
+  };
+
   return (
     <>
       <div className="admin-page">
@@ -425,25 +461,66 @@ export default function CitasPage() {
             </article>
           </div>
 
-          {/* Filtros */}
-          <div className="mt-6 flex flex-wrap gap-2">
-            {(["todas", "pendientes", "confirmadas"] as const).map((f) => (
+          {/* Filtros + Toggle de vista */}
+          <div className="mt-6 flex flex-wrap items-center justify-between gap-3">
+            <div className="flex flex-wrap gap-2">
+              {(["todas", "pendientes", "confirmadas"] as const).map((f) => (
+                <button
+                  key={f}
+                  onClick={() => setFiltro(f)}
+                  className={`rounded-2xl px-4 py-2 text-sm font-semibold transition ${
+                    filtro === f
+                      ? "bg-brand-600 text-white"
+                      : "border border-slate-200 bg-white text-slate-600 hover:bg-slate-100 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-300"
+                  }`}
+                >
+                  {f.charAt(0).toUpperCase() + f.slice(1)}
+                </button>
+              ))}
+            </div>
+
+            <div className="flex gap-1 rounded-2xl border border-slate-200 bg-white p-1 dark:border-slate-700 dark:bg-slate-900">
               <button
-                key={f}
-                onClick={() => setFiltro(f)}
-                className={`rounded-2xl px-4 py-2 text-sm font-semibold transition ${
-                  filtro === f
+                type="button"
+                onClick={() => setVistaActiva("lista")}
+                className={`flex items-center gap-1.5 rounded-xl px-3 py-1.5 text-xs font-semibold transition ${
+                  vistaActiva === "lista"
                     ? "bg-brand-600 text-white"
-                    : "border border-slate-200 bg-white text-slate-600 hover:bg-slate-100 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-300"
+                    : "text-slate-600 hover:bg-slate-100 dark:text-slate-300 dark:hover:bg-slate-800"
                 }`}
               >
-                {f.charAt(0).toUpperCase() + f.slice(1)}
+                <List className="h-3.5 w-3.5" />
+                Lista
               </button>
-            ))}
+              <button
+                type="button"
+                onClick={() => setVistaActiva("calendario")}
+                className={`flex items-center gap-1.5 rounded-xl px-3 py-1.5 text-xs font-semibold transition ${
+                  vistaActiva === "calendario"
+                    ? "bg-brand-600 text-white"
+                    : "text-slate-600 hover:bg-slate-100 dark:text-slate-300 dark:hover:bg-slate-800"
+                }`}
+              >
+                <CalendarDays className="h-3.5 w-3.5" />
+                Calendario
+              </button>
+            </div>
           </div>
 
+          {/* Vista calendario */}
+          {vistaActiva === "calendario" && !loading && (
+            <div className="mt-6">
+              <InteractiveCalendar
+                events={calendarEvents}
+                onSelectEvent={(event) => setCitaDetalleCalendario(event.resource)}
+                onSelectSlot={handleSelectSlot}
+                selectable
+              />
+            </div>
+          )}
+
           {/* Lista */}
-          <div className="mt-6 space-y-4">
+          <div className={`mt-6 space-y-4 ${vistaActiva === "calendario" ? "hidden" : ""}`}>
             {loading ? (
               <SkeletonCardList count={5} />
             ) : citasFiltradas.length === 0 ? (
@@ -557,6 +634,16 @@ export default function CitasPage() {
         cancelLabel="No, mantener"
         onConfirm={handleCancelConfirm}
         onCancel={() => setConfirmCancel(null)}
+      />
+
+      <AppointmentDetailModal
+        isOpen={!!citaDetalleCalendario}
+        onClose={() => setCitaDetalleCalendario(null)}
+        appointment={citaDetalleCalendario}
+        onCancel={(appointment) => {
+          setCitaDetalleCalendario(null);
+          setConfirmCancel(appointment);
+        }}
       />
     </>
   );

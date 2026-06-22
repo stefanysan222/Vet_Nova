@@ -8,6 +8,10 @@ import { useAuth } from "@/lib/auth-context";
 import { fetchCitas, updateCitaEstado } from "../../../lib/api/citas";
 import type { Appointment } from "../../../lib/recepcionista/types";
 import { getStatusStyle } from "../../../lib/utils/status";
+import InteractiveCalendar, {
+  type CalendarAppointmentEvent,
+} from "../../components/calendar/InteractiveCalendar";
+import AppointmentDetailModal from "../../components/appointments/AppointmentDetailModal";
 import {
   Plus,
   Search,
@@ -17,6 +21,7 @@ import {
   CalendarOff,
   Clock,
   ClipboardList,
+  List,
   User,
   CheckCircle,
   AlertCircle,
@@ -84,11 +89,14 @@ function AgendarContent() {
   const solicitudEnviada = searchParams.get("solicitud") === "enviada";
 
   const [citas, setCitas] = useState<Cita[]>([]);
+  const [appointments, setAppointments] = useState<Appointment[]>([]);
   const [busqueda, setBusqueda] = useState("");
   const [filtro, setFiltro] = useState<FiltroCita>("todas");
   const [citaSeleccionada, setCitaSeleccionada] = useState<Cita | null>(null);
   const [cargado, setCargado] = useState(false);
   const [bannerVisible, setBannerVisible] = useState(solicitudEnviada);
+  const [vistaActiva, setVistaActiva] = useState<"lista" | "calendario">("lista");
+  const [citaCalendario, setCitaCalendario] = useState<Appointment | null>(null);
   const { user } = useAuth();
 
   const cargarCitas = async () => {
@@ -99,8 +107,10 @@ function AgendarContent() {
     try {
       const apiCitas = await fetchCitas();
       setCitas(apiCitas.map(appointmentToCita));
+      setAppointments(apiCitas);
     } catch {
       setCitas([]);
+      setAppointments([]);
     } finally {
       setCargado(true);
     }
@@ -162,6 +172,25 @@ function AgendarContent() {
     setBusqueda("");
     setFiltro("todas");
   };
+
+  const calendarEvents = useMemo<CalendarAppointmentEvent[]>(() => {
+    const idsFiltrados = new Set(citasFiltradas.map((c) => c.id));
+    return appointments
+      .filter((a) => a.date && idsFiltrados.has(a.id))
+      .map((a) => {
+        const [hh, mm] = (a.time || "00:00").split(":").map((n) => parseInt(n, 10) || 0);
+        const start = new Date(`${a.date}T00:00:00`);
+        start.setHours(hh, mm, 0, 0);
+        const end = new Date(start);
+        end.setMinutes(end.getMinutes() + 30);
+        return {
+          title: `${a.time ?? ""} ${a.petName}`.trim(),
+          start,
+          end,
+          resource: a,
+        };
+      });
+  }, [appointments, citasFiltradas]);
 
   if (!cargado) {
     return (
@@ -306,14 +335,48 @@ function AgendarContent() {
 
       {/* Listado de citas */}
       <section>
-        <div className="mb-4 flex items-center justify-between">
+        <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
           <h2 className="text-section-title">Citas programadas</h2>
-          <p className="text-sm text-slate-500 dark:text-slate-400">
-            {citasFiltradas.length} {citasFiltradas.length === 1 ? "resultado" : "resultados"}
-          </p>
+          <div className="flex items-center gap-3">
+            <p className="text-sm text-slate-500 dark:text-slate-400">
+              {citasFiltradas.length} {citasFiltradas.length === 1 ? "resultado" : "resultados"}
+            </p>
+            <div className="flex gap-1 rounded-xl border border-slate-200 bg-white p-1 dark:border-slate-700 dark:bg-slate-900">
+              <button
+                type="button"
+                onClick={() => setVistaActiva("lista")}
+                className={`flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs font-semibold transition ${
+                  vistaActiva === "lista"
+                    ? "bg-brand-600 text-white"
+                    : "text-slate-600 hover:bg-slate-100 dark:text-slate-300 dark:hover:bg-slate-800"
+                }`}
+              >
+                <List className="h-3.5 w-3.5" />
+                Lista
+              </button>
+              <button
+                type="button"
+                onClick={() => setVistaActiva("calendario")}
+                className={`flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs font-semibold transition ${
+                  vistaActiva === "calendario"
+                    ? "bg-brand-600 text-white"
+                    : "text-slate-600 hover:bg-slate-100 dark:text-slate-300 dark:hover:bg-slate-800"
+                }`}
+              >
+                <CalendarDays className="h-3.5 w-3.5" />
+                Calendario
+              </button>
+            </div>
+          </div>
         </div>
 
-        {citasFiltradas.length > 0 ? (
+        {vistaActiva === "calendario" ? (
+          <InteractiveCalendar
+            events={calendarEvents}
+            onSelectEvent={(event) => setCitaCalendario(event.resource)}
+            selectable={false}
+          />
+        ) : citasFiltradas.length > 0 ? (
           <div className="space-y-5">
             {citasFiltradas.map((cita) => (
               <article
@@ -401,6 +464,17 @@ function AgendarContent() {
           onCancel={() => cancelarCita(citaSeleccionada.id)}
         />
       )}
+
+      {/* Modal de detalle — vista calendario */}
+      <AppointmentDetailModal
+        isOpen={!!citaCalendario}
+        onClose={() => setCitaCalendario(null)}
+        appointment={citaCalendario}
+        onCancel={(appointment) => {
+          setCitaCalendario(null);
+          cancelarCita(appointment.id);
+        }}
+      />
     </div>
   );
 }

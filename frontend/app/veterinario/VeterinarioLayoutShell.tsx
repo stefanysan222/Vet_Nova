@@ -6,6 +6,8 @@ import { usePathname, useRouter } from "next/navigation";
 import { useEffect, useMemo, useRef, useState, type KeyboardEvent, type ReactNode } from "react";
 import { logout } from "../../lib/auth";
 import { useAuth } from "@/lib/auth-context";
+import { useNotifications } from "@/lib/hooks/useNotifications";
+import { useClickOutside } from "@/lib/hooks/useClickOutside";
 import {
   LayoutDashboard,
   CalendarDays,
@@ -15,6 +17,7 @@ import {
   User,
   Search,
   Bell,
+  Check,
   LogOut,
   Moon,
   Sun,
@@ -80,8 +83,15 @@ const navigation: {
   },
 ];
 
-const notificationPreview: { title: string; description: string; time: string; unread: boolean }[] =
-  [];
+function timeAgo(dateStr: string): string {
+  const diff = Date.now() - new Date(dateStr).getTime();
+  const m = Math.floor(diff / 60000);
+  if (m < 1) return "Ahora";
+  if (m < 60) return `Hace ${m} min`;
+  const h = Math.floor(m / 60);
+  if (h < 24) return `Hace ${h}h`;
+  return `Hace ${Math.floor(h / 24)}d`;
+}
 
 const elementosBusqueda: ResultadoBusqueda[] = [
   {
@@ -144,6 +154,8 @@ export default function VeterinarioLayoutShell({ children }: { children: ReactNo
   const pathname = usePathname();
   const router = useRouter();
   const buscadorRef = useRef<HTMLDivElement>(null);
+  const notifRef = useRef<HTMLDivElement>(null);
+  const userMenuRef = useRef<HTMLDivElement>(null);
   const { user, loading } = useAuth();
   const userName = user?.name ?? "Veterinario";
   const userInitials = user?.name
@@ -164,6 +176,13 @@ export default function VeterinarioLayoutShell({ children }: { children: ReactNo
 
   const [busquedaGlobal, setBusquedaGlobal] = useState("");
   const [mostrarResultados, setMostrarResultados] = useState(false);
+  const {
+    count: notifCount,
+    items: notifItems,
+    loadItems: loadNotifItems,
+    marcarLeida,
+    marcarTodasLeidas,
+  } = useNotifications({ enabled: !!user });
 
   const resultadosBusqueda = useMemo(() => {
     const termino = normalizarTexto(busquedaGlobal.trim());
@@ -213,21 +232,15 @@ export default function VeterinarioLayoutShell({ children }: { children: ReactNo
     setBusquedaGlobal("");
   }, [pathname]);
 
+  useClickOutside(buscadorRef, () => setMostrarResultados(false));
+  useClickOutside(notifRef, () => setShowNotifications(false));
+  useClickOutside(userMenuRef, () => setShowUserMenu(false));
+
+  // Cargar lista al abrir el dropdown
   useEffect(() => {
-    function cerrarElementosAbiertos(event: MouseEvent) {
-      const target = event.target as Node;
-
-      if (buscadorRef.current && !buscadorRef.current.contains(target)) {
-        setMostrarResultados(false);
-      }
-    }
-
-    document.addEventListener("mousedown", cerrarElementosAbiertos);
-
-    return () => {
-      document.removeEventListener("mousedown", cerrarElementosAbiertos);
-    };
-  }, []);
+    if (!showNotifications) return;
+    loadNotifItems();
+  }, [showNotifications, loadNotifItems]);
 
   function toggleDarkMode() {
     const nuevoTema = !darkMode;
@@ -426,7 +439,7 @@ export default function VeterinarioLayoutShell({ children }: { children: ReactNo
 
             <div className="ml-5 flex items-center gap-4">
               {/* NOTIFICACIONES */}
-              <div className="relative">
+              <div ref={notifRef} className="relative">
                 <button
                   type="button"
                   aria-label="Ver notificaciones"
@@ -439,7 +452,11 @@ export default function VeterinarioLayoutShell({ children }: { children: ReactNo
                 >
                   <AppIcon name="bell" />
 
-                  <span className="absolute right-[8px] top-[8px] h-2.5 w-2.5 rounded-full bg-danger-500" />
+                  {notifCount > 0 && (
+                    <span className="absolute right-[6px] top-[6px] flex h-4 w-4 items-center justify-center rounded-full bg-danger-500 text-[9px] font-bold text-white ring-2 ring-white dark:ring-surface-900">
+                      {notifCount > 9 ? "9+" : notifCount}
+                    </span>
+                  )}
                 </button>
 
                 {showNotifications && (
@@ -451,49 +468,79 @@ export default function VeterinarioLayoutShell({ children }: { children: ReactNo
                         </h3>
 
                         <p className="mt-1 text-xs text-surface-500 dark:text-surface-400">
-                          Tienes 2 notificaciones nuevas
+                          {notifItems && notifItems.length > 0
+                            ? `${notifItems.length} sin leer`
+                            : "No tienes notificaciones nuevas"}
                         </p>
                       </div>
 
-                      <span className="rounded-lg bg-brand-100 px-3 py-1 text-xs font-semibold text-brand-600 dark:bg-brand-900/40 dark:text-brand-300">
-                        2 nuevas
-                      </span>
+                      {notifItems && notifItems.length > 0 && (
+                        <button
+                          onClick={() => marcarTodasLeidas()}
+                          className="text-xs font-semibold text-brand-600 hover:text-brand-700 dark:text-brand-300"
+                        >
+                          Marcar todas leídas
+                        </button>
+                      )}
                     </div>
 
-                    <div className="divide-y divide-surface-200 dark:divide-surface-700">
-                      {notificationPreview.map((notification) => (
-                        <div
-                          key={notification.title}
-                          className="flex gap-3 px-5 py-4 transition hover:bg-surface-50 dark:hover:bg-surface-800"
-                        >
-                          <div className="mt-1 flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-brand-100 text-brand-600 dark:bg-brand-900/40 dark:text-brand-300">
-                            <AppIcon name="bell" className="h-5 w-5" />
-                          </div>
-
-                          <div className="min-w-0 flex-1">
-                            <div className="flex items-center gap-2">
-                              <p className="text-sm font-semibold text-surface-900 dark:text-white">
-                                {notification.title}
-                              </p>
-
-                              {notification.unread && (
-                                <span className="h-2 w-2 rounded-full bg-danger-500" />
-                              )}
+                    <div className="max-h-[290px] divide-y divide-surface-200 overflow-y-auto dark:divide-surface-700">
+                      {notifItems === null ? (
+                        <div className="space-y-2 p-3">
+                          {[1, 2, 3].map((i) => (
+                            <div
+                              key={i}
+                              className="h-12 animate-pulse rounded-xl bg-surface-100 dark:bg-surface-800"
+                            />
+                          ))}
+                        </div>
+                      ) : notifItems.length === 0 ? (
+                        <p className="px-5 py-6 text-center text-sm text-surface-500 dark:text-surface-400">
+                          No tienes notificaciones nuevas.
+                        </p>
+                      ) : (
+                        notifItems.map((item) => (
+                          <div
+                            key={item.id}
+                            className="flex gap-3 px-5 py-4 transition hover:bg-surface-50 dark:hover:bg-surface-800"
+                          >
+                            <div className="mt-1 flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-brand-100 text-brand-600 dark:bg-brand-900/40 dark:text-brand-300">
+                              <AppIcon name="bell" className="h-[18px] w-[18px]" />
                             </div>
 
-                            <p className="mt-1 text-xs leading-5 text-surface-500 dark:text-surface-400">
-                              {notification.description}
-                            </p>
+                            <div className="min-w-0 flex-1">
+                              <div className="flex items-center gap-2">
+                                <h4 className="text-sm font-semibold text-surface-900 dark:text-white">
+                                  {item.titulo}
+                                </h4>
+                                <span className="h-2 w-2 rounded-full bg-danger-500" />
+                              </div>
 
-                            <p className="text-caption mt-2">{notification.time}</p>
+                              <p className="mt-1 text-xs leading-5 text-surface-500 dark:text-surface-400">
+                                {item.mensaje}
+                              </p>
+
+                              <p className="text-caption mt-2">{timeAgo(item.creadaEn)}</p>
+                            </div>
+
+                            <button
+                              type="button"
+                              onClick={() => marcarLeida(item.id)}
+                              className="mt-0.5 shrink-0 self-start rounded-lg p-1 text-surface-400 hover:bg-surface-100 hover:text-surface-600 dark:hover:bg-surface-700"
+                              title="Marcar como leída"
+                              aria-label="Marcar como leída"
+                            >
+                              <Check className="h-3.5 w-3.5" />
+                            </button>
                           </div>
-                        </div>
-                      ))}
+                        ))
+                      )}
                     </div>
 
                     <div className="border-t border-surface-200 p-4 dark:border-surface-700">
                       <Link
                         href="/veterinario/notificaciones"
+                        onClick={() => setShowNotifications(false)}
                         className="flex h-[42px] items-center justify-center rounded-xl bg-brand-600 text-sm font-semibold text-white transition hover:bg-brand-700"
                       >
                         Ver todas las notificaciones
@@ -506,7 +553,7 @@ export default function VeterinarioLayoutShell({ children }: { children: ReactNo
               <div className="h-8 w-px bg-surface-200 dark:bg-surface-700" />
 
               {/* USUARIO */}
-              <div className="relative">
+              <div ref={userMenuRef} className="relative">
                 <button
                   type="button"
                   onClick={() => {

@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { ChangeEvent, FormEvent, ReactNode, useEffect, useMemo, useState } from "react";
-import { Plus, X, AlertCircle, CheckCircle2 } from "lucide-react";
+import { Plus, X, AlertCircle, CheckCircle2, CalendarDays, List } from "lucide-react";
 import { fetchCitas, createCita } from "../../../lib/api/citas";
 import { SkeletonBanner, SkeletonStats, SkeletonCardList } from "../../components/ui/Skeleton";
 import { fetchMascotas } from "../../../lib/api/mascotas";
@@ -14,6 +14,11 @@ import { useAuth } from "@/lib/auth-context";
 import { getClinicSlots, isClinicOpen, getScheduleLabel } from "../../../lib/utils/clinic-schedule";
 import { StatusBadge } from "../../../lib/utils/status-badge";
 import type { AppointmentStatus } from "../../../lib/utils/status";
+import AppointmentDetailModal from "../../components/appointments/AppointmentDetailModal";
+import InteractiveCalendar, {
+  type CalendarAppointmentEvent,
+} from "../../components/calendar/InteractiveCalendar";
+import type { SlotInfo } from "react-big-calendar";
 
 type EstadoCita = "Pendiente de confirmación" | "Confirmada" | "En proceso" | "Atendida";
 
@@ -86,6 +91,7 @@ function formularioVacio(vetName = ""): FormularioCita {
 
 export default function VeterinarioCitasPage() {
   const [citas, setCitas] = useState<Cita[]>([]);
+  const [appointments, setAppointments] = useState<Appointment[]>([]);
   const [mascotas, setMascotas] = useState<PetRecord[]>([]);
   const [vets, setVets] = useState<UsuarioAPI[]>([]);
   const { user } = useAuth();
@@ -97,6 +103,8 @@ export default function VeterinarioCitasPage() {
   const [mostrarMensaje, setMostrarMensaje] = useState(false);
   const [citaDetalle, setCitaDetalle] = useState<Cita | null>(null);
   const [formulario, setFormulario] = useState<FormularioCita>(() => formularioVacio(""));
+  const [vistaActiva, setVistaActiva] = useState<"lista" | "calendario">("lista");
+  const [citaCalendario, setCitaCalendario] = useState<Appointment | null>(null);
 
   useEffect(() => {
     if (!user) return;
@@ -113,12 +121,42 @@ export default function VeterinarioCitasPage() {
     ])
       .then(([appts, pets, vetList]) => {
         setCitas(appts.map(mapAppointmentToCita));
+        setAppointments(appts);
         setMascotas(pets);
         setVets(vetList);
       })
       .catch(() => setError("No se pudo cargar la agenda. Verifica la conexión con el servidor."))
       .finally(() => setLoading(false));
   }, []);
+
+  const calendarEvents = useMemo<CalendarAppointmentEvent[]>(() => {
+    return appointments
+      .filter((a) => a.date)
+      .map((a) => {
+        const [hh, mm] = (a.time || "00:00").split(":").map((n) => parseInt(n, 10) || 0);
+        const start = new Date(`${a.date}T00:00:00`);
+        start.setHours(hh, mm, 0, 0);
+        const end = new Date(start);
+        end.setMinutes(end.getMinutes() + 30);
+        return {
+          title: `${a.time ?? ""} ${a.petName}`.trim(),
+          start,
+          end,
+          resource: a,
+        };
+      });
+  }, [appointments]);
+
+  // TODO(MP-01): "Agendar cita" abre el formulario completo definido abajo (mascota, servicio,
+  // veterinario, etc.). Reutilizamos ese mismo modal preseleccionando fecha/hora del slot
+  // en vez de construir un formulario nuevo desde cero.
+  const handleSelectSlot = (slotInfo: SlotInfo) => {
+    const fecha = slotInfo.start.toISOString().slice(0, 10);
+    const hora = slotInfo.start.toTimeString().slice(0, 5);
+    setFormulario({ ...formularioVacio(currentVetName), fecha, hora });
+    setMostrarMensaje(false);
+    setMostrarFormulario(true);
+  };
 
   // Slots de la clínica para la fecha seleccionada
   const clinicSlots = useMemo(() => getClinicSlots(formulario.fecha), [formulario.fecha]);
@@ -329,12 +367,48 @@ export default function VeterinarioCitasPage() {
             </p>
           </div>
 
-          <span className="w-fit rounded-lg bg-brand-100 px-4 py-2 text-sm font-semibold text-brand-600 dark:bg-brand-900/40 dark:text-brand-300">
-            {citas.length} citas
-          </span>
+          <div className="flex items-center gap-3">
+            <span className="w-fit rounded-lg bg-brand-100 px-4 py-2 text-sm font-semibold text-brand-600 dark:bg-brand-900/40 dark:text-brand-300">
+              {citas.length} citas
+            </span>
+
+            <div className="flex gap-1 rounded-xl border border-surface-200 bg-white p-1 dark:border-surface-700 dark:bg-surface-900">
+              <button
+                type="button"
+                onClick={() => setVistaActiva("lista")}
+                className={`flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs font-semibold transition ${
+                  vistaActiva === "lista"
+                    ? "bg-brand-600 text-white"
+                    : "text-surface-600 hover:bg-surface-100 dark:text-surface-300 dark:hover:bg-surface-800"
+                }`}
+              >
+                <List className="h-3.5 w-3.5" />
+                Lista
+              </button>
+              <button
+                type="button"
+                onClick={() => setVistaActiva("calendario")}
+                className={`flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs font-semibold transition ${
+                  vistaActiva === "calendario"
+                    ? "bg-brand-600 text-white"
+                    : "text-surface-600 hover:bg-surface-100 dark:text-surface-300 dark:hover:bg-surface-800"
+                }`}
+              >
+                <CalendarDays className="h-3.5 w-3.5" />
+                Calendario
+              </button>
+            </div>
+          </div>
         </div>
 
-        {citas.length === 0 ? (
+        {vistaActiva === "calendario" ? (
+          <InteractiveCalendar
+            events={calendarEvents}
+            onSelectEvent={(event) => setCitaCalendario(event.resource)}
+            onSelectSlot={handleSelectSlot}
+            selectable
+          />
+        ) : citas.length === 0 ? (
           <p className="py-10 text-center text-sm text-surface-500 dark:text-surface-400">
             No hay citas registradas.
           </p>
@@ -752,6 +826,12 @@ export default function VeterinarioCitasPage() {
           </section>
         </div>
       )}
+
+      <AppointmentDetailModal
+        isOpen={!!citaCalendario}
+        onClose={() => setCitaCalendario(null)}
+        appointment={citaCalendario}
+      />
     </div>
   );
 }

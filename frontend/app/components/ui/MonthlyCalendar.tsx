@@ -24,21 +24,43 @@ function toDateKey(year: number, month: number, day: number): string {
   return `${year}-${String(month + 1).padStart(2, "0")}-${String(day).padStart(2, "0")}`;
 }
 
+function formatLongDate(key: string): string {
+  const [y, m, d] = key.split("-").map(Number);
+  return new Date(y, m - 1, d).toLocaleDateString("es-ES", {
+    weekday: "long",
+    day: "numeric",
+    month: "long",
+  });
+}
+
+export interface CalendarEvent {
+  id: string;
+  title: string;
+  subtitle?: string;
+  badgeLabel?: string;
+  badgeClassName?: string;
+}
+
 interface MonthlyCalendarProps {
   datesWithCitas: Set<string>;
   accentColor?: string;
   legendLabel?: string;
+  eventsByDate?: Record<string, CalendarEvent[]>;
+  emptyDayMessage?: string;
 }
 
 export default function MonthlyCalendar({
   datesWithCitas,
   accentColor = "#7C3AED",
   legendLabel = "Con citas",
+  eventsByDate,
+  emptyDayMessage = "Sin citas registradas.",
 }: MonthlyCalendarProps) {
   const isDark = useIsDarkMode();
   const today = new Date();
   const todayKey = today.toISOString().slice(0, 10);
   const [cursor, setCursor] = useState(new Date(today.getFullYear(), today.getMonth(), 1));
+  const [selectedKey, setSelectedKey] = useState<string | null>(null);
 
   const year = cursor.getFullYear();
   const month = cursor.getMonth();
@@ -66,7 +88,10 @@ export default function MonthlyCalendar({
         <div className="flex items-center gap-1">
           <button
             type="button"
-            onClick={() => setCursor(new Date(year, month - 1, 1))}
+            onClick={() => {
+              setCursor(new Date(year, month - 1, 1));
+              setSelectedKey(null);
+            }}
             className="flex h-6 w-6 items-center justify-center rounded-md text-[#555068] transition hover:bg-[#F7F6FA] dark:text-slate-400 dark:hover:bg-slate-800"
             aria-label="Mes anterior"
           >
@@ -74,7 +99,10 @@ export default function MonthlyCalendar({
           </button>
           <button
             type="button"
-            onClick={() => setCursor(new Date(year, month + 1, 1))}
+            onClick={() => {
+              setCursor(new Date(year, month + 1, 1));
+              setSelectedKey(null);
+            }}
             className="flex h-6 w-6 items-center justify-center rounded-md text-[#555068] transition hover:bg-[#F7F6FA] dark:text-slate-400 dark:hover:bg-slate-800"
             aria-label="Mes siguiente"
           >
@@ -93,15 +121,27 @@ export default function MonthlyCalendar({
         {cells.map((cell, i) => {
           if (!cell) return <span key={`empty-${i}`} />;
           const isToday = cell.key === todayKey;
+          const isSelected = cell.key === selectedKey;
           const hasCitas = datesWithCitas.has(cell.key);
           return (
-            <div key={cell.key} className="flex flex-col items-center gap-0.5">
+            <button
+              key={cell.key}
+              type="button"
+              onClick={() => setSelectedKey((prev) => (prev === cell.key ? null : cell.key))}
+              className="flex flex-col items-center gap-0.5 rounded-md py-0.5 transition hover:bg-[#F7F6FA] dark:hover:bg-slate-800"
+            >
               <span
                 className="flex h-6 w-6 items-center justify-center rounded-full text-[11px]"
                 style={
                   isToday
                     ? { background: accentColor, color: "#fff", fontWeight: 600 }
-                    : { color: isDark ? "#CBD5E1" : "#334155" }
+                    : isSelected
+                      ? {
+                          border: `1.5px solid ${accentColor}`,
+                          color: accentColor,
+                          fontWeight: 600,
+                        }
+                      : { color: isDark ? "#CBD5E1" : "#334155" }
                 }
               >
                 {cell.day}
@@ -110,10 +150,48 @@ export default function MonthlyCalendar({
                 className="h-1 w-1 rounded-full"
                 style={{ background: hasCitas ? accentColor : "transparent" }}
               />
-            </div>
+            </button>
           );
         })}
       </div>
+
+      {selectedKey && (
+        <div className="mt-3 border-t border-[#E4DFF0] pt-3 dark:border-slate-700/60">
+          <p className="mb-2 text-[11px] font-semibold capitalize text-slate-900 dark:text-white">
+            {formatLongDate(selectedKey)}
+          </p>
+          {eventsByDate?.[selectedKey]?.length ? (
+            <div className="space-y-1.5">
+              {eventsByDate[selectedKey].map((event) => (
+                <div
+                  key={event.id}
+                  className="flex items-center justify-between gap-2 rounded-lg bg-[#F7F6FA] px-2.5 py-1.5 dark:bg-slate-800/60"
+                >
+                  <div className="min-w-0">
+                    <p className="truncate text-[11px] font-semibold text-slate-900 dark:text-white">
+                      {event.title}
+                    </p>
+                    {event.subtitle && (
+                      <p className="truncate text-[10px] text-[#555068] dark:text-slate-400">
+                        {event.subtitle}
+                      </p>
+                    )}
+                  </div>
+                  {event.badgeLabel && (
+                    <span
+                      className={`shrink-0 whitespace-nowrap rounded-full px-2 py-0.5 text-[9px] font-semibold ${event.badgeClassName ?? ""}`}
+                    >
+                      {event.badgeLabel}
+                    </span>
+                  )}
+                </div>
+              ))}
+            </div>
+          ) : (
+            <p className="text-[11px] text-[#555068] dark:text-slate-400">{emptyDayMessage}</p>
+          )}
+        </div>
+      )}
 
       <div className="mt-3 flex items-center gap-4 border-t border-[#E4DFF0] pt-3 dark:border-slate-700/60">
         <span className="flex items-center gap-1.5 text-[11px] text-[#555068] dark:text-slate-400">

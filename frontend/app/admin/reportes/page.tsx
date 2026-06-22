@@ -28,6 +28,7 @@ export default function ReportesPage() {
   const [stats, setStats] = useState<AllStats | null>(null);
   const [citas, setCitas] = useState<Appointment[]>([]);
   const [loading, setLoading] = useState(true);
+  const [hiddenChartSeries, setHiddenChartSeries] = useState<Set<string>>(new Set());
 
   useEffect(() => {
     const hoy = new Date().toISOString().slice(0, 10);
@@ -216,27 +217,37 @@ export default function ReportesPage() {
               <p className="mt-0.5 text-xs text-slate-400">Últimos 30 días y próximos 14</p>
             </div>
             <div className="mb-3 mt-3 flex items-center gap-4">
-              <span className="flex items-center gap-1.5 text-[11px] text-slate-500 dark:text-slate-400">
-                <span
-                  className="inline-block h-2 w-2 rounded-full"
-                  style={{ background: CHART_BAR_COLORS.hoy }}
-                />
-                Hoy
-              </span>
-              <span className="flex items-center gap-1.5 text-[11px] text-slate-500 dark:text-slate-400">
-                <span
-                  className="inline-block h-2 w-2 rounded-full"
-                  style={{ background: CHART_BAR_COLORS.pasado }}
-                />
-                Pasado
-              </span>
-              <span className="flex items-center gap-1.5 text-[11px] text-slate-500 dark:text-slate-400">
-                <span
-                  className="inline-block h-2 w-2 rounded-full"
-                  style={{ background: CHART_BAR_COLORS.proximo }}
-                />
-                Próximo
-              </span>
+              {(
+                [
+                  { key: "hoy", label: "Hoy" },
+                  { key: "pasado", label: "Pasado" },
+                  { key: "proximo", label: "Próximo" },
+                ] as const
+              ).map(({ key, label }) => {
+                const isHidden = hiddenChartSeries.has(key);
+                return (
+                  <button
+                    key={key}
+                    type="button"
+                    onClick={() =>
+                      setHiddenChartSeries((prev) => {
+                        const next = new Set(prev);
+                        if (next.has(key)) next.delete(key);
+                        else next.add(key);
+                        return next;
+                      })
+                    }
+                    className={`flex items-center gap-1.5 text-[11px] transition-opacity ${isHidden ? "opacity-40" : ""} text-slate-500 dark:text-slate-400`}
+                    aria-pressed={!isHidden}
+                  >
+                    <span
+                      className="inline-block h-2 w-2 rounded-full"
+                      style={{ background: CHART_BAR_COLORS[key] }}
+                    />
+                    {label}
+                  </button>
+                );
+              })}
             </div>
             <div className="h-60 w-full">
               <ResponsiveContainer width="100%" height="100%">
@@ -265,24 +276,30 @@ export default function ReportesPage() {
                     }}
                     formatter={(value) => [`${value} cita${Number(value) !== 1 ? "s" : ""}`, ""]}
                   />
-                  <Bar
-                    dataKey="hoy"
-                    stackId="citas"
-                    fill={CHART_BAR_COLORS.hoy}
-                    radius={[6, 6, 6, 6]}
-                  />
-                  <Bar
-                    dataKey="pasado"
-                    stackId="citas"
-                    fill={CHART_BAR_COLORS.pasado}
-                    radius={[6, 6, 6, 6]}
-                  />
-                  <Bar
-                    dataKey="proximo"
-                    stackId="citas"
-                    fill={CHART_BAR_COLORS.proximo}
-                    radius={[6, 6, 6, 6]}
-                  />
+                  {!hiddenChartSeries.has("hoy") && (
+                    <Bar
+                      dataKey="hoy"
+                      stackId="citas"
+                      fill={CHART_BAR_COLORS.hoy}
+                      radius={[6, 6, 6, 6]}
+                    />
+                  )}
+                  {!hiddenChartSeries.has("pasado") && (
+                    <Bar
+                      dataKey="pasado"
+                      stackId="citas"
+                      fill={CHART_BAR_COLORS.pasado}
+                      radius={[6, 6, 6, 6]}
+                    />
+                  )}
+                  {!hiddenChartSeries.has("proximo") && (
+                    <Bar
+                      dataKey="proximo"
+                      stackId="citas"
+                      fill={CHART_BAR_COLORS.proximo}
+                      radius={[6, 6, 6, 6]}
+                    />
+                  )}
                 </BarChart>
               </ResponsiveContainer>
             </div>

@@ -5,6 +5,7 @@ import Link from "next/link";
 import { AnimatePresence, motion } from "framer-motion";
 import { Building2, Moon, Search, Sun, X } from "lucide-react";
 import { useAuth } from "@/lib/auth-context";
+import { useClickOutside } from "@/lib/hooks/useClickOutside";
 import { fetchClinicas, type Clinica } from "../../../lib/api/clinicas";
 
 function normalizar(texto: string) {
@@ -33,15 +34,7 @@ export default function SuperAdminTopbar() {
       .catch(() => setClinicas([]));
   }, []);
 
-  useEffect(() => {
-    const handler = (e: MouseEvent) => {
-      if (searchRef.current && !searchRef.current.contains(e.target as Node)) {
-        setOpen(false);
-      }
-    };
-    document.addEventListener("mousedown", handler);
-    return () => document.removeEventListener("mousedown", handler);
-  }, []);
+  useClickOutside(searchRef, () => setOpen(false));
 
   const toggleDark = () => {
     const next = !darkMode;
@@ -165,7 +158,7 @@ export default function SuperAdminTopbar() {
           </button>
 
           <div className="flex items-center gap-2 rounded-xl border border-slate-200 bg-white px-3 py-2 dark:border-slate-700 dark:bg-slate-900">
-            <div className="flex h-7 w-7 items-center justify-center rounded-full bg-[#7C3AED] text-xs font-bold text-white dark:bg-[#A78BFA] dark:text-[#1A0F35]">
+            <div className="flex h-7 w-7 items-center justify-center rounded-full bg-brand-600 text-xs font-bold text-white dark:bg-brand-300 dark:text-brand-950">
               {initials}
             </div>
             <span className="hidden max-w-[140px] truncate text-sm font-medium text-slate-700 dark:text-slate-200 sm:block">
