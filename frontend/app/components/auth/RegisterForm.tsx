@@ -3,10 +3,10 @@
 import type { FormEvent } from "react";
 import { useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
-import { Building2, Eye, EyeOff, Lock, Mail, MapPin, UserCircle } from "lucide-react";
+import { Building2, Eye, EyeOff, Lock, Mail, MailCheck, MapPin, UserCircle } from "lucide-react";
 import { motion } from "framer-motion";
 import GoogleAuthButton from "./GoogleAuthButton";
-import { registerUser, loginOrRegisterGoogle } from "../../../lib/auth";
+import { registerUser, loginOrRegisterGoogle, resendVerification } from "../../../lib/auth";
 import {
   fetchClinicaBySlug,
   fetchClinicasActivas,
@@ -32,6 +32,9 @@ export default function RegisterForm({ clinicaSlug }: { clinicaSlug?: string }) 
   const [clinicasActivas, setClinicasActivas] = useState<ClinicaActiva[]>([]);
   const [loadingClinicas, setLoadingClinicas] = useState(!clinicaSlug);
   const [userLocation, setUserLocation] = useState<{ lat: number; lng: number } | null>(null);
+  const [pendingVerificationEmail, setPendingVerificationEmail] = useState<string | null>(null);
+  const [resendStatus, setResendStatus] = useState<string | null>(null);
+  const [resending, setResending] = useState(false);
   const router = useRouter();
   const { refresh } = useAuth();
   const { info } = useToast();
@@ -194,11 +197,19 @@ export default function RegisterForm({ clinicaSlug }: { clinicaSlug?: string }) 
       return;
     }
     setErrors({});
-    if (result.user) {
+    if (result.requiresEmailVerification && result.email) {
       notifyOtraClinica(result.avisoOtraClinica);
-      await refresh();
-      router.push(getDashboardRoute(result.user.role));
+      setPendingVerificationEmail(result.email);
     }
+  };
+
+  const handleResendVerification = async () => {
+    if (!pendingVerificationEmail) return;
+    setResending(true);
+    setResendStatus(null);
+    const { message } = await resendVerification(pendingVerificationEmail, resolvedSlug);
+    setResendStatus(message);
+    setResending(false);
   };
 
   const inputBase = (field: string) =>
@@ -361,6 +372,43 @@ export default function RegisterForm({ clinicaSlug }: { clinicaSlug?: string }) 
         >
           Volver a iniciar sesión
         </a>
+      </div>
+    );
+  }
+
+  if (pendingVerificationEmail) {
+    return (
+      <div className="space-y-4 text-center">
+        <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-2xl bg-brand-50 text-brand-600 dark:bg-brand-950/30 dark:text-brand-300">
+          <MailCheck className="h-6 w-6" />
+        </div>
+        <h3 className="text-base font-semibold text-slate-900 dark:text-white">
+          Confirma tu correo
+        </h3>
+        <p className="text-sm leading-6 text-slate-600 dark:text-slate-300">
+          Enviamos un enlace de confirmación a <strong>{pendingVerificationEmail}</strong>. Ábrelo
+          para activar tu cuenta. El enlace expira en 24 horas.
+        </p>
+        {resendStatus && (
+          <p className="text-sm text-slate-500 dark:text-slate-400">{resendStatus}</p>
+        )}
+        <button
+          type="button"
+          onClick={handleResendVerification}
+          disabled={resending}
+          className="text-sm font-semibold text-brand-600 transition hover:text-brand-700 disabled:cursor-not-allowed disabled:opacity-60 dark:text-brand-300 dark:hover:text-brand-200"
+        >
+          {resending ? "Enviando..." : "Reenviar enlace de confirmación"}
+        </button>
+        <p className="text-center text-sm text-slate-500 dark:text-slate-400">
+          ¿Ya confirmaste?{" "}
+          <a
+            href="/login"
+            className="font-semibold text-brand-600 transition hover:text-brand-700 dark:text-brand-300 dark:hover:text-brand-200"
+          >
+            Iniciar sesión
+          </a>
+        </p>
       </div>
     );
   }

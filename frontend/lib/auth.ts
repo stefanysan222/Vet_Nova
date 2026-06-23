@@ -61,14 +61,85 @@ async function postAuth(path: string, data: unknown): Promise<AuthResult> {
   }
 }
 
+export interface RegisterResult {
+  error?: string;
+  requiresEmailVerification?: boolean;
+  email?: string;
+  avisoOtraClinica?: ClinicaOpcion;
+}
+
 export async function registerUser(data: {
   nombre: string;
   email: string;
   password: string;
   rol?: string;
   clinicaSlug?: string;
-}): Promise<{ user?: AuthUser; error?: string; avisoOtraClinica?: ClinicaOpcion }> {
-  return postAuth("register", data);
+}): Promise<RegisterResult> {
+  try {
+    const res = await fetch("/api/auth/register", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      credentials: "include",
+      body: JSON.stringify(data),
+    });
+    if (res.status === 429)
+      return { error: "Demasiados intentos. Intenta de nuevo en unos minutos." };
+    const json = await res.json();
+    if (!res.ok) {
+      const msg = Array.isArray(json.message) ? json.message[0] : json.message;
+      return { error: msg ?? "No se pudo completar la solicitud." };
+    }
+    return {
+      requiresEmailVerification: json.requiresEmailVerification,
+      email: json.email,
+      avisoOtraClinica: json.avisoOtraClinica,
+    };
+  } catch {
+    return { error: "No se pudo conectar con el servidor." };
+  }
+}
+
+export async function verifyEmail(token: string): Promise<{ user?: AuthUser; error?: string }> {
+  try {
+    const res = await fetch("/api/auth/verify-email", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      credentials: "include",
+      body: JSON.stringify({ token }),
+    });
+    const json = await res.json().catch(() => ({}));
+    if (!res.ok) {
+      const msg = Array.isArray(json.message) ? json.message[0] : json.message;
+      return { error: msg ?? "El enlace de confirmación es inválido o ha expirado." };
+    }
+    return { user: json.user };
+  } catch {
+    return { error: "No se pudo conectar con el servidor." };
+  }
+}
+
+export async function resendVerification(
+  email: string,
+  clinicaSlug?: string,
+): Promise<{ message: string }> {
+  try {
+    const res = await fetch("/api/auth/resend-verification", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      credentials: "include",
+      body: JSON.stringify({ email, clinicaSlug }),
+    });
+    const json = await res.json().catch(() => ({}));
+    return {
+      message:
+        json.message ??
+        (res.status === 429
+          ? "Demasiados intentos. Intenta de nuevo en unos minutos."
+          : "Si la cuenta existe y aún no fue confirmada, recibirás un nuevo enlace."),
+    };
+  } catch {
+    return { message: "No se pudo conectar con el servidor." };
+  }
 }
 
 export async function loginUser(
