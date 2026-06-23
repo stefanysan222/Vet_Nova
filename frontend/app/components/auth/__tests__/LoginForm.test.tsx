@@ -19,13 +19,20 @@ vi.mock("../GoogleAuthButton", () => ({
   ),
 }));
 
+const mockResendVerification = vi.fn();
+
 vi.mock("../../../../lib/auth", () => ({
   loginUser: (...args: unknown[]) => mockLoginUser(...args),
   loginOrRegisterGoogle: (...args: unknown[]) => mockLoginOrRegisterGoogle(...args),
+  resendVerification: (...args: unknown[]) => mockResendVerification(...args),
 }));
 
 vi.mock("@/lib/auth-context", () => ({
   useAuth: () => ({ user: null, loading: false, refresh: mockRefresh }),
+}));
+
+vi.mock("../../ui/Toast", () => ({
+  useToast: () => ({ info: vi.fn() }),
 }));
 
 vi.mock("framer-motion", () => {

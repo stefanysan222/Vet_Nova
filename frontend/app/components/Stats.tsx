@@ -15,12 +15,12 @@ export default function Stats() {
         <div
           aria-hidden
           className="relative hidden h-[140px] w-[220px] shrink-0 bg-contain bg-center bg-no-repeat dark:hidden sm:block"
-          style={{ backgroundImage: "url(/logos/Vetnova-ligth-word.jpg)" }}
+          style={{ backgroundImage: "url(/logos/vetnova-wordmark-light.png)" }}
         />
         <div
           aria-hidden
           className="relative hidden h-[140px] w-[220px] shrink-0 bg-contain bg-center bg-no-repeat dark:block sm:block"
-          style={{ backgroundImage: "url(/logos/Vetnova-dark-word.jpg)" }}
+          style={{ backgroundImage: "url(/logos/vetnova-wordmark-dark.png)" }}
         />
 
         <div className="relative max-w-lg">

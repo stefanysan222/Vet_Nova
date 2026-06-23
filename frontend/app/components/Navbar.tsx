@@ -39,19 +39,19 @@ export default function Navbar() {
         <a href="#" className="inline-flex items-center">
           <div className="relative -my-2 h-[52px] w-[52px] shrink-0">
             <Image
-              src="/logos/Vetnova-ligth-word.jpg"
+              src="/logos/vetnova-wordmark-light.png"
               alt="VetNova"
               fill
               sizes="52px"
-              className="block rounded-lg object-contain dark:hidden"
+              className="block object-contain dark:hidden"
               priority
             />
             <Image
-              src="/logos/Vetnova-dark-word.jpg"
+              src="/logos/vetnova-wordmark-dark.png"
               alt="VetNova"
               fill
               sizes="52px"
-              className="hidden rounded-lg object-contain mix-blend-lighten dark:block"
+              className="hidden object-contain dark:block"
               priority
             />
           </div>

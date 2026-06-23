@@ -120,21 +120,21 @@ export default function ClientLayoutShell({ children }: { children: ReactNode })
         {/* Sidebar */}
         <aside className="hidden h-screen w-[260px] shrink-0 border-r border-surface-200 bg-white dark:border-surface-800 dark:bg-surface-900 lg:flex lg:flex-col">
           <div className="flex h-[78px] items-center gap-3 border-b border-surface-200 px-5 dark:border-surface-800">
-            <Image
-              src={darkMode ? "/logos/vetnova-logo-dark.png" : "/logos/vetnova-logo-light.png"}
-              alt="VetNova Logo"
-              width={40}
-              height={40}
-              className="rounded-xl object-contain"
-            />
-
-            <div>
-              <h1 className="text-xl font-semibold leading-none text-surface-900 dark:text-white">
-                VetNova
-              </h1>
-
-              <p className="text-caption mt-1.5">Sistema Veterinario</p>
+            <div className="relative h-11 w-11 shrink-0">
+              <Image
+                src={
+                  darkMode
+                    ? "/logos/vetnova-wordmark-dark.png"
+                    : "/logos/vetnova-wordmark-light.png"
+                }
+                alt="VetNova"
+                fill
+                sizes="44px"
+                className="object-contain"
+              />
             </div>
+
+            <p className="text-caption">Sistema Veterinario</p>
           </div>
 
           <nav className="flex-1 px-4 py-4">
@@ -456,17 +456,18 @@ export default function ClientLayoutShell({ children }: { children: ReactNode })
             onClick={(e) => e.stopPropagation()}
           >
             <div className="flex h-[64px] items-center justify-between border-b border-surface-200 px-5 dark:border-surface-800">
-              <div className="flex items-center gap-3">
+              <div className="relative h-9 w-9 shrink-0">
                 <Image
-                  src={darkMode ? "/logos/vetnova-logo-dark.png" : "/logos/vetnova-logo-light.png"}
+                  src={
+                    darkMode
+                      ? "/logos/vetnova-wordmark-dark.png"
+                      : "/logos/vetnova-wordmark-light.png"
+                  }
                   alt="VetNova"
-                  width={32}
-                  height={32}
-                  className="rounded-xl object-contain"
+                  fill
+                  sizes="36px"
+                  className="object-contain"
                 />
-                <span className="text-lg font-semibold text-surface-900 dark:text-white">
-                  VetNova
-                </span>
               </div>
               <button
                 onClick={() => setMobileOpen(false)}

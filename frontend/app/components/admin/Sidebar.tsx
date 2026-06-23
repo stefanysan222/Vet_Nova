@@ -73,17 +73,18 @@ export default function Sidebar() {
       {/* Sidebar desktop */}
       <aside className="hidden lg:flex lg:h-screen lg:w-[260px] lg:flex-col lg:border-r lg:border-slate-200/70 lg:bg-white lg:px-4 lg:py-6 dark:lg:border-slate-800 dark:lg:bg-slate-950">
         {/* Logo */}
-        <div className="mb-6 flex items-center gap-3 px-1">
-          <Image
-            src={darkMode ? "/logos/vetnova-logo-dark.png" : "/logos/vetnova-logo-light.png"}
-            alt="VetNova"
-            width={36}
-            height={36}
-            className="rounded-xl object-contain"
-          />
-          <span className="text-lg font-semibold leading-none text-slate-900 dark:text-white">
-            VetNova
-          </span>
+        <div className="mb-6 flex items-center px-1">
+          <div className="relative h-11 w-11 shrink-0">
+            <Image
+              src={
+                darkMode ? "/logos/vetnova-wordmark-dark.png" : "/logos/vetnova-wordmark-light.png"
+              }
+              alt="VetNova"
+              fill
+              sizes="44px"
+              className="object-contain"
+            />
+          </div>
         </div>
 
         {/* Perfil del usuario */}
@@ -165,19 +166,18 @@ export default function Sidebar() {
             >
               {/* Cerrar mobile */}
               <div className="mb-2 flex items-center justify-between">
-                <div className="flex items-center gap-2">
+                <div className="relative h-9 w-9 shrink-0">
                   <Image
                     src={
-                      darkMode ? "/logos/vetnova-logo-dark.png" : "/logos/vetnova-logo-light.png"
+                      darkMode
+                        ? "/logos/vetnova-wordmark-dark.png"
+                        : "/logos/vetnova-wordmark-light.png"
                     }
                     alt="VetNova"
-                    width={32}
-                    height={32}
-                    className="rounded-xl object-contain"
+                    fill
+                    sizes="36px"
+                    className="object-contain"
                   />
-                  <span className="text-base font-semibold text-slate-900 dark:text-white">
-                    VetNova
-                  </span>
                 </div>
                 <button
                   type="button"
