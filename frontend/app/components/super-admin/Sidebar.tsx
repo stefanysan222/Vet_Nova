@@ -50,21 +50,12 @@ export default function SuperAdminSidebar() {
     router.push("/login");
   };
 
-  const initials = user?.name
-    ? user.name
-        .split(" ")
-        .map((p) => p[0])
-        .slice(0, 2)
-        .join("")
-        .toUpperCase()
-    : "SA";
-
   return (
     <>
       {/* Sidebar desktop */}
       <aside className="hidden lg:flex lg:h-screen lg:w-[260px] lg:flex-col lg:border-r lg:border-slate-200/70 lg:bg-white lg:px-4 lg:py-6 dark:lg:border-slate-800 dark:lg:bg-slate-950">
         {/* Logo */}
-        <div className="mb-6 flex items-center px-1">
+        <div className="mb-6 flex items-center gap-3 px-1">
           <div className="relative h-11 w-11 shrink-0">
             <Image
               src={
@@ -76,16 +67,9 @@ export default function SuperAdminSidebar() {
               className="object-contain"
             />
           </div>
-        </div>
-
-        {/* Perfil */}
-        <div className="mb-6 flex items-center gap-3 border-b border-slate-200/70 px-1 pb-5 dark:border-slate-800">
-          <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full border-[1.5px] border-brand-600 bg-brand-600/10 text-xs font-bold text-brand-600 dark:border-brand-300 dark:bg-brand-300/10 dark:text-brand-300">
-            {initials}
-          </div>
           <div className="min-w-0">
             <p className="truncate text-sm font-semibold text-slate-900 dark:text-white">
-              {user?.name ?? "Super Administrador"}
+              {user?.name ?? "Panel global"}
             </p>
             <p className="text-xs text-slate-500 dark:text-slate-400">Super Administrador</p>
           </div>
@@ -144,19 +128,29 @@ export default function SuperAdminSidebar() {
               className="absolute bottom-0 left-0 top-0 w-[260px] bg-white px-4 py-6 shadow-2xl dark:bg-slate-950"
               onClick={(e) => e.stopPropagation()}
             >
-              <div className="mb-2 flex items-center justify-between">
-                <div className="relative h-9 w-9 shrink-0">
-                  <Image
-                    src={
-                      darkMode
-                        ? "/logos/vetnova-wordmark-dark.png"
-                        : "/logos/vetnova-wordmark-light.png"
-                    }
-                    alt="VetNova"
-                    fill
-                    sizes="36px"
-                    className="object-contain"
-                  />
+              <div className="mb-5 flex items-center justify-between border-b border-slate-200 pb-5 dark:border-slate-800">
+                <div className="flex items-center gap-3">
+                  <div className="relative h-9 w-9 shrink-0">
+                    <Image
+                      src={
+                        darkMode
+                          ? "/logos/vetnova-wordmark-dark.png"
+                          : "/logos/vetnova-wordmark-light.png"
+                      }
+                      alt="VetNova"
+                      fill
+                      sizes="36px"
+                      className="object-contain"
+                    />
+                  </div>
+                  <div className="min-w-0">
+                    <p className="truncate text-sm font-semibold text-slate-900 dark:text-white">
+                      {user?.name ?? "Panel global"}
+                    </p>
+                    <p className="text-xs text-slate-500 dark:text-slate-400">
+                      Super Administrador
+                    </p>
+                  </div>
                 </div>
                 <button
                   type="button"
@@ -165,18 +159,6 @@ export default function SuperAdminSidebar() {
                 >
                   ×
                 </button>
-              </div>
-
-              <div className="mb-5 flex items-center gap-3 border-b border-slate-200 pb-5 dark:border-slate-800">
-                <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full border-[1.5px] border-brand-600 bg-brand-600/10 text-xs font-bold text-brand-600 dark:border-brand-300 dark:bg-brand-300/10 dark:text-brand-300">
-                  {initials}
-                </div>
-                <div className="min-w-0">
-                  <p className="truncate text-sm font-semibold text-slate-900 dark:text-white">
-                    {user?.name ?? "Super Administrador"}
-                  </p>
-                  <p className="text-xs text-slate-500 dark:text-slate-400">Super Administrador</p>
-                </div>
               </div>
 
               <NavLinks pathname={pathname} onItemClick={() => setMobileOpen(false)} />

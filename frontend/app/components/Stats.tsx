@@ -10,20 +10,9 @@ export default function Stats() {
         whileInView={{ opacity: 1, y: 0 }}
         viewport={{ once: true, margin: "-60px" }}
         transition={{ duration: 0.4 }}
-        className="relative flex min-h-[280px] flex-col items-start gap-8 overflow-hidden rounded-3xl border border-surface-200 bg-white p-12 dark:border-surface-800 dark:bg-surface-900 sm:flex-row sm:items-center sm:gap-12 sm:p-14"
+        className="relative flex min-h-[220px] flex-col items-start justify-center gap-8 overflow-hidden rounded-3xl border border-surface-200 bg-white p-12 dark:border-surface-800 dark:bg-surface-900 sm:p-14"
       >
-        <div
-          aria-hidden
-          className="relative hidden h-[140px] w-[220px] shrink-0 bg-contain bg-center bg-no-repeat dark:hidden sm:block"
-          style={{ backgroundImage: "url(/logos/vetnova-wordmark-light.png)" }}
-        />
-        <div
-          aria-hidden
-          className="relative hidden h-[140px] w-[220px] shrink-0 bg-contain bg-center bg-no-repeat dark:block sm:block"
-          style={{ backgroundImage: "url(/logos/vetnova-wordmark-dark.png)" }}
-        />
-
-        <div className="relative max-w-lg">
+        <div className="relative max-w-2xl">
           <p className="text-sm font-semibold uppercase tracking-[0.28em] text-brand-600 dark:text-brand-300">
             ¿Por qué VetNova?
           </p>

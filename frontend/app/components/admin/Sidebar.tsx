@@ -73,7 +73,7 @@ export default function Sidebar() {
       {/* Sidebar desktop */}
       <aside className="hidden lg:flex lg:h-screen lg:w-[260px] lg:flex-col lg:border-r lg:border-slate-200/70 lg:bg-white lg:px-4 lg:py-6 dark:lg:border-slate-800 dark:lg:bg-slate-950">
         {/* Logo */}
-        <div className="mb-6 flex items-center px-1">
+        <div className="mb-6 flex items-center gap-3 px-1">
           <div className="relative h-11 w-11 shrink-0">
             <Image
               src={
@@ -85,29 +85,11 @@ export default function Sidebar() {
               className="object-contain"
             />
           </div>
-        </div>
-
-        {/* Perfil del usuario */}
-        <div className="mb-6 rounded-xl border border-slate-200/80 bg-slate-50 px-3 py-3 dark:border-slate-700 dark:bg-slate-900">
-          <div className="flex items-center gap-3">
-            <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-brand-600 text-xs font-bold text-white">
-              {user?.name
-                ? user.name
-                    .split(" ")
-                    .map((p) => p[0])
-                    .slice(0, 2)
-                    .join("")
-                    .toUpperCase()
-                : "A"}
-            </div>
-            <div className="min-w-0">
-              <p className="truncate text-sm font-semibold text-slate-900 dark:text-white">
-                {user?.name ?? "Administrador"}
-              </p>
-              <p className="truncate text-xs text-slate-500 dark:text-slate-400">
-                {user?.clinicaNombre ?? "Administrador"}
-              </p>
-            </div>
+          <div className="min-w-0">
+            <p className="truncate text-sm font-semibold text-slate-900 dark:text-white">
+              {user?.clinicaNombre ?? "Panel administrativo"}
+            </p>
+            <p className="truncate text-xs text-slate-500 dark:text-slate-400">Administrador</p>
           </div>
         </div>
 
@@ -165,19 +147,29 @@ export default function Sidebar() {
               onClick={(e) => e.stopPropagation()}
             >
               {/* Cerrar mobile */}
-              <div className="mb-2 flex items-center justify-between">
-                <div className="relative h-9 w-9 shrink-0">
-                  <Image
-                    src={
-                      darkMode
-                        ? "/logos/vetnova-wordmark-dark.png"
-                        : "/logos/vetnova-wordmark-light.png"
-                    }
-                    alt="VetNova"
-                    fill
-                    sizes="36px"
-                    className="object-contain"
-                  />
+              <div className="mb-5 flex items-center justify-between">
+                <div className="flex items-center gap-3">
+                  <div className="relative h-9 w-9 shrink-0">
+                    <Image
+                      src={
+                        darkMode
+                          ? "/logos/vetnova-wordmark-dark.png"
+                          : "/logos/vetnova-wordmark-light.png"
+                      }
+                      alt="VetNova"
+                      fill
+                      sizes="36px"
+                      className="object-contain"
+                    />
+                  </div>
+                  <div className="min-w-0">
+                    <p className="truncate text-sm font-semibold text-slate-900 dark:text-white">
+                      {user?.clinicaNombre ?? "Panel administrativo"}
+                    </p>
+                    <p className="truncate text-xs text-slate-500 dark:text-slate-400">
+                      Administrador
+                    </p>
+                  </div>
                 </div>
                 <button
                   type="button"
@@ -186,30 +178,6 @@ export default function Sidebar() {
                 >
                   ×
                 </button>
-              </div>
-
-              {/* Perfil mobile */}
-              <div className="mb-5 rounded-xl border border-slate-200 bg-slate-50 px-3 py-3 dark:border-slate-700 dark:bg-slate-900">
-                <div className="flex items-center gap-3">
-                  <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-brand-600 text-xs font-bold text-white">
-                    {user?.name
-                      ? user.name
-                          .split(" ")
-                          .map((p) => p[0])
-                          .slice(0, 2)
-                          .join("")
-                          .toUpperCase()
-                      : "A"}
-                  </div>
-                  <div>
-                    <p className="text-sm font-semibold text-slate-900 dark:text-white">
-                      {user?.name ?? "Administrador"}
-                    </p>
-                    <p className="truncate text-xs text-slate-500">
-                      {user?.clinicaNombre ?? "Administrador"}
-                    </p>
-                  </div>
-                </div>
               </div>
 
               <NavLinks pathname={pathname} onItemClick={() => setMobileOpen(false)} />
