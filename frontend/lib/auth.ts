@@ -29,6 +29,12 @@ interface AuthResult {
   error?: string;
   requiresClinicSelection?: boolean;
   clinicas?: ClinicaOpcion[];
+  /**
+   * Presente cuando el correo ya tiene una cuenta independiente en otra
+   * clínica. No bloquea el login/registro — es solo informativo, ya que
+   * cada clínica mantiene su propio historial de mascotas sin compartirlo.
+   */
+  avisoOtraClinica?: ClinicaOpcion;
 }
 
 async function postAuth(path: string, data: unknown): Promise<AuthResult> {
@@ -49,7 +55,7 @@ async function postAuth(path: string, data: unknown): Promise<AuthResult> {
     if (json.requiresClinicSelection) {
       return { requiresClinicSelection: true, clinicas: json.clinicas };
     }
-    return { user: json.user };
+    return { user: json.user, avisoOtraClinica: json.avisoOtraClinica };
   } catch {
     return { error: "No se pudo conectar con el servidor." };
   }
@@ -61,7 +67,7 @@ export async function registerUser(data: {
   password: string;
   rol?: string;
   clinicaSlug?: string;
-}): Promise<{ user?: AuthUser; error?: string }> {
+}): Promise<{ user?: AuthUser; error?: string; avisoOtraClinica?: ClinicaOpcion }> {
   return postAuth("register", data);
 }
 

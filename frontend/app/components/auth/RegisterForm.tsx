@@ -13,6 +13,7 @@ import {
   type ClinicaActiva,
 } from "../../../lib/api/clinicas";
 import { useAuth } from "@/lib/auth-context";
+import { useToast } from "../ui/Toast";
 
 const initialState = { name: "", email: "", password: "", confirmPassword: "", acceptTerms: false };
 
@@ -33,6 +34,7 @@ export default function RegisterForm({ clinicaSlug }: { clinicaSlug?: string }) 
   const [userLocation, setUserLocation] = useState<{ lat: number; lng: number } | null>(null);
   const router = useRouter();
   const { refresh } = useAuth();
+  const { info } = useToast();
 
   useEffect(() => {
     if (!clinicaSlug) return;
@@ -146,6 +148,14 @@ export default function RegisterForm({ clinicaSlug }: { clinicaSlug?: string }) 
     return "/cliente";
   };
 
+  const notifyOtraClinica = (aviso?: { nombre: string; slug: string }) => {
+    if (!aviso) return;
+    info(
+      `Ya tienes una cuenta en ${aviso.nombre}`,
+      "Esta es una cuenta nueva e independiente. Tu historial de mascotas no se comparte entre clínicas.",
+    );
+  };
+
   const handleGoogleSuccess = async (data: { credential: string }) => {
     setLoading(true);
     setSubmitError(null);
@@ -156,6 +166,7 @@ export default function RegisterForm({ clinicaSlug }: { clinicaSlug?: string }) 
       return;
     }
     if (result.user) {
+      notifyOtraClinica(result.avisoOtraClinica);
       await refresh();
       router.push(getDashboardRoute(result.user.role));
     }
@@ -184,6 +195,7 @@ export default function RegisterForm({ clinicaSlug }: { clinicaSlug?: string }) 
     }
     setErrors({});
     if (result.user) {
+      notifyOtraClinica(result.avisoOtraClinica);
       await refresh();
       router.push(getDashboardRoute(result.user.role));
     }

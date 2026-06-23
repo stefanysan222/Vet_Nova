@@ -8,6 +8,7 @@ import { motion } from "framer-motion";
 import GoogleAuthButton from "./GoogleAuthButton";
 import { loginUser, loginOrRegisterGoogle, type ClinicaOpcion } from "../../../lib/auth";
 import { useAuth } from "@/lib/auth-context";
+import { useToast } from "../ui/Toast";
 
 const initialState = { email: "", password: "" };
 
@@ -27,6 +28,7 @@ export default function LoginForm() {
   const [pendingGoogleCredential, setPendingGoogleCredential] = useState<string | null>(null);
   const router = useRouter();
   const { refresh } = useAuth();
+  const { info } = useToast();
 
   const handleChange = (field: string, value: string | boolean) => {
     setFormData((c) => ({ ...c, [field]: value }));
@@ -49,6 +51,14 @@ export default function LoginForm() {
     return "/cliente";
   };
 
+  const notifyOtraClinica = (aviso?: { nombre: string; slug: string }) => {
+    if (!aviso) return;
+    info(
+      `Ya tienes una cuenta en ${aviso.nombre}`,
+      "Esta es una cuenta nueva e independiente. Tu historial de mascotas no se comparte entre clínicas.",
+    );
+  };
+
   const handleGoogleSuccess = async (data: { credential: string }) => {
     setLoading(true);
     setSubmitError(null);
@@ -64,6 +74,7 @@ export default function LoginForm() {
       return;
     }
     if (result.user) {
+      notifyOtraClinica(result.avisoOtraClinica);
       await refresh();
       router.push(getDashboardRoute(result.user.role));
     }
@@ -112,6 +123,7 @@ export default function LoginForm() {
     if (result.user) {
       setClinicOptions(null);
       setPendingGoogleCredential(null);
+      notifyOtraClinica(result.avisoOtraClinica);
       await refresh();
       router.push(getDashboardRoute(result.user.role));
     }
