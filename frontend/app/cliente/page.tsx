@@ -229,7 +229,7 @@ export default function ClientePage() {
   ];
 
   return (
-    <div className="bg-[#F7F6FA] dark:bg-transparent">
+    <div className="admin-page h-full overflow-y-auto bg-[#F7F6FA] dark:bg-transparent">
       <div className="flex flex-col gap-3">
         {/* FILA 1 — Hero + Próxima cita */}
         <div className="grid grid-cols-1 gap-3 lg:grid-cols-[1fr_240px]">
