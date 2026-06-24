@@ -607,7 +607,7 @@ function HistorialContent() {
       {/* MODAL AGREGAR EVOLUCIÓN */}
       {mostrarFormulario && paciente && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-surface-900/50 px-4 py-6 backdrop-blur-sm">
-          <section className="max-h-[95vh] w-full max-w-[760px] overflow-y-auto rounded-3xl border border-surface-200/60 bg-white shadow-modal dark:border-surface-700 dark:bg-surface-900">
+          <section className="modal-shell max-h-[95vh] overflow-y-auto rounded-3xl border border-surface-200/60 bg-white shadow-modal dark:border-surface-700 dark:bg-surface-900">
             <div className="flex items-start justify-between border-b border-surface-100 px-6 py-5 dark:border-surface-800">
               <div>
                 <p className="text-xs font-semibold uppercase tracking-[0.2em] text-brand-600 dark:text-brand-300">

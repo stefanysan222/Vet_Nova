@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { Eye, EyeOff } from "lucide-react";
+import { Check, Eye, EyeOff, X } from "lucide-react";
 import { useAuth } from "@/lib/auth-context";
 import { updateUsuario } from "../../../lib/api/usuarios";
 import { useToast } from "../../components/ui/Toast";
@@ -289,11 +289,16 @@ export default function ConfiguracionPage() {
 
           {newPassword && confirmPassword && (
             <p
-              className={`mt-3 text-xs font-medium ${newPassword === confirmPassword ? "text-success-600" : "text-danger-600"}`}
+              className={`mt-3 flex items-center gap-1.5 text-xs font-medium ${newPassword === confirmPassword ? "text-success-600" : "text-danger-600"}`}
             >
+              {newPassword === confirmPassword ? (
+                <Check className="h-3.5 w-3.5 shrink-0" />
+              ) : (
+                <X className="h-3.5 w-3.5 shrink-0" />
+              )}
               {newPassword === confirmPassword
-                ? "✓ Las contraseñas coinciden"
-                : "✗ Las contraseñas no coinciden"}
+                ? "Las contraseñas coinciden"
+                : "Las contraseñas no coinciden"}
             </p>
           )}
 

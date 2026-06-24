@@ -115,10 +115,10 @@ export default function ClientLayoutShell({ children }: { children: ReactNode })
   const nombreCompleto = `${perfil.nombre} ${perfil.apellido}`;
 
   return (
-    <main className="h-screen overflow-hidden bg-surface-50 text-surface-900 dark:bg-surface-950 dark:text-white">
-      <div className="flex h-screen overflow-hidden">
+    <main className="h-dvh overflow-hidden bg-surface-50 text-surface-900 dark:bg-surface-950 dark:text-white">
+      <div className="flex h-dvh overflow-hidden">
         {/* Sidebar */}
-        <aside className="hidden h-screen w-[260px] shrink-0 border-r border-surface-200 bg-white dark:border-surface-800 dark:bg-surface-900 lg:flex lg:flex-col">
+        <aside className="hidden h-dvh w-[260px] shrink-0 border-r border-surface-200 bg-white dark:border-surface-800 dark:bg-surface-900 lg:flex lg:flex-col">
           <div className="flex h-[78px] items-center gap-3 border-b border-surface-200 px-5 dark:border-surface-800">
             <div className="relative h-11 w-11 shrink-0">
               <Image
@@ -221,7 +221,7 @@ export default function ClientLayoutShell({ children }: { children: ReactNode })
 
                 {/* Ventana de notificaciones */}
                 {showNotifications && (
-                  <div className="absolute right-0 top-[48px] z-50 w-[380px] overflow-hidden rounded-2xl border border-surface-200 bg-white shadow-modal dark:border-surface-700 dark:bg-surface-900">
+                  <div className="absolute right-0 top-[48px] z-50 w-[calc(100vw-2rem)] overflow-hidden rounded-2xl border border-surface-200 bg-white shadow-modal dark:border-surface-700 dark:bg-surface-900 sm:w-[380px]">
                     <div className="flex items-center justify-between border-b border-surface-200 px-5 py-4 dark:border-surface-700">
                       <div>
                         <h3 className="text-base font-semibold text-surface-900 dark:text-white">
@@ -334,7 +334,7 @@ export default function ClientLayoutShell({ children }: { children: ReactNode })
                 </button>
 
                 {showUserMenu && (
-                  <div className="absolute right-0 top-[48px] z-50 w-[280px] overflow-hidden rounded-2xl border border-surface-200 bg-white shadow-modal dark:border-surface-700 dark:bg-surface-900">
+                  <div className="absolute right-0 top-[48px] z-50 w-[calc(100vw-2rem)] overflow-hidden rounded-2xl border border-surface-200 bg-white shadow-modal dark:border-surface-700 dark:bg-surface-900 sm:w-[280px]">
                     <div className="flex items-center gap-3 border-b border-surface-200 px-5 py-4 dark:border-surface-700">
                       <AvatarCliente />
 
@@ -430,7 +430,7 @@ export default function ClientLayoutShell({ children }: { children: ReactNode })
           </header>
 
           {/* Página activa */}
-          <div className="h-[calc(100vh-64px)] overflow-hidden">
+          <div className="h-[calc(100dvh-64px)] overflow-hidden">
             <AnimatePresence mode="wait" initial={false}>
               <motion.div
                 key={pathname}

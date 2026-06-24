@@ -536,9 +536,9 @@ function DetalleCitaModal({
         aria-modal="true"
         aria-labelledby="titulo-detalle-cita"
         onClick={(event) => event.stopPropagation()}
-        className="max-h-full w-full max-w-[680px] overflow-y-auto rounded-3xl border border-surface-200/60 bg-white shadow-modal dark:border-surface-700 dark:bg-surface-900"
+        className="modal-shell max-h-full overflow-y-auto rounded-3xl border border-surface-200/60 bg-white shadow-modal dark:border-surface-700 dark:bg-surface-900"
       >
-        <div className="flex items-start justify-between border-b border-slate-200 px-7 py-6 dark:border-slate-700">
+        <div className="flex items-start justify-between border-b border-slate-200 px-4 py-5 dark:border-slate-700 sm:px-7 sm:py-6">
           <div className="flex items-start gap-4">
             <div className="flex h-[52px] w-[52px] shrink-0 items-center justify-center rounded-xl bg-brand-50 text-brand-600 dark:bg-brand-900/30 dark:text-brand-300">
               <CalendarDays className="h-[25px] w-[25px]" />
@@ -563,7 +563,7 @@ function DetalleCitaModal({
           </button>
         </div>
 
-        <div className="px-7 py-6">
+        <div className="px-4 py-5 sm:px-7 sm:py-6">
           <div className="flex flex-col justify-between gap-4 rounded-xl bg-slate-50 p-5 dark:bg-slate-800/50 sm:flex-row sm:items-center">
             <div>
               <p className="text-label">Mascota</p>

@@ -71,7 +71,7 @@ export default function Sidebar() {
   return (
     <>
       {/* Sidebar desktop */}
-      <aside className="hidden lg:flex lg:h-screen lg:w-[260px] lg:flex-col lg:border-r lg:border-slate-200/70 lg:bg-white lg:px-4 lg:py-6 dark:lg:border-slate-800 dark:lg:bg-slate-950">
+      <aside className="hidden lg:flex lg:h-dvh lg:w-[260px] lg:flex-col lg:border-r lg:border-slate-200/70 lg:bg-white lg:px-4 lg:py-6 dark:lg:border-slate-800 dark:lg:bg-slate-950">
         {/* Logo */}
         <div className="mb-6 flex items-center gap-3 px-1">
           <div className="relative h-11 w-11 shrink-0">
@@ -121,7 +121,7 @@ export default function Sidebar() {
         <button
           type="button"
           onClick={() => setMobileOpen(true)}
-          className="fixed left-4 top-4 z-50 inline-flex items-center gap-2 rounded-xl bg-white px-3 py-2 text-sm font-semibold text-slate-900 shadow-card ring-1 ring-slate-200 dark:bg-slate-900 dark:text-white dark:ring-slate-700"
+          className="fixed left-4 top-[max(1rem,env(safe-area-inset-top))] z-50 inline-flex items-center gap-2 rounded-xl bg-white px-3 py-2 text-sm font-semibold text-slate-900 shadow-card ring-1 ring-slate-200 dark:bg-slate-900 dark:text-white dark:ring-slate-700"
         >
           <BarChart3 className="h-4 w-4 text-brand-600" />
           Menú

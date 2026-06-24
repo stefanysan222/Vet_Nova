@@ -15,6 +15,7 @@ import {
   CalendarPlus,
   UserPlus,
   ClipboardList,
+  Hand,
 } from "lucide-react";
 import RegisterUserModal from "../components/admin/RegisterUserModal";
 import MonthlyCalendar, { type CalendarEvent } from "../components/ui/MonthlyCalendar";
@@ -259,8 +260,8 @@ const AdminDashboardPage: React.FC = () => {
             <p className="text-[11px] font-semibold uppercase tracking-[0.25em] text-[#5A4880] dark:text-[#9D88CC]">
               Panel administrativo
             </p>
-            <h1 className="mt-2 text-2xl font-bold tracking-tight text-[#1A0F35] dark:text-[#E8DCFF] sm:text-3xl">
-              Hola, {userName} 👋
+            <h1 className="mt-2 flex items-center gap-2 text-2xl font-bold tracking-tight text-[#1A0F35] dark:text-[#E8DCFF] sm:text-3xl">
+              Hola, {userName} <Hand className="h-5 w-5 shrink-0 sm:h-6 sm:w-6" />
             </h1>
             <p className="mt-2 max-w-md text-sm leading-6 text-[#5A4880] dark:text-[#9D88CC]">
               Gestiona usuarios, citas y mascotas desde aquí.

@@ -195,6 +195,17 @@ body {
   .form-label {
     @apply mb-1.5 block text-xs font-medium text-surface-500 dark:text-surface-400;
   }
+
+  /* ─── Convención responsive ────────────────────────────────────
+     Mobile-first: base = 375px. Breakpoint de sidebar/shell = lg (1024px) en
+     toda la app. Padding de contenido = px-4 sm:px-6 lg:px-8. Grids de
+     tarjetas = grid-cols-1 sm:grid-cols-2 lg:grid-cols-3. Alturas de viewport
+     completo deben usar dvh, no vh. */
+
+  /* Ancho estándar de modal: evita anchos arbitrarios distintos por página */
+  .modal-shell {
+    @apply w-full max-w-[92vw] sm:max-w-[640px] lg:max-w-[780px];
+  }
 }
 
 /* ─── Identidad visual del panel Super-Admin: acento violeta ──────── */

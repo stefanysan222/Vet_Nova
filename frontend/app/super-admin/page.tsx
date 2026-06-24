@@ -11,6 +11,7 @@ import {
   CheckCircle2,
   ClipboardList,
   Copy,
+  Hand,
   History,
   Mail,
   MapPin,
@@ -500,8 +501,9 @@ export default function SuperAdminPage() {
               <p className="text-[11px] font-semibold uppercase tracking-[0.25em] text-[#5A4880] dark:text-[#9D88CC]">
                 Panel super administrativo
               </p>
-              <h1 className="mt-2 text-2xl font-bold tracking-tight text-[#1A0F35] dark:text-[#E8DCFF] sm:text-3xl">
-                Hola, {user?.name ?? "Super Administrador"} 👋
+              <h1 className="mt-2 flex items-center gap-2 text-2xl font-bold tracking-tight text-[#1A0F35] dark:text-[#E8DCFF] sm:text-3xl">
+                Hola, {user?.name ?? "Super Administrador"}{" "}
+                <Hand className="h-5 w-5 shrink-0 sm:h-6 sm:w-6" />
               </h1>
               <p className="mt-2 max-w-md text-sm leading-6 text-[#5A4880] dark:text-[#9D88CC]">
                 Gestiona las clínicas que usan VetNova, activa o desactiva sus accesos y registra

@@ -1,7 +1,7 @@
 "use client";
 
 import { type FormEvent, useState } from "react";
-import { Eye, EyeOff, Lock } from "lucide-react";
+import { Check, Eye, EyeOff, Lock, X } from "lucide-react";
 import { motion } from "framer-motion";
 import { useRouter, useSearchParams } from "next/navigation";
 import { resetPassword } from "../../../lib/auth";
@@ -233,11 +233,14 @@ export default function ResetPasswordForm() {
         )}
         {password && confirm && !errors.confirm && (
           <p
-            className={`text-xs font-medium ${password === confirm ? "text-success-600 dark:text-success-400" : "text-danger-600 dark:text-danger-400"}`}
+            className={`flex items-center gap-1.5 text-xs font-medium ${password === confirm ? "text-success-600 dark:text-success-400" : "text-danger-600 dark:text-danger-400"}`}
           >
-            {password === confirm
-              ? "✓ Las contraseñas coinciden"
-              : "✗ Las contraseñas no coinciden"}
+            {password === confirm ? (
+              <Check className="h-3.5 w-3.5 shrink-0" />
+            ) : (
+              <X className="h-3.5 w-3.5 shrink-0" />
+            )}
+            {password === confirm ? "Las contraseñas coinciden" : "Las contraseñas no coinciden"}
           </p>
         )}
       </motion.div>

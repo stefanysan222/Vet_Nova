@@ -177,7 +177,10 @@ export default function BuscadorCliente() {
   };
 
   return (
-    <div ref={contenedorRef} className="relative w-full max-w-[505px]">
+    <div
+      ref={contenedorRef}
+      className="relative w-full min-w-0 max-w-full sm:max-w-[420px] lg:max-w-[520px]"
+    >
       <div className="flex h-[42px] items-center gap-3 rounded-lg border border-surface-300 bg-white px-4 transition-all focus-within:border-brand-400 focus-within:ring-2 focus-within:ring-brand-100 dark:border-surface-700 dark:bg-surface-900 dark:focus-within:border-brand-500">
         <Search className="h-[18px] w-[18px] shrink-0 text-surface-500 dark:text-surface-400" />
 
