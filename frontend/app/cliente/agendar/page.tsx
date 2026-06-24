@@ -95,6 +95,7 @@ function AgendarContent() {
   const [citaSeleccionada, setCitaSeleccionada] = useState<Cita | null>(null);
   const [cargado, setCargado] = useState(false);
   const [bannerVisible, setBannerVisible] = useState(solicitudEnviada);
+  const [errorCancelar, setErrorCancelar] = useState<string | null>(null);
   const [vistaActiva, setVistaActiva] = useState<"lista" | "calendario">("lista");
   const [citaCalendario, setCitaCalendario] = useState<Appointment | null>(null);
   const { user } = useAuth();
@@ -153,19 +154,18 @@ function AgendarContent() {
   const totalPendientes = citas.filter((cita) => cita.estado === "Pendiente").length;
 
   const cancelarCita = async (id: string) => {
+    setErrorCancelar(null);
     try {
       await updateCitaEstado(id, "Cancelada");
       await cargarCitas();
-    } catch {
-      // update local state optimistically if API fails
-      setCitas((prev) =>
-        prev.map((c) => (c.id === id ? { ...c, estado: "Cancelada" as EstadoCita } : c)),
+      setCitaSeleccionada((actual) =>
+        actual?.id === id ? { ...actual, estado: "Cancelada" as EstadoCita } : actual,
+      );
+    } catch (err) {
+      setErrorCancelar(
+        err instanceof Error ? err.message : "No se pudo cancelar la cita. Intenta de nuevo.",
       );
     }
-
-    setCitaSeleccionada((actual) =>
-      actual?.id === id ? { ...actual, estado: "Cancelada" as EstadoCita } : actual,
-    );
   };
 
   const limpiarFiltros = () => {
@@ -221,6 +221,26 @@ function AgendarContent() {
             type="button"
             onClick={() => setBannerVisible(false)}
             className="shrink-0 text-lg font-semibold text-success-700 dark:text-success-300"
+            aria-label="Cerrar"
+          >
+            ×
+          </button>
+        </div>
+      )}
+
+      {/* Banner de error al cancelar */}
+      {errorCancelar && (
+        <div className="dark:bg-danger-950/30 mb-6 flex items-start justify-between gap-4 rounded-xl border border-danger-200 bg-danger-50 px-5 py-4 dark:border-danger-800">
+          <div className="flex items-start gap-3">
+            <AlertCircle className="mt-0.5 h-5 w-5 shrink-0 text-danger-600" />
+            <p className="text-sm font-semibold text-danger-700 dark:text-danger-300">
+              {errorCancelar}
+            </p>
+          </div>
+          <button
+            type="button"
+            onClick={() => setErrorCancelar(null)}
+            className="shrink-0 text-lg font-semibold text-danger-700 dark:text-danger-300"
             aria-label="Cerrar"
           >
             ×
