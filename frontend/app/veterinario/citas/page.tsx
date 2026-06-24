@@ -128,19 +128,36 @@ export default function VeterinarioCitasPage() {
   }, [user]);
 
   useEffect(() => {
-    Promise.all([
-      fetchCitas(),
-      fetchMascotas(),
-      fetchVeterinarios().catch(() => [] as UsuarioAPI[]),
-    ])
-      .then(([appts, pets, vetList]) => {
-        setCitas(appts.map(mapAppointmentToCita));
-        setAppointments(appts);
-        setMascotas(pets);
-        setVets(vetList);
-      })
-      .catch(() => setError("No se pudo cargar la agenda. Verifica la conexión con el servidor."))
-      .finally(() => setLoading(false));
+    const cargarAgenda = () => {
+      Promise.all([
+        fetchCitas(),
+        fetchMascotas(),
+        fetchVeterinarios().catch(() => [] as UsuarioAPI[]),
+      ])
+        .then(([appts, pets, vetList]) => {
+          setCitas(appts.map(mapAppointmentToCita));
+          setAppointments(appts);
+          setMascotas(pets);
+          setVets(vetList);
+        })
+        .catch(() => setError("No se pudo cargar la agenda. Verifica la conexión con el servidor."))
+        .finally(() => setLoading(false));
+    };
+
+    cargarAgenda();
+
+    // Refresca al volver a la pestaña, para reflejar cambios hechos desde
+    // otra sesión (ej. un cliente cancelando su cita) sin requerir reload manual.
+    const onFocus = () => cargarAgenda();
+    const onVisibilityChange = () => {
+      if (document.visibilityState === "visible") cargarAgenda();
+    };
+    window.addEventListener("focus", onFocus);
+    document.addEventListener("visibilitychange", onVisibilityChange);
+    return () => {
+      window.removeEventListener("focus", onFocus);
+      document.removeEventListener("visibilitychange", onVisibilityChange);
+    };
   }, []);
 
   // Lista mostrada en la vista "Lista" — aplica el filtro de fecha (?filter=today) sin alterar
