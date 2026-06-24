@@ -73,6 +73,9 @@ export default function ReportSection() {
 
     setEstado("enviando");
 
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 20_000);
+
     try {
       const res = await fetch("/api/email/contact", {
         method: "POST",
@@ -83,6 +86,7 @@ export default function ReportSection() {
           asunto: asuntoFinal,
           mensaje: mensajeFinal,
         }),
+        signal: controller.signal,
       });
 
       if (res.ok) {
@@ -93,6 +97,8 @@ export default function ReportSection() {
       }
     } catch {
       setEstado("error");
+    } finally {
+      clearTimeout(timeoutId);
     }
   };
 

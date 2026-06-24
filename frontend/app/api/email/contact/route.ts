@@ -2,6 +2,8 @@ import { NextResponse } from "next/server";
 import * as nodemailer from "nodemailer";
 import { rateLimit } from "@/lib/rate-limit";
 
+export const maxDuration = 30;
+
 function escapeHtml(value: string): string {
   return value
     .replace(/&/g, "&amp;")
@@ -39,6 +41,9 @@ export async function POST(req: Request) {
   const transporter = nodemailer.createTransport({
     service: "gmail",
     auth: { user, pass },
+    connectionTimeout: 10_000,
+    greetingTimeout: 10_000,
+    socketTimeout: 15_000,
   });
 
   const nombreSeguro = escapeHtml(nombre.trim());
@@ -47,30 +52,31 @@ export async function POST(req: Request) {
   const mensajeSeguro = escapeHtml(mensaje.trim()).replace(/\n/g, "<br/>");
 
   try {
-    await transporter.sendMail({
-      from: `"VetNova" <${user}>`,
-      to: user,
-      replyTo: email.trim(),
-      subject: `[Contacto] ${asunto.trim()}`,
-      html: `
-        <p><strong>Nombre:</strong> ${nombreSeguro}</p>
-        <p><strong>Correo:</strong> ${emailSeguro}</p>
-        <p><strong>Asunto:</strong> ${asuntoSeguro}</p>
-        <p><strong>Mensaje:</strong></p>
-        <p>${mensajeSeguro}</p>
-      `,
-    });
-
-    await transporter.sendMail({
-      from: `"VetNova" <${user}>`,
-      to: email.trim(),
-      subject: "Hemos recibido tu mensaje — VetNova",
-      html: `
-        <p>Hola <strong>${nombreSeguro}</strong>,</p>
-        <p>Gracias por escribirnos. Hemos recibido tu mensaje sobre "<strong>${asuntoSeguro}</strong>" y te responderemos dentro de las 24 horas hábiles siguientes.</p>
-        <p>El equipo de VetNova</p>
-      `,
-    });
+    await Promise.all([
+      transporter.sendMail({
+        from: `"VetNova" <${user}>`,
+        to: user,
+        replyTo: email.trim(),
+        subject: `[Contacto] ${asunto.trim()}`,
+        html: `
+          <p><strong>Nombre:</strong> ${nombreSeguro}</p>
+          <p><strong>Correo:</strong> ${emailSeguro}</p>
+          <p><strong>Asunto:</strong> ${asuntoSeguro}</p>
+          <p><strong>Mensaje:</strong></p>
+          <p>${mensajeSeguro}</p>
+        `,
+      }),
+      transporter.sendMail({
+        from: `"VetNova" <${user}>`,
+        to: email.trim(),
+        subject: "Hemos recibido tu mensaje — VetNova",
+        html: `
+          <p>Hola <strong>${nombreSeguro}</strong>,</p>
+          <p>Gracias por escribirnos. Hemos recibido tu mensaje sobre "<strong>${asuntoSeguro}</strong>" y te responderemos dentro de las 24 horas hábiles siguientes.</p>
+          <p>El equipo de VetNova</p>
+        `,
+      }),
+    ]);
   } catch (err) {
     console.error("Nodemailer error:", err);
     return NextResponse.json({ error: "Error al enviar el mensaje." }, { status: 502 });
