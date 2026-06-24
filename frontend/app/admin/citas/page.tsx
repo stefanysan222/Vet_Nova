@@ -1,10 +1,12 @@
 ﻿"use client";
 
 import { useEffect, useMemo, useState } from "react";
-import { fetchCitas, updateCitaEstado, updateCita } from "../../../lib/api/citas";
+import { fetchCitas, updateCitaEstado, updateCita, createCita } from "../../../lib/api/citas";
 import { fetchVeterinarios } from "../../../lib/api/usuarios";
 import type { UsuarioAPI } from "../../../lib/api/usuarios";
+import { fetchMascotas } from "../../../lib/api/mascotas";
 import type { Appointment } from "../../../lib/recepcionista/types";
+import type { PetRecord } from "../../../lib/recepcionista/types";
 import { getClinicSlots, isClinicOpen, getScheduleLabel } from "../../../lib/utils/clinic-schedule";
 import { SkeletonCardList } from "../../components/ui/Skeleton";
 import { useToast } from "../../components/ui/Toast";
@@ -15,7 +17,7 @@ import InteractiveCalendar, {
   type CalendarAppointmentEvent,
 } from "../../components/calendar/InteractiveCalendar";
 import { AnimatePresence, motion } from "framer-motion";
-import { CalendarDays, CheckCircle2, Clock, List, User, X } from "lucide-react";
+import { CalendarDays, CheckCircle2, Clock, List, PawPrint, User, X } from "lucide-react";
 import type { SlotInfo } from "react-big-calendar";
 
 type AppointmentStatus = Appointment["status"];
@@ -278,6 +280,342 @@ function RescheduleModal({
   );
 }
 
+function CreateAppointmentModal({
+  initialDate,
+  initialTime,
+  allAppointments,
+  onClose,
+  onCreate,
+  saving,
+}: {
+  initialDate: string;
+  initialTime: string;
+  allAppointments: Appointment[];
+  onClose: () => void;
+  onCreate: (data: {
+    date: string;
+    time: string;
+    petId: string;
+    petName: string;
+    ownerId: string;
+    ownerName: string;
+    petEspecie?: string;
+    petRaza?: string;
+    service: string;
+    veterinarian?: string;
+    veterinarianId?: number;
+    notes?: string;
+  }) => void;
+  saving: boolean;
+}) {
+  const [date, setDate] = useState(initialDate);
+  const [time, setTime] = useState(initialTime);
+  const [mascotaId, setMascotaId] = useState("");
+  const [servicio, setServicio] = useState("");
+  const [observaciones, setObservaciones] = useState("");
+  const [selectedVet, setSelectedVet] = useState("");
+  const [selectedVetId, setSelectedVetId] = useState<number | undefined>(undefined);
+  const [mascotas, setMascotas] = useState<PetRecord[]>([]);
+  const [loadingMascotas, setLoadingMascotas] = useState(true);
+  const [vets, setVets] = useState<UsuarioAPI[]>([]);
+  const [loadingVets, setLoadingVets] = useState(true);
+  const today = new Date().toISOString().slice(0, 10);
+
+  useEffect(() => {
+    fetchMascotas()
+      .then(setMascotas)
+      .catch(() => setMascotas([]))
+      .finally(() => setLoadingMascotas(false));
+    fetchVeterinarios()
+      .then(setVets)
+      .catch(() => setVets([]))
+      .finally(() => setLoadingVets(false));
+  }, []);
+
+  const slots = getClinicSlots(date);
+  const clinicaCerrada = !!date && !isClinicOpen(date);
+
+  const busyVetNames = new Set(
+    allAppointments
+      .filter((a) => a.date === date && a.time === time && a.status !== "Cancelada")
+      .map((a) => a.veterinarian)
+      .filter(Boolean),
+  );
+
+  const availableVets = vets.filter((v) => !busyVetNames.has(v.nombre ?? ""));
+  const busyVets = vets.filter((v) => busyVetNames.has(v.nombre ?? ""));
+
+  const mascotaSeleccionada = mascotas.find((m) => m.id === mascotaId) ?? null;
+
+  const puedeGuardar = !!date && !!time && !clinicaCerrada && !!mascotaSeleccionada && !!servicio;
+
+  return (
+    <motion.div
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      exit={{ opacity: 0 }}
+      className="fixed inset-0 z-[100] flex items-center justify-center bg-surface-900/50 px-4 backdrop-blur-sm"
+      onClick={onClose}
+    >
+      <motion.div
+        initial={{ scale: 0.96, opacity: 0, y: 10 }}
+        animate={{ scale: 1, opacity: 1, y: 0 }}
+        exit={{ scale: 0.96, opacity: 0, y: 10 }}
+        transition={{ type: "spring", bounce: 0.2, duration: 0.35 }}
+        className="flex max-h-[90vh] w-full max-w-md flex-col overflow-hidden rounded-3xl border border-surface-200/60 bg-white shadow-modal dark:border-surface-700 dark:bg-surface-900"
+        onClick={(e) => e.stopPropagation()}
+      >
+        <div className="overflow-y-auto p-6">
+          <div className="mb-6 flex items-start justify-between gap-3">
+            <div>
+              <p className="text-xs font-semibold uppercase tracking-widest text-brand-600 dark:text-brand-300">
+                Nueva cita
+              </p>
+              <h2 className="mt-1 text-xl font-semibold text-slate-900 dark:text-white">
+                Crear cita
+              </h2>
+              <p className="mt-0.5 text-sm text-slate-500 dark:text-slate-400">
+                Completa los datos para agendar la cita.
+              </p>
+            </div>
+            <button
+              onClick={onClose}
+              className="flex h-8 w-8 shrink-0 items-center justify-center rounded-xl text-slate-400 transition hover:bg-slate-100 hover:text-slate-600 dark:hover:bg-slate-800"
+            >
+              <X className="h-4 w-4" />
+            </button>
+          </div>
+
+          <div className="space-y-5">
+            {/* Mascota */}
+            <div>
+              <label className="mb-1.5 flex items-center gap-1.5 text-sm font-medium text-slate-700 dark:text-slate-300">
+                <PawPrint className="h-4 w-4 text-brand-600" />
+                Mascota
+              </label>
+              {loadingMascotas ? (
+                <p className="text-xs text-slate-400">Cargando mascotas...</p>
+              ) : (
+                <select
+                  value={mascotaId}
+                  onChange={(e) => setMascotaId(e.target.value)}
+                  className="w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-2.5 text-sm text-slate-900 outline-none transition focus:border-brand-500 focus:ring-2 focus:ring-brand-100 dark:border-slate-700 dark:bg-slate-800 dark:text-white"
+                >
+                  <option value="" disabled>
+                    Selecciona la mascota
+                  </option>
+                  {mascotas.map((m) => (
+                    <option key={m.id} value={m.id}>
+                      {m.nombre} ({m.especie}) — Propietario: {m.propietarioNombre}
+                    </option>
+                  ))}
+                </select>
+              )}
+            </div>
+
+            {/* Fecha */}
+            <div>
+              <label className="mb-1.5 flex items-center gap-1.5 text-sm font-medium text-slate-700 dark:text-slate-300">
+                <CalendarDays className="h-4 w-4 text-brand-600" />
+                Fecha
+              </label>
+              <input
+                type="date"
+                min={today}
+                value={date}
+                onChange={(e) => {
+                  setDate(e.target.value);
+                  setTime("");
+                  setSelectedVet("");
+                  setSelectedVetId(undefined);
+                }}
+                className="w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-2.5 text-sm text-slate-900 outline-none transition focus:border-brand-500 focus:ring-2 focus:ring-brand-100 dark:border-slate-700 dark:bg-slate-800 dark:text-white"
+              />
+              {date && (
+                <p
+                  className={`mt-1 text-xs font-medium ${isClinicOpen(date) ? "text-success-600 dark:text-success-400" : "text-danger-600 dark:text-danger-400"}`}
+                >
+                  {isClinicOpen(date)
+                    ? `Horario: ${getScheduleLabel(date)}`
+                    : "La clínica está cerrada este día"}
+                </p>
+              )}
+            </div>
+
+            {/* Hora */}
+            <div>
+              <label className="mb-1.5 flex items-center gap-1.5 text-sm font-medium text-slate-700 dark:text-slate-300">
+                <Clock className="h-4 w-4 text-brand-600" />
+                Hora
+              </label>
+              {clinicaCerrada ? (
+                <div className="dark:bg-danger-950/30 rounded-xl border border-danger-200 bg-danger-50 px-4 py-3 text-xs text-danger-700 dark:border-danger-900 dark:text-danger-400">
+                  No hay turnos disponibles. La clínica está cerrada ese día.
+                </div>
+              ) : !date ? (
+                <p className="text-xs text-slate-400">Selecciona una fecha primero.</p>
+              ) : (
+                <div className="grid grid-cols-4 gap-2">
+                  {slots.map((slot) => (
+                    <button
+                      key={slot}
+                      type="button"
+                      onClick={() => {
+                        setTime(slot);
+                        setSelectedVet("");
+                        setSelectedVetId(undefined);
+                      }}
+                      className={`rounded-xl py-2 text-xs font-medium transition ${
+                        time === slot
+                          ? "bg-brand-600 text-white shadow-sm"
+                          : "border border-slate-200 bg-white text-slate-600 hover:border-brand-300 hover:bg-brand-50 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-300"
+                      }`}
+                    >
+                      {slot}
+                    </button>
+                  ))}
+                </div>
+              )}
+            </div>
+
+            {/* Servicio */}
+            <div>
+              <label className="mb-1.5 flex items-center gap-1.5 text-sm font-medium text-slate-700 dark:text-slate-300">
+                Servicio
+              </label>
+              <select
+                value={servicio}
+                onChange={(e) => setServicio(e.target.value)}
+                className="w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-2.5 text-sm text-slate-900 outline-none transition focus:border-brand-500 focus:ring-2 focus:ring-brand-100 dark:border-slate-700 dark:bg-slate-800 dark:text-white"
+              >
+                <option value="" disabled>
+                  Selecciona el servicio
+                </option>
+                <option value="Consulta General">Consulta General</option>
+                <option value="Vacunación">Vacunación</option>
+                <option value="Control Post-Op">Control Post-Op</option>
+                <option value="Desparasitación">Desparasitación</option>
+                <option value="Urgencia">Urgencia</option>
+                <option value="Cirugía Menor">Cirugía Menor</option>
+              </select>
+            </div>
+
+            {/* Veterinario */}
+            <div>
+              <label className="mb-1.5 flex items-center gap-1.5 text-sm font-medium text-slate-700 dark:text-slate-300">
+                <User className="h-4 w-4 text-brand-600" />
+                Veterinario
+                {date && time && (
+                  <span className="ml-auto text-xs font-normal text-slate-400">
+                    {availableVets.length} disponible{availableVets.length !== 1 ? "s" : ""}
+                  </span>
+                )}
+              </label>
+
+              {loadingVets ? (
+                <p className="text-xs text-slate-400">Cargando veterinarios...</p>
+              ) : !date || !time ? (
+                <p className="text-xs text-slate-400">Selecciona fecha y hora primero.</p>
+              ) : vets.length === 0 ? (
+                <p className="text-xs text-slate-400">No hay veterinarios registrados.</p>
+              ) : (
+                <div className="space-y-2">
+                  {availableVets.map((v) => (
+                    <button
+                      key={v.id}
+                      type="button"
+                      onClick={() => {
+                        setSelectedVet(v.nombre ?? "");
+                        setSelectedVetId(v.id);
+                      }}
+                      className={`flex w-full items-center gap-3 rounded-xl border px-4 py-2.5 text-left text-sm transition ${
+                        selectedVet === v.nombre
+                          ? "border-brand-400 bg-brand-50 text-brand-800 dark:border-brand-600 dark:bg-brand-950/40 dark:text-brand-200"
+                          : "border-slate-200 bg-white text-slate-700 hover:border-brand-200 hover:bg-slate-50 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-300"
+                      }`}
+                    >
+                      <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg bg-success-100 text-xs font-bold text-success-700 dark:bg-success-900/40 dark:text-success-300">
+                        {(v.nombre ?? "?")[0].toUpperCase()}
+                      </span>
+                      <span className="flex-1 font-medium">{v.nombre}</span>
+                      <span className="text-xs text-success-600 dark:text-success-400">
+                        Disponible
+                      </span>
+                    </button>
+                  ))}
+
+                  {busyVets.map((v) => (
+                    <div
+                      key={v.id}
+                      className="flex w-full items-center gap-3 rounded-xl border border-slate-100 bg-slate-50 px-4 py-2.5 text-sm opacity-50 dark:border-slate-800 dark:bg-slate-800/50"
+                    >
+                      <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg bg-slate-200 text-xs font-bold text-slate-500 dark:bg-slate-700">
+                        {(v.nombre ?? "?")[0].toUpperCase()}
+                      </span>
+                      <span className="flex-1 font-medium text-slate-500 dark:text-slate-400">
+                        {v.nombre}
+                      </span>
+                      <span className="text-xs text-danger-500">Ocupado</span>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+
+            {/* Notas */}
+            <div>
+              <label className="mb-1.5 flex items-center gap-1.5 text-sm font-medium text-slate-700 dark:text-slate-300">
+                Notas
+              </label>
+              <textarea
+                value={observaciones}
+                onChange={(e) => setObservaciones(e.target.value)}
+                rows={3}
+                placeholder="Información adicional sobre la cita..."
+                className="w-full resize-none rounded-xl border border-slate-200 bg-slate-50 px-4 py-2.5 text-sm text-slate-900 outline-none transition focus:border-brand-500 focus:ring-2 focus:ring-brand-100 dark:border-slate-700 dark:bg-slate-800 dark:text-white"
+              />
+            </div>
+          </div>
+        </div>
+
+        <div className="border-t border-slate-100 p-4 dark:border-slate-800">
+          <div className="flex gap-3">
+            <button
+              onClick={onClose}
+              className="flex-1 rounded-2xl border border-slate-200 bg-white py-2.5 text-sm font-semibold text-slate-700 transition hover:bg-slate-50 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-300"
+            >
+              Cancelar
+            </button>
+            <button
+              onClick={() =>
+                mascotaSeleccionada &&
+                onCreate({
+                  date,
+                  time,
+                  petId: mascotaSeleccionada.id,
+                  petName: mascotaSeleccionada.nombre,
+                  ownerId: mascotaSeleccionada.propietarioId,
+                  ownerName: mascotaSeleccionada.propietarioNombre,
+                  petEspecie: mascotaSeleccionada.especie,
+                  petRaza: mascotaSeleccionada.raza,
+                  service: servicio,
+                  veterinarian: selectedVet || undefined,
+                  veterinarianId: selectedVetId,
+                  notes: observaciones || undefined,
+                })
+              }
+              disabled={saving || !puedeGuardar}
+              className="flex-1 rounded-2xl bg-brand-600 py-2.5 text-sm font-semibold text-white transition hover:bg-brand-700 disabled:opacity-50"
+            >
+              {saving ? "Guardando..." : "Crear cita"}
+            </button>
+          </div>
+        </div>
+      </motion.div>
+    </motion.div>
+  );
+}
+
 export default function CitasPage() {
   const [appointments, setAppointments] = useState<Appointment[]>([]);
   const [loading, setLoading] = useState(true);
@@ -287,6 +625,8 @@ export default function CitasPage() {
   const [rescheduleTarget, setRescheduleTarget] = useState<Appointment | null>(null);
   const [editTarget, setEditTarget] = useState<Appointment | null>(null);
   const [savingReschedule, setSavingReschedule] = useState(false);
+  const [createSlot, setCreateSlot] = useState<{ date: string; time: string } | null>(null);
+  const [savingCreate, setSavingCreate] = useState(false);
   const [vistaActiva, setVistaActiva] = useState<"lista" | "calendario">("lista");
   const [citaDetalleCalendario, setCitaDetalleCalendario] = useState<Appointment | null>(null);
   const { success, error } = useToast();
@@ -400,15 +740,53 @@ export default function CitasPage() {
       });
   }, [citasFiltradas]);
 
-  // TODO(MP-01): el flujo de creación de cita en este rol vive en RescheduleModal /
-  // EditTarget, que requiere una cita existente. No hay un modal de "alta" reutilizable
-  // en admin/citas — crear uno de cero estaría fuera de alcance de esta tarea. Se deja
-  // el callback preparado para cuando exista un flujo de creación reutilizable.
-  const handleSelectSlot = (_slotInfo: SlotInfo) => {
-    error(
-      "Crear cita desde el calendario",
-      "Esta función aún no está disponible. Usa 'Agendar cita' desde el panel de veterinario o el flujo de creación existente.",
-    );
+  // LP-06: abre el modal de creación de cita precargando la fecha/hora del slot seleccionado
+  // en el calendario interactivo.
+  const handleSelectSlot = (slotInfo: SlotInfo) => {
+    const date = slotInfo.start.toISOString().slice(0, 10);
+    const time = slotInfo.start.toTimeString().slice(0, 5);
+    setCreateSlot({ date, time });
+  };
+
+  const handleCreateAppointment = async (data: {
+    date: string;
+    time: string;
+    petId: string;
+    petName: string;
+    ownerId: string;
+    ownerName: string;
+    petEspecie?: string;
+    petRaza?: string;
+    service: string;
+    veterinarian?: string;
+    veterinarianId?: number;
+    notes?: string;
+  }) => {
+    setSavingCreate(true);
+    try {
+      const nueva = await createCita({
+        date: data.date,
+        time: data.time,
+        petId: data.petId,
+        ownerId: data.ownerId,
+        petName: data.petName,
+        ownerName: data.ownerName,
+        petEspecie: data.petEspecie,
+        petRaza: data.petRaza,
+        service: data.service,
+        status: "Pendiente",
+        veterinarian: data.veterinarian,
+        veterinarianId: data.veterinarianId,
+        notes: data.notes,
+      });
+      setAppointments((prev) => [nueva, ...prev]);
+      setCreateSlot(null);
+      success("Cita creada", `La cita de ${nueva.petName} fue creada correctamente.`);
+    } catch (err) {
+      error("Error al crear", err instanceof Error ? err.message : "No se pudo crear la cita.");
+    } finally {
+      setSavingCreate(false);
+    }
   };
 
   return (
@@ -622,6 +1000,16 @@ export default function CitasPage() {
             onSave={handleReschedule}
             saving={savingReschedule}
             mode="editar"
+          />
+        )}
+        {createSlot && (
+          <CreateAppointmentModal
+            initialDate={createSlot.date}
+            initialTime={createSlot.time}
+            allAppointments={appointments}
+            onClose={() => setCreateSlot(null)}
+            onCreate={handleCreateAppointment}
+            saving={savingCreate}
           />
         )}
       </AnimatePresence>

@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { useSearchParams } from "next/navigation";
 import { ChangeEvent, FormEvent, ReactNode, useEffect, useMemo, useState } from "react";
 import { Plus, X, AlertCircle, CheckCircle2, CalendarDays, List } from "lucide-react";
 import { fetchCitas, createCita } from "../../../lib/api/citas";
@@ -78,6 +79,14 @@ function mapAppointmentToCita(a: Appointment): Cita {
   };
 }
 
+function fechaHoyLocal(): string {
+  const d = new Date();
+  const yyyy = d.getFullYear();
+  const mm = String(d.getMonth() + 1).padStart(2, "0");
+  const dd = String(d.getDate()).padStart(2, "0");
+  return `${yyyy}-${mm}-${dd}`;
+}
+
 function formularioVacio(vetName = ""): FormularioCita {
   return {
     fecha: "",
@@ -90,6 +99,11 @@ function formularioVacio(vetName = ""): FormularioCita {
 }
 
 export default function VeterinarioCitasPage() {
+  const searchParams = useSearchParams();
+  const filtroFecha = searchParams.get("filter");
+  const soloHoy = filtroFecha === "today";
+  const hoyLocal = useMemo(() => fechaHoyLocal(), []);
+
   const [citas, setCitas] = useState<Cita[]>([]);
   const [appointments, setAppointments] = useState<Appointment[]>([]);
   const [mascotas, setMascotas] = useState<PetRecord[]>([]);
@@ -129,9 +143,17 @@ export default function VeterinarioCitasPage() {
       .finally(() => setLoading(false));
   }, []);
 
+  // Lista mostrada en la vista "Lista" — aplica el filtro de fecha (?filter=today) sin alterar
+  // `citas`, que sigue usándose para calcular disponibilidad de horarios/veterinarios en el form.
+  const citasMostradas = useMemo(
+    () => (soloHoy ? citas.filter((c) => c.fecha === hoyLocal) : citas),
+    [citas, soloHoy, hoyLocal],
+  );
+
   const calendarEvents = useMemo<CalendarAppointmentEvent[]>(() => {
     return appointments
       .filter((a) => a.date)
+      .filter((a) => !soloHoy || a.date === hoyLocal)
       .map((a) => {
         const [hh, mm] = (a.time || "00:00").split(":").map((n) => parseInt(n, 10) || 0);
         const start = new Date(`${a.date}T00:00:00`);
@@ -145,7 +167,7 @@ export default function VeterinarioCitasPage() {
           resource: a,
         };
       });
-  }, [appointments]);
+  }, [appointments, soloHoy, hoyLocal]);
 
   // TODO(MP-01): "Agendar cita" abre el formulario completo definido abajo (mascota, servicio,
   // veterinario, etc.). Reutilizamos ese mismo modal preseleccionando fecha/hora del slot
@@ -363,13 +385,23 @@ export default function VeterinarioCitasPage() {
             <h2 className="text-section-title">Citas registradas</h2>
 
             <p className="text-subtitle mt-1">
-              Consulta el estado actual y revisa los detalles de cada cita.
+              {soloHoy
+                ? "Mostrando únicamente las citas programadas para hoy."
+                : "Consulta el estado actual y revisa los detalles de cada cita."}
             </p>
           </div>
 
           <div className="flex items-center gap-3">
+            {soloHoy && (
+              <Link
+                href="/veterinario/citas"
+                className="w-fit rounded-lg border border-surface-200 px-3 py-2 text-xs font-semibold text-surface-600 transition hover:bg-surface-50 dark:border-surface-700 dark:text-surface-300 dark:hover:bg-surface-800"
+              >
+                Ver todas
+              </Link>
+            )}
             <span className="w-fit rounded-lg bg-brand-100 px-4 py-2 text-sm font-semibold text-brand-600 dark:bg-brand-900/40 dark:text-brand-300">
-              {citas.length} citas
+              {citasMostradas.length} citas
             </span>
 
             <div className="flex gap-1 rounded-xl border border-surface-200 bg-white p-1 dark:border-surface-700 dark:bg-surface-900">
@@ -408,13 +440,13 @@ export default function VeterinarioCitasPage() {
             onSelectSlot={handleSelectSlot}
             selectable
           />
-        ) : citas.length === 0 ? (
+        ) : citasMostradas.length === 0 ? (
           <p className="py-10 text-center text-sm text-surface-500 dark:text-surface-400">
-            No hay citas registradas.
+            {soloHoy ? "No hay citas programadas para hoy." : "No hay citas registradas."}
           </p>
         ) : (
           <div className="space-y-3">
-            {citas.map((cita) => (
+            {citasMostradas.map((cita) => (
               <article
                 key={cita.id}
                 className="group rounded-2xl border border-surface-200 bg-surface-50 p-5 transition-all duration-300 hover:-translate-y-0.5 hover:border-brand-200 hover:shadow-card-hover dark:border-surface-700 dark:bg-surface-950"

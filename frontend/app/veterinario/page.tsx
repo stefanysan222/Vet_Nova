@@ -199,7 +199,7 @@ export default function VeterinarioPage() {
       icon: CalendarDays,
       color: "#1D4ED8",
       bg: "#EFF6FF",
-      href: "/veterinario/citas",
+      href: "/veterinario/citas?filter=today",
     },
     {
       label: "Atendidas",

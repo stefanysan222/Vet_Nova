@@ -8,7 +8,7 @@ import {
   type TimelineEventAPI,
 } from "../../../lib/api/historias-clinicas";
 import { SkeletonCardList } from "../../components/ui/Skeleton";
-import StatusBadge from "../../components/ui/StatusBadge";
+import { StatusBadge } from "../../../lib/utils/status-badge";
 
 interface ClinicalHistorySectionProps {
   petId: number;

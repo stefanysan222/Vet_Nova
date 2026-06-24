@@ -3,7 +3,7 @@
 import { useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { CalendarDays, Clock, PawPrint, Stethoscope, X } from "lucide-react";
-import StatusBadge from "../ui/StatusBadge";
+import { StatusBadge } from "../../../lib/utils/status-badge";
 import type { Appointment } from "../../../lib/recepcionista/types";
 
 interface AppointmentDetailModalProps {

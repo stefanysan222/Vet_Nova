@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
+import Link from "next/link";
 import { AnimatePresence, motion } from "framer-motion";
 import {
   Activity,
@@ -8,8 +9,6 @@ import {
   Building2,
   CalendarDays,
   CheckCircle2,
-  ChevronLeft,
-  ChevronRight,
   ClipboardList,
   Copy,
   History,
@@ -34,10 +33,11 @@ import {
 } from "../../lib/api/clinicas";
 import AddressAutocomplete from "../components/maps/AddressAutocomplete";
 import MapPreview from "../components/maps/MapPreview";
-import { SkeletonCardList } from "../components/ui/Skeleton";
 import { useToast } from "../components/ui/Toast";
 import ConfirmDialog from "../components/ui/ConfirmDialog";
-import StatusBadge from "../components/ui/StatusBadge";
+import Pagination from "../components/ui/Pagination";
+import ClinicasTable from "../components/super-admin/ClinicasTable";
+import { StatusBadge } from "../../lib/utils/status-badge";
 import MonthlyCalendar, { type CalendarEvent } from "../components/ui/MonthlyCalendar";
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from "recharts";
 import { useIsDarkMode } from "@/lib/hooks/useDarkMode";
@@ -320,6 +320,24 @@ export default function SuperAdminPage() {
     loadHistory(c.id, 1);
   };
 
+  // Permite enlazar directamente a una clínica desde otra ruta (ej. el
+  // listado dedicado en /super-admin/clinicas) usando
+  // #clinica-row-{id} en la URL: al cargar las clínicas, si el hash
+  // coincide con una fila, abrimos su drawer de detalle automáticamente.
+  useEffect(() => {
+    if (loading || clinicas.length === 0) return;
+    const hash = window.location.hash;
+    const match = hash.match(/^#clinica-row-(\d+)$/);
+    if (!match) return;
+    const id = Number(match[1]);
+    const clinica = clinicas.find((c) => c.id === id);
+    if (clinica) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
+      openDetail(clinica);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [loading, clinicas]);
+
   const closeDetail = () => {
     setDetailTarget(null);
     setHistoryPage({ data: [], page: 1, lastPage: 1 });
@@ -497,13 +515,13 @@ export default function SuperAdminPage() {
                   <Plus className="h-3.5 w-3.5" />
                   Nueva clínica
                 </button>
-                <a
-                  href="#tabla-clinicas"
+                <Link
+                  href="/super-admin/clinicas"
                   className="inline-flex items-center gap-2 rounded-[9px] border-[0.5px] border-[#7C3AED]/30 bg-white/60 px-4 py-2 text-[12px] font-semibold text-[#7C3AED] transition hover:bg-white"
                 >
                   <ClipboardList className="h-3.5 w-3.5" />
                   Ver listado
-                </a>
+                </Link>
               </div>
             </motion.div>
 
@@ -557,8 +575,8 @@ export default function SuperAdminPage() {
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ duration: 0.4, delay: i * 0.06 }}
                 >
-                  <a
-                    href="#tabla-clinicas"
+                  <Link
+                    href="/super-admin/clinicas"
                     className={`block ${cardClass} cursor-pointer transition hover:-translate-y-0.5 hover:shadow-card-hover focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#7C3AED]`}
                   >
                     <div
@@ -573,7 +591,7 @@ export default function SuperAdminPage() {
                     <p className="mt-1.5 text-[11px] text-[#555068] dark:text-slate-400">
                       {m.label}
                     </p>
-                  </a>
+                  </Link>
                 </motion.div>
               );
             })}
@@ -742,20 +760,20 @@ export default function SuperAdminPage() {
                   <Plus className="h-3.5 w-3.5 text-[#7C3AED]" />
                   Nueva clínica
                 </button>
-                <a
-                  href="#tabla-clinicas"
+                <Link
+                  href="/super-admin/clinicas"
                   className="flex w-full items-center gap-2 rounded-[9px] border-[0.5px] border-[#E4DFF0] bg-[#F7F6FA] px-3 py-2 text-[11px] font-semibold text-slate-700 transition hover:border-[#7C3AED]/30 hover:bg-[#EDE8FA] dark:border-slate-700/60 dark:bg-slate-800/60 dark:text-slate-300 dark:hover:border-[#7C3AED]/40 dark:hover:bg-[#7C3AED]/10"
                 >
                   <ClipboardList className="h-3.5 w-3.5 text-[#7C3AED]" />
-                  Ver reportes
-                </a>
-                <a
-                  href="#tabla-clinicas"
+                  Ver clínicas
+                </Link>
+                <Link
+                  href="/super-admin/usuarios"
                   className="flex w-full items-center gap-2 rounded-[9px] border-[0.5px] border-[#E4DFF0] bg-[#F7F6FA] px-3 py-2 text-[11px] font-semibold text-slate-700 transition hover:border-[#7C3AED]/30 hover:bg-[#EDE8FA] dark:border-slate-700/60 dark:bg-slate-800/60 dark:text-slate-300 dark:hover:border-[#7C3AED]/40 dark:hover:bg-[#7C3AED]/10"
                 >
                   <Users2 className="h-3.5 w-3.5 text-[#7C3AED]" />
                   Gestionar usuarios
-                </a>
+                </Link>
               </div>
             </div>
           </div>
@@ -772,137 +790,14 @@ export default function SuperAdminPage() {
             </p>
           </div>
           <div className="mt-4">
-            {loading ? (
-              <SkeletonCardList count={4} />
-            ) : clinicas.length === 0 ? (
-              <div className="flex flex-col items-center gap-3 rounded-2xl border border-slate-200/70 bg-slate-50 py-14 text-center dark:border-slate-700 dark:bg-slate-800/40">
-                <Building2 className="h-10 w-10 text-slate-300 dark:text-slate-600" />
-                <p className="text-sm text-slate-500 dark:text-slate-400">
-                  Todavía no hay clínicas registradas.
-                </p>
-              </div>
-            ) : (
-              <div className="overflow-x-auto rounded-2xl border border-slate-200/70 dark:border-slate-700">
-                <table className="w-full min-w-[720px] border-collapse text-left text-sm">
-                  <thead>
-                    <tr className="border-b border-slate-200/70 bg-slate-50 dark:border-slate-700 dark:bg-slate-800/50">
-                      <th className="px-4 py-3 text-xs font-semibold uppercase tracking-wide text-slate-500 dark:text-slate-400">
-                        Clínica
-                      </th>
-                      <th className="px-4 py-3 text-xs font-semibold uppercase tracking-wide text-slate-500 dark:text-slate-400">
-                        Contacto
-                      </th>
-                      <th className="px-4 py-3 text-xs font-semibold uppercase tracking-wide text-slate-500 dark:text-slate-400">
-                        Registrada
-                      </th>
-                      <th className="px-4 py-3 text-xs font-semibold uppercase tracking-wide text-slate-500 dark:text-slate-400">
-                        Estado
-                      </th>
-                      <th className="px-4 py-3 text-right text-xs font-semibold uppercase tracking-wide text-slate-500 dark:text-slate-400">
-                        Acciones
-                      </th>
-                    </tr>
-                  </thead>
-                  <tbody className="divide-y divide-slate-100 dark:divide-slate-800">
-                    {clinicas.map((c) => (
-                      <tr
-                        key={c.id}
-                        id={`clinica-row-${c.id}`}
-                        onClick={() => openDetail(c)}
-                        className="cursor-pointer bg-white transition hover:bg-slate-50 dark:bg-transparent dark:hover:bg-slate-800/40"
-                      >
-                        <td className="px-4 py-3">
-                          <div className="flex items-center gap-3">
-                            <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-violet-100 text-violet-700 dark:bg-violet-900/40 dark:text-violet-300">
-                              <Building2 className="h-5 w-5" />
-                            </div>
-                            <div className="min-w-0">
-                              <p className="font-semibold text-slate-900 dark:text-white">
-                                {c.nombre}
-                              </p>
-                              <div className="flex items-center gap-1.5">
-                                <p className="truncate text-xs text-slate-400">
-                                  /register?clinica={c.slug}
-                                </p>
-                                <button
-                                  type="button"
-                                  onClick={(e) => {
-                                    e.stopPropagation();
-                                    handleCopyLink(c.slug, c.nombre);
-                                  }}
-                                  className="shrink-0 rounded-md p-1 text-slate-400 transition hover:bg-slate-100 hover:text-brand-600 dark:hover:bg-slate-800 dark:hover:text-brand-400"
-                                  aria-label="Copiar enlace de registro"
-                                  title="Copiar enlace de registro"
-                                >
-                                  <Copy className="h-3.5 w-3.5" />
-                                </button>
-                              </div>
-                            </div>
-                          </div>
-                        </td>
-                        <td className="px-4 py-3">
-                          <div className="flex flex-col gap-1 text-xs text-slate-500 dark:text-slate-400">
-                            {c.direccion && (
-                              <span className="flex items-center gap-1">
-                                <MapPin className="h-3 w-3 shrink-0" /> {c.direccion}
-                              </span>
-                            )}
-                            {c.telefono && (
-                              <span className="flex items-center gap-1">
-                                <Phone className="h-3 w-3 shrink-0" /> {c.telefono}
-                              </span>
-                            )}
-                            {c.email && (
-                              <span className="flex items-center gap-1">
-                                <Mail className="h-3 w-3 shrink-0" /> {c.email}
-                              </span>
-                            )}
-                            {!c.direccion && !c.telefono && !c.email && <span>—</span>}
-                          </div>
-                        </td>
-                        <td className="px-4 py-3 text-sm text-slate-500 dark:text-slate-400">
-                          {c.createdAt
-                            ? new Date(c.createdAt).toLocaleDateString("es-ES", {
-                                day: "2-digit",
-                                month: "short",
-                                year: "numeric",
-                              })
-                            : "—"}
-                        </td>
-                        <td className="px-4 py-3">
-                          <StatusBadge status={c.estado === "activa" ? "Activa" : "Inactiva"} />
-                        </td>
-                        <td className="px-4 py-3 text-right" onClick={(e) => e.stopPropagation()}>
-                          <div className="flex items-center justify-end gap-2">
-                            <button
-                              onClick={() => openCoordsModal(c)}
-                              className="btn-secondary px-3.5 py-2 text-xs"
-                              title={
-                                c.latitud != null && c.longitud != null
-                                  ? "Editar coordenadas"
-                                  : "Agregar coordenadas"
-                              }
-                            >
-                              <MapPin className="h-3.5 w-3.5" />
-                            </button>
-                            <button
-                              onClick={() => setToggleTarget(c)}
-                              className={
-                                c.estado === "activa"
-                                  ? "btn-danger px-3.5 py-2 text-xs"
-                                  : "btn-secondary px-3.5 py-2 text-xs"
-                              }
-                            >
-                              {c.estado === "activa" ? "Desactivar" : "Activar"}
-                            </button>
-                          </div>
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
-            )}
+            <ClinicasTable
+              clinicas={clinicas}
+              loading={loading}
+              onRowClick={openDetail}
+              onCopyLink={handleCopyLink}
+              onEditCoords={openCoordsModal}
+              onToggleEstado={setToggleTarget}
+            />
           </div>
         </section>
       </div>
@@ -1346,27 +1241,12 @@ export default function SuperAdminPage() {
                         </div>
                       ))}
                       {historyPage.lastPage > 1 && (
-                        <div className="flex items-center justify-between pt-1">
-                          <button
-                            type="button"
-                            disabled={historyPage.page <= 1}
-                            onClick={() => loadHistory(detailTarget.id, historyPage.page - 1)}
-                            className="btn-secondary px-2.5 py-1.5 text-xs disabled:opacity-40"
-                          >
-                            <ChevronLeft className="h-3.5 w-3.5" />
-                          </button>
-                          <span className="text-xs text-slate-400">
-                            Página {historyPage.page} de {historyPage.lastPage}
-                          </span>
-                          <button
-                            type="button"
-                            disabled={historyPage.page >= historyPage.lastPage}
-                            onClick={() => loadHistory(detailTarget.id, historyPage.page + 1)}
-                            className="btn-secondary px-2.5 py-1.5 text-xs disabled:opacity-40"
-                          >
-                            <ChevronRight className="h-3.5 w-3.5" />
-                          </button>
-                        </div>
+                        <Pagination
+                          page={historyPage.page}
+                          totalPages={historyPage.lastPage}
+                          onPageChange={(p) => loadHistory(detailTarget.id, p)}
+                          className="pt-1"
+                        />
                       )}
                     </div>
                   )}

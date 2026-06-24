@@ -4,13 +4,17 @@ import { useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
-import { Building2, LogOut, Menu, ShieldCheck } from "lucide-react";
+import { Building2, LogOut, Menu, ShieldCheck, Users2 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { logout } from "../../../lib/auth";
 import { useAuth } from "@/lib/auth-context";
 import { useIsDarkMode } from "@/lib/hooks/useDarkMode";
 
-const menuItems = [{ label: "Veterinarias", icon: Building2, href: "/super-admin" }];
+const menuItems = [
+  { label: "Veterinarias", icon: Building2, href: "/super-admin" },
+  { label: "Clínicas", icon: Building2, href: "/super-admin/clinicas" },
+  { label: "Usuarios", icon: Users2, href: "/super-admin/usuarios" },
+];
 
 function NavLinks({ onItemClick, pathname }: { onItemClick?: () => void; pathname: string }) {
   return (
