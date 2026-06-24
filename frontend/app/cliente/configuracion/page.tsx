@@ -1,11 +1,14 @@
 "use client";
 
 import { ChangeEvent, FormEvent, useEffect, useState } from "react";
-import { User, Lock } from "lucide-react";
+import { User, Lock, Building2 } from "lucide-react";
 import { useAuth } from "@/lib/auth-context";
 import { api } from "@/lib/api/client";
+import { cambiarClinica } from "@/lib/auth";
 import { updateUsuario } from "@/lib/api/usuarios";
 import { fetchPropietarioByUsuario, updatePropietario } from "@/lib/api/propietarios";
+import { fetchClinicasActivas, type ClinicaActiva } from "@/lib/api/clinicas";
+import ConfirmDialog from "@/app/components/ui/ConfirmDialog";
 import type { Owner } from "@/lib/recepcionista/types";
 import { useClienteProfile } from "../ClienteProfileContext";
 
@@ -22,7 +25,7 @@ type PasswordForm = { currentPassword: string; newPassword: string; confirmPassw
 const EMPTY_PWD: PasswordForm = { currentPassword: "", newPassword: "", confirmPassword: "" };
 
 export default function ConfiguracionPage() {
-  const { user } = useAuth();
+  const { user, refresh } = useAuth();
   const { perfil: perfilContexto, refrescar } = useClienteProfile();
   const [perfil, setPerfil] = useState<PerfilCliente>({ ...EMPTY_PERFIL, ...perfilContexto });
   const [perfilGuardado, setPerfilGuardado] = useState<PerfilCliente>({
@@ -38,6 +41,35 @@ export default function ConfiguracionPage() {
   const [mensajePwd, setMensajePwd] = useState("");
   const [errorPwd, setErrorPwd] = useState("");
   const [guardandoPwd, setGuardandoPwd] = useState(false);
+
+  const [clinicas, setClinicas] = useState<ClinicaActiva[]>([]);
+  const [clinicaSeleccionada, setClinicaSeleccionada] = useState<ClinicaActiva | null>(null);
+  const [mensajeClinica, setMensajeClinica] = useState("");
+  const [errorClinica, setErrorClinica] = useState("");
+  const [cambiandoClinica, setCambiandoClinica] = useState(false);
+
+  useEffect(() => {
+    fetchClinicasActivas()
+      .then(setClinicas)
+      .catch(() => {});
+  }, []);
+
+  const confirmarCambioClinica = async () => {
+    if (!clinicaSeleccionada) return;
+    setCambiandoClinica(true);
+    setErrorClinica("");
+    try {
+      await cambiarClinica(clinicaSeleccionada.slug);
+      await refresh();
+      setMensajeClinica(`Tu cuenta ahora pertenece a ${clinicaSeleccionada.nombre}.`);
+      setClinicaSeleccionada(null);
+    } catch (err) {
+      setErrorClinica(err instanceof Error ? err.message : "No se pudo cambiar de veterinaria.");
+      setClinicaSeleccionada(null);
+    } finally {
+      setCambiandoClinica(false);
+    }
+  };
 
   useEffect(() => {
     // Sincroniza el formulario cuando llega el perfil real desde /auth/me
@@ -271,7 +303,74 @@ export default function ConfiguracionPage() {
             </button>
           </div>
         </form>
+
+        <div className="admin-card p-7">
+          <div className="mb-2 flex items-center gap-3">
+            <Building2 className="h-[22px] w-[22px] text-slate-800 dark:text-white" />
+            <h2 className="text-section-title">Cambiar de veterinaria</h2>
+          </div>
+          <p className="mb-6 text-sm text-slate-500 dark:text-slate-400">
+            Actualmente estás en <strong>{user?.clinicaNombre ?? "tu clínica"}</strong>. Si te
+            mudaste o prefieres atender a tu mascota en otra veterinaria de VetNova, puedes migrar
+            tu cuenta sin registrarte de nuevo: tu perfil y tus mascotas se mueven contigo.
+          </p>
+
+          {mensajeClinica && (
+            <div className="mb-5 rounded-xl border border-success-200 bg-success-50 px-4 py-3 text-sm font-medium text-success-700 dark:border-success-800 dark:bg-success-900/30 dark:text-success-400">
+              {mensajeClinica}
+            </div>
+          )}
+          {errorClinica && (
+            <div className="mb-5 rounded-xl border border-danger-200 bg-danger-50 px-4 py-3 text-sm font-medium text-danger-700 dark:border-danger-800 dark:bg-danger-900/30 dark:text-danger-400">
+              {errorClinica}
+            </div>
+          )}
+
+          <div className="max-w-[760px] space-y-2">
+            {clinicas
+              .filter((c) => c.nombre !== user?.clinicaNombre)
+              .map((c) => (
+                <button
+                  key={c.slug}
+                  type="button"
+                  onClick={() => {
+                    setMensajeClinica("");
+                    setErrorClinica("");
+                    setClinicaSeleccionada(c);
+                  }}
+                  className="flex w-full items-center justify-between rounded-xl border border-slate-200 px-4 py-3 text-left transition hover:border-brand-300 hover:bg-brand-50/40 dark:border-slate-700 dark:hover:border-brand-700 dark:hover:bg-brand-900/10"
+                >
+                  <span>
+                    <span className="block text-sm font-semibold text-slate-800 dark:text-white">
+                      {c.nombre}
+                    </span>
+                    {c.direccion && (
+                      <span className="block text-xs text-slate-500 dark:text-slate-400">
+                        {c.direccion}
+                      </span>
+                    )}
+                  </span>
+                  <span className="btn-secondary !px-3 !py-1.5 text-xs">Migrar aquí</span>
+                </button>
+              ))}
+            {clinicas.filter((c) => c.nombre !== user?.clinicaNombre).length === 0 && (
+              <p className="text-sm text-slate-500 dark:text-slate-400">
+                No hay otras veterinarias disponibles por ahora.
+              </p>
+            )}
+          </div>
+        </div>
       </div>
+
+      <ConfirmDialog
+        open={!!clinicaSeleccionada}
+        title={`¿Cambiar a ${clinicaSeleccionada?.nombre}?`}
+        description="Tu perfil y tus mascotas se moverán a esta veterinaria. El historial detallado de consultas y vacunas de tu clínica actual no se compartirá con la nueva (solo un resumen), pero tú seguirás viendo tu historial completo desde tu perfil en cualquier momento."
+        confirmLabel={cambiandoClinica ? "Migrando..." : "Confirmar cambio"}
+        variant="warning"
+        onConfirm={confirmarCambioClinica}
+        onCancel={() => setClinicaSeleccionada(null)}
+      />
     </div>
   );
 }

@@ -1,3 +1,5 @@
+import { api } from "@/lib/api/client";
+
 export type UserRole = "SuperAdministrador" | "Administrador" | "Veterinario" | "Cliente";
 
 export interface AuthUser {
@@ -174,6 +176,15 @@ export async function forgotPassword(email: string): Promise<ForgotPasswordOutco
   } catch {
     return "error";
   }
+}
+
+/**
+ * Migra al cliente actual a otra clínica sin re-registro. El backend
+ * reemite la cookie de sesión con el nuevo clinicaId.
+ */
+export async function cambiarClinica(clinicaSlug: string): Promise<AuthUser> {
+  const result = await api.post<{ user: AuthUser }>("/auth/cambiar-clinica", { clinicaSlug });
+  return result.user;
 }
 
 export async function resetPassword(
