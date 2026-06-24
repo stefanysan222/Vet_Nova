@@ -207,7 +207,9 @@ export default function SuperAdminPage() {
       closeForm();
       cargar();
     } catch (err) {
-      setFormError(err instanceof Error ? err.message : "Error al registrar la clínica.");
+      const message = err instanceof Error ? err.message : "Error al registrar la clínica.";
+      setFormError(message);
+      notifyError("No se pudo registrar la clínica", message);
     } finally {
       setSaving(false);
     }

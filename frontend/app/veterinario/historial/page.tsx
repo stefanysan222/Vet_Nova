@@ -6,6 +6,7 @@ import { FormEvent, ReactNode, Suspense, useEffect, useState } from "react";
 import { AlertCircle, CheckCircle2, X, Plus } from "lucide-react";
 import { fetchMascotas } from "../../../lib/api/mascotas";
 import { fetchCitas, createCita } from "../../../lib/api/citas";
+import { createConsulta } from "../../../lib/api/historias-clinicas";
 import type { PetRecord, Appointment } from "../../../lib/recepcionista/types";
 import { useAuth } from "@/lib/auth-context";
 
@@ -227,13 +228,32 @@ function HistorialContent() {
     setGuardando(true);
     setError(null);
     try {
+      const idMascota = parseInt(paciente.id, 10);
+      if (Number.isNaN(idMascota)) {
+        throw new Error("No se pudo identificar la mascota del paciente.");
+      }
+
+      const tratamientoTexto =
+        formulario.cambioTratamiento || "Sin cambios en el tratamiento actual.";
+      const recomendacionesTexto = formulario.proximoControl
+        ? `${formulario.recomendaciones} Próximo control: ${formulario.proximoControl}.`
+        : formulario.recomendaciones;
+
+      // Registra la evolución en el historial clínico real (consultas/historias_clinicas),
+      // que es lo que alimenta el timeline y el PDF que ven cliente, veterinario y admin.
+      await createConsulta({
+        id_mascota: idMascota,
+        motivo: "Evolución clínica",
+        diagnostico: formulario.evolucion,
+        tratamiento: tratamientoTexto,
+        recomendaciones: recomendacionesTexto,
+      });
+
       const notasClinicas = JSON.stringify({
         tipo: "Evolución clínica",
         diagnostico: formulario.evolucion,
-        tratamiento: formulario.cambioTratamiento || "Sin cambios en el tratamiento actual.",
-        recomendaciones: formulario.proximoControl
-          ? `${formulario.recomendaciones} Próximo control: ${formulario.proximoControl}.`
-          : formulario.recomendaciones,
+        tratamiento: tratamientoTexto,
+        recomendaciones: recomendacionesTexto,
       });
 
       const nuevaCita = await createCita({
