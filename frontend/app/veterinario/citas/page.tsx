@@ -504,7 +504,7 @@ export default function VeterinarioCitasPage() {
             role="dialog"
             aria-modal="true"
             aria-labelledby="titulo-detalle-cita"
-            className="max-h-[95vh] w-full max-w-[780px] overflow-y-auto rounded-3xl border border-surface-200/60 bg-white shadow-modal dark:border-surface-700 dark:bg-surface-900"
+            className="modal-shell max-h-[95vh] overflow-y-auto rounded-3xl border border-surface-200/60 bg-white shadow-modal dark:border-surface-700 dark:bg-surface-900"
           >
             <div className="border-b border-surface-100 px-6 py-6 dark:border-surface-800">
               <div className="flex items-start justify-between gap-5">
@@ -620,7 +620,7 @@ export default function VeterinarioCitasPage() {
             role="dialog"
             aria-modal="true"
             aria-labelledby="titulo-agendar-cita"
-            className="max-h-[95vh] w-full max-w-[780px] overflow-y-auto rounded-3xl border border-surface-200/60 bg-white shadow-modal dark:border-surface-700 dark:bg-surface-900"
+            className="modal-shell max-h-[95vh] overflow-y-auto rounded-3xl border border-surface-200/60 bg-white shadow-modal dark:border-surface-700 dark:bg-surface-900"
           >
             <div className="flex items-start justify-between border-b border-surface-100 px-6 py-5 dark:border-surface-800">
               <div>

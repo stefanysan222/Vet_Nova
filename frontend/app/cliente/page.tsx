@@ -242,8 +242,9 @@ export default function ClientePage() {
             <p className="text-[11px] font-semibold uppercase tracking-[0.25em] text-[#4C4A8A] dark:text-[#A5A9F0]">
               Panel cliente
             </p>
-            <h1 className="mt-2 text-2xl font-bold tracking-tight text-[#1E1B4B] dark:text-[#E0E3FF] sm:text-3xl">
-              Hola, <NombreCliente soloNombre /> 🐾
+            <h1 className="mt-2 flex items-center gap-2 text-2xl font-bold tracking-tight text-[#1E1B4B] dark:text-[#E0E3FF] sm:text-3xl">
+              Hola, <NombreCliente soloNombre />{" "}
+              <PawPrint className="h-5 w-5 shrink-0 sm:h-6 sm:w-6" />
             </h1>
             <p className="mt-2 max-w-md text-sm leading-6 text-[#4C4A8A] dark:text-[#A5A9F0]">
               {loading

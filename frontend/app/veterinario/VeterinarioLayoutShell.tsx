@@ -281,10 +281,10 @@ export default function VeterinarioLayoutShell({ children }: { children: ReactNo
   }
 
   return (
-    <main className="h-screen overflow-hidden bg-surface-50 text-surface-900 dark:bg-surface-950 dark:text-white">
-      <div className="flex h-screen overflow-hidden">
+    <main className="h-dvh overflow-hidden bg-surface-50 text-surface-900 dark:bg-surface-950 dark:text-white">
+      <div className="flex h-dvh overflow-hidden">
         {/* SIDEBAR */}
-        <aside className="hidden h-screen w-[260px] shrink-0 border-r border-surface-200 bg-white dark:border-surface-800 dark:bg-surface-900 lg:flex lg:flex-col">
+        <aside className="hidden h-dvh w-[260px] shrink-0 border-r border-surface-200 bg-white dark:border-surface-800 dark:bg-surface-900 lg:flex lg:flex-col">
           <div className="flex h-[78px] items-center gap-3 border-b border-surface-200 px-5 dark:border-surface-800">
             <div className="relative h-11 w-11 shrink-0">
               <Image
@@ -342,7 +342,10 @@ export default function VeterinarioLayoutShell({ children }: { children: ReactNo
               <Menu className="h-5 w-5" />
             </button>
             {/* BUSCADOR GLOBAL */}
-            <div ref={buscadorRef} className="relative w-full max-w-[520px]">
+            <div
+              ref={buscadorRef}
+              className="relative w-full min-w-0 max-w-full sm:max-w-[420px] lg:max-w-[520px]"
+            >
               <div className="flex h-[42px] items-center gap-3 rounded-xl border border-surface-300 bg-white px-4 transition-all focus-within:border-brand-400 focus-within:ring-2 focus-within:ring-brand-100 dark:border-surface-700 dark:bg-surface-900 dark:focus-within:border-brand-500">
                 <Search className="h-[18px] w-[18px] shrink-0 text-surface-500 dark:text-surface-400" />
 
@@ -460,7 +463,7 @@ export default function VeterinarioLayoutShell({ children }: { children: ReactNo
                 </button>
 
                 {showNotifications && (
-                  <div className="absolute right-0 top-[52px] z-50 w-[380px] overflow-hidden rounded-2xl border border-surface-200 bg-white shadow-modal dark:border-surface-700 dark:bg-surface-900">
+                  <div className="absolute right-0 top-[52px] z-50 w-[calc(100vw-2rem)] overflow-hidden rounded-2xl border border-surface-200 bg-white shadow-modal dark:border-surface-700 dark:bg-surface-900 sm:w-[380px]">
                     <div className="flex items-center justify-between border-b border-surface-200 px-5 py-4 dark:border-surface-700">
                       <div>
                         <h3 className="text-base font-semibold text-surface-900 dark:text-white">
@@ -577,7 +580,7 @@ export default function VeterinarioLayoutShell({ children }: { children: ReactNo
                 </button>
 
                 {showUserMenu && (
-                  <div className="absolute right-0 top-[54px] z-50 w-[285px] overflow-hidden rounded-2xl border border-surface-200 bg-white shadow-modal dark:border-surface-700 dark:bg-surface-900">
+                  <div className="absolute right-0 top-[54px] z-50 w-[calc(100vw-2rem)] overflow-hidden rounded-2xl border border-surface-200 bg-white shadow-modal dark:border-surface-700 dark:bg-surface-900 sm:w-[285px]">
                     <div className="flex items-center gap-3 border-b border-surface-200 px-5 py-4 dark:border-surface-700">
                       <div className="flex h-11 w-11 items-center justify-center rounded-full bg-brand-600 font-semibold text-white">
                         {userInitials}
@@ -657,7 +660,7 @@ export default function VeterinarioLayoutShell({ children }: { children: ReactNo
           </header>
 
           {/* CONTENIDO */}
-          <div className="h-[calc(100vh-64px)] overflow-y-auto bg-surface-50 px-6 py-6 dark:bg-surface-950">
+          <div className="h-[calc(100dvh-64px)] overflow-y-auto bg-surface-50 px-4 py-4 dark:bg-surface-950 sm:px-6 sm:py-6">
             {children}
           </div>
         </section>

@@ -8,7 +8,7 @@ const LIBRARIES: "places"[] = ["places"];
 
 const containerStyle = {
   width: "100%",
-  height: "220px",
+  height: "100%",
   borderRadius: "12px",
 };
 
@@ -21,7 +21,7 @@ interface MapPreviewProps {
 function PlaceholderBox({ message, className }: { message: string; className?: string }) {
   return (
     <div
-      className={`flex h-[220px] w-full items-center justify-center rounded-xl border border-dashed border-slate-200 bg-slate-50 px-4 text-center text-sm text-slate-400 dark:border-slate-700 dark:bg-slate-800/40 dark:text-slate-500 ${className ?? ""}`}
+      className={`flex aspect-[16/9] w-full items-center justify-center rounded-xl border border-dashed border-slate-200 bg-slate-50 px-4 text-center text-sm text-slate-400 dark:border-slate-700 dark:bg-slate-800/40 dark:text-slate-500 sm:aspect-[2/1] ${className ?? ""}`}
     >
       <span className="flex flex-col items-center gap-1.5">
         <MapPin className="h-5 w-5" />
@@ -67,7 +67,9 @@ export default function MapPreview({ lat, lng, className }: MapPreviewProps) {
   }
 
   return (
-    <div className={`w-full overflow-hidden rounded-xl ${className ?? ""}`}>
+    <div
+      className={`aspect-[16/9] w-full overflow-hidden rounded-xl sm:aspect-[2/1] ${className ?? ""}`}
+    >
       <GoogleMap
         mapContainerStyle={containerStyle}
         center={{ lat, lng }}

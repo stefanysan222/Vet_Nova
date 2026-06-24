@@ -5,7 +5,18 @@ import Link from "next/link";
 import Image from "next/image";
 import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
-import { ArrowLeft, Moon, Sun } from "lucide-react";
+import {
+  ArrowLeft,
+  Bone,
+  Cat,
+  Dog,
+  Heart,
+  Moon,
+  PawPrint,
+  Pill,
+  Stethoscope,
+  Sun,
+} from "lucide-react";
 
 interface AuthLayoutProps {
   title: string;
@@ -13,14 +24,15 @@ interface AuthLayoutProps {
   children: ReactNode;
 }
 
+const PET_ICONS = [PawPrint, Dog, Cat, Stethoscope, Pill, Bone, Heart];
+
 function PetPattern() {
-  const icons = ["🐾", "🐶", "🐱", "🦮", "🐕", "🐈", "🩺", "💊", "🦴", "❤️"];
-  const items = Array.from({ length: 30 }, (_, i) => ({
+  const items = Array.from({ length: 28 }, (_, i) => ({
     id: i,
-    icon: icons[i % icons.length],
+    Icon: PET_ICONS[i % PET_ICONS.length],
     x: Math.round((i * 37 + 11) % 95),
     y: Math.round((i * 53 + 7) % 95),
-    size: 0.7 + (i % 5) * 0.15,
+    size: 1.1 + (i % 5) * 0.25,
     delay: (i % 8) * 0.4,
     duration: 4 + (i % 4),
   }));
@@ -30,11 +42,12 @@ function PetPattern() {
       {items.map((item) => (
         <motion.span
           key={item.id}
-          className="absolute select-none opacity-[0.06] dark:opacity-[0.04]"
+          className="absolute select-none text-slate-900 opacity-[0.06] dark:text-white dark:opacity-[0.04]"
           style={{
             left: `${item.x}%`,
             top: `${item.y}%`,
-            fontSize: `${item.size}rem`,
+            width: `${item.size}rem`,
+            height: `${item.size}rem`,
           }}
           animate={{ y: [0, -8, 0], rotate: [0, 6, -6, 0] }}
           transition={{
@@ -44,7 +57,7 @@ function PetPattern() {
             ease: "easeInOut",
           }}
         >
-          {item.icon}
+          <item.Icon className="h-full w-full" />
         </motion.span>
       ))}
     </div>
@@ -129,7 +142,8 @@ export default function AuthLayout({ title, description, children }: AuthLayoutP
               </div>
             </Link>
             <div className="flex items-center gap-1.5 rounded-lg bg-brand-100 px-3 py-1.5 text-xs font-medium text-brand-600 dark:bg-brand-900/30 dark:text-brand-300">
-              🐾 Clínica veterinaria
+              <PawPrint className="h-3.5 w-3.5" />
+              Clínica veterinaria
             </div>
           </div>
 

@@ -448,7 +448,7 @@ function PacientesContent() {
       {/* MODAL PERFIL */}
       {pacientePerfil && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-surface-900/50 px-4 py-6 backdrop-blur-sm">
-          <section className="max-h-[94vh] w-full max-w-[740px] overflow-y-auto rounded-3xl border border-surface-200/60 bg-white shadow-modal dark:border-surface-700 dark:bg-surface-900">
+          <section className="modal-shell max-h-[94vh] overflow-y-auto rounded-3xl border border-surface-200/60 bg-white shadow-modal dark:border-surface-700 dark:bg-surface-900">
             <div className="border-b border-surface-100 px-6 py-6 dark:border-surface-800">
               <div className="flex items-start justify-between gap-5">
                 <div className="flex items-center gap-4">

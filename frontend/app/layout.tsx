@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { Geist, Geist_Mono, Caveat } from "next/font/google";
 import { headers } from "next/headers";
 import "./globals.css";
@@ -25,6 +25,12 @@ export const metadata: Metadata = {
   title: "Vet Nova | Clínica Veterinaria",
   description:
     "Página principal de Vet Nova, clínica veterinaria con servicios de urgencias, vacunación y estética para mascotas.",
+};
+
+export const viewport: Viewport = {
+  width: "device-width",
+  initialScale: 1,
+  viewportFit: "cover",
 };
 
 export default async function RootLayout({ children }: { children: React.ReactNode }) {
