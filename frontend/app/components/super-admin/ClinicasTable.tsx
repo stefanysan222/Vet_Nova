@@ -15,10 +15,7 @@ interface ClinicasTableProps {
 }
 
 /**
- * Tabla de clínicas reutilizada por el dashboard de Super-Admin
- * (app/super-admin/page.tsx) y por el listado dedicado
- * (app/super-admin/clinicas/page.tsx). Mantiene el mismo markup y estilos
- * para no duplicar el componente visual.
+ * Tabla de clínicas usada por el dashboard de Super-Admin (app/super-admin/page.tsx).
  */
 export default function ClinicasTable({
   clinicas,

@@ -17,7 +17,6 @@ import {
   Phone,
   Plus,
   User,
-  Users2,
   X,
   Zap,
 } from "lucide-react";
@@ -320,10 +319,9 @@ export default function SuperAdminPage() {
     loadHistory(c.id, 1);
   };
 
-  // Permite enlazar directamente a una clínica desde otra ruta (ej. el
-  // listado dedicado en /super-admin/clinicas) usando
-  // #clinica-row-{id} en la URL: al cargar las clínicas, si el hash
-  // coincide con una fila, abrimos su drawer de detalle automáticamente.
+  // Permite enlazar directamente a una clínica usando #clinica-row-{id}
+  // en la URL: al cargar las clínicas, si el hash coincide con una fila,
+  // abrimos su drawer de detalle automáticamente.
   useEffect(() => {
     if (loading || clinicas.length === 0) return;
     const hash = window.location.hash;
@@ -516,7 +514,7 @@ export default function SuperAdminPage() {
                   Nueva clínica
                 </button>
                 <Link
-                  href="/super-admin/clinicas"
+                  href="#tabla-clinicas"
                   className="inline-flex items-center gap-2 rounded-[9px] border-[0.5px] border-[#7C3AED]/30 bg-white/60 px-4 py-2 text-[12px] font-semibold text-[#7C3AED] transition hover:bg-white"
                 >
                   <ClipboardList className="h-3.5 w-3.5" />
@@ -576,7 +574,7 @@ export default function SuperAdminPage() {
                   transition={{ duration: 0.4, delay: i * 0.06 }}
                 >
                   <Link
-                    href="/super-admin/clinicas"
+                    href="#tabla-clinicas"
                     className={`block ${cardClass} cursor-pointer transition hover:-translate-y-0.5 hover:shadow-card-hover focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#7C3AED]`}
                   >
                     <div
@@ -761,18 +759,11 @@ export default function SuperAdminPage() {
                   Nueva clínica
                 </button>
                 <Link
-                  href="/super-admin/clinicas"
+                  href="#tabla-clinicas"
                   className="flex w-full items-center gap-2 rounded-[9px] border-[0.5px] border-[#E4DFF0] bg-[#F7F6FA] px-3 py-2 text-[11px] font-semibold text-slate-700 transition hover:border-[#7C3AED]/30 hover:bg-[#EDE8FA] dark:border-slate-700/60 dark:bg-slate-800/60 dark:text-slate-300 dark:hover:border-[#7C3AED]/40 dark:hover:bg-[#7C3AED]/10"
                 >
                   <ClipboardList className="h-3.5 w-3.5 text-[#7C3AED]" />
                   Ver clínicas
-                </Link>
-                <Link
-                  href="/super-admin/usuarios"
-                  className="flex w-full items-center gap-2 rounded-[9px] border-[0.5px] border-[#E4DFF0] bg-[#F7F6FA] px-3 py-2 text-[11px] font-semibold text-slate-700 transition hover:border-[#7C3AED]/30 hover:bg-[#EDE8FA] dark:border-slate-700/60 dark:bg-slate-800/60 dark:text-slate-300 dark:hover:border-[#7C3AED]/40 dark:hover:bg-[#7C3AED]/10"
-                >
-                  <Users2 className="h-3.5 w-3.5 text-[#7C3AED]" />
-                  Gestionar usuarios
                 </Link>
               </div>
             </div>
