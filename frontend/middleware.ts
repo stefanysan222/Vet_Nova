@@ -54,9 +54,12 @@ function buildCsp(nonce: string): string {
     scriptSrc,
     "style-src 'self' 'unsafe-inline' https://accounts.google.com",
     "img-src 'self' data: blob: https://res.cloudinary.com https://lh3.googleusercontent.com",
-    `connect-src 'self' ${API_URL} https://accounts.google.com https://api.cloudinary.com`,
+    // El WebSocket de notificaciones en tiempo real (HP-02) se conecta directo
+    // al backend con ws(s)://, no http(s)://, así que ambos esquemas deben
+    // estar permitidos o la conexión queda bloqueada silenciosamente.
+    `connect-src 'self' ${API_URL} ${API_URL.replace(/^http/, "ws")} https://accounts.google.com https://api.cloudinary.com`,
     "font-src 'self'",
-    "frame-src https://accounts.google.com",
+    "frame-src https://accounts.google.com https://maps.google.com https://www.google.com",
     "object-src 'none'",
     "base-uri 'self'",
     "form-action 'self'",

@@ -6,8 +6,14 @@ import { useRouter } from "next/navigation";
 import { Building2, Eye, EyeOff, Lock, Mail } from "lucide-react";
 import { motion } from "framer-motion";
 import GoogleAuthButton from "./GoogleAuthButton";
-import { loginUser, loginOrRegisterGoogle, type ClinicaOpcion } from "../../../lib/auth";
+import {
+  loginUser,
+  loginOrRegisterGoogle,
+  resendVerification,
+  type ClinicaOpcion,
+} from "../../../lib/auth";
 import { useAuth } from "@/lib/auth-context";
+import { useToast } from "../ui/Toast";
 
 const initialState = { email: "", password: "" };
 
@@ -25,8 +31,22 @@ export default function LoginForm() {
   const [loading, setLoading] = useState(false);
   const [clinicOptions, setClinicOptions] = useState<ClinicaOpcion[] | null>(null);
   const [pendingGoogleCredential, setPendingGoogleCredential] = useState<string | null>(null);
+  const [resendStatus, setResendStatus] = useState<string | null>(null);
+  const [resending, setResending] = useState(false);
   const router = useRouter();
   const { refresh } = useAuth();
+  const { info } = useToast();
+
+  const isUnverifiedError = submitError?.includes("confirmar tu correo") ?? false;
+
+  const handleResendVerification = async () => {
+    if (!formData.email) return;
+    setResending(true);
+    setResendStatus(null);
+    const { message } = await resendVerification(formData.email);
+    setResendStatus(message);
+    setResending(false);
+  };
 
   const handleChange = (field: string, value: string | boolean) => {
     setFormData((c) => ({ ...c, [field]: value }));
@@ -49,6 +69,14 @@ export default function LoginForm() {
     return "/cliente";
   };
 
+  const notifyOtraClinica = (aviso?: { nombre: string; slug: string }) => {
+    if (!aviso) return;
+    info(
+      `Ya tienes una cuenta en ${aviso.nombre}`,
+      "Esta es una cuenta nueva e independiente. Tu historial de mascotas no se comparte entre clínicas.",
+    );
+  };
+
   const handleGoogleSuccess = async (data: { credential: string }) => {
     setLoading(true);
     setSubmitError(null);
@@ -64,6 +92,7 @@ export default function LoginForm() {
       return;
     }
     if (result.user) {
+      notifyOtraClinica(result.avisoOtraClinica);
       await refresh();
       router.push(getDashboardRoute(result.user.role));
     }
@@ -112,6 +141,7 @@ export default function LoginForm() {
     if (result.user) {
       setClinicOptions(null);
       setPendingGoogleCredential(null);
+      notifyOtraClinica(result.avisoOtraClinica);
       await refresh();
       router.push(getDashboardRoute(result.user.role));
     }
@@ -199,9 +229,20 @@ export default function LoginForm() {
         <motion.div
           initial={{ opacity: 0, y: -6 }}
           animate={{ opacity: 1, y: 0 }}
-          className="dark:bg-danger-950 rounded-xl border border-danger-100 bg-danger-50 px-4 py-3 text-sm text-danger-700 dark:border-danger-900 dark:text-danger-400"
+          className="dark:bg-danger-950 space-y-2 rounded-xl border border-danger-100 bg-danger-50 px-4 py-3 text-sm text-danger-700 dark:border-danger-900 dark:text-danger-400"
         >
-          {submitError}
+          <p>{submitError}</p>
+          {isUnverifiedError && (
+            <button
+              type="button"
+              onClick={handleResendVerification}
+              disabled={resending}
+              className="font-semibold underline disabled:cursor-not-allowed disabled:opacity-60"
+            >
+              {resending ? "Enviando..." : "Reenviar enlace de confirmación"}
+            </button>
+          )}
+          {resendStatus && <p className="text-danger-600 dark:text-danger-400">{resendStatus}</p>}
         </motion.div>
       )}
 

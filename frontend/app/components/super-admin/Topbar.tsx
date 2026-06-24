@@ -3,12 +3,24 @@
 import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { AnimatePresence, motion } from "framer-motion";
-import { Building2, Moon, Search, Sun, X } from "lucide-react";
+import { Bell, Building2, CheckCircle, Moon, Search, Sun, X } from "lucide-react";
 import { useAuth } from "@/lib/auth-context";
+import { useClickOutside } from "@/lib/hooks/useClickOutside";
+import { useNotifications } from "@/lib/hooks/useNotifications";
 import { fetchClinicas, type Clinica } from "../../../lib/api/clinicas";
 
 function normalizar(texto: string) {
   return texto.toLowerCase().normalize("NFD").replace(/[̀-ͯ]/g, "");
+}
+
+function timeAgo(dateStr: string): string {
+  const diff = Date.now() - new Date(dateStr).getTime();
+  const m = Math.floor(diff / 60000);
+  if (m < 1) return "Ahora";
+  if (m < 60) return `Hace ${m} min`;
+  const h = Math.floor(m / 60);
+  if (h < 24) return `Hace ${h}h`;
+  return `Hace ${Math.floor(h / 24)}d`;
 }
 
 export default function SuperAdminTopbar() {
@@ -21,7 +33,16 @@ export default function SuperAdminTopbar() {
   const [clinicas, setClinicas] = useState<Clinica[]>([]);
   const [query, setQuery] = useState("");
   const [open, setOpen] = useState(false);
+  const [notifOpen, setNotifOpen] = useState(false);
   const searchRef = useRef<HTMLDivElement>(null);
+  const notifRef = useRef<HTMLDivElement>(null);
+  const {
+    count: notifCount,
+    items: notifItems,
+    loadItems: loadNotifItems,
+    marcarLeida,
+    marcarTodasLeidas,
+  } = useNotifications({ enabled: !!user });
 
   useEffect(() => {
     document.documentElement.classList.toggle("dark", darkMode);
@@ -33,15 +54,14 @@ export default function SuperAdminTopbar() {
       .catch(() => setClinicas([]));
   }, []);
 
+  // Cargar lista al abrir el dropdown
   useEffect(() => {
-    const handler = (e: MouseEvent) => {
-      if (searchRef.current && !searchRef.current.contains(e.target as Node)) {
-        setOpen(false);
-      }
-    };
-    document.addEventListener("mousedown", handler);
-    return () => document.removeEventListener("mousedown", handler);
-  }, []);
+    if (!notifOpen) return;
+    loadNotifItems();
+  }, [notifOpen, loadNotifItems]);
+
+  useClickOutside(searchRef, () => setOpen(false));
+  useClickOutside(notifRef, () => setNotifOpen(false));
 
   const toggleDark = () => {
     const next = !darkMode;
@@ -164,8 +184,98 @@ export default function SuperAdminTopbar() {
             {darkMode ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
           </button>
 
+          {/* Notificaciones */}
+          <div className="relative" ref={notifRef}>
+            <button
+              onClick={() => setNotifOpen(!notifOpen)}
+              className="relative flex h-9 w-9 items-center justify-center rounded-xl text-slate-500 transition hover:bg-slate-100 dark:text-slate-400 dark:hover:bg-slate-800"
+              aria-label="Ver notificaciones"
+            >
+              <Bell className="h-4 w-4" />
+              {notifCount > 0 && (
+                <span className="absolute right-1.5 top-1.5 flex h-4 w-4 items-center justify-center rounded-full bg-violet-600 text-[9px] font-bold text-white ring-2 ring-white dark:ring-slate-950">
+                  {notifCount > 9 ? "9+" : notifCount}
+                </span>
+              )}
+            </button>
+
+            <AnimatePresence>
+              {notifOpen && (
+                <>
+                  <div className="fixed inset-0 z-40" onClick={() => setNotifOpen(false)} />
+                  <motion.div
+                    initial={{ opacity: 0, y: -8, scale: 0.97 }}
+                    animate={{ opacity: 1, y: 0, scale: 1 }}
+                    exit={{ opacity: 0, y: -8, scale: 0.97 }}
+                    transition={{ duration: 0.15 }}
+                    className="absolute right-0 top-12 z-50 w-80 max-w-[calc(100vw-2rem)] overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-lg dark:border-slate-700 dark:bg-slate-900"
+                  >
+                    {/* Header */}
+                    <div className="flex items-center justify-between border-b border-slate-100 px-4 py-3 dark:border-slate-800">
+                      <p className="text-sm font-semibold text-slate-900 dark:text-white">
+                        Notificaciones
+                      </p>
+                      {notifItems && notifItems.length > 0 && (
+                        <button
+                          onClick={() => marcarTodasLeidas()}
+                          className="text-xs font-semibold text-violet-600 hover:text-violet-700 dark:text-violet-300"
+                        >
+                          Marcar todas leídas
+                        </button>
+                      )}
+                    </div>
+
+                    {/* Lista */}
+                    <div className="max-h-72 divide-y divide-slate-100 overflow-y-auto dark:divide-slate-800">
+                      {notifItems === null ? (
+                        <div className="space-y-2 p-3">
+                          {[1, 2, 3].map((i) => (
+                            <div
+                              key={i}
+                              className="h-12 animate-pulse rounded-xl bg-slate-100 dark:bg-slate-800"
+                            />
+                          ))}
+                        </div>
+                      ) : notifItems.length === 0 ? (
+                        <p className="px-4 py-6 text-center text-sm text-slate-500 dark:text-slate-400">
+                          Sin notificaciones nuevas.
+                        </p>
+                      ) : (
+                        notifItems.map((n) => (
+                          <div
+                            key={n.id}
+                            className="flex items-start gap-3 px-4 py-3 hover:bg-slate-50 dark:hover:bg-slate-800/50"
+                          >
+                            <div className="min-w-0 flex-1">
+                              <p className="text-sm font-medium text-slate-900 dark:text-white">
+                                {n.titulo}
+                              </p>
+                              <p className="mt-0.5 line-clamp-1 text-xs text-slate-500 dark:text-slate-400">
+                                {n.mensaje}
+                              </p>
+                              <p className="mt-1 text-[10px] text-slate-400">
+                                {timeAgo(n.creadaEn)}
+                              </p>
+                            </div>
+                            <button
+                              onClick={() => marcarLeida(n.id)}
+                              className="mt-0.5 shrink-0 rounded-lg p-1 text-slate-400 hover:bg-slate-100 hover:text-slate-600 dark:hover:bg-slate-700"
+                              title="Marcar como leída"
+                            >
+                              <CheckCircle className="h-3.5 w-3.5" />
+                            </button>
+                          </div>
+                        ))
+                      )}
+                    </div>
+                  </motion.div>
+                </>
+              )}
+            </AnimatePresence>
+          </div>
+
           <div className="flex items-center gap-2 rounded-xl border border-slate-200 bg-white px-3 py-2 dark:border-slate-700 dark:bg-slate-900">
-            <div className="flex h-7 w-7 items-center justify-center rounded-full bg-[#7C3AED] text-xs font-bold text-white dark:bg-[#A78BFA] dark:text-[#1A0F35]">
+            <div className="flex h-7 w-7 items-center justify-center rounded-full bg-brand-600 text-xs font-bold text-white dark:bg-brand-300 dark:text-brand-950">
               {initials}
             </div>
             <span className="hidden max-w-[140px] truncate text-sm font-medium text-slate-700 dark:text-slate-200 sm:block">

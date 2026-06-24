@@ -12,6 +12,7 @@ const config: Config = {
       fontFamily: {
         sans: ["var(--font-geist-sans)", "system-ui", "sans-serif"],
         mono: ["var(--font-geist-mono)", "monospace"],
+        accent: ["var(--font-caveat)", "cursive"],
       },
       colors: {
         // Token principal de marca — índigo cálido

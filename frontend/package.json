@@ -16,18 +16,22 @@
     "prepare": "husky"
   },
   "dependencies": {
+    "@react-google-maps/api": "^2.20.8",
     "@upstash/ratelimit": "^2.0.8",
     "@upstash/redis": "^1.38.0",
     "chart.js": "^4.5.1",
+    "date-fns": "^3.6.0",
     "framer-motion": "^12.38.0",
     "jose": "^6.2.3",
     "lucide-react": "^0.467.0",
     "next": "^16.2.7",
     "nodemailer": "^8.0.10",
     "react": "19.2.4",
+    "react-big-calendar": "^1.20.0",
     "react-chartjs-2": "^5.3.1",
     "react-dom": "19.2.4",
-    "recharts": "^3.8.1"
+    "recharts": "^3.8.1",
+    "socket.io-client": "^4.8.3"
   },
   "lint-staged": {
     "**/*.{ts,tsx}": [
@@ -46,6 +50,7 @@
     "@types/node": "^20",
     "@types/nodemailer": "^8.0.0",
     "@types/react": "^19",
+    "@types/react-big-calendar": "^1.16.3",
     "@types/react-dom": "^19",
     "@vitejs/plugin-react": "^6.0.2",
     "@vitest/coverage-v8": "^4.1.8",

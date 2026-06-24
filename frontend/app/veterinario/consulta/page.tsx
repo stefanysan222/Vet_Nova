@@ -13,7 +13,8 @@ import {
   History,
   Save,
 } from "lucide-react";
-import { fetchCitas, updateCita } from "../../../lib/api/citas";
+import { createCita, fetchCitas, updateCita } from "../../../lib/api/citas";
+import { createConsulta } from "../../../lib/api/historias-clinicas";
 import type { Appointment } from "../../../lib/recepcionista/types";
 import { useAuth } from "@/lib/auth-context";
 
@@ -99,6 +100,7 @@ function RegistrarConsultaContent() {
   const [guardando, setGuardando] = useState(false);
   const [guardado, setGuardado] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [mensajeExito, setMensajeExito] = useState<string | null>(null);
   const [formulario, setFormulario] = useState<FormularioConsulta>(formularioInicial());
 
   const { user } = useAuth();
@@ -140,6 +142,7 @@ function RegistrarConsultaContent() {
     const citaId = event.target.value;
     setFormulario({ ...formularioInicial(), citaId });
     setGuardado(false);
+    setMensajeExito(null);
     setError(null);
   }
 
@@ -166,28 +169,67 @@ function RegistrarConsultaContent() {
     setGuardando(true);
     setError(null);
     try {
-      const notasClinicas = JSON.stringify({
-        tipo: "Consulta",
-        motivoReferido: formulario.motivoReferido,
-        hallazgos: formulario.hallazgos,
-        diagnostico: formulario.diagnostico,
-        tratamiento: formulario.tratamiento,
-        recomendaciones: formulario.recomendaciones,
-        peso: formulario.peso,
-        temperatura: formulario.temperatura,
-        frecuenciaCardiaca: formulario.frecuenciaCardiaca,
-        seguimiento: formulario.seguimiento,
-        ...(formulario.seguimiento === "Sí" ? { fechaControl: formulario.fechaControl } : {}),
+      // El detalle completo de la atención vive en el historial clínico real
+      // (tablas historias_clinicas/consultas), no en el campo notas de la cita.
+      const diagnosticoConHallazgos = formulario.hallazgos
+        ? `Hallazgos: ${formulario.hallazgos}\n\nDiagnóstico: ${formulario.diagnostico}`
+        : formulario.diagnostico;
+
+      const idMascota = parseInt(citaSeleccionada.petId, 10);
+      if (Number.isNaN(idMascota)) {
+        throw new Error("No se pudo identificar la mascota de la cita seleccionada.");
+      }
+
+      await createConsulta({
+        id_mascota: idMascota,
+        motivo: formulario.motivoReferido || undefined,
+        diagnostico: diagnosticoConHallazgos || undefined,
+        tratamiento: formulario.tratamiento || undefined,
+        recomendaciones: formulario.recomendaciones || undefined,
+        peso: formulario.peso ? parseFloat(formulario.peso) : undefined,
+        temperatura: formulario.temperatura ? parseFloat(formulario.temperatura) : undefined,
+        frecuencia_cardiaca: formulario.frecuenciaCardiaca
+          ? parseInt(formulario.frecuenciaCardiaca, 10)
+          : undefined,
       });
 
+      // Solo si la consulta clínica se registró correctamente marcamos la
+      // cita como Finalizada. El campo notes ahora guarda un resumen corto,
+      // ya que el detalle completo vive en el historial clínico real.
       await updateCita({
         ...citaOriginal,
         status: "Finalizada",
-        notes: notasClinicas,
+        notes: formulario.diagnostico || formulario.motivoReferido || undefined,
         veterinarian: user?.name ?? citaOriginal.veterinarian,
       });
 
+      let citaSeguimientoCreada = false;
+      if (formulario.seguimiento === "Sí" && formulario.fechaControl) {
+        const hoyStr = new Date().toLocaleDateString("es-CO");
+        await createCita({
+          date: formulario.fechaControl,
+          time: citaOriginal.time || "09:00",
+          petId: citaOriginal.petId,
+          ownerId: citaOriginal.ownerId,
+          petName: citaOriginal.petName,
+          ownerName: citaOriginal.ownerName,
+          service: "Control de seguimiento",
+          status: "Pendiente",
+          veterinarianId: citaOriginal.veterinarianId,
+          veterinarian: user?.name ?? citaOriginal.veterinarian,
+          notes: `Seguimiento de consulta del ${hoyStr}`,
+          petEspecie: citaOriginal.petEspecie,
+          petRaza: citaOriginal.petRaza,
+        });
+        citaSeguimientoCreada = true;
+      }
+
       setCitasHabilitadas((prev) => prev.filter((c) => c.id !== citaSeleccionada.id));
+      setMensajeExito(
+        citaSeguimientoCreada
+          ? "La atención clínica fue registrada en el historial del paciente y se creó la cita de seguimiento."
+          : "La atención clínica fue registrada y el historial del paciente ha sido actualizado.",
+      );
       setGuardado(true);
       setFormulario(formularioInicial());
     } catch (err) {
@@ -261,13 +303,17 @@ function RegistrarConsultaContent() {
                 Consulta registrada correctamente
               </p>
               <p className="mt-1 text-sm leading-6 text-success-600 dark:text-success-400">
-                La atención clínica fue registrada y el historial del paciente ha sido actualizado.
+                {mensajeExito ??
+                  "La atención clínica fue registrada y el historial del paciente ha sido actualizado."}
               </p>
             </div>
           </div>
           <button
             type="button"
-            onClick={() => setGuardado(false)}
+            onClick={() => {
+              setGuardado(false);
+              setMensajeExito(null);
+            }}
             className="flex h-8 w-8 shrink-0 items-center justify-center rounded-xl text-success-500 transition hover:bg-success-100 dark:hover:bg-success-900/40"
             aria-label="Cerrar mensaje"
           >

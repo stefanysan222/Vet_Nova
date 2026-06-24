@@ -43,14 +43,15 @@ describe("logout", () => {
 });
 
 describe("registerUser", () => {
-  it("returns the user on success", async () => {
-    mockFetch(201, { user: { id: 1, name: "Ana", email: "ana@test.com", role: "Cliente" } });
+  it("returns requiresEmailVerification on success", async () => {
+    mockFetch(201, { requiresEmailVerification: true, email: "ana@test.com" });
     const result = await registerUser({
       nombre: "Ana",
       email: "ana@test.com",
       password: "pass123",
     });
-    expect(result.user?.id).toBe(1);
+    expect(result.requiresEmailVerification).toBe(true);
+    expect(result.email).toBe("ana@test.com");
     expect(result.error).toBeUndefined();
   });
 

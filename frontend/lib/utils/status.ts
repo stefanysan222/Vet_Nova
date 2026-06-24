@@ -90,6 +90,40 @@ const STATUS_MAP: Record<string, StatusStyle> = {
     dot: "bg-purple-500",
     label: "Reprogramada",
   },
+
+  // Estados generales (clínicas, usuarios, etc.)
+  Activa: {
+    badge: "bg-success-100 text-success-700",
+    dot: "bg-success-600",
+    label: "Activa",
+  },
+  Activo: {
+    badge: "bg-success-100 text-success-700",
+    dot: "bg-success-600",
+    label: "Activo",
+  },
+  Inactiva: {
+    badge: "bg-surface-200 text-surface-600",
+    dot: "bg-surface-400",
+    label: "Inactiva",
+  },
+  Inactivo: {
+    badge: "bg-surface-200 text-surface-600",
+    dot: "bg-surface-400",
+    label: "Inactivo",
+  },
+
+  // Historial clínico
+  Vacuna: {
+    badge: "bg-surface-200 text-surface-600",
+    dot: "bg-surface-400",
+    label: "Vacuna",
+  },
+  Consulta: {
+    badge: "bg-surface-200 text-surface-600",
+    dot: "bg-surface-400",
+    label: "Consulta",
+  },
 };
 
 const FALLBACK: StatusStyle = {

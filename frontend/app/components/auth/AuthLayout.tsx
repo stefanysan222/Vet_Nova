@@ -110,24 +110,23 @@ export default function AuthLayout({ title, description, children }: AuthLayoutP
         >
           {/* Header */}
           <div className="flex items-center justify-between border-b border-slate-100 px-6 py-4 dark:border-slate-800">
-            <Link href="/" className="inline-flex items-center gap-2">
-              <div className="relative h-8 w-8 shrink-0">
+            <Link href="/" className="inline-flex items-center">
+              <div className="relative h-10 w-10 shrink-0">
                 <Image
-                  src="/logos/vetnova-logo-light.png"
+                  src="/logos/vetnova-wordmark-light.png"
                   alt="VetNova"
-                  width={32}
-                  height={32}
-                  className="block rounded-lg object-contain dark:hidden"
+                  fill
+                  sizes="40px"
+                  className="block object-contain dark:hidden"
                 />
                 <Image
-                  src="/logos/vetnova-logo-dark.png"
+                  src="/logos/vetnova-wordmark-dark.png"
                   alt="VetNova"
-                  width={32}
-                  height={32}
-                  className="hidden rounded-lg object-contain dark:block"
+                  fill
+                  sizes="40px"
+                  className="hidden object-contain dark:block"
                 />
               </div>
-              <span className="text-sm font-semibold text-slate-900 dark:text-white">VetNova</span>
             </Link>
             <div className="flex items-center gap-1.5 rounded-lg bg-brand-100 px-3 py-1.5 text-xs font-medium text-brand-600 dark:bg-brand-900/30 dark:text-brand-300">
               🐾 Clínica veterinaria

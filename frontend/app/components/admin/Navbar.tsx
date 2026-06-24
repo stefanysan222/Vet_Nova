@@ -17,16 +17,11 @@ import {
 } from "lucide-react";
 import { AnimatePresence, motion } from "framer-motion";
 import { useAuth } from "@/lib/auth-context";
+import { useClickOutside } from "@/lib/hooks/useClickOutside";
+import { useNotifications } from "@/lib/hooks/useNotifications";
 import { fetchUsuarios } from "../../../lib/api/usuarios";
 import { fetchMascotas } from "../../../lib/api/mascotas";
 import { fetchCitas } from "../../../lib/api/citas";
-import {
-  fetchNotificacionesCount,
-  fetchNotificaciones,
-  marcarLeida,
-  marcarTodasLeidas,
-  type NotificacionAPI,
-} from "../../../lib/api/notificaciones";
 
 type SearchResult = {
   id: string;
@@ -110,8 +105,6 @@ function timeAgo(dateStr: string): string {
 export default function Navbar() {
   const router = useRouter();
   const [notifOpen, setNotifOpen] = useState(false);
-  const [notifCount, setNotifCount] = useState(0);
-  const [notifItems, setNotifItems] = useState<NotificacionAPI[] | null>(null);
   const [darkMode, setDarkMode] = useState(() => {
     if (typeof window === "undefined") return false;
     const saved = localStorage.getItem("vetnova-theme");
@@ -124,48 +117,28 @@ export default function Navbar() {
   const [activeIdx, setActiveIdx] = useState(0);
   const searchRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
+  const notifRef = useRef<HTMLDivElement>(null);
   const { user } = useAuth();
+  const {
+    count: notifCount,
+    items: notifItems,
+    loadItems: loadNotifItems,
+    marcarLeida,
+    marcarTodasLeidas,
+  } = useNotifications({ enabled: !!user });
 
-  // Badge: contar no leídas al montar y cada 30s
-  useEffect(() => {
-    const load = () =>
-      fetchNotificacionesCount()
-        .then(setNotifCount)
-        .catch(() => {});
-    load();
-    const interval = setInterval(load, 30000);
-    return () => clearInterval(interval);
-  }, []);
-
-  // Cargar lista al abrir el dropdown (null = cargando)
+  // Cargar lista al abrir el dropdown
   useEffect(() => {
     if (!notifOpen) return;
-    // Limpiar la lista (estado "cargando") antes de refetch al abrir el dropdown
-    // eslint-disable-next-line react-hooks/set-state-in-effect
-    setNotifItems(null);
-    let cancelled = false;
-    fetchNotificaciones(true)
-      .then((data) => {
-        if (!cancelled) setNotifItems(data);
-      })
-      .catch(() => {
-        if (!cancelled) setNotifItems([]);
-      });
-    return () => {
-      cancelled = true;
-    };
-  }, [notifOpen]);
+    loadNotifItems();
+  }, [notifOpen, loadNotifItems]);
 
-  const handleMarcarLeida = async (id: number) => {
-    await marcarLeida(id).catch(() => {});
-    setNotifItems((prev) => prev?.filter((n) => n.id !== id) ?? prev);
-    setNotifCount((c) => Math.max(0, c - 1));
+  const handleMarcarLeida = (id: number) => {
+    marcarLeida(id);
   };
 
-  const handleMarcarTodas = async () => {
-    await marcarTodasLeidas().catch(() => {});
-    setNotifItems([]);
-    setNotifCount(0);
+  const handleMarcarTodas = () => {
+    marcarTodasLeidas();
   };
 
   // Tema — sincronizar DOM y escuchar cambios de sistema
@@ -193,15 +166,8 @@ export default function Navbar() {
   };
 
   // Cerrar al hacer clic fuera
-  useEffect(() => {
-    const handler = (e: MouseEvent) => {
-      if (searchRef.current && !searchRef.current.contains(e.target as Node)) {
-        setOpen(false);
-      }
-    };
-    document.addEventListener("mousedown", handler);
-    return () => document.removeEventListener("mousedown", handler);
-  }, []);
+  useClickOutside(searchRef, () => setOpen(false));
+  useClickOutside(notifRef, () => setNotifOpen(false));
 
   // Búsqueda con debounce
   const doSearch = useCallback(async (q: string) => {
@@ -437,7 +403,7 @@ export default function Navbar() {
           </button>
 
           {/* Notificaciones */}
-          <div className="relative">
+          <div className="relative" ref={notifRef}>
             <button
               onClick={() => setNotifOpen(!notifOpen)}
               className="relative flex h-9 w-9 items-center justify-center rounded-xl text-slate-500 transition hover:bg-slate-100 dark:text-slate-400 dark:hover:bg-slate-800"
@@ -492,7 +458,7 @@ export default function Navbar() {
                           Sin notificaciones nuevas.
                         </p>
                       ) : (
-                        (notifItems as NotificacionAPI[]).map((n) => (
+                        notifItems.map((n) => (
                           <div
                             key={n.id}
                             className="flex items-start gap-3 px-4 py-3 hover:bg-slate-50 dark:hover:bg-slate-800/50"

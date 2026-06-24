@@ -7,16 +7,8 @@ import { useEffect, useState } from "react";
 import { fetchMascotas } from "../../../../lib/api/mascotas";
 import { useAuth } from "@/lib/auth-context";
 import type { PetRecord } from "../../../../lib/recepcionista/types";
-import { ArrowLeft, Info, FileText, Eye, Download, Lock } from "lucide-react";
-
-type DocumentoClinicoAdjunto = {
-  id: string;
-  nombre: string;
-  tipo: string;
-  tamano: number;
-  fechaCarga: string;
-  dataUrl?: string;
-};
+import { ArrowLeft, Info, Lock } from "lucide-react";
+import ClinicalHistorySection from "../ClinicalHistorySection";
 
 export default function PerfilCompletoMascotaPage() {
   const params = useParams();
@@ -75,7 +67,6 @@ export default function PerfilCompletoMascotaPage() {
     );
   }
 
-  const documentosClinicos: DocumentoClinicoAdjunto[] = [];
   const tipoNormalizado = mascota.especie.toLowerCase().includes("perro")
     ? "perro"
     : mascota.especie.toLowerCase().includes("gato")
@@ -163,35 +154,7 @@ export default function PerfilCompletoMascotaPage() {
             </div>
           </section>
 
-          <section className="rounded-xl border border-surface-200 bg-white p-7 shadow-sm dark:border-surface-700 dark:bg-surface-900">
-            <div className="mb-6 flex items-center gap-3">
-              <FileText className="h-[22px] w-[22px] shrink-0 text-brand-600" />
-              <div>
-                <h2 className="text-section-title">Historial clínico</h2>
-                <p className="text-subtitle mt-1">Archivos adjuntados al registrar la mascota.</p>
-              </div>
-            </div>
-
-            {documentosClinicos.length > 0 ? (
-              <div className="space-y-4">
-                {documentosClinicos.map((documento) => (
-                  <DocumentoClinicoCard key={documento.id} documento={documento} />
-                ))}
-              </div>
-            ) : (
-              <div className="rounded-xl border border-dashed border-surface-200 bg-surface-50 px-6 py-10 text-center dark:border-surface-700 dark:bg-surface-950">
-                <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-full bg-brand-100 text-brand-600 dark:bg-brand-900/40 dark:text-brand-300">
-                  <FileText className="h-[22px] w-[22px]" />
-                </div>
-                <p className="mt-4 text-sm font-semibold text-surface-900 dark:text-white">
-                  Sin historial clínico adjunto
-                </p>
-                <p className="mt-2 text-sm text-surface-500 dark:text-surface-400">
-                  Esta mascota no tiene archivos clínicos registrados.
-                </p>
-              </div>
-            )}
-          </section>
+          <ClinicalHistorySection petId={parseInt(mascota.id, 10)} petName={mascota.nombre} />
 
           <div className="flex items-start gap-3 rounded-xl border border-surface-200 bg-surface-50 px-5 py-4 dark:border-surface-700 dark:bg-surface-900">
             <Lock className="mt-0.5 h-[19px] w-[19px] shrink-0 text-brand-600" />
@@ -203,57 +166,6 @@ export default function PerfilCompletoMascotaPage() {
         </main>
       </div>
     </div>
-  );
-}
-
-function DocumentoClinicoCard({ documento }: { documento: DocumentoClinicoAdjunto }) {
-  const archivoDisponible = Boolean(documento.dataUrl);
-  const esPdf =
-    documento.nombre.toLowerCase().endsWith(".pdf") || documento.tipo.toLowerCase().includes("pdf");
-
-  return (
-    <article className="flex flex-col justify-between gap-4 rounded-xl border border-surface-200 bg-surface-50 p-4 dark:border-surface-700 dark:bg-surface-950 sm:flex-row sm:items-center">
-      <div className="flex min-w-0 items-center gap-4">
-        <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-brand-100 text-brand-600 dark:bg-brand-900/40 dark:text-brand-300">
-          <FileText className="h-[22px] w-[22px]" />
-        </div>
-        <div className="min-w-0">
-          <p className="truncate text-sm font-semibold text-surface-900 dark:text-white">
-            {documento.nombre}
-          </p>
-          <p className="mt-1 text-xs text-surface-500 dark:text-surface-400">
-            {esPdf ? "Documento PDF" : "Archivo clínico"} · {formatearTamano(documento.tamano)}
-          </p>
-          <p className="mt-1 text-xs text-surface-500 dark:text-surface-400">
-            Cargado el {formatearFechaDocumento(documento.fechaCarga)}
-          </p>
-        </div>
-      </div>
-
-      {archivoDisponible ? (
-        <div className="flex shrink-0 flex-wrap gap-3">
-          <a
-            href={documento.dataUrl}
-            target="_blank"
-            rel="noreferrer"
-            className="inline-flex h-10 items-center gap-2 rounded-lg border border-surface-200 bg-white px-4 text-xs font-semibold text-surface-900 transition-colors hover:border-brand-400 hover:text-brand-600 dark:border-surface-700 dark:bg-surface-900 dark:text-white"
-          >
-            <Eye className="h-4 w-4" />
-            {esPdf ? "Ver PDF" : "Ver archivo"}
-          </a>
-          <a
-            href={documento.dataUrl}
-            download={documento.nombre}
-            className="inline-flex h-10 items-center gap-2 rounded-lg bg-brand-600 px-4 text-xs font-semibold text-white transition-colors hover:bg-brand-700"
-          >
-            <Download className="h-4 w-4" />
-            Descargar
-          </a>
-        </div>
-      ) : (
-        <p className="text-xs text-surface-500 dark:text-surface-400">Archivo no disponible</p>
-      )}
-    </article>
   );
 }
 
@@ -282,25 +194,9 @@ function formatearFecha(fecha?: string) {
   }).format(d);
 }
 
-function formatearFechaDocumento(fecha: string) {
-  const d = new Date(fecha);
-  if (isNaN(d.getTime())) return "fecha no disponible";
-  return new Intl.DateTimeFormat("es-CO", {
-    day: "numeric",
-    month: "short",
-    year: "numeric",
-  }).format(d);
-}
-
 function formatearPeso(peso?: string) {
   if (!peso?.trim()) return "No registrado";
   return peso.toLowerCase().includes("kg") ? peso : `${peso} kg`;
-}
-
-function formatearTamano(bytes: number) {
-  if (bytes < 1024) return `${bytes} B`;
-  if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(1)} KB`;
-  return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
 }
 
 function DogIcon() {

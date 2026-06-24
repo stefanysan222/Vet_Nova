@@ -3,7 +3,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
-import { useEffect, useState, type ReactNode } from "react";
+import { useEffect, useRef, useState, type ReactNode } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import {
   Home,
@@ -24,13 +24,8 @@ import BuscadorCliente from "./BuscadorCliente";
 import { logout } from "../../lib/auth";
 import { useAuth } from "@/lib/auth-context";
 import { useClienteProfile } from "./ClienteProfileContext";
-import {
-  fetchNotificaciones,
-  fetchNotificacionesCount,
-  marcarLeida,
-  marcarTodasLeidas,
-  type NotificacionAPI,
-} from "../../lib/api/notificaciones";
+import { useNotifications } from "@/lib/hooks/useNotifications";
+import { useClickOutside } from "@/lib/hooks/useClickOutside";
 
 function timeAgo(dateStr: string): string {
   const diff = Date.now() - new Date(dateStr).getTime();
@@ -47,9 +42,9 @@ export default function ClientLayoutShell({ children }: { children: ReactNode })
   const router = useRouter();
 
   const [showNotifications, setShowNotifications] = useState(false);
-  const [notifCount, setNotifCount] = useState(0);
-  const [notifItems, setNotifItems] = useState<NotificacionAPI[] | null>(null);
   const [showUserMenu, setShowUserMenu] = useState(false);
+  const notifRef = useRef<HTMLDivElement>(null);
+  const userMenuRef = useRef<HTMLDivElement>(null);
   const [darkMode, setDarkMode] = useState(() => {
     if (typeof window === "undefined") return false;
     return localStorage.getItem("vetnova-theme") === "dark";
@@ -57,6 +52,13 @@ export default function ClientLayoutShell({ children }: { children: ReactNode })
   const { perfil } = useClienteProfile();
   const { user, loading } = useAuth();
   const [mobileOpen, setMobileOpen] = useState(false);
+  const {
+    count: notifCount,
+    items: notifItems,
+    loadItems: loadNotifItems,
+    marcarLeida,
+    marcarTodasLeidas,
+  } = useNotifications({ enabled: !!user });
 
   useEffect(() => {
     if (loading) return;
@@ -85,46 +87,21 @@ export default function ClientLayoutShell({ children }: { children: ReactNode })
     setShowUserMenu(false);
   }, [pathname]);
 
-  // Badge: contar no leídas al montar y cada 30s
-  useEffect(() => {
-    if (!user) return;
-    const load = () =>
-      fetchNotificacionesCount()
-        .then(setNotifCount)
-        .catch(() => {});
-    load();
-    const interval = setInterval(load, 30000);
-    return () => clearInterval(interval);
-  }, [user]);
+  useClickOutside(notifRef, () => setShowNotifications(false));
+  useClickOutside(userMenuRef, () => setShowUserMenu(false));
 
   // Cargar lista al abrir el dropdown
   useEffect(() => {
     if (!showNotifications) return;
-    // eslint-disable-next-line react-hooks/set-state-in-effect
-    setNotifItems(null);
-    let cancelled = false;
-    fetchNotificaciones(true)
-      .then((data) => {
-        if (!cancelled) setNotifItems(data);
-      })
-      .catch(() => {
-        if (!cancelled) setNotifItems([]);
-      });
-    return () => {
-      cancelled = true;
-    };
-  }, [showNotifications]);
+    loadNotifItems();
+  }, [showNotifications, loadNotifItems]);
 
-  const handleMarcarLeida = async (id: number) => {
-    await marcarLeida(id).catch(() => {});
-    setNotifItems((prev) => prev?.filter((n) => n.id !== id) ?? prev);
-    setNotifCount((c) => Math.max(0, c - 1));
+  const handleMarcarLeida = (id: number) => {
+    marcarLeida(id);
   };
 
-  const handleMarcarTodas = async () => {
-    await marcarTodasLeidas().catch(() => {});
-    setNotifItems([]);
-    setNotifCount(0);
+  const handleMarcarTodas = () => {
+    marcarTodasLeidas();
   };
 
   function toggleDarkMode() {
@@ -143,21 +120,21 @@ export default function ClientLayoutShell({ children }: { children: ReactNode })
         {/* Sidebar */}
         <aside className="hidden h-screen w-[260px] shrink-0 border-r border-surface-200 bg-white dark:border-surface-800 dark:bg-surface-900 lg:flex lg:flex-col">
           <div className="flex h-[78px] items-center gap-3 border-b border-surface-200 px-5 dark:border-surface-800">
-            <Image
-              src={darkMode ? "/logos/vetnova-logo-dark.png" : "/logos/vetnova-logo-light.png"}
-              alt="VetNova Logo"
-              width={40}
-              height={40}
-              className="rounded-xl object-contain"
-            />
-
-            <div>
-              <h1 className="text-xl font-semibold leading-none text-surface-900 dark:text-white">
-                VetNova
-              </h1>
-
-              <p className="text-caption mt-1.5">Sistema Veterinario</p>
+            <div className="relative h-11 w-11 shrink-0">
+              <Image
+                src={
+                  darkMode
+                    ? "/logos/vetnova-wordmark-dark.png"
+                    : "/logos/vetnova-wordmark-light.png"
+                }
+                alt="VetNova"
+                fill
+                sizes="44px"
+                className="object-contain"
+              />
             </div>
+
+            <p className="text-caption">Sistema Veterinario</p>
           </div>
 
           <nav className="flex-1 px-4 py-4">
@@ -224,116 +201,118 @@ export default function ClientLayoutShell({ children }: { children: ReactNode })
 
             <div className="ml-5 flex items-center gap-4">
               {/* Botón notificaciones */}
-              <button
-                type="button"
-                onClick={() => {
-                  setShowNotifications(!showNotifications);
-                  setShowUserMenu(false);
-                }}
-                className="relative flex h-8 w-8 items-center justify-center rounded-lg text-surface-900 transition-colors hover:bg-surface-100 dark:text-white dark:hover:bg-surface-800"
-                aria-label="Abrir notificaciones"
-              >
-                <Bell className="h-[19px] w-[19px]" />
-                {notifCount > 0 && (
-                  <span className="absolute right-0.5 top-0.5 flex h-4 w-4 items-center justify-center rounded-full bg-danger-500 text-[9px] font-bold text-white ring-2 ring-white dark:ring-surface-900">
-                    {notifCount > 9 ? "9+" : notifCount}
-                  </span>
-                )}
-              </button>
+              <div ref={notifRef} className="relative">
+                <button
+                  type="button"
+                  onClick={() => {
+                    setShowNotifications(!showNotifications);
+                    setShowUserMenu(false);
+                  }}
+                  className="relative flex h-8 w-8 items-center justify-center rounded-lg text-surface-900 transition-colors hover:bg-surface-100 dark:text-white dark:hover:bg-surface-800"
+                  aria-label="Abrir notificaciones"
+                >
+                  <Bell className="h-[19px] w-[19px]" />
+                  {notifCount > 0 && (
+                    <span className="absolute right-0.5 top-0.5 flex h-4 w-4 items-center justify-center rounded-full bg-danger-500 text-[9px] font-bold text-white ring-2 ring-white dark:ring-surface-900">
+                      {notifCount > 9 ? "9+" : notifCount}
+                    </span>
+                  )}
+                </button>
 
-              {/* Ventana de notificaciones */}
-              {showNotifications && (
-                <div className="absolute right-[112px] top-[58px] z-50 w-[380px] overflow-hidden rounded-2xl border border-surface-200 bg-white shadow-modal dark:border-surface-700 dark:bg-surface-900">
-                  <div className="flex items-center justify-between border-b border-surface-200 px-5 py-4 dark:border-surface-700">
-                    <div>
-                      <h3 className="text-base font-semibold text-surface-900 dark:text-white">
-                        Notificaciones
-                      </h3>
-                      <p className="mt-1 text-xs text-surface-500 dark:text-surface-400">
-                        {notifItems && notifItems.length > 0
-                          ? `${notifItems.length} sin leer`
-                          : "No tienes notificaciones nuevas"}
-                      </p>
-                    </div>
-                    {notifItems && notifItems.length > 0 && (
-                      <button
-                        onClick={handleMarcarTodas}
-                        className="text-xs font-semibold text-brand-600 hover:text-brand-700 dark:text-brand-300"
-                      >
-                        Marcar todas leídas
-                      </button>
-                    )}
-                  </div>
-
-                  <div className="max-h-[290px] divide-y divide-surface-200 overflow-y-auto dark:divide-surface-700">
-                    {notifItems === null ? (
-                      <div className="space-y-2 p-3">
-                        {[1, 2, 3].map((i) => (
-                          <div
-                            key={i}
-                            className="h-12 animate-pulse rounded-xl bg-surface-100 dark:bg-surface-800"
-                          />
-                        ))}
+                {/* Ventana de notificaciones */}
+                {showNotifications && (
+                  <div className="absolute right-0 top-[48px] z-50 w-[380px] overflow-hidden rounded-2xl border border-surface-200 bg-white shadow-modal dark:border-surface-700 dark:bg-surface-900">
+                    <div className="flex items-center justify-between border-b border-surface-200 px-5 py-4 dark:border-surface-700">
+                      <div>
+                        <h3 className="text-base font-semibold text-surface-900 dark:text-white">
+                          Notificaciones
+                        </h3>
+                        <p className="mt-1 text-xs text-surface-500 dark:text-surface-400">
+                          {notifItems && notifItems.length > 0
+                            ? `${notifItems.length} sin leer`
+                            : "No tienes notificaciones nuevas"}
+                        </p>
                       </div>
-                    ) : notifItems.length === 0 ? (
-                      <p className="px-5 py-6 text-center text-sm text-surface-500 dark:text-surface-400">
-                        No tienes notificaciones nuevas.
-                      </p>
-                    ) : (
-                      notifItems.map((item) => (
-                        <div
-                          key={item.id}
-                          className="flex gap-3 px-5 py-4 transition-colors hover:bg-surface-50 dark:hover:bg-surface-800"
+                      {notifItems && notifItems.length > 0 && (
+                        <button
+                          onClick={handleMarcarTodas}
+                          className="text-xs font-semibold text-brand-600 hover:text-brand-700 dark:text-brand-300"
                         >
-                          <div className="mt-1 flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-brand-100 text-brand-600 dark:bg-brand-900/40 dark:text-brand-300">
-                            <Bell className="h-[18px] w-[18px]" />
-                          </div>
+                          Marcar todas leídas
+                        </button>
+                      )}
+                    </div>
 
-                          <div className="min-w-0 flex-1">
-                            <div className="flex items-center gap-2">
-                              <h4 className="text-sm font-semibold text-surface-900 dark:text-white">
-                                {item.titulo}
-                              </h4>
-                              <span className="h-2 w-2 rounded-full bg-danger-500" />
+                    <div className="max-h-[290px] divide-y divide-surface-200 overflow-y-auto dark:divide-surface-700">
+                      {notifItems === null ? (
+                        <div className="space-y-2 p-3">
+                          {[1, 2, 3].map((i) => (
+                            <div
+                              key={i}
+                              className="h-12 animate-pulse rounded-xl bg-surface-100 dark:bg-surface-800"
+                            />
+                          ))}
+                        </div>
+                      ) : notifItems.length === 0 ? (
+                        <p className="px-5 py-6 text-center text-sm text-surface-500 dark:text-surface-400">
+                          No tienes notificaciones nuevas.
+                        </p>
+                      ) : (
+                        notifItems.map((item) => (
+                          <div
+                            key={item.id}
+                            className="flex gap-3 px-5 py-4 transition-colors hover:bg-surface-50 dark:hover:bg-surface-800"
+                          >
+                            <div className="mt-1 flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-brand-100 text-brand-600 dark:bg-brand-900/40 dark:text-brand-300">
+                              <Bell className="h-[18px] w-[18px]" />
                             </div>
 
-                            <p className="mt-1 text-xs leading-5 text-surface-500 dark:text-surface-400">
-                              {item.mensaje}
-                            </p>
+                            <div className="min-w-0 flex-1">
+                              <div className="flex items-center gap-2">
+                                <h4 className="text-sm font-semibold text-surface-900 dark:text-white">
+                                  {item.titulo}
+                                </h4>
+                                <span className="h-2 w-2 rounded-full bg-danger-500" />
+                              </div>
 
-                            <p className="text-caption mt-2">{timeAgo(item.creadaEn)}</p>
+                              <p className="mt-1 text-xs leading-5 text-surface-500 dark:text-surface-400">
+                                {item.mensaje}
+                              </p>
+
+                              <p className="text-caption mt-2">{timeAgo(item.creadaEn)}</p>
+                            </div>
+
+                            <button
+                              type="button"
+                              onClick={() => handleMarcarLeida(item.id)}
+                              className="mt-0.5 shrink-0 self-start rounded-lg p-1 text-surface-400 hover:bg-surface-100 hover:text-surface-600 dark:hover:bg-surface-700"
+                              title="Marcar como leída"
+                              aria-label="Marcar como leída"
+                            >
+                              <Check className="h-3.5 w-3.5" />
+                            </button>
                           </div>
+                        ))
+                      )}
+                    </div>
 
-                          <button
-                            type="button"
-                            onClick={() => handleMarcarLeida(item.id)}
-                            className="mt-0.5 shrink-0 self-start rounded-lg p-1 text-surface-400 hover:bg-surface-100 hover:text-surface-600 dark:hover:bg-surface-700"
-                            title="Marcar como leída"
-                            aria-label="Marcar como leída"
-                          >
-                            <Check className="h-3.5 w-3.5" />
-                          </button>
-                        </div>
-                      ))
-                    )}
+                    <div className="border-t border-surface-200 p-4 dark:border-surface-700">
+                      <Link
+                        href="/cliente/notificaciones"
+                        onClick={() => setShowNotifications(false)}
+                        className="flex h-[40px] w-full items-center justify-center rounded-xl bg-brand-600 text-sm font-semibold text-white transition-colors hover:bg-brand-700"
+                      >
+                        Ver más
+                      </Link>
+                    </div>
                   </div>
-
-                  <div className="border-t border-surface-200 p-4 dark:border-surface-700">
-                    <Link
-                      href="/cliente/notificaciones"
-                      onClick={() => setShowNotifications(false)}
-                      className="flex h-[40px] w-full items-center justify-center rounded-xl bg-brand-600 text-sm font-semibold text-white transition-colors hover:bg-brand-700"
-                    >
-                      Ver más
-                    </Link>
-                  </div>
-                </div>
-              )}
+                )}
+              </div>
 
               <div className="h-8 w-px bg-surface-200 dark:bg-surface-700" />
 
               {/* Perfil del cliente */}
-              <div className="relative">
+              <div ref={userMenuRef} className="relative">
                 <button
                   type="button"
                   onClick={() => {
@@ -477,17 +456,18 @@ export default function ClientLayoutShell({ children }: { children: ReactNode })
             onClick={(e) => e.stopPropagation()}
           >
             <div className="flex h-[64px] items-center justify-between border-b border-surface-200 px-5 dark:border-surface-800">
-              <div className="flex items-center gap-3">
+              <div className="relative h-9 w-9 shrink-0">
                 <Image
-                  src={darkMode ? "/logos/vetnova-logo-dark.png" : "/logos/vetnova-logo-light.png"}
+                  src={
+                    darkMode
+                      ? "/logos/vetnova-wordmark-dark.png"
+                      : "/logos/vetnova-wordmark-light.png"
+                  }
                   alt="VetNova"
-                  width={32}
-                  height={32}
-                  className="rounded-xl object-contain"
+                  fill
+                  sizes="36px"
+                  className="object-contain"
                 />
-                <span className="text-lg font-semibold text-surface-900 dark:text-white">
-                  VetNova
-                </span>
               </div>
               <button
                 onClick={() => setMobileOpen(false)}

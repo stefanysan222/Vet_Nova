@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import Image from "next/image";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import {
@@ -17,6 +18,7 @@ import {
 import { motion, AnimatePresence } from "framer-motion";
 import { logout } from "../../../lib/auth";
 import { useAuth } from "@/lib/auth-context";
+import { useIsDarkMode } from "@/lib/hooks/useDarkMode";
 
 const menuItems = [
   { label: "Dashboard", icon: Home, href: "/admin" },
@@ -59,6 +61,7 @@ export default function Sidebar() {
   const pathname = usePathname();
   const router = useRouter();
   const { user } = useAuth();
+  const darkMode = useIsDarkMode();
 
   const handleLogout = async () => {
     await logout();
@@ -69,27 +72,24 @@ export default function Sidebar() {
     <>
       {/* Sidebar desktop */}
       <aside className="hidden lg:flex lg:h-screen lg:w-[260px] lg:flex-col lg:border-r lg:border-slate-200/70 lg:bg-white lg:px-4 lg:py-6 dark:lg:border-slate-800 dark:lg:bg-slate-950">
-        {/* Perfil del usuario */}
-        <div className="mb-6 rounded-xl border border-slate-200/80 bg-slate-50 px-3 py-3 dark:border-slate-700 dark:bg-slate-900">
-          <div className="flex items-center gap-3">
-            <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-brand-600 text-xs font-bold text-white">
-              {user?.name
-                ? user.name
-                    .split(" ")
-                    .map((p) => p[0])
-                    .slice(0, 2)
-                    .join("")
-                    .toUpperCase()
-                : "A"}
-            </div>
-            <div className="min-w-0">
-              <p className="truncate text-sm font-semibold text-slate-900 dark:text-white">
-                {user?.name ?? "Administrador"}
-              </p>
-              <p className="truncate text-xs text-slate-500 dark:text-slate-400">
-                {user?.clinicaNombre ?? "Administrador"}
-              </p>
-            </div>
+        {/* Logo */}
+        <div className="mb-6 flex items-center gap-3 px-1">
+          <div className="relative h-11 w-11 shrink-0">
+            <Image
+              src={
+                darkMode ? "/logos/vetnova-wordmark-dark.png" : "/logos/vetnova-wordmark-light.png"
+              }
+              alt="VetNova"
+              fill
+              sizes="44px"
+              className="object-contain"
+            />
+          </div>
+          <div className="min-w-0">
+            <p className="truncate text-sm font-semibold text-slate-900 dark:text-white">
+              {user?.clinicaNombre ?? "Panel administrativo"}
+            </p>
+            <p className="truncate text-xs text-slate-500 dark:text-slate-400">Administrador</p>
           </div>
         </div>
 
@@ -147,38 +147,37 @@ export default function Sidebar() {
               onClick={(e) => e.stopPropagation()}
             >
               {/* Cerrar mobile */}
-              <div className="mb-6 flex items-center justify-end">
-                <button
-                  type="button"
-                  onClick={() => setMobileOpen(false)}
-                  className="rounded-lg p-1.5 text-slate-500 transition hover:bg-slate-100 dark:hover:bg-slate-800"
-                >
-                  ×
-                </button>
-              </div>
-
-              {/* Perfil mobile */}
-              <div className="mb-5 rounded-xl border border-slate-200 bg-slate-50 px-3 py-3 dark:border-slate-700 dark:bg-slate-900">
+              <div className="mb-5 flex items-center justify-between">
                 <div className="flex items-center gap-3">
-                  <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-brand-600 text-xs font-bold text-white">
-                    {user?.name
-                      ? user.name
-                          .split(" ")
-                          .map((p) => p[0])
-                          .slice(0, 2)
-                          .join("")
-                          .toUpperCase()
-                      : "A"}
+                  <div className="relative h-9 w-9 shrink-0">
+                    <Image
+                      src={
+                        darkMode
+                          ? "/logos/vetnova-wordmark-dark.png"
+                          : "/logos/vetnova-wordmark-light.png"
+                      }
+                      alt="VetNova"
+                      fill
+                      sizes="36px"
+                      className="object-contain"
+                    />
                   </div>
-                  <div>
-                    <p className="text-sm font-semibold text-slate-900 dark:text-white">
-                      {user?.name ?? "Administrador"}
+                  <div className="min-w-0">
+                    <p className="truncate text-sm font-semibold text-slate-900 dark:text-white">
+                      {user?.clinicaNombre ?? "Panel administrativo"}
                     </p>
-                    <p className="truncate text-xs text-slate-500">
-                      {user?.clinicaNombre ?? "Administrador"}
+                    <p className="truncate text-xs text-slate-500 dark:text-slate-400">
+                      Administrador
                     </p>
                   </div>
                 </div>
+                <button
+                  type="button"
+                  onClick={() => setMobileOpen(false)}
+                  className="cursor-pointer rounded-lg p-1.5 text-slate-500 transition hover:bg-slate-100 dark:hover:bg-slate-800"
+                >
+                  ×
+                </button>
               </div>
 
               <NavLinks pathname={pathname} onItemClick={() => setMobileOpen(false)} />
