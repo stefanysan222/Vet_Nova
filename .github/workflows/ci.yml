@@ -172,6 +172,7 @@ jobs:
           build-args: |
             NEXT_PUBLIC_API_URL=https://api.vetnova.online
             NEXT_PUBLIC_GOOGLE_CLIENT_ID=590317538413-snk0stt6ikta5dqdcm4jnndor178gmnj.apps.googleusercontent.com
+            NEXT_PUBLIC_GOOGLE_MAPS_API_KEY=${{ secrets.GOOGLE_MAPS_API_KEY }}
           tags: |
             ghcr.io/stefanysan222/vetnova-frontend:latest
             ghcr.io/stefanysan222/vetnova-frontend:sha-${{ github.sha }}
