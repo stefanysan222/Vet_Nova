@@ -52,13 +52,17 @@ function buildCsp(nonce: string): string {
   return [
     "default-src 'self'",
     scriptSrc,
-    "style-src 'self' 'unsafe-inline' https://accounts.google.com",
-    "img-src 'self' data: blob: https://res.cloudinary.com https://lh3.googleusercontent.com",
+    // fonts.googleapis.com: hoja de estilos que el propio Google Maps JS API
+    // inyecta para su UI (controles, info windows) — no es nuestro CSS.
+    "style-src 'self' 'unsafe-inline' https://accounts.google.com https://fonts.googleapis.com",
+    "img-src 'self' data: blob: https://res.cloudinary.com https://lh3.googleusercontent.com https://maps.gstatic.com https://maps.googleapis.com",
     // El WebSocket de notificaciones en tiempo real (HP-02) se conecta directo
     // al backend con ws(s)://, no http(s)://, así que ambos esquemas deben
     // estar permitidos o la conexión queda bloqueada silenciosamente.
-    `connect-src 'self' ${API_URL} ${API_URL.replace(/^http/, "ws")} https://accounts.google.com https://api.cloudinary.com`,
-    "font-src 'self'",
+    // maps.googleapis.com: tiles/telemetría del mapa interactivo (Google Maps JS API).
+    `connect-src 'self' ${API_URL} ${API_URL.replace(/^http/, "ws")} https://accounts.google.com https://api.cloudinary.com https://maps.googleapis.com`,
+    // fonts.gstatic.com: archivos de fuente que sirve la hoja de estilos de arriba.
+    "font-src 'self' https://fonts.gstatic.com",
     "frame-src https://accounts.google.com https://maps.google.com https://www.google.com",
     "object-src 'none'",
     "base-uri 'self'",

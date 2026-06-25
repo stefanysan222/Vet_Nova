@@ -2,9 +2,11 @@
 
 import { useJsApiLoader, GoogleMap, Marker } from "@react-google-maps/api";
 import { MapPin } from "lucide-react";
-
-const GOOGLE_MAPS_API_KEY = process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY;
-const LIBRARIES: "places"[] = ["places"];
+import {
+  GOOGLE_MAPS_API_KEY,
+  GOOGLE_MAPS_SCRIPT_ID,
+  GOOGLE_MAPS_LIBRARIES,
+} from "./google-maps-loader";
 
 const containerStyle = {
   width: "100%",
@@ -33,9 +35,9 @@ function PlaceholderBox({ message, className }: { message: string; className?: s
 
 export default function MapPreview({ lat, lng, className }: MapPreviewProps) {
   const { isLoaded, loadError } = useJsApiLoader({
-    id: "vetnova-google-maps-script",
+    id: GOOGLE_MAPS_SCRIPT_ID,
     googleMapsApiKey: GOOGLE_MAPS_API_KEY || "",
-    libraries: LIBRARIES,
+    libraries: GOOGLE_MAPS_LIBRARIES,
   });
 
   if (!GOOGLE_MAPS_API_KEY) {

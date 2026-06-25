@@ -12,6 +12,7 @@ import {
   fetchClinicasActivas,
   type ClinicaActiva,
 } from "../../../lib/api/clinicas";
+import { haversineDistanceKm } from "../../../lib/utils/geo";
 import { useAuth } from "@/lib/auth-context";
 import { useToast } from "../ui/Toast";
 
@@ -89,15 +90,7 @@ export default function RegisterForm({ clinicaSlug }: { clinicaSlug?: string }) 
 
   const distanceToClinica = (clinica: ClinicaActiva): number | null => {
     if (!userLocation || clinica.latitud == null || clinica.longitud == null) return null;
-    const R = 6371;
-    const dLat = ((clinica.latitud - userLocation.lat) * Math.PI) / 180;
-    const dLng = ((clinica.longitud - userLocation.lng) * Math.PI) / 180;
-    const a =
-      Math.sin(dLat / 2) ** 2 +
-      Math.cos((userLocation.lat * Math.PI) / 180) *
-        Math.cos((clinica.latitud * Math.PI) / 180) *
-        Math.sin(dLng / 2) ** 2;
-    return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+    return haversineDistanceKm(userLocation, { lat: clinica.latitud, lng: clinica.longitud });
   };
 
   const sortedClinicas = useMemo(() => {

@@ -24,7 +24,9 @@ const securityHeaders = [
   },
   {
     key: "Permissions-Policy",
-    value: "camera=(), microphone=(), geolocation=()",
+    // geolocation=(self): la vista de "clínicas cercanas" del cliente la
+    // necesita para ubicar al usuario y ordenar las clínicas por distancia.
+    value: "camera=(), microphone=(), geolocation=(self)",
   },
 ];
 

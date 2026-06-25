@@ -18,6 +18,7 @@ import {
   Sun,
   Menu,
   X,
+  MapPin,
 } from "lucide-react";
 import AvatarCliente from "./AvatarCliente";
 import BuscadorCliente from "./BuscadorCliente";
@@ -160,6 +161,14 @@ export default function ClientLayoutShell({ children }: { children: ReactNode })
               icon={<PawPrint className="h-5 w-5" />}
             >
               Mascotas
+            </SidebarItem>
+
+            <SidebarItem
+              href="/cliente/clinicas"
+              active={pathname.startsWith("/cliente/clinicas")}
+              icon={<MapPin className="h-5 w-5" />}
+            >
+              Clínicas cercanas
             </SidebarItem>
 
             <SidebarItem
@@ -500,6 +509,14 @@ export default function ClientLayoutShell({ children }: { children: ReactNode })
                 onClick={() => setMobileOpen(false)}
               >
                 Mascotas
+              </SidebarItem>
+              <SidebarItem
+                href="/cliente/clinicas"
+                active={pathname.startsWith("/cliente/clinicas")}
+                icon={<MapPin className="h-5 w-5" />}
+                onClick={() => setMobileOpen(false)}
+              >
+                Clínicas cercanas
               </SidebarItem>
               <SidebarItem
                 href="/cliente/configuracion"
