@@ -1,23 +1,29 @@
 "use client";
 
-import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
-import { MapPin, Navigation, Settings } from "lucide-react";
+import { MapPin, Navigation, ArrowRightLeft, CheckCircle2 } from "lucide-react";
 import { fetchClinicasActivas, type ClinicaActiva } from "../../../lib/api/clinicas";
 import { useAuth } from "@/lib/auth-context";
+import { cambiarClinica } from "@/lib/auth";
 import { haversineDistanceKm, type LatLng } from "../../../lib/utils/geo";
 import ClinicsMap, { type ClinicMarker } from "../../components/maps/ClinicsMap";
+import ConfirmDialog from "../../components/ui/ConfirmDialog";
 
 function formatDistancia(km: number): string {
   return km < 1 ? `${Math.round(km * 1000)} m` : `${km.toFixed(1)} km`;
 }
 
 export default function ClinicasCercanasPage() {
-  const { user } = useAuth();
+  const { user, refresh } = useAuth();
   const [clinicas, setClinicas] = useState<ClinicaActiva[]>([]);
   const [cargando, setCargando] = useState(true);
   const [userLocation, setUserLocation] = useState<LatLng | null>(null);
   const [locationStatus, setLocationStatus] = useState<"loading" | "ok" | "denied">("loading");
+
+  const [clinicaSeleccionada, setClinicaSeleccionada] = useState<ClinicaActiva | null>(null);
+  const [cambiandoClinica, setCambiandoClinica] = useState(false);
+  const [mensajeClinica, setMensajeClinica] = useState("");
+  const [errorClinica, setErrorClinica] = useState("");
 
   useEffect(() => {
     fetchClinicasActivas()
@@ -63,6 +69,23 @@ export default function ClinicasCercanasPage() {
     distanciaKm: c.distanciaKm,
   }));
 
+  const confirmarCambioClinica = async () => {
+    if (!clinicaSeleccionada) return;
+    setCambiandoClinica(true);
+    setErrorClinica("");
+    try {
+      await cambiarClinica(clinicaSeleccionada.slug);
+      await refresh();
+      setMensajeClinica(`Tu cuenta ahora pertenece a ${clinicaSeleccionada.nombre}.`);
+      setClinicaSeleccionada(null);
+    } catch (err) {
+      setErrorClinica(err instanceof Error ? err.message : "No se pudo cambiar de veterinaria.");
+      setClinicaSeleccionada(null);
+    } finally {
+      setCambiandoClinica(false);
+    }
+  };
+
   return (
     <div className="h-full overflow-y-auto bg-surface-50 px-6 py-8 dark:bg-surface-950">
       <div className="mb-8">
@@ -77,6 +100,19 @@ export default function ClinicasCercanasPage() {
           <Navigation className="h-4 w-4 shrink-0" />
           No pudimos acceder a tu ubicación. Activa los permisos de ubicación en tu navegador para
           ver las distancias y ordenar las clínicas por cercanía.
+        </div>
+      )}
+
+      {mensajeClinica && (
+        <div className="mb-6 flex items-center gap-3 rounded-xl border border-success-200 bg-success-50 px-4 py-3 text-sm text-success-700 dark:border-success-800 dark:bg-success-900/30 dark:text-success-400">
+          <CheckCircle2 className="h-4 w-4 shrink-0" />
+          {mensajeClinica}
+        </div>
+      )}
+
+      {errorClinica && (
+        <div className="mb-6 flex items-center gap-3 rounded-xl border border-danger-200 bg-danger-50 px-4 py-3 text-sm text-danger-700 dark:border-danger-800 dark:bg-danger-900/30 dark:text-danger-400">
+          {errorClinica}
         </div>
       )}
 
@@ -125,19 +161,34 @@ export default function ClinicasCercanasPage() {
                     Esta es tu clínica actual
                   </p>
                 ) : (
-                  <Link
-                    href="/cliente/configuracion"
+                  <button
+                    type="button"
+                    onClick={() => setClinicaSeleccionada(clinica)}
                     className="mt-3 inline-flex items-center gap-1.5 text-xs font-semibold text-brand-600 hover:text-brand-700 dark:text-brand-300"
                   >
-                    <Settings className="h-3.5 w-3.5" />
+                    <ArrowRightLeft className="h-3.5 w-3.5" />
                     Migrar mi cuenta aquí
-                  </Link>
+                  </button>
                 )}
               </div>
             ))
           )}
         </div>
       </div>
+
+      <ConfirmDialog
+        open={clinicaSeleccionada != null}
+        title="Cambiar de veterinaria"
+        description={
+          clinicaSeleccionada
+            ? `Tu cuenta y tus mascotas pasarán a estar registradas en ${clinicaSeleccionada.nombre}. Podrás volver a migrar cuando quieras.`
+            : undefined
+        }
+        confirmLabel={cambiandoClinica ? "Migrando..." : "Confirmar cambio"}
+        variant="warning"
+        onConfirm={confirmarCambioClinica}
+        onCancel={() => setClinicaSeleccionada(null)}
+      />
     </div>
   );
 }
