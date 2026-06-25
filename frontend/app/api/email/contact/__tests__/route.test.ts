@@ -1,15 +1,16 @@
 import { vi, describe, it, expect, beforeEach } from "vitest";
 
 const mockRateLimit = vi.fn();
-const mockSendMail = vi.fn();
-const mockCreateTransport = vi.fn((..._args: unknown[]) => ({ sendMail: mockSendMail }));
+const mockSend = vi.fn();
 
 vi.mock("@/lib/rate-limit", () => ({
   rateLimit: (...args: unknown[]) => mockRateLimit(...args),
 }));
 
-vi.mock("nodemailer", () => ({
-  createTransport: (...args: unknown[]) => mockCreateTransport(...args),
+vi.mock("resend", () => ({
+  Resend: class {
+    emails = { send: (...args: unknown[]) => mockSend(...args) };
+  },
 }));
 
 function buildRequest(body: unknown) {
@@ -30,32 +31,28 @@ const CAMPOS_VALIDOS = {
 beforeEach(() => {
   vi.clearAllMocks();
   vi.unstubAllEnvs();
-  vi.stubEnv("GMAIL_USER", "suportvetnova@gmail.com");
-  vi.stubEnv("GMAIL_APP_PASSWORD", "app-password");
+  vi.stubEnv("RESEND_API_KEY", "re_test_key");
+  vi.stubEnv("SUPPORT_INBOX", "suportvetnova@gmail.com");
   mockRateLimit.mockResolvedValue(true);
-  mockSendMail.mockResolvedValue({});
+  mockSend.mockResolvedValue({ data: { id: "test-id" }, error: null });
 });
 
 describe("POST /api/email/contact", () => {
-  it("envía el mensaje vía Nodemailer/Gmail (no EmailJS) y responde ok", async () => {
+  it("envía el mensaje vía Resend y responde ok", async () => {
     const { POST } = await import("../route");
     const res = await POST(buildRequest(CAMPOS_VALIDOS));
     const json = await res.json();
 
     expect(res.status).toBe(200);
     expect(json).toEqual({ ok: true });
-    expect(mockCreateTransport).toHaveBeenCalledWith({
-      service: "gmail",
-      auth: { user: "suportvetnova@gmail.com", pass: "app-password" },
-    });
-    expect(mockSendMail).toHaveBeenCalledTimes(2);
+    expect(mockSend).toHaveBeenCalledTimes(2);
   });
 
   it("envía una copia al equipo de soporte y un acuse de recibo al remitente", async () => {
     const { POST } = await import("../route");
     await POST(buildRequest(CAMPOS_VALIDOS));
 
-    const [supportMail, ackMail] = mockSendMail.mock.calls.map(([arg]) => arg);
+    const [supportMail, ackMail] = mockSend.mock.calls.map(([arg]) => arg);
     expect(supportMail.to).toBe("suportvetnova@gmail.com");
     expect(supportMail.replyTo).toBe(CAMPOS_VALIDOS.email);
     expect(ackMail.to).toBe(CAMPOS_VALIDOS.email);
@@ -68,7 +65,7 @@ describe("POST /api/email/contact", () => {
 
     expect(res.status).toBe(400);
     expect(json.error).toBe("Todos los campos son requeridos.");
-    expect(mockSendMail).not.toHaveBeenCalled();
+    expect(mockSend).not.toHaveBeenCalled();
   });
 
   it("responde 429 cuando se excede el límite de solicitudes", async () => {
@@ -79,13 +76,12 @@ describe("POST /api/email/contact", () => {
 
     expect(res.status).toBe(429);
     expect(json.error).toBe("Demasiadas solicitudes. Intenta en un minuto.");
-    expect(mockSendMail).not.toHaveBeenCalled();
+    expect(mockSend).not.toHaveBeenCalled();
   });
 
-  it("responde 500 si faltan las credenciales de Gmail", async () => {
+  it("responde 500 si falta la API key de Resend", async () => {
     vi.unstubAllEnvs();
-    vi.stubEnv("GMAIL_USER", "");
-    vi.stubEnv("GMAIL_APP_PASSWORD", "");
+    vi.stubEnv("RESEND_API_KEY", "");
     const { POST } = await import("../route");
     const res = await POST(buildRequest(CAMPOS_VALIDOS));
     const json = await res.json();
@@ -94,8 +90,18 @@ describe("POST /api/email/contact", () => {
     expect(json.error).toBe("Configuración de email incompleta.");
   });
 
-  it("responde 502 si Nodemailer falla al enviar", async () => {
-    mockSendMail.mockRejectedValue(new Error("SMTP error"));
+  it("responde 502 si Resend falla al enviar", async () => {
+    mockSend.mockRejectedValue(new Error("Resend error"));
+    const { POST } = await import("../route");
+    const res = await POST(buildRequest(CAMPOS_VALIDOS));
+    const json = await res.json();
+
+    expect(res.status).toBe(502);
+    expect(json.error).toBe("Error al enviar el mensaje.");
+  });
+
+  it("responde 502 si Resend devuelve un error en el payload", async () => {
+    mockSend.mockResolvedValue({ data: null, error: { message: "domain not verified" } });
     const { POST } = await import("../route");
     const res = await POST(buildRequest(CAMPOS_VALIDOS));
     const json = await res.json();
@@ -114,7 +120,7 @@ describe("POST /api/email/contact", () => {
       }),
     );
 
-    const [supportMail] = mockSendMail.mock.calls.map(([arg]) => arg);
+    const [supportMail] = mockSend.mock.calls.map(([arg]) => arg);
     expect(supportMail.html).not.toContain("<script>");
     expect(supportMail.html).toContain("&lt;script&gt;");
     expect(supportMail.html).not.toContain("<img src=x");

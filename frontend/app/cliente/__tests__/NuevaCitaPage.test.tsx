@@ -4,6 +4,16 @@ import type { PetRecord, Appointment } from "../../../lib/recepcionista/types";
 import type { UsuarioAPI } from "../../../lib/api/usuarios";
 import NuevaCitaPage from "../agendar/nueva/page";
 
+// El input type="date" espera la fecha en horario local — usar
+// toISOString() aquí desfasa el día cuando la hora local actual,
+// convertida a UTC, cruza la medianoche (p. ej. en UTC-5 desde las 7pm).
+function toLocalDateStr(date: Date): string {
+  const y = date.getFullYear();
+  const m = String(date.getMonth() + 1).padStart(2, "0");
+  const d = String(date.getDate()).padStart(2, "0");
+  return `${y}-${m}-${d}`;
+}
+
 const mockPush = vi.fn();
 const mockUseAuth = vi.fn();
 const mockFetchMascotas = vi.fn();
@@ -139,7 +149,7 @@ describe("NuevaCitaPage — paso 3: fecha, hora y envío", () => {
     const daysUntilSunday = (7 - today.getDay()) % 7 || 7;
     const sunday = new Date(today);
     sunday.setDate(today.getDate() + daysUntilSunday);
-    const sundayStr = sunday.toISOString().slice(0, 10);
+    const sundayStr = toLocalDateStr(sunday);
 
     const dateInput = document.querySelector('input[type="date"]') as HTMLInputElement;
     fireEvent.change(dateInput, { target: { value: sundayStr } });
@@ -162,7 +172,7 @@ describe("NuevaCitaPage — paso 3: fecha, hora y envío", () => {
     const offset = weekday === 6 ? 2 : weekday === 0 ? 1 : 1;
     const nextDay = new Date(today);
     nextDay.setDate(today.getDate() + offset);
-    const dateStr = nextDay.toISOString().slice(0, 10);
+    const dateStr = toLocalDateStr(nextDay);
 
     const dateInput = document.querySelector('input[type="date"]') as HTMLInputElement;
     fireEvent.change(dateInput, { target: { value: dateStr } });
@@ -204,7 +214,7 @@ describe("NuevaCitaPage — paso 3: fecha, hora y envío", () => {
     const offset = weekday === 6 ? 2 : weekday === 0 ? 1 : 1;
     const nextDay = new Date(today);
     nextDay.setDate(today.getDate() + offset);
-    const dateStr = nextDay.toISOString().slice(0, 10);
+    const dateStr = toLocalDateStr(nextDay);
     const dateInput = document.querySelector('input[type="date"]') as HTMLInputElement;
     fireEvent.change(dateInput, { target: { value: dateStr } });
 

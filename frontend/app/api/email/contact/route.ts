@@ -1,8 +1,35 @@
 import { NextResponse } from "next/server";
-import * as nodemailer from "nodemailer";
+import { Resend } from "resend";
 import { rateLimit } from "@/lib/rate-limit";
+import { API_URL } from "@/lib/config";
 
 export const maxDuration = 30;
+
+const FROM_ADDRESS = "VetNova <notificaciones@vetnova.online>";
+
+async function notificarSuperAdmin(datos: {
+  nombre: string;
+  email: string;
+  asunto: string;
+  mensaje: string;
+}): Promise<void> {
+  try {
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 8_000);
+    const res = await fetch(`${API_URL}/notificaciones/contacto`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(datos),
+      signal: controller.signal,
+    });
+    clearTimeout(timeoutId);
+    if (!res.ok) {
+      console.error("No se pudo crear la notificación interna:", res.status);
+    }
+  } catch (err) {
+    console.error("Error al notificar al super admin:", err);
+  }
+}
 
 function escapeHtml(value: string): string {
   return value
@@ -24,10 +51,10 @@ export async function POST(req: Request) {
     );
   }
 
-  const user = process.env.GMAIL_USER;
-  const pass = process.env.GMAIL_APP_PASSWORD;
+  const apiKey = process.env.RESEND_API_KEY;
+  const supportInbox = process.env.SUPPORT_INBOX ?? "suportvetnova@gmail.com";
 
-  if (!user || !pass) {
+  if (!apiKey) {
     return NextResponse.json({ error: "Configuración de email incompleta." }, { status: 500 });
   }
 
@@ -38,24 +65,27 @@ export async function POST(req: Request) {
     return NextResponse.json({ error: "Todos los campos son requeridos." }, { status: 400 });
   }
 
-  const transporter = nodemailer.createTransport({
-    service: "gmail",
-    auth: { user, pass },
-    connectionTimeout: 10_000,
-    greetingTimeout: 10_000,
-    socketTimeout: 15_000,
-  });
+  const resend = new Resend(apiKey);
 
   const nombreSeguro = escapeHtml(nombre.trim());
   const emailSeguro = escapeHtml(email.trim());
   const asuntoSeguro = escapeHtml(asunto.trim());
   const mensajeSeguro = escapeHtml(mensaje.trim()).replace(/\n/g, "<br/>");
 
+  // Mejor esfuerzo: si el backend no responde, no debe tumbar el envío del email.
+  const notificacionInterna = notificarSuperAdmin({
+    nombre: nombre.trim(),
+    email: email.trim(),
+    asunto: asunto.trim(),
+    mensaje: mensaje.trim(),
+  });
+
   try {
-    await Promise.all([
-      transporter.sendMail({
-        from: `"VetNova" <${user}>`,
-        to: user,
+    const [, supportResult, ackResult] = await Promise.all([
+      notificacionInterna,
+      resend.emails.send({
+        from: FROM_ADDRESS,
+        to: supportInbox,
         replyTo: email.trim(),
         subject: `[Contacto] ${asunto.trim()}`,
         html: `
@@ -66,8 +96,8 @@ export async function POST(req: Request) {
           <p>${mensajeSeguro}</p>
         `,
       }),
-      transporter.sendMail({
-        from: `"VetNova" <${user}>`,
+      resend.emails.send({
+        from: FROM_ADDRESS,
         to: email.trim(),
         subject: "Hemos recibido tu mensaje — VetNova",
         html: `
@@ -77,8 +107,13 @@ export async function POST(req: Request) {
         `,
       }),
     ]);
+
+    if (supportResult.error || ackResult.error) {
+      console.error("Resend error:", supportResult.error ?? ackResult.error);
+      return NextResponse.json({ error: "Error al enviar el mensaje." }, { status: 502 });
+    }
   } catch (err) {
-    console.error("Nodemailer error:", err);
+    console.error("Resend error:", err);
     return NextResponse.json({ error: "Error al enviar el mensaje." }, { status: 502 });
   }
 
